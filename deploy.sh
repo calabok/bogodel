@@ -8,7 +8,7 @@ SRC=$(pwd)
 REPO="${REPO:-/workspace/bogodel-repo}"
 MSG="${1:-обновление}"
 BUILD="$(date +%Y%m%d-%H%M%S)"
-./build.sh local index.html >/dev/null                     # локальная копия для тестов
+./build.sh local index.html >/dev/null; cp -r site/icons . ; cp site/manifest.webmanifest .   # локальная копия для тестов
 mkdir -p "$REPO/docs/icons" "$REPO/src" "$REPO/tests" "$REPO/tools"
 ./build.sh "$BUILD" "$REPO/docs/index.html"
 sed "s/__BUILD__/$BUILD/g" site/sw.js.tpl > "$REPO/docs/sw.js"   # новая версия SW → обновление у игроков
@@ -26,5 +26,5 @@ if [ "${NOPUSH:-0}" = "1" ]; then echo "Собрано: $BUILD (без пуша)
 cd "$REPO"
 git add -A
 git commit -q -m "Деплой $BUILD: $MSG" || { echo "Нет изменений"; exit 0; }
-git push -q origin main
+timeout 120 git push -q origin main
 echo "Опубликовано: $BUILD → https://calabok.github.io/bogodel/"
