@@ -33,9 +33,11 @@ function diary(text, cls, fx) {
 function toast(msg) {
   if (SILENT || typeof document === 'undefined') return;
   if (/вер/i.test(msg)) { const fm = $('faithMeter'); if (fm) { fm.classList.remove('flash'); void fm.offsetWidth; fm.classList.add('flash'); } }
-  const box = $('toasts'); while (box.children.length >= 4) box.firstChild.remove();
+  const box = $('toasts'), lim = innerWidth <= 760 ? 2 : 4;
+  for (const c of Array.from(box.children)) if (c.textContent === msg) c.remove();
+  while (box.children.length >= lim) box.firstChild.remove();
   const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
-  box.appendChild(el); setTimeout(() => el.remove(), 4200);
+  box.appendChild(el); setTimeout(() => el.remove(), innerWidth <= 760 ? 3200 : 4200);
 }
 function addFaith(v) { S.god.faith = clamp(S.god.faith + v, 0, maxFaith()); }
 function addTrust(v) { if (v > 0) v *= (hasFeat('devout') ? 1.5 : 1) * (S.hero.cls === 'cleric' ? 1.2 : 1); S.hero.trust = clamp(Math.round((S.hero.trust + v) * 10) / 10, 0, 100); }
@@ -62,6 +64,7 @@ function statValOf(h, s) {
   let v = h.st[s];
   for (const it of equipped(h)) for (const p of it.props) if (p.k === s) v += p.v || 1;
   if (s === 'cha' && equipped(h).some(it => it.curse && it.curse.k === 'chatty')) v -= 1;
+  if (h.inj) for (const j of h.inj) if (j.s === s && INJURIES[j.k]) v -= INJURIES[j.k].pen;
   return clamp(v, 1, 30);
 }
 const statVal = s => statValOf(S.hero, s);
@@ -400,8 +403,9 @@ function restStep() {
   const h = S.hero; h.restT--;
   if (h.restKind === 'camp' && R() < .15) { diary('Ночью к лагерю подкрался кто-то голодный. Отдых отменяется!', 'fight'); h.restT = 0; h.state = 'road'; startFight(); return; }
   if (h.restT > 0) { if (R() < .5) diary(pick(['Сплю. Снится, что я король. Король тоже спит.', 'Храплю так, что разбудил соседа. Он вызвал меня на дуэль. Сплю дальше.', 'Ворочаюсь. Под матрасом горошина. Я что, принцесса?'])); return; }
+  const cured = healInjuries(h.restKind === 'temple' ? 'temple' : 'rest');
   const a = healHero(h.maxHp); h.shortRests = 2;
-  diary('Выспался! Как заново родился, только без мучений.', 'level', `+${a} HP (долгий отдых)`);
+  diary('Выспался! Как заново родился, только без мучений.', 'level', `+${a} HP (долгий отдых)${cured ? `, травм вылечено: ${cured}` : ''}`);
   h.state = h.restKind === 'camp' ? 'road' : 'town';
 }
 
@@ -460,7 +464,7 @@ function preach() {
 }
 function heroStep() {
   const h = S.hero;
-  if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon') return;
+  if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon' || S.fight) return;
   if (eqHas('regen') && h.hp < h.maxHp) healHero(h.maxHp * .02);
   if (h.state === 'fight') return fightStep();
   if (h.state === 'rest') return restStep();
@@ -482,9 +486,8 @@ function heroStep() {
 
 /* ---------- Силы бога вне дуэли ---------- */
 function usePower(id) {
-  if (S.duel && S.duel.phase === 'fight') return duelAct(id);
-  if (S.dun && S.dun.phase === 'room') return dunAct(id);
-  if (S.duel || S.hero.state === 'duel' || S.dun || S.hero.state === 'dungeon') return toast('Герой занят: силы можно применять, когда идёт раунд или комната.');
+  if (S.fight && S.fight.phase === 'turn') return fightPower(id);
+  if (S.fight || S.hero.state === 'duel' || S.hero.state === 'dungeon' || duelPending || dunPending) return toast(S.dun && !S.fight ? 'В пещере силы помогают только в бою. Ведите отряд к врагам!' : 'Подождите начала хода — тогда силы сработают в бою.');
   const h = S.hero, p = POWERS[id], L = S.god.skills[id] || 0, mu = pmult(id);
   if (!L) return toast('Эта сила ещё не изучена.');
   if (h.state === 'dead') return toast('Герой мёртв. Сначала воскресите его.');
@@ -492,7 +495,7 @@ function usePower(id) {
   S.god.faith -= c; shiftAlign(p.al); addGxp(c / 2);
   const m = h.monster, lv = h.lvl;
   switch (id) {
-    case 'heal': { const a = healHero(h.maxHp * .3 * mu); addTrust(2); diary('Почувствовал тёплый свет с небес. Раны затянулись. Спасибо, о {god}!', 'god', `+${a} HP, +2 доверия`); break; }
+    case 'heal': { const a = healHero(h.maxHp * .3 * mu); addTrust(2); const cu = h.inj.length ? healInjuries('one') : 0; diary('Почувствовал тёплый свет с небес. Раны затянулись. Спасибо, о {god}!', 'god', `+${a} HP, +2 доверия${cu ? ', травма исцелена' : ''}`); break; }
     case 'bless': S.buffs.luck += 300 * mu; addTrust(1); diary('На меня снизошло благословение! Чувствую, что сегодня всё получится.', 'god', '🍀 удача на ' + Math.round(5 * mu) + ' мин'); break;
     case 'shield': S.buffs.shield += 300 * mu; diary('Вокруг меня засиял божий щит. Комары в ярости.', 'god', '🛡 щит на ' + Math.round(5 * mu) + ' мин'); break;
     case 'bolt':
@@ -551,7 +554,7 @@ function voice(text) {
 
 /* ---------- Развилки ---------- */
 function startFork(idx) {
-  if (S.fork || S.duel || S.dun || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
+  if (S.fork || S.fight || S.dun || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
   let i = idx;
   if (i === undefined) { const free = FORKS.map((_, k) => k).filter(k => !S.forkHist.includes(k)); i = pick(free.length ? free : FORKS.map((_, k) => k)); }
   S.forkHist.push(i); if (S.forkHist.length > 10) S.forkHist.shift();

@@ -9,7 +9,7 @@ const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalon
 let swReg = null, waitingSW = null, installEvt = null, updating = false, updFallback = null;
 const PWA = { get waiting() { return !!waitingSW; }, get build() { return APP_BUILD; }, get reg() { return swReg; }, get installable() { return !!installEvt; }, updateShown: false };
 function showUpdateBar() { PWA.updateShown = true; const b = $('updBar'); if (b) b.classList.add('on'); }
-function calmMoment() { return !S || (!S.fork && !S.duel && !S.dun && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
+function calmMoment() { return !S || (!S.fork && !S.fight && !S.dun && !(S.arena && S.arena.apps.some(a => a.joined !== null)) && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
 function applyUpdate() {
   if (S) save();
   if (waitingSW) { updating = true; waitingSW.postMessage({ type: 'SKIP_WAITING' }); setTimeout(() => location.reload(), 3000); }
@@ -93,7 +93,6 @@ function doImport() {
   if (S && !confirm(`Заменить текущий мир на сохранение «${ns.god.name}» (герой ${ns.hero.name}, ур. ${ns.hero.lvl})?`)) return;
   try { if (S) localStorage.setItem(SAVE_KEY + '_before_import', JSON.stringify(S)); } catch (e) { }
   S = ns; duelPending = false; dunPending = false;
-  if (S.dun && S.dun.room) S.dun.room.planned = S.dun.room.plan.length > 0;
   offlineCatchUp();
   if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev);
   diary('📥 Мир перенесён в новое место. Герой огляделся, почесал затылок и пошёл дальше.', 'god');
@@ -107,4 +106,3 @@ Object.assign(ACT, {
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([exportText()], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('💾 Файл ' + name + ' скачан.'); }
 });
 /* Импорт доступен и без существующего мира (с экрана создания) */
-window.GAME.PWA = PWA; window.GAME.parseSave = parseSave; window.GAME.checkUpdate = checkUpdate; window.GAME.APP_BUILD = APP_BUILD;

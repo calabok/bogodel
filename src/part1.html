@@ -202,6 +202,94 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
 .restbox{background:#e6eef8;border-radius:10px;padding:8px;margin:8px 0;font-size:13px}
 #modal select{width:100%;padding:8px;border-radius:9px;border:1px solid #c8ad74;margin:4px 0 4px;font:inherit;background:#fffaf0}
 .desc{font-size:12px;color:var(--ink2);margin-bottom:10px;min-height:16px}
+/* ===== v4: бой по зонам ===== */
+.card.zf{border:2px solid var(--red);background:linear-gradient(180deg,#fff4ec,#f5dccb)}
+.zf h2{color:#8c2e20;border-color:#e2a48f;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.zf h2 .muted{font-size:13px;font-weight:400}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.team{background:#ffffff8c;border-radius:10px;padding:5px 6px;min-width:0}
+.team h4{margin:0 0 3px;font-size:12px;color:#6b5233;text-transform:uppercase;letter-spacing:.04em}
+.fr{display:block;width:100%;text-align:left;border:1px solid transparent;background:none;border-radius:8px;padding:3px 5px;margin:1px 0;font:inherit;font-size:12.5px;color:inherit;cursor:default}
+.fr .nm{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}.fr .nm b{overflow:hidden;text-overflow:ellipsis}
+.fr .bar{height:6px;margin-top:2px}
+.fr.dead{opacity:.45;text-decoration:line-through}
+.fr.me b{color:#244f8a}
+.fr.tg{cursor:pointer}.fr.tg:hover{border-color:#e2a48f}
+.fr.sel{border-color:var(--red);background:#ffe1d6;box-shadow:inset 3px 0 0 var(--red)}
+.fr .tl{font-size:11px;color:#8c2e20;font-weight:700}
+.zpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.body{display:flex;flex-direction:column;align-items:center;gap:3px;background:#ffffff70;border-radius:12px;padding:6px 4px}
+.body h4{margin:0 0 2px;font-size:13px}
+.body.atk h4{color:#8c2e20}.body.blk h4{color:#244f8a}
+.zb{border:2px solid #c8ad74;background:#fffaf0;color:#3a2a18;font:inherit;font-size:13px;font-weight:600;min-height:40px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 4px;transition:background .12s}
+.zb.head{width:52%;border-radius:50% 50% 42% 42%;min-height:46px}
+.zb.chest{width:92%;border-radius:16px 16px 6px 6px}
+.zb.belly{width:76%;border-radius:6px}
+.zb.waist{width:70%;border-radius:6px 6px 10px 10px}
+.zb.legs{width:62%;border-radius:6px 6px 14px 14px;min-height:48px}
+.body.atk .zb.on{background:#e0573f;border-color:#8c2e20;color:#fff}
+.body.blk .zb.on{background:#4d82c0;border-color:#244f8a;color:#fff}
+.zb.tele{box-shadow:0 0 0 3px #f2b705}
+.zb:disabled{opacity:.6;cursor:default}
+.fctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fctl .go{flex:1 1 140px;font-size:16px;padding:10px}
+.telewarn{background:#fff1b8;border:1px solid #e0b100;border-radius:8px;padding:5px 8px;font-size:13px;margin:6px 0;color:#6a4b00}
+.flog{max-height:190px;overflow:auto;font-size:13px;background:#fff8;border-radius:8px;padding:6px 8px;margin-top:8px}
+.flog div{padding:2px 0;border-bottom:1px dotted #e0bfae}
+.flog .foe{color:#8c2e20}.flog .me{color:#244f8a}.flog .sys{color:#555;font-weight:600}.flog .crit{color:#a0002a;font-weight:700}.flog .god{color:#5e2f86;font-style:italic}.flog .warn{color:#8a5a00;font-weight:700}.flog .dead{color:#5a3b12;font-weight:700}.flog .heal{color:#2f6b20}.flog .turn{color:#6b5233;font-size:11.5px;text-align:center;border:none}
+.fend{font-size:15px;margin:8px 0}
+/* арена */
+.apps{display:flex;flex-direction:column;gap:6px}
+.app{border:1px solid #c8ad74;border-radius:10px;padding:6px 8px;background:#fff8e8;font-size:13px}
+.app.mine{border-color:var(--red);background:#ffece4}
+.app .at{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.app .tm{font-size:12px;color:#6b5233}
+.app .sides{display:grid;grid-template-columns:1fr auto 1fr;gap:4px;align-items:start;margin:4px 0;font-size:12px}
+.app .sides .vsx{font-size:13px}
+.app .btns{margin-top:4px}
+#arenaDot:not(:empty),.chatPill i{display:inline-block;min-width:16px;padding:0 4px;margin-left:3px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-style:normal;line-height:16px}
+.tabs button{position:relative}
+/* пещера-карта */
+.card.dmap{border:2px solid #6b4a1f;background:linear-gradient(180deg,#f3e7cf,#e3cfa6)}
+.dmap h2{color:#5a3b12}
+.dgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:330px;margin:6px auto;background:#2b2118;padding:5px;border-radius:12px}
+.dc{aspect-ratio:1;border-radius:8px;border:none;background:#1a140e;font-size:20px;display:flex;align-items:center;justify-content:center;color:#f6ecd4;padding:0;min-height:40px;touch-action:manipulation}
+.dc.room{background:#5d4a33}.dc.done{background:#3e3224;color:#b9a483}
+.dc.fog{background:#2f261c;color:#7c6a52}
+.dc.adj{outline:2px solid #e8c063;cursor:pointer;background:#7a6040}
+.dc.adj:hover{background:#94744a}
+.dc.cur{background:#c9962b;outline:3px solid #fff3c4}
+.dc.lock{outline-color:#b8412f}
+.party2{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
+.party2 .pm{flex:1 1 120px;background:#ffffff80;border-radius:8px;padding:4px 6px;font-size:12px}
+.party2 .pm.me{outline:2px solid var(--blue)}
+.party2 .pm.down{opacity:.5}
+.party2 .bar{height:5px;margin-top:2px}
+.dleg{font-size:11.5px;color:#6b5233;text-align:center}
+/* чат */
+#chatDock{position:fixed;left:12px;bottom:12px;z-index:40;font-size:13.5px}
+.chatPill{background:#2a1f45;color:#f3e6c4;border:2px solid var(--gold);border-radius:20px;padding:7px 12px;font:inherit;font-weight:600;box-shadow:var(--shadow);cursor:pointer}
+#chatDock.closed .chatPanel{display:none}
+#chatDock.open .chatPill{display:none}
+.chatPanel{width:330px;height:380px;max-height:60vh;display:flex;flex-direction:column;background:var(--parch);border:2px solid var(--gold);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.chatHead{display:flex;align-items:center;gap:8px;padding:6px 8px;background:#2a1f45;color:#f3e6c4}.chatHead b{flex:1}.chatHead .muted{color:#cbb98f;font-size:12px}
+.chatLog{flex:1;overflow:auto;padding:6px 8px;display:flex;flex-direction:column;gap:3px}
+.cm{line-height:1.35;word-wrap:break-word}.cm .tm{color:#9a8462;font-size:11px;margin-right:4px}.cm b{color:#5a3b12}
+.cm.me b{color:#244f8a}.cm.sys{color:#0f5d55;font-size:12.5px;font-style:italic}
+.chatIn{display:flex;gap:5px;padding:6px;border-top:1px solid #d8c08e}
+.chatIn input{flex:1;min-width:0;padding:7px 9px;border-radius:9px;border:1px solid #c8ad74;background:#fffaf0;font:inherit}
+.injrow{font-size:12.5px;color:#8c2e20;background:#ffe9e2;border-radius:8px;padding:4px 7px;margin:4px 0}
+@media (max-width:760px){
+  #chatDock{left:8px;bottom:8px}
+  #chatDock.open{left:0;right:0;bottom:0}
+  .chatPanel{width:auto;height:55vh;max-height:none;border-radius:14px 14px 0 0;border-bottom:none}
+  #toasts{bottom:60px}
+  main{padding-bottom:64px}
+  .toast{font-size:13px;padding:7px 10px}
+  .zb{min-height:44px;font-size:13.5px}
+  .zb.head{min-height:48px}
+}
+@media (max-width:360px){.teams{grid-template-columns:1fr}.zpick{gap:6px}.zb{font-size:12.5px}}
 @media (max-width:360px){.stgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:360px){.logoTxt{display:none}.meter.gxpM>span{font-size:10px}}
 @media (max-width:430px){.hrow2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}.hrow2 .faithM{grid-column:1/-1}.meter.hpM{height:22px}.meter.hpM>span{font-size:12px;padding:0 4px}.meter.hpM>span small{display:none}.meter.gxpM{height:22px}.meter.gxpM>span{font-size:11px;padding:0 4px}}
@@ -248,8 +336,8 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
   <section id="colCenter">
     <div id="featBox"></div>
     <div id="forkBox"></div>
+    <div id="fightBox"></div>
     <div id="dunBox"></div>
-    <div id="duelBox"></div>
     <div id="eventBox"></div>
     <div class="card">
       <h2>📜 Дневник героя</h2>
@@ -264,10 +352,14 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
     </div>
   </section>
   <section id="colRight" class="card">
-    <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="gods">⚔ Пантеон</button></div>
+    <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="arena">🤺 Арена<i id="arenaDot"></i></button><button data-act="tab" data-arg="gods">⚜ Пантеон</button></div>
     <div id="rightBody"></div>
   </section>
 </main>
 <div id="modal"></div>
 <div id="toasts"></div>
+<div id="chatDock" class="closed"><button class="chatPill" data-act="chatToggle" id="chatPill">💬 Чат</button>
+  <div class="chatPanel"><div class="chatHead"><b>💬 Общий чат</b><span class="muted" id="chatOnline"></span><button class="btn small" data-act="chatToggle" title="Свернуть">✕</button></div>
+  <div class="chatLog" id="chatLog"></div>
+  <div class="chatIn"><input id="chatIn" maxlength="120" placeholder="Скажите что-нибудь богам…" autocomplete="off"><button class="btn small" data-act="chatSend">➤</button></div></div></div>
 <div id="updBar"><span>✨ Доступно обновление</span><button class="btn small" data-act="applyUpdate">Обновить</button></div>

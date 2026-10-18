@@ -202,6 +202,94 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
 .restbox{background:#e6eef8;border-radius:10px;padding:8px;margin:8px 0;font-size:13px}
 #modal select{width:100%;padding:8px;border-radius:9px;border:1px solid #c8ad74;margin:4px 0 4px;font:inherit;background:#fffaf0}
 .desc{font-size:12px;color:var(--ink2);margin-bottom:10px;min-height:16px}
+/* ===== v4: бой по зонам ===== */
+.card.zf{border:2px solid var(--red);background:linear-gradient(180deg,#fff4ec,#f5dccb)}
+.zf h2{color:#8c2e20;border-color:#e2a48f;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.zf h2 .muted{font-size:13px;font-weight:400}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
+.team{background:#ffffff8c;border-radius:10px;padding:5px 6px;min-width:0}
+.team h4{margin:0 0 3px;font-size:12px;color:#6b5233;text-transform:uppercase;letter-spacing:.04em}
+.fr{display:block;width:100%;text-align:left;border:1px solid transparent;background:none;border-radius:8px;padding:3px 5px;margin:1px 0;font:inherit;font-size:12.5px;color:inherit;cursor:default}
+.fr .nm{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}.fr .nm b{overflow:hidden;text-overflow:ellipsis}
+.fr .bar{height:6px;margin-top:2px}
+.fr.dead{opacity:.45;text-decoration:line-through}
+.fr.me b{color:#244f8a}
+.fr.tg{cursor:pointer}.fr.tg:hover{border-color:#e2a48f}
+.fr.sel{border-color:var(--red);background:#ffe1d6;box-shadow:inset 3px 0 0 var(--red)}
+.fr .tl{font-size:11px;color:#8c2e20;font-weight:700}
+.zpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.body{display:flex;flex-direction:column;align-items:center;gap:3px;background:#ffffff70;border-radius:12px;padding:6px 4px}
+.body h4{margin:0 0 2px;font-size:13px}
+.body.atk h4{color:#8c2e20}.body.blk h4{color:#244f8a}
+.zb{border:2px solid #c8ad74;background:#fffaf0;color:#3a2a18;font:inherit;font-size:13px;font-weight:600;min-height:40px;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 4px;transition:background .12s}
+.zb.head{width:52%;border-radius:50% 50% 42% 42%;min-height:46px}
+.zb.chest{width:92%;border-radius:16px 16px 6px 6px}
+.zb.belly{width:76%;border-radius:6px}
+.zb.waist{width:70%;border-radius:6px 6px 10px 10px}
+.zb.legs{width:62%;border-radius:6px 6px 14px 14px;min-height:48px}
+.body.atk .zb.on{background:#e0573f;border-color:#8c2e20;color:#fff}
+.body.blk .zb.on{background:#4d82c0;border-color:#244f8a;color:#fff}
+.zb.tele{box-shadow:0 0 0 3px #f2b705}
+.zb:disabled{opacity:.6;cursor:default}
+.fctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fctl .go{flex:1 1 140px;font-size:16px;padding:10px}
+.telewarn{background:#fff1b8;border:1px solid #e0b100;border-radius:8px;padding:5px 8px;font-size:13px;margin:6px 0;color:#6a4b00}
+.flog{max-height:190px;overflow:auto;font-size:13px;background:#fff8;border-radius:8px;padding:6px 8px;margin-top:8px}
+.flog div{padding:2px 0;border-bottom:1px dotted #e0bfae}
+.flog .foe{color:#8c2e20}.flog .me{color:#244f8a}.flog .sys{color:#555;font-weight:600}.flog .crit{color:#a0002a;font-weight:700}.flog .god{color:#5e2f86;font-style:italic}.flog .warn{color:#8a5a00;font-weight:700}.flog .dead{color:#5a3b12;font-weight:700}.flog .heal{color:#2f6b20}.flog .turn{color:#6b5233;font-size:11.5px;text-align:center;border:none}
+.fend{font-size:15px;margin:8px 0}
+/* арена */
+.apps{display:flex;flex-direction:column;gap:6px}
+.app{border:1px solid #c8ad74;border-radius:10px;padding:6px 8px;background:#fff8e8;font-size:13px}
+.app.mine{border-color:var(--red);background:#ffece4}
+.app .at{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.app .tm{font-size:12px;color:#6b5233}
+.app .sides{display:grid;grid-template-columns:1fr auto 1fr;gap:4px;align-items:start;margin:4px 0;font-size:12px}
+.app .sides .vsx{font-size:13px}
+.app .btns{margin-top:4px}
+#arenaDot:not(:empty),.chatPill i{display:inline-block;min-width:16px;padding:0 4px;margin-left:3px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-style:normal;line-height:16px}
+.tabs button{position:relative}
+/* пещера-карта */
+.card.dmap{border:2px solid #6b4a1f;background:linear-gradient(180deg,#f3e7cf,#e3cfa6)}
+.dmap h2{color:#5a3b12}
+.dgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-width:330px;margin:6px auto;background:#2b2118;padding:5px;border-radius:12px}
+.dc{aspect-ratio:1;border-radius:8px;border:none;background:#1a140e;font-size:20px;display:flex;align-items:center;justify-content:center;color:#f6ecd4;padding:0;min-height:40px;touch-action:manipulation}
+.dc.room{background:#5d4a33}.dc.done{background:#3e3224;color:#b9a483}
+.dc.fog{background:#2f261c;color:#7c6a52}
+.dc.adj{outline:2px solid #e8c063;cursor:pointer;background:#7a6040}
+.dc.adj:hover{background:#94744a}
+.dc.cur{background:#c9962b;outline:3px solid #fff3c4}
+.dc.lock{outline-color:#b8412f}
+.party2{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
+.party2 .pm{flex:1 1 120px;background:#ffffff80;border-radius:8px;padding:4px 6px;font-size:12px}
+.party2 .pm.me{outline:2px solid var(--blue)}
+.party2 .pm.down{opacity:.5}
+.party2 .bar{height:5px;margin-top:2px}
+.dleg{font-size:11.5px;color:#6b5233;text-align:center}
+/* чат */
+#chatDock{position:fixed;left:12px;bottom:12px;z-index:40;font-size:13.5px}
+.chatPill{background:#2a1f45;color:#f3e6c4;border:2px solid var(--gold);border-radius:20px;padding:7px 12px;font:inherit;font-weight:600;box-shadow:var(--shadow);cursor:pointer}
+#chatDock.closed .chatPanel{display:none}
+#chatDock.open .chatPill{display:none}
+.chatPanel{width:330px;height:380px;max-height:60vh;display:flex;flex-direction:column;background:var(--parch);border:2px solid var(--gold);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.chatHead{display:flex;align-items:center;gap:8px;padding:6px 8px;background:#2a1f45;color:#f3e6c4}.chatHead b{flex:1}.chatHead .muted{color:#cbb98f;font-size:12px}
+.chatLog{flex:1;overflow:auto;padding:6px 8px;display:flex;flex-direction:column;gap:3px}
+.cm{line-height:1.35;word-wrap:break-word}.cm .tm{color:#9a8462;font-size:11px;margin-right:4px}.cm b{color:#5a3b12}
+.cm.me b{color:#244f8a}.cm.sys{color:#0f5d55;font-size:12.5px;font-style:italic}
+.chatIn{display:flex;gap:5px;padding:6px;border-top:1px solid #d8c08e}
+.chatIn input{flex:1;min-width:0;padding:7px 9px;border-radius:9px;border:1px solid #c8ad74;background:#fffaf0;font:inherit}
+.injrow{font-size:12.5px;color:#8c2e20;background:#ffe9e2;border-radius:8px;padding:4px 7px;margin:4px 0}
+@media (max-width:760px){
+  #chatDock{left:8px;bottom:8px}
+  #chatDock.open{left:0;right:0;bottom:0}
+  .chatPanel{width:auto;height:55vh;max-height:none;border-radius:14px 14px 0 0;border-bottom:none}
+  #toasts{bottom:60px}
+  main{padding-bottom:64px}
+  .toast{font-size:13px;padding:7px 10px}
+  .zb{min-height:44px;font-size:13.5px}
+  .zb.head{min-height:48px}
+}
+@media (max-width:360px){.teams{grid-template-columns:1fr}.zpick{gap:6px}.zb{font-size:12.5px}}
 @media (max-width:360px){.stgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:360px){.logoTxt{display:none}.meter.gxpM>span{font-size:10px}}
 @media (max-width:430px){.hrow2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}.hrow2 .faithM{grid-column:1/-1}.meter.hpM{height:22px}.meter.hpM>span{font-size:12px;padding:0 4px}.meter.hpM>span small{display:none}.meter.gxpM{height:22px}.meter.gxpM>span{font-size:11px;padding:0 4px}}
@@ -248,8 +336,8 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
   <section id="colCenter">
     <div id="featBox"></div>
     <div id="forkBox"></div>
+    <div id="fightBox"></div>
     <div id="dunBox"></div>
-    <div id="duelBox"></div>
     <div id="eventBox"></div>
     <div class="card">
       <h2>📜 Дневник героя</h2>
@@ -264,12 +352,16 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
     </div>
   </section>
   <section id="colRight" class="card">
-    <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="gods">⚔ Пантеон</button></div>
+    <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="arena">🤺 Арена<i id="arenaDot"></i></button><button data-act="tab" data-arg="gods">⚜ Пантеон</button></div>
     <div id="rightBody"></div>
   </section>
 </main>
 <div id="modal"></div>
 <div id="toasts"></div>
+<div id="chatDock" class="closed"><button class="chatPill" data-act="chatToggle" id="chatPill">💬 Чат</button>
+  <div class="chatPanel"><div class="chatHead"><b>💬 Общий чат</b><span class="muted" id="chatOnline"></span><button class="btn small" data-act="chatToggle" title="Свернуть">✕</button></div>
+  <div class="chatLog" id="chatLog"></div>
+  <div class="chatIn"><input id="chatIn" maxlength="120" placeholder="Скажите что-нибудь богам…" autocomplete="off"><button class="btn small" data-act="chatSend">➤</button></div></div></div>
 <div id="updBar"><span>✨ Доступно обновление</span><button class="btn small" data-act="applyUpdate">Обновить</button></div>
 <script>
 'use strict';
@@ -608,6 +700,61 @@ const DUN_ROOMS = {
 const DUN_POW = { heal: { heal: .3 }, rain: { heal: .15, bonus: 1 }, bless: { bonus: 4 }, shield: { shield: 1 }, bolt: { bonus: 4 }, curse: { bonus: 3 }, quake: { bonus: 7 }, luck: { bonus: 3 }, beast: { bonus: 5 } };
 
 /* =====================================================================
+   1в) ДАННЫЕ v4: бой по зонам, арена, пещеры, чат
+   ===================================================================== */
+const ZONES = ['head', 'chest', 'belly', 'waist', 'legs'];
+const ZONE_RU = { head: 'голова', chest: 'грудь', belly: 'живот', waist: 'пояс', legs: 'ноги' };
+const ZONE_ACC = { head: 'по голове', chest: 'в грудь', belly: 'в живот', waist: 'по поясу', legs: 'по ногам' };
+const ZONE_GEN = { head: 'голову', chest: 'грудь', belly: 'живот', waist: 'пояс', legs: 'ноги' };
+const ZONE_MUL = { head: 1.25, chest: 1, belly: 1.05, waist: .95, legs: .85 };
+const ZONE_ARM = { head: .4, chest: 1, belly: .9, waist: .7, legs: .5 };
+/* Стиль боя класса: число атак и блоков (как в «Бойцовском клубе»: щит = 3 блока, два клинка = 2 удара) */
+const STYLE = {
+  warrior: { atk: 1, blk: 3, n: 'меч и щит', h: 'head' }, cleric: { atk: 1, blk: 3, n: 'булава и щит', h: 'chest' },
+  rogue: { atk: 2, blk: 1, n: 'два кинжала', h: 'belly' }, ranger: { atk: 1, blk: 2, n: 'лук и нож', h: 'chest', aimed: 1 },
+  mage: { atk: 1, blk: 2, n: 'посох', h: 'head' }, bard: { atk: 1, blk: 2, n: 'лютня-дубинка', h: 'legs' },
+  barbarian: { atk: 1, blk: 2, n: 'двуручный топор', h: 'head', heavy: 1 }
+};
+const MONSTER_STYLE = { atk: 1, blk: 1, n: 'когти и зубы', h: 'chest' };
+const F_ADV = ['неожиданно', 'украдкой', 'с размаху', 'не глядя', 'по-богатырски', 'исподтишка', 'мощно', 'от души', 'лениво', 'вдохновенно', 'случайно', 'со злости', 'хитро', 'с разворота', 'зажмурившись'];
+const F_VERB = ['стукнул', 'врезал', 'треснул', 'приложил', 'ткнул', 'огрел', 'заехал', 'пнул', 'боднул', 'шлёпнул', 'двинул'];
+const F_BLOCK = ['{d} закрылся — {a} бьёт {z} прямо в блок.', '{a} целился {z}, но {d} был начеку.', '{a} бьёт {z}, а там блок. {d} хихикает.', '{d} прикрылся щитом из собственной гордости — {a} бьёт {z} впустую.'];
+const F_DODGE = ['{d} изящно увернулся — {a} бил {z}.', '{a} промахнулся {z}: {d} шагнул в сторону и зевнул.', '{d} пригнулся, и {a} рассёк воздух.', '{d} сделал сальто назад. Зачем — непонятно, но удар мимо.'];
+const F_CRIT = ['нашёл слабое место и', 'с криком «За бога!»', 'вложив всю душу,', 'вспомнив обиды детства,'];
+const F_DEATH = ['{d} падает без сил. Кто-то уже несёт ромашки.', '{d} повержен и прилёг отдохнуть прямо на арене.', '{d} больше не боец. Сегодня.', '{d} рухнул, как мешок с репой.'];
+const BOT_NAMES = ['xX_Убийца_Xx', 'Бабушка_с_Топором', 'ГрозаДеревни', 'Тапок_Возмездия', 'Мистер Пельмень', 'Дядя Фёдор', 'Сантехник80lvl', 'Ночной Кефир', 'Злой Пряник', 'КотЛеопольд', 'Вован Непобедимый', 'Леди Кочерга', 'Добрый Молодец', 'Кузя', 'ТёмныйВластелин2007', 'Ёжик_в_тумане', 'Сэр Вареник', 'Борщевик', 'Пупсик', 'Зубастик', 'Mr_Kill', 'Ромашка', 'Гоша Гроза', 'Пахом', 'Шаурмен', 'Принцесса_Тьмы', 'Колобок_Мститель', 'Валера', 'Дед_Пихто', 'Ушастый', 'Бобёр Воин', 'Кефирный Лорд'];
+const ARENA_TYPES = { duel: { n: 'Дуэль', ic: '🤺' }, group: { n: 'Групповой бой', ic: '👥' }, chaos: { n: 'Хаотичный бой', ic: '🌀' } };
+const INJURIES = {
+  light: { n: 'лёгкая травма', pen: 1, t: 2 * 3600 },
+  mid: { n: 'средняя травма', pen: 2, t: 5 * 3600 },
+  heavy: { n: 'тяжёлая травма', pen: 3, t: 10 * 3600 }
+};
+const INJ_TEXT = { str: 'вывих плеча', dex: 'отбитые пятки', con: 'ушиб рёбер', int: 'шишка на лбу', wis: 'фингал под глазом', cha: 'выбитый зуб' };
+const BOSSES = [
+  { n: 'Каменный Голем', m: 'tele', d: 'Замахивается заранее: блокируйте зону, которую он назвал!' },
+  { n: 'Король Крыс', m: 'adds', d: 'На 3-м и 6-м ходу зовёт крысят на подмогу.' },
+  { n: 'Тёща Некроманта', m: 'enrage', d: 'На половине здоровья впадает в ярость: два удара за ход.' },
+  { n: 'Древний Кракозябр', m: 'sweep', d: 'Каждый 3-й ход бьёт хвостом по всему отряду.' },
+  { n: 'Пещерный Тролль-Бухгалтер', m: 'tele', d: 'Объявляет, куда ударит счётами. Блокируйте!' }
+];
+const DTILE = {
+  start: { ic: '🚪', n: 'Вход' }, empty: { ic: '·', n: 'Пустой зал' }, fight: { ic: '⚔', n: 'Логово' }, trap: { ic: '🪤', n: 'Ловушка' },
+  chest: { ic: '💎', n: 'Сундук' }, key: { ic: '🗝', n: 'Ключ' }, shrine: { ic: '⛲', n: 'Источник' }, boss: { ic: '👑', n: 'Логово босса' }
+};
+const D_EMPTY = ['Пустой зал. На стене надпись: «Здесь был Вася».', 'Тут пахнет носками предыдущего отряда.', 'Пусто. Только эхо повторяет «пусто».', 'Скелет в углу машет рукой. Или это сквозняк.', 'Груда костей и табличка «Не кормить».'];
+const D_TRAP = ['Пол провалился!', 'Из стены вылетели ржавые стрелы!', 'С потолка упала наковальня. Классика.', 'Плиты пола оказались кнопками. Все сразу.'];
+const D_CHEST = ['Сундук скрипнул и открылся.', 'В сундуке — записка «Должен будешь» и немного добра.', 'Сундук был заперт, но очень хотел открыться.'];
+const CHAT_BOT_LINES = ['кто в хаот?', 'го 3на3, нужен лекарь', 'опять мне голову отбили 😵', 'продам кольцо +2, недорого', 'у кого есть ключ от пещеры?', 'блокируйте ноги, босс бьёт по ногам', 'лол', 'мой бог опять молчит', 'кто-нибудь видел говорящую корову?', 'поменяю носок на носок', 'в Годграде скидки на зелья', 'кто украл мой шлем?! верните', 'админ, верни мне мой топор', 'всем привет из таверны', 'жрец, отхиль, будь человеком', 'ставлю на тапка в следующем бою', 'тролль-бухгалтер опять насчитал мне долгов', 'новичкам: блокируйте голову, все бьют в голову', 'ищу клан, умею громко кричать', 'кто-то опять молнией в своего попал'];
+const CHAT_REPLIES = [
+  { re: /привет|здравств|хай|ку\b|салют/i, r: ['привет, {me}!', 'здорово, {me} 👋', 'о, {me} в чате!', 'хай'] },
+  { re: /бой|хаот|арен|дуэл|драк/i, r: ['{me}, давай в хаот, я заявку кинул', 'го 1на1, {me}?', 'только не по голове, пожалуйста', 'я в группе, заходи'] },
+  { re: /пещер|подзем|данж|босс/i, r: ['в пещеру без жреца не ходи', 'голема бей по ногам, он неповоротливый', 'ключ обычно в дальнем зале', 'возьми плута, он ловушки снимает'] },
+  { re: /помо|как |что дел|подскаж/i, r: ['блок ставь туда, куда тебя били в прошлый раз', 'читай лог боя, там всё видно', 'жми «Автобой», если лень думать', 'спроси у тапка, он мудрый'] },
+  { re: /дур|туп|лох|нуб/i, r: ['сам такой 😤', 'на арене поговорим, {me}', 'фу таким быть', 'модератор, тут хамят'] },
+  { re: /.*/, r: ['ага', '+1', 'жиза', 'не, не слышал', 'это ты зря, {me}', 'хаха', 'кто-нибудь понял, что он сказал?', 'согласен'] }
+];
+
+/* =====================================================================
    2) ТЕМП ИГРЫ (все времена — в игровых секундах при скорости ×1)
    Цели: ур.2 ≈ 30 мин, ур.5 ≈ 11 ч, ур.10 ≈ 7 дней «жизни героя»
    (с учётом офлайна, где герой живёт на 75% темпа, — ≈ 9–10 дней реального времени).
@@ -618,6 +765,7 @@ const PACE = {
   duel: [2700, 4500],      // дуэль раз в 45–75 мин
   event: [7200, 10800],    // мировое событие раз в 2–3 ч
   dun: [10800, 18000],     // подземелье само раз в 3–5 ч (или по зову бога)
+  dunCd: 4 * 3600,         // пещера не чаще раза в 4 ч
   rivals: 3600,            // соперники растут раз в час
   feat: 1800,              // 30 мин на выбор черты, потом герой выберет сам
   dead: 600,               // 10 мин до самовоскрешения
@@ -673,13 +821,14 @@ function defaultState(god, hero, race, cls) {
     hero: { name: hero, race, cls, st: genStats(cls, race), feats: [], lvl: 1, xp: 0, hp: 30, maxHp: 30, gold: 30, potions: 1,
       eq: { weapon: starterItem('weapon', c.wpn), armor: starterItem('armor', c.arm), amulet: null, ring: null },
       inv: [], loc: 'Годград', state: 'road', monster: null, quest: newQuest(), trust: 40, deadT: 0, townStep: 0,
-      restT: 0, restKind: '', shortRests: 2, orcCd: 0 },
+      restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [] },
     flock: { fol: 3, temple: 0, templeProg: 0, army: 0 },
     buffs: { luck: 0, shield: 0, trade: 0 },
-    timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, rivals: PACE.rivals },
-    fork: null, duel: null, ev: null, dun: null, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
+    timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
+    fork: null, fight: null, ev: null, dun: null, fightAuto: false,
+    arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2) }, r)),
-    stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0 },
+    stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
     speed: 1, paused: false, tab: 'powers', lastSeen: Date.now()
   };
   return S0;
@@ -695,7 +844,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -735,6 +884,15 @@ function migrate(o) {
     if (Array.isArray(o.rivals)) o.rivals.forEach(r => { const b = RIVALS_BASE.find(x => x.id === r.id); if (b) { r.race = b.race; r.cls = b.cls; } r.hlvl = clamp(newL + rnd(-1, 1), 1, MAX_LVL); });
     o._migratedV3 = { race: h.race, cls: h.cls, oldL, newL };
   }
+  if (v < 4) {
+    // v3 → v4: старая дуэль и подземелье заменены боем по зонам и пещерой-картой
+    const hadDun = !!o.dun;
+    o.duel = null; o.dun = null; o.fight = null;
+    if (o.hero) { const h = o.hero; if (['duel', 'dungeon'].includes(h.state)) h.state = 'road'; if (h.state === 'fight') { h.state = 'road'; h.monster = null; } h.inj = []; }
+    if (o.timers && typeof o.timers === 'object') { o.timers.dunCd = hadDun ? 3600 : 0; o.timers.duel = Math.min(isNum(o.timers.duel) ? o.timers.duel : 600, 900); }
+    o._migratedV4 = 1;
+  }
+  delete o.duel;
   o.v = SAVE_VERSION;
   return o;
 }
@@ -774,6 +932,7 @@ function sanitize(o) {
   if (typeof h.loc !== 'string') h.loc = 'Годград';
   if (!HERO_STATES.includes(h.state)) h.state = 'road';
   fixNum(f, 'fol', 0, 0); fixNum(f, 'temple', 0, 0, 10); f.temple = Math.floor(f.temple); fixNum(f, 'templeProg', 0, 0); fixNum(f, 'army', 0, 0); f.army = Math.floor(f.army);
+  h.inj = Array.isArray(h.inj) ? h.inj.filter(j => j && STATS.includes(j.s) && INJURIES[j.k] && isNum(j.t) && j.t > 0).map(j => ({ k: j.k, s: j.s, t: Math.min(j.t, INJURIES[j.k].t), n: INJ_TEXT[j.s] })).slice(-4) : [];
   // HP после пересчёта (максимум зависит от класса/ТЕЛ/черт)
   const oldMax = h.maxHp; h.maxHp = calcMaxHp(h);
   if (isNum(h._hpFrac)) { h.hp = Math.round(h.maxHp * h._hpFrac); delete h._hpFrac; }
@@ -792,23 +951,25 @@ function sanitize(o) {
   fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20);
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
-  if (!['powers', 'flock', 'gods'].includes(o.tab)) o.tab = 'powers';
+  if (!['powers', 'flock', 'arena', 'gods'].includes(o.tab)) o.tab = 'powers';
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
   if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;
   if (o.fork) { o.fork.T = 30; o.fork.t = clamp(o.fork.t, 1, 30); o.fork.cls = !!o.fork.cls; }
-  const D = o.duel;
-  if (D && !(['intro', 'fight', 'end'].includes(D.phase) && D.me && D.foe && D.opp && isNum(D.me.hp) && isNum(D.foe.hp) && Array.isArray(D.log))) o.duel = null;
-  if (o.duel) { const D2 = o.duel; ['myActs', 'foeActs', 'plan'].forEach(k => { if (!Array.isArray(D2[k])) D2[k] = []; }); fixNum(D2, 't', 1, 0, 10); fixNum(D2, 'foeFaith', 50, 0, 200); fixNum(D2, 'round', 1, 0, 5); }
-  const U = o.dun;
-  if (U && !(['intro', 'room', 'resolve', 'end'].includes(U.phase) && Array.isArray(U.party) && Array.isArray(U.rooms) && isNum(U.idx) && Array.isArray(U.log) && (U.phase !== 'room' || (U.room && Array.isArray(U.room.opts))))) o.dun = null;
-  if (o.dun) { fixNum(o.dun, 't', 1, 0, 20); if (o.dun.phase === 'end' && !o.dun.result) o.dun = null; }
-  if (o.duel && o.duel.phase !== 'end') h.state = 'duel';
-  else if (o.dun && o.dun.phase !== 'end') h.state = 'dungeon';
-  if (!o.duel && h.state === 'duel') h.state = 'road';
+  o.fightAuto = !!o.fightAuto;
+  sanitizeArena(o, h);
+  if (o.fight && !validFight(o.fight)) o.fight = null;
+  if (o.dun && !validDun(o.dun)) o.dun = null;
+  if (o.dun && o.dun.phase === 'end' && !o.dun.result) o.dun = null;
+  const FK = o.fight && o.fight.phase !== 'end' ? o.fight.kind : null;
+  if (FK === 'dungeon' && !o.dun) o.fight = null;
+  if (FK === 'monster' && !(h.state === 'fight' && h.monster)) o.fight = null;
+  if (o.dun && o.dun.phase === 'fight' && !(o.fight && o.fight.kind === 'dungeon')) o.dun.phase = 'explore';
+  if (o.fight && ['duel', 'group', 'chaos', 'godduel'].includes(o.fight.kind) && o.fight.phase !== 'end') { if (o.dun) o.fight = null; else { h.state = 'duel'; h.monster = null; } }
+  if (o.dun && o.dun.phase !== 'end') { h.state = h.state === 'dead' ? (h.hp = 1, 'dungeon') : 'dungeon'; h.monster = null; }
+  if (h.state === 'duel' && !(o.fight && o.fight.phase !== 'end')) h.state = 'road';
   if (!o.dun && h.state === 'dungeon') h.state = 'road';
-  if (o.duel && o.dun) o.dun = null;
-  if ((o.duel || o.dun) && o.fork) o.fork = null;
+  if ((o.fight || o.dun) && o.fork) o.fork = null;
   if (o.fork && h.state === 'dead') o.fork = null;
   const E = o.ev;
   if (E && !(WEVENTS.find(e => e.id === E.id) && ['live', 'done'].includes(E.phase) && E.my && Array.isArray(E.parts))) {
@@ -1004,9 +1165,11 @@ function diary(text, cls, fx) {
 function toast(msg) {
   if (SILENT || typeof document === 'undefined') return;
   if (/вер/i.test(msg)) { const fm = $('faithMeter'); if (fm) { fm.classList.remove('flash'); void fm.offsetWidth; fm.classList.add('flash'); } }
-  const box = $('toasts'); while (box.children.length >= 4) box.firstChild.remove();
+  const box = $('toasts'), lim = innerWidth <= 760 ? 2 : 4;
+  for (const c of Array.from(box.children)) if (c.textContent === msg) c.remove();
+  while (box.children.length >= lim) box.firstChild.remove();
   const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg;
-  box.appendChild(el); setTimeout(() => el.remove(), 4200);
+  box.appendChild(el); setTimeout(() => el.remove(), innerWidth <= 760 ? 3200 : 4200);
 }
 function addFaith(v) { S.god.faith = clamp(S.god.faith + v, 0, maxFaith()); }
 function addTrust(v) { if (v > 0) v *= (hasFeat('devout') ? 1.5 : 1) * (S.hero.cls === 'cleric' ? 1.2 : 1); S.hero.trust = clamp(Math.round((S.hero.trust + v) * 10) / 10, 0, 100); }
@@ -1033,6 +1196,7 @@ function statValOf(h, s) {
   let v = h.st[s];
   for (const it of equipped(h)) for (const p of it.props) if (p.k === s) v += p.v || 1;
   if (s === 'cha' && equipped(h).some(it => it.curse && it.curse.k === 'chatty')) v -= 1;
+  if (h.inj) for (const j of h.inj) if (j.s === s && INJURIES[j.k]) v -= INJURIES[j.k].pen;
   return clamp(v, 1, 30);
 }
 const statVal = s => statValOf(S.hero, s);
@@ -1371,8 +1535,9 @@ function restStep() {
   const h = S.hero; h.restT--;
   if (h.restKind === 'camp' && R() < .15) { diary('Ночью к лагерю подкрался кто-то голодный. Отдых отменяется!', 'fight'); h.restT = 0; h.state = 'road'; startFight(); return; }
   if (h.restT > 0) { if (R() < .5) diary(pick(['Сплю. Снится, что я король. Король тоже спит.', 'Храплю так, что разбудил соседа. Он вызвал меня на дуэль. Сплю дальше.', 'Ворочаюсь. Под матрасом горошина. Я что, принцесса?'])); return; }
+  const cured = healInjuries(h.restKind === 'temple' ? 'temple' : 'rest');
   const a = healHero(h.maxHp); h.shortRests = 2;
-  diary('Выспался! Как заново родился, только без мучений.', 'level', `+${a} HP (долгий отдых)`);
+  diary('Выспался! Как заново родился, только без мучений.', 'level', `+${a} HP (долгий отдых)${cured ? `, травм вылечено: ${cured}` : ''}`);
   h.state = h.restKind === 'camp' ? 'road' : 'town';
 }
 
@@ -1431,7 +1596,7 @@ function preach() {
 }
 function heroStep() {
   const h = S.hero;
-  if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon') return;
+  if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon' || S.fight) return;
   if (eqHas('regen') && h.hp < h.maxHp) healHero(h.maxHp * .02);
   if (h.state === 'fight') return fightStep();
   if (h.state === 'rest') return restStep();
@@ -1453,9 +1618,8 @@ function heroStep() {
 
 /* ---------- Силы бога вне дуэли ---------- */
 function usePower(id) {
-  if (S.duel && S.duel.phase === 'fight') return duelAct(id);
-  if (S.dun && S.dun.phase === 'room') return dunAct(id);
-  if (S.duel || S.hero.state === 'duel' || S.dun || S.hero.state === 'dungeon') return toast('Герой занят: силы можно применять, когда идёт раунд или комната.');
+  if (S.fight && S.fight.phase === 'turn') return fightPower(id);
+  if (S.fight || S.hero.state === 'duel' || S.hero.state === 'dungeon' || duelPending || dunPending) return toast(S.dun && !S.fight ? 'В пещере силы помогают только в бою. Ведите отряд к врагам!' : 'Подождите начала хода — тогда силы сработают в бою.');
   const h = S.hero, p = POWERS[id], L = S.god.skills[id] || 0, mu = pmult(id);
   if (!L) return toast('Эта сила ещё не изучена.');
   if (h.state === 'dead') return toast('Герой мёртв. Сначала воскресите его.');
@@ -1463,7 +1627,7 @@ function usePower(id) {
   S.god.faith -= c; shiftAlign(p.al); addGxp(c / 2);
   const m = h.monster, lv = h.lvl;
   switch (id) {
-    case 'heal': { const a = healHero(h.maxHp * .3 * mu); addTrust(2); diary('Почувствовал тёплый свет с небес. Раны затянулись. Спасибо, о {god}!', 'god', `+${a} HP, +2 доверия`); break; }
+    case 'heal': { const a = healHero(h.maxHp * .3 * mu); addTrust(2); const cu = h.inj.length ? healInjuries('one') : 0; diary('Почувствовал тёплый свет с небес. Раны затянулись. Спасибо, о {god}!', 'god', `+${a} HP, +2 доверия${cu ? ', травма исцелена' : ''}`); break; }
     case 'bless': S.buffs.luck += 300 * mu; addTrust(1); diary('На меня снизошло благословение! Чувствую, что сегодня всё получится.', 'god', '🍀 удача на ' + Math.round(5 * mu) + ' мин'); break;
     case 'shield': S.buffs.shield += 300 * mu; diary('Вокруг меня засиял божий щит. Комары в ярости.', 'god', '🛡 щит на ' + Math.round(5 * mu) + ' мин'); break;
     case 'bolt':
@@ -1522,7 +1686,7 @@ function voice(text) {
 
 /* ---------- Развилки ---------- */
 function startFork(idx) {
-  if (S.fork || S.duel || S.dun || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
+  if (S.fork || S.fight || S.dun || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
   let i = idx;
   if (i === undefined) { const free = FORKS.map((_, k) => k).filter(k => !S.forkHist.includes(k)); i = pick(free.length ? free : FORKS.map((_, k) => k)); }
   S.forkHist.push(i); if (S.forkHist.length > 10) S.forkHist.shift();
@@ -1602,129 +1766,10 @@ function recruit(n) {
 }
 
 /* =====================================================================
-   6) ДУЭЛЬ БОГОВ
+   6) ОБЩЕЕ ДЛЯ БОЁВ (старая дуэль заменена боем по зонам — см. раздел 12)
    ===================================================================== */
-const DUEL_ROUNDS = 5, ROUND_T = 10;
-const DUEL_NAMES = { bolt: '⚡ Молния', heal: '✚ Исцеление', shield: '🛡 Щит', curse: '☠ Проклятие', quake: '🌋 Землетрясение', beast: '🐻 Зверь', bless: '✨ Благословение', luck: '🍀 Удача', rain: '🌧 Ливень', cheer: '📣 Подбадривание' };
-function dlog(t, c) { const D = S.duel; D.log.unshift({ t, c: c || 'sys' }); if (D.log.length > 40) D.log.length = 40; }
-function duelFighter(name, h, temple) {
-  const sh = sheetOf(h, temple), hit = clamp((21 - (13 - sh.atkB)) / 20, .15, .95), max = calcMaxHp(h) * 2;
-  return { name, hp: max, max, atk: Math.max(2, Math.round(sh.avg * hit * 1.6)), def: Math.max(0, Math.floor((sh.ac - 10) / 2)), beast: 0, beastM: 1, race: h.race, cls: h.cls, lvl: h.lvl };
-}
+const DUEL_NAMES = { bolt: '⚡ Молния', heal: '✚ Исцеление', shield: '🛡 Щит', curse: '☠ Проклятие', quake: '🌋 Землетрясение', beast: '🐻 Зверь', bless: '✨ Благословение', luck: '🍀 Удача', rain: '🌧 Ливень' };
 let duelPending = false;
-const heroBusy = () => !!(S.fork || S.duel || S.dun || duelPending || dunPending);
-async function startDuel(godId) {
-  if (S.duel || S.dun || duelPending || dunPending || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
-  const h = S.hero, st = S, prev = h.state;
-  h.state = 'duel'; h.monster = null; h.restT = 0; duelPending = true;
-  let opp;
-  try { opp = await rivals.findOpponent({ godLvl: S.god.lvl, heroLvl: h.lvl, godId }); } finally { duelPending = false; }
-  if (S !== st || h.state !== 'duel') return false;
-  const vh = virtualHero(opp.race, opp.cls, opp.heroLvl);
-  S.duel = { id: Date.now(), phase: 'intro', t: 5, T: 5, round: 0, opp,
-    me: duelFighter(h.name, h, S.flock.temple), foe: duelFighter(opp.hero, vh, 0),
-    foeFaith: 50 + opp.lvl * 12, myActs: [], foeActs: [], plan: [], log: [], result: null };
-  S.stats.duels++; S.timers.duel = Math.max(S.timers.duel, 1200);
-  dlog(`${h.name} встречает героя по имени ${opp.hero} (${RACES[opp.race].n.toLowerCase()}-${CLASSES[opp.cls].n.toLowerCase()}, ур. ${opp.heroLvl}). Покровитель — ${opp.god} (${PERS[opp.pers]}). Арена богов удваивает здоровье обоим — бой честный!`);
-  diary(`⚔ Встретил героя по имени ${opp.hero} (его бог — ${opp.god}). Он сказал, что мой бог — «так себе». Начинается дуэль богов!`, 'duel');
-  toast('⚔ Дуэль богов! Вмешивайтесь в каждый раунд.');
-  return true;
-}
-function duelView(D, extra) {
-  return Object.assign({ round: D.round, roundT: ROUND_T, pers: D.opp.pers, lvl: D.opp.lvl, faith: D.foeFaith,
-    self: { hp: D.foe.hp, max: D.foe.max }, enemy: { hp: D.me.hp, max: D.me.max }, selfCursed: D.myActs.includes('curse'), elapsed: ROUND_T - D.t }, extra || {});
-}
-function beginRound() {
-  const D = S.duel; D.round++; D.t = ROUND_T; D.T = ROUND_T; D.myActs = []; D.foeActs = []; D.plan = [];
-  D.foeFaith = Math.min(200, D.foeFaith + 14);
-  dlog(`— Раунд ${D.round} из ${DUEL_ROUNDS} —`);
-  const tok = D.id + ':' + D.round, st = S;
-  rivals.planRound(duelView(D)).then(pl => { if (S === st && S.duel && S.duel.id + ':' + S.duel.round === tok) S.duel.plan = S.duel.plan.concat(pl); });
-}
-function duelAct(id) {
-  const D = S.duel; if (!D || D.phase !== 'fight') return;
-  if (id !== 'cheer' && D.myActs.filter(a => a !== 'cheer').length >= 2) return toast('Не больше двух сил за раунд.');
-  if (id === 'cheer') { if (D.myActs.includes('cheer')) return toast('Уже подбодрили в этом раунде.'); D.myActs.push('cheer'); dlog('Вы: 📣 «Давай, ты сможешь!» (+15% к удару)', 'me'); return; }
-  if (!S.god.skills[id]) return toast('Сила не изучена.');
-  if (D.myActs.includes(id)) return toast('Эта сила уже применена в раунде.');
-  const c = powerCost(id); if (S.god.faith < c) return toast('Не хватает веры.');
-  S.god.faith -= c; D.myActs.push(id); shiftAlign(POWERS[id].al); addGxp(c / 3);
-  dlog(`Вы: ${DUEL_NAMES[id]}`, 'me');
-  const r = rivals.react(duelView(D), id); if (r) D.plan.push(r);
-}
-function calcHit(att, def, acts, oacts, mul, army, log, k) {
-  let base = att.atk * (.8 + R() * .4) + Math.min(army, 10) * 1.2 * k;
-  if (acts.includes('cheer')) base *= 1.15;
-  if (acts.includes('bless')) { base *= 1.3 + .3 * mul('bless'); log.push('крит'); }
-  if (oacts.includes('curse') && !acts.includes('rain')) { base *= .5; log.push('проклят'); }
-  base = Math.max(1, base - def.def);
-  let extra = 0;
-  if (acts.includes('bolt')) { extra += 16 * mul('bolt') * k; log.push('молния'); }
-  if (acts.includes('quake')) { extra += 34 * mul('quake') * k; log.push('землетрясение'); }
-  if (att.beast > 0) { extra += 11 * att.beastM * k; log.push('медведь'); }
-  let total = base + extra;
-  if (oacts.includes('shield')) { total *= .3; log.push('щит'); }
-  if (oacts.includes('luck') && R() < .5) { total = 0; log.push('уворот!'); }
-  return Math.round(total);
-}
-function resolveRound() {
-  const D = S.duel, me = D.me, foe = D.foe, A = D.myActs, B = D.foeActs;
-  const k = (me.max + foe.max) / 140;
-  const fmul = () => 1 + .5 * Math.min(2, Math.floor(D.opp.lvl / 3));
-  if (A.includes('beast')) { me.beast = 2; me.beastM = pmult('beast'); }
-  if (B.includes('beast')) { foe.beast = 2; foe.beastM = fmul(); }
-  const hm = [], hf = [];
-  const heal = (f, v) => { const a = Math.max(0, Math.min(f.max - f.hp, Math.round(v))); f.hp += a; return a; };
-  if (A.includes('heal')) hm.push(`+${heal(me, 20 * pmult('heal') * k)} HP`);
-  if (A.includes('rain')) hm.push(`ливень +${heal(me, 10 * pmult('rain') * k)}`);
-  if (B.includes('heal')) hf.push(`+${heal(foe, 20 * fmul() * k)} HP`);
-  if (B.includes('rain')) hf.push(`ливень +${heal(foe, 10 * fmul() * k)}`);
-  const lm = [], lf = [];
-  const dMe = calcHit(me, foe, A, B, pmult, S.flock.army, lm, k);
-  const dFoe = calcHit(foe, me, B, A, fmul, D.opp.army || 0, lf, k);
-  foe.hp -= dMe; me.hp -= dFoe;
-  if (me.beast > 0) me.beast--; if (foe.beast > 0) foe.beast--;
-  dlog(`${me.name} бьёт на ${dMe}${lm.length ? ' (' + lm.join(', ') + ')' : ''}${hm.length ? '; ' + hm.join(', ') : ''}.`, 'me');
-  dlog(`${foe.name} бьёт на ${dFoe}${lf.length ? ' (' + lf.join(', ') + ')' : ''}${hf.length ? '; ' + hf.join(', ') : ''}.`, 'foe');
-  if (me.hp <= 0 || foe.hp <= 0 || D.round >= DUEL_ROUNDS) endDuel(); else beginRound();
-}
-function endDuel() {
-  const D = S.duel, me = D.me, foe = D.foe, h = S.hero;
-  let win;
-  if (foe.hp <= 0 && me.hp > 0) win = true; else if (me.hp <= 0 && foe.hp > 0) win = false;
-  else if (me.hp <= 0 && foe.hp <= 0) win = me.hp >= foe.hp; else win = me.hp / me.max >= foe.hp / foe.max;
-  D.phase = 'end'; D.t = 8; D.T = 8;
-  rivals.reportDuel({ godId: D.opp.godId, playerWon: win });
-  h.state = 'road';
-  if (win) {
-    S.stats.dwins++;
-    const g = Math.round(30 * goldScale(h.lvl)), x = Math.round(xpUnit(h.lvl) * 6), n = rnd(2, 5) + Math.floor(S.flock.army / 5);
-    h.gold += g; S.flock.fol += n; addTrust(5); gainXp(x); addGxp(30);
-    D.result = `Победа! ${me.name} сильнее, чем ${foe.name}. ${n} ${plural(n, 'последователь соперника перешёл', 'последователя соперника перешли', 'последователей соперника перешли')} к вам.`;
-    dlog('🏆 ' + D.result);
-    diary(`🏆 Победил в дуэли! ${foe.name} повержен. Мой бог сильнее, чем ${D.opp.god}. Его последователи перебегают к нам.`, 'duel', `+${g} 💰, +${x} опыта, +${n} паствы, +5 доверия`);
-  } else {
-    const g = Math.floor(h.gold * .1), n = Math.min(Math.floor(S.flock.fol), rnd(1, 3));
-    h.gold -= g; S.flock.fol -= n; addTrust(-3); addGxp(12);
-    const hd = Math.min(h.hp - 1, Math.round(h.maxHp * .2)); if (hd > 0) h.hp -= hd;
-    D.result = `Поражение. ${foe.name} оказался сильнее. ${D.opp.god} злорадствует.`;
-    dlog('💔 ' + D.result);
-    diary(`💔 Проиграл дуэль: ${foe.name} оказался сильнее. Где был мой бог, когда он был так нужен? Ушёл, прихрамывая.`, 'duel', `−${g} 💰, −${n} паствы, −3 доверия`);
-  }
-}
-function duelTick(idt) {
-  const D = S.duel;
-  D.t -= idt;
-  if (D.phase === 'intro') { if (D.t <= 0) { D.phase = 'fight'; beginRound(); } return; }
-  if (D.phase === 'end') { if (D.t <= 0) S.duel = null; return; }
-  const el = ROUND_T - D.t;
-  for (const p of D.plan) if (!p.done && el >= p.at) {
-    p.done = 1; const c = DUEL_COST[p.act];
-    if (D.foeFaith >= c && !D.foeActs.includes(p.act)) { D.foeFaith -= c; D.foeActs.push(p.act); dlog(`${D.opp.god}: ${DUEL_NAMES[p.act]}`, 'foe'); }
-  }
-  if (D.t <= 0) resolveRound();
-}
-
 /* =====================================================================
    7) МИРОВЫЕ СОБЫТИЯ
    ===================================================================== */
@@ -1801,199 +1846,23 @@ function resolveEvent() {
 }
 
 /* =====================================================================
-   8) ПОДЗЕМЕЛЬЯ С ОТРЯДОМ
-   ===================================================================== */
-const DUN_ROOM_T = 20;
-let dunPending = false;
-function ulog(t, c) { const U = S.dun; U.log.unshift({ t, c: c || 'sys' }); if (U.log.length > 50) U.log.length = 50; }
-async function startDungeon(byCall) {
-  if (S.dun || S.duel || S.fork || duelPending || dunPending) return false;
-  const h = S.hero; if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon') return false;
-  const st = S; h.state = 'dungeon'; h.monster = null; h.restT = 0; dunPending = true;
-  let mates;
-  try { mates = await rivals.formParty({ heroLvl: h.lvl, godLvl: S.god.lvl }); } finally { dunPending = false; }
-  if (S !== st || h.state !== 'dungeon') return false;
-  const party = [{ godId: 'me', god: S.god.name, hero: h.name, race: h.race, cls: h.cls, lvl: h.lvl, pers: 'me', isMe: true, hp: 100 }]
-    .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, hp: 100 })));
-  const pool = ['fight', 'trap', 'puzzle', 'path', 'treasure', 'fight', 'trap', 'puzzle'];
-  const rooms = [];
-  while (rooms.length < 4) { const t = pick(pool); if (rooms[rooms.length - 1] === t) continue; if (t === 'path' && rooms.includes('path')) continue; rooms.push(t); }
-  rooms.push('boss');
-  S.dun = { id: Date.now(), name: pick(DUN_NAMES), tier: h.lvl, party, rooms, idx: 0, phase: 'intro', t: 6, T: 6, room: null, log: [], gold: 0, xp: 0, loot: [], wins: 0, fails: 0, bonusNext: 0, result: null, byCall: !!byCall };
-  S.stats.duns++; S.timers.dun = Math.max(S.timers.dun, 3600);
-  ulog(`Отряд собран: ${party.map(p => `${p.hero} (${CLASSES[p.cls].n.toLowerCase()})`).join(', ')}. Впереди — ${S.dun.name}.`);
-  diary(`🏰 Собрался в «${S.dun.name}» с отрядом: ${mates.map(m => m.hero).join(', ')}. Надеюсь, хоть кто-то взял факел.`, 'event');
-  toast('🏰 Подземелье! Голосуйте в каждой комнате и помогайте силами.');
-  return true;
-}
-function dunView(U) { return { type: U.room.type, opts: U.room.opts.map(o => ({ l: o.l, s: o.s, cls: o.cls, split: o.split })), party: U.party.map(p => ({ godId: p.godId, cls: p.cls, pers: p.pers, isMe: !!p.isMe })), roundT: DUN_ROOM_T }; }
-function dunBeginRoom() {
-  const U = S.dun, type = U.rooms[U.idx], def = DUN_ROOMS[type], h = S.hero;
-  const mt = clamp(U.tier + (type === 'boss' ? 2 : 0), 1, 22), near = ALL_MONSTERS.filter(m => Math.abs(m[1] - mt) <= 1);
-  const mname = pick(near.length ? near : ALL_MONSTERS)[0];
-  const classes = U.party.map(p => p.cls);
-  const opts = def.o.filter(o => !o.cls || !o.need || o.cls.some(c => classes.includes(c))).map(o => Object.assign({}, o, { has: !o.cls || o.cls.some(c => classes.includes(c)) }));
-  U.room = { type, text: pick(def.t).split('{m}').join(mname), m: mname, opts, votes: {}, myVote: null, myActs: [], aiActs: [], plan: [], bonus: U.bonusNext, heal: 0, shield: false, spent: 0, planned: false };
-  U.bonusNext = 0;
-  U.phase = 'room'; U.t = DUN_ROOM_T; U.T = DUN_ROOM_T;
-  ulog(`${def.ic} Комната ${U.idx + 1}/${U.rooms.length}: ${def.n}. ${U.room.text}`);
-  dunRequestPlan();
-}
-function dunRequestPlan() {
-  const U = S.dun, st = S, tok = U.id + ':' + U.idx;
-  U.room.planned = true;
-  rivals.dungeonDecide(dunView(U)).then(pl => { if (S === st && S.dun && S.dun.room && S.dun.id + ':' + S.dun.idx === tok) S.dun.room.plan = S.dun.room.plan.concat(pl); });
-}
-function dunVote(k) { const U = S.dun; if (!U || U.phase !== 'room' || !U.room.opts[+k]) return; U.room.myVote = +k; }
-function dunAct(id) {
-  const U = S.dun; if (!U || U.phase !== 'room') return;
-  const rm = U.room;
-  if (rm.type === 'treasure' || rm.type === 'path') return toast('Тут силы не помогут — только голосование.');
-  if (rm.myActs.length >= 2) return toast('Не больше двух сил на комнату.');
-  if (!S.god.skills[id]) return toast('Сила не изучена.');
-  if (rm.myActs.includes(id)) return toast('Эта сила уже применена здесь.');
-  const c = powerCost(id); if (S.god.faith < c) return toast('Не хватает веры.');
-  S.god.faith -= c; rm.myActs.push(id); rm.spent += c; shiftAlign(POWERS[id].al); addGxp(c / 3);
-  const P = DUN_POW[id] || {}, mu = pmult(id);
-  if (P.bonus) rm.bonus += Math.round(P.bonus * mu);
-  if (P.heal) rm.heal += P.heal * mu;
-  if (P.shield) rm.shield = true;
-  ulog(`Вы: ${DUEL_NAMES[id]}${P.bonus ? ` (+${Math.round(P.bonus * mu)} к проверке)` : ''}${P.heal ? ' (лечение отряда)' : ''}${P.shield ? ' (урон вдвое меньше)' : ''}`, 'me');
-}
-function dunTally(U) {
-  const rm = U.room, t = rm.opts.map(() => 0);
-  for (const id in rm.votes) if (t[rm.votes[id]] !== undefined) t[rm.votes[id]] += 1;
-  if (rm.myVote !== null) t[rm.myVote] += 1 + rm.spent / 20;
-  return t;
-}
-function dunChoice(U) {
-  const rm = U.room, t = dunTally(U);
-  if (t.every(x => x === 0)) { const i = rm.opts.findIndex(o => o.cls && o.has); return i >= 0 ? i : 0; }
-  let b = 0; t.forEach((v, i) => { if (v > t[b]) b = i; });
-  if (rm.myVote !== null && t[rm.myVote] === t[b]) b = rm.myVote;
-  return b;
-}
-function memberCheck(U, opt) {
-  // кто выполняет: подходящий по классу, иначе тот, у кого стат выше
-  const cands = U.party.filter(p => p.hp > 0 || p.isMe);
-  let best = null, bestV = -99;
-  for (const p of cands) {
-    const vh = p.isMe ? S.hero : virtualHero(p.race, p.cls, p.lvl);
-    let v = mod(statValOf(vh, opt.s)) + (CLASSES[p.cls].prof.includes(opt.s) ? profB(p.lvl) : 0) + (opt.cls && opt.cls.includes(p.cls) ? 4 : 0);
-    if (v > bestV) { bestV = v; best = p; }
-  }
-  return { who: best, bonus: bestV };
-}
-function dunResolve() {
-  const U = S.dun, rm = U.room, h = S.hero, k = dunChoice(U), opt = rm.opts[k], L = h.lvl;
-  ulog(`Решение отряда: «${opt.l}».`, 'sys');
-  if (rm.heal > 0) { const a = healHero(h.maxHp * rm.heal); U.party.forEach(p => { if (!p.isMe) p.hp = Math.min(100, p.hp + Math.round(rm.heal * 100)); }); ulog(a > 0 ? `Божественное лечение: ${h.name} +${a} HP, отряд взбодрился.` : 'Божественное лечение: отряд взбодрился (наш герой и так цел).', 'me'); }
-  if (rm.type === 'treasure') {
-    const pot = Math.round(rnd(30, 60) * goldScale(L));
-    if (opt.split === 'fair') { const g = Math.round(pot / U.party.length * 2); U.gold += g; ulog(`Поделили честно. Доля героя: ${g} 💰. Все довольны, даже облизывающийся сундук.`); shiftAlign(2); }
-    else if (opt.split === 'greedy') {
-      U.gold += pot; const it = makeItem(undefined, L, Math.max(1, rollRarity(.8))); U.loot.push(it); shiftAlign(-3);
-      ulog(`Лучшее забрал ${h.name}: ${pot} 💰 и «${it.n}». Остальные боги запомнят это.`);
-      for (const p of U.party) if (!p.isMe) { const g = S.rivals.find(r => r.id === p.godId); if (g) g.w++; }
-    } else { addFaith(25); U.gold += Math.round(pot * .3); ulog('Часть сокровищ ушла в храмы богов. +25 веры, совесть чиста.'); shiftAlign(3); }
-    U.wins++;
-  } else if (rm.type === 'path') {
-    const next = U.idx + 1;
-    if (opt.to === 'skip') {
-      const c = memberCheck(U, opt), ok = rnd(1, 20) + c.bonus + rm.bonus >= 12;
-      if (ok) { ulog(`${c.who.hero} нашёл потайной ход! Отряд срезал путь прямо к боссу и подкрался незаметно (+3 к следующей проверке).`); U.rooms.splice(next, U.rooms.length - next - 1); U.bonusNext = 3; U.wins++; }
-      else { ulog(`${c.who.hero} застрял в щели. Пока его вытаскивали, проснулась стража.`); if (U.rooms[next] !== 'boss') U.rooms[next] = 'fight'; U.fails++; }
-    } else if (U.rooms[next] && U.rooms[next] !== 'boss') { U.rooms[next] = opt.to; ulog(opt.to === 'treasure' ? 'Сыр привёл к сокровищнице!' : 'Храп привёл к страже. Зато там будет добыча.'); }
-  } else {
-    const isBoss = rm.type === 'boss';
-    const dc = 10 + Math.ceil(U.tier / 2) + (isBoss ? 3 : 0) + rnd(0, 2);
-    let tries = isBoss ? 2 : 1, ok = false, who;
-    while (tries-- > 0 && !ok) {
-      const c = memberCheck(U, opt.s ? opt : { s: 'str' }); who = c.who;
-      if (who.isMe) { const chk = check(opt.s || 'str', dc, rm.bonus + (opt.cls && opt.cls.includes(h.cls) ? 4 : 0)); ok = chk.ok; if (chk.note) ulog(`(${chk.label})`); }
-      else ok = rnd(1, 20) + c.bonus + rm.bonus >= dc;
-      if (!ok && isBoss && tries > 0) ulog(`${who.hero} не справился — босс отбросил отряд! Ещё одна попытка…`, 'foe');
-    }
-    const cn = CLASSES[who.cls].n.toLowerCase();
-    if (ok) {
-      U.wins++; const g = Math.round(rnd(10, 25) * goldScale(L) * (isBoss ? 3 : 1)); U.gold += g; U.xp += Math.round(xpUnit(L) * (isBoss ? 10 : 4));
-      const lines = { fight: `${who.hero} (${cn}) повёл отряд — стража разбита!`, trap: `${who.hero} (${cn}) провёл всех через ловушку без единой царапины.`, puzzle: `${who.hero} (${cn}) разгадал загадку. Ответ был «огурец». Опять.`, boss: `${who.hero} (${cn}) нанёс решающий удар! «${rm.m}» повержен!` };
-      ulog('✅ ' + lines[rm.type], 'me');
-      if (rm.type === 'fight' && R() < .4) U.loot.push(makeItem(undefined, L, rollRarity(.6)));
-      if (isBoss) { U.loot.push(makeItem(undefined, L, Math.max(2, rollRarity(1.2 + U.wins * .2)))); if (R() < .4) U.loot.push(makeItem(undefined, L, Math.max(1, rollRarity(.8)))); }
-    } else {
-      U.fails++;
-      let dmg = h.maxHp * (rm.type === 'trap' ? .2 : .25) * (isBoss ? 1.4 : 1) * (.8 + R() * .4);
-      if (rm.shield) dmg *= .5; if (rm.type === 'trap' && h.race === 'dwarf') dmg *= .67; if (rm.type === 'trap' && hasFeat('sentinel')) dmg *= .3;
-      const d = Math.round(dmg); h.hp -= d;
-      U.party.forEach(p => { if (!p.isMe) p.hp = Math.max(0, p.hp - rnd(10, 30)); });
-      const lines = { fight: `Стража оказалась сильнее. ${who.hero} отступил первым.`, trap: `${who.hero} наступил ровно туда, куда не надо. Сработало всё сразу.`, puzzle: `Ответ был неверный. Дверь обиделась и плюнула в отряд камнями.`, boss: `«${rm.m}» раскидал отряд. Пришлось отступить с тем, что успели схватить.` };
-      ulog(`❌ ${lines[rm.type]} ${h.name}: −${d} HP.`, 'foe');
-      if (h.hp <= 0) { h.hp = 1; U.carried = true; ulog(`${h.name} без сознания. Отряд выносит его на руках. Поход окончен.`, 'foe'); }
-    }
-  }
-  U.idx++;
-  U.phase = 'resolve'; U.t = 5; U.T = 5;
-}
-function endDungeon() {
-  const U = S.dun, h = S.hero;
-  const boss = U.rooms[U.rooms.length - 1] === 'boss' && U.idx >= U.rooms.length;
-  const ok = !U.carried && U.wins >= Math.ceil(U.rooms.length / 2) && boss;
-  const mult = U.carried ? .4 : 1;
-  const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(h.lvl) * 15 : 0)) * mult);
-  h.gold += gold; gainXp(xp); addGxp(30 + U.wins * 10);
-  if (ok) { addTrust(3); S.stats.dwinsD++; }
-  const items = U.carried ? U.loot.slice(0, 1) : U.loot;
-  const names = [];
-  for (const it of items) { const worn = equip(it, true); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); if (worn && it.curse) diary(`Надел трофей «${it.n}», а он проклят: ${CURSES[it.curse.k].d}!`, 'fight'); }
-  rivals.reportDungeon({ ok, godIds: U.party.filter(p => !p.isMe).map(p => p.godId) });
-  U.result = `${ok ? '🏆 Подземелье пройдено!' : U.carried ? '🩹 Героя вынесли на руках.' : '😅 Отряд выбрался, но босс жив.'} Добыча: ${gold} 💰, ${xp} опыта${names.length ? ', ' + names.join(', ') : ''}.`;
-  ulog(U.result, 'sys');
-  diary(`🏰 ${ok ? `Прошёл «${U.name}»! Отряд — молодцы, я — особенно.` : `Вернулся из «${U.name}». Было весело, но не очень.`}`, items.some(i => i.rar >= 2) ? 'rare' : 'event', `+${gold} 💰, +${xp} опыта${names.length ? ', ' + names.join(', ') : ''}`);
-  U.phase = 'end'; U.t = 12; U.T = 12;
-  h.state = 'road';
-}
-function dunTick(idt) {
-  const U = S.dun;
-  U.t -= idt;
-  if (U.phase === 'intro') { if (U.t <= 0) dunBeginRoom(); return; }
-  if (U.phase === 'end') { if (U.t <= 0) S.dun = null; return; }
-  if (U.phase === 'resolve') { if (U.t <= 0) { if (U.carried || U.idx >= U.rooms.length) endDungeon(); else dunBeginRoom(); } return; }
-  const rm = U.room, el = DUN_ROOM_T - U.t;
-  if (!rm.planned) dunRequestPlan();
-  for (const p of rm.plan) if (!p.done && el >= p.at) {
-    p.done = 1; const m = U.party.find(x => x.godId === p.godId); if (!m) continue;
-    if (p.vote !== undefined && rm.opts[p.vote]) { rm.votes[p.godId] = p.vote; ulog(`${m.god} (бог героя ${m.hero}) голосует: «${rm.opts[p.vote].l}»`, 'foe'); }
-    if (p.act && DUN_POW[p.act]) { const P = DUN_POW[p.act]; if (P.bonus) rm.bonus += P.bonus; if (P.heal) rm.heal += P.heal * .5; if (P.shield) rm.shield = true; rm.aiActs.push(p.act); ulog(`${m.god} помогает: ${DUEL_NAMES[p.act]}`, 'foe'); }
-  }
-  if (U.t <= 0) dunResolve();
-}
-function dunAutoFinish() {
-  // Бог отсутствовал: отряд доходит сам, голосуют только ИИ-боги (по умолчанию — классовый вариант)
-  let guard = 0;
-  while (S.dun && S.dun.phase !== 'end' && guard++ < 20) {
-    const U = S.dun;
-    if (U.phase === 'intro' || (U.phase === 'resolve' && !U.carried && U.idx < U.rooms.length)) { dunBeginRoom(); continue; }
-    if (U.phase === 'resolve') { endDungeon(); continue; }
-    if (U.phase === 'room') dunResolve();
-  }
-  if (S.dun) S.dun = null;
-  if (S.hero.state === 'dungeon') S.hero.state = 'road';
-}
-
-/* =====================================================================
    9) ГЛАВНЫЙ ЦИКЛ И ОФЛАЙН
    ===================================================================== */
 let saveAcc = 0;
 const rspan = a => a[0] + R() * (a[1] - a[0]);
 function syncGuards() {
   const h = S.hero;
-  if (h.state === 'duel' && !S.duel && !duelPending) h.state = 'road';
+  const F = S.fight, fk = F && F.phase !== 'end' ? F.kind : null;
+  if (fk && ARENA_KINDS.includes(fk)) h.state = 'duel';
+  if (fk === 'monster' && !(h.state === 'fight' && h.monster)) S.fight = null;
+  if (fk === 'dungeon' && !S.dun) S.fight = null;
+  if (S.dun && S.dun.phase !== 'end') h.state = h.state === 'dead' ? 'dead' : 'dungeon';
+  if (h.state === 'duel' && !(S.fight && ARENA_KINDS.includes(S.fight.kind)) && !duelPending) h.state = 'road';
   if (h.state === 'dungeon' && !S.dun && !dunPending) h.state = 'road';
   if (h.state === 'fight' && !h.monster) h.state = 'road';
   if (h.monster && h.state !== 'fight') h.monster = null;
   if (h.state === 'rest' && h.restT <= 0) h.state = 'road';
-  if (S.fork && (h.state === 'dead' || S.duel || S.dun)) S.fork = null;
+  if (S.fork && (h.state === 'dead' || S.fight || S.dun)) S.fork = null;
 }
 function passiveTick(gdt) {
   const h = S.hero;
@@ -2004,6 +1873,8 @@ function passiveTick(gdt) {
   if (h.state === 'dead') { h.deadT -= gdt; if (h.deadT <= 0) resurrect(false); }
   if (S.featOffer) { if (!SILENT) { S.featOffer.t -= gdt; if (S.featOffer.t <= 0) heroPicksFeat(); } } // офлайн черты ждут бога
   else if (S.featQueue > 0) offerFeat();
+  if (S.timers.dunCd > 0) S.timers.dunCd = Math.max(0, S.timers.dunCd - gdt);
+  if (h.inj.length) { for (const j of h.inj) j.t -= gdt; const n = h.inj.length; h.inj = h.inj.filter(j => j.t > 0); if (h.inj.length !== n) { recalcHp(); diary('🩹 Травма зажила. Снова как новенький (почти).', 'level'); } }
   S.timers.rivals -= gdt;
   if (S.timers.rivals <= 0) { S.timers.rivals = PACE.rivals; const r = pick(S.rivals); if (r.lvl < S.god.lvl + 2 && R() < .5) r.lvl++; r.hlvl = clamp(h.lvl + rnd(-1, 1), 1, MAX_LVL); if (R() < .5) r.army += rnd(0, 2); }
 }
@@ -2013,15 +1884,17 @@ function step(realDt) {
   const h = S.hero;
   syncGuards();
   passiveTick(gdt);
-  if (!S.fork && !S.duel && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
+  if (!S.fork && !S.fight && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
   if (S.fork) { S.fork.t -= idt; if (S.fork.t <= 0) timeoutFork(); }
-  else if (!S.duel && !S.dun && !dunPending && !duelPending) { S.timers.fork -= gdt; if (S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town')) { startFork(); S.timers.fork = rspan(PACE.fork); } }
-  if (S.duel) duelTick(idt);
-  else if (!S.fork && !S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road') { S.timers.duel = rspan(PACE.duel); startDuel(); } }
+  else if (!S.fight && !S.dun && !dunPending && !duelPending) { S.timers.fork -= gdt; if (S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town')) { startFork(); S.timers.fork = rspan(PACE.fork); } }
+  if (S.fight) fightTick(idt);
+  else if (!S.fork && !S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
   if (S.dun) dunTick(idt);
-  else if (!S.fork && !S.duel && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road') { S.timers.dun = rspan(PACE.dun); startDungeon(false); } }
+  else if (!S.fork && !S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { S.timers.dun = rspan(PACE.dun); startDungeon(false); } }
   if (S.ev) evTick(idt);
   else { S.timers.event -= gdt; if (S.timers.event <= 0) { S.timers.event = rspan(PACE.event); startEvent(); } }
+  arenaStep(idt);
+  chat.tick(idt);
   saveAcc += realDt; if (saveAcc > 5) { saveAcc = 0; save(); }
 }
 function fmtDur(sec) { const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60); return h ? `${h} ч ${m} мин` : `${m} мин`; }
@@ -2029,8 +1902,9 @@ function fmtDur(sec) { const h = Math.floor(sec / 3600), m = Math.round((sec % 3
 function simulateAway(sec, why) {
   if (!(sec >= 60)) return null;
   const h = S.hero, cap = Math.min(sec, PACE.offCap);
-  if (S.duel) { S.duel = null; h.state = 'road'; diary('Соперник по дуэли не дождался и ушёл с арены.', 'duel'); }
   if (S.dun) dunAutoFinish();
+  if (S.fight) autoResolveBattle(S.fight);
+  S.arena.apps = S.arena.apps.filter(a => a.joined === null && !a.mine);
   if (S.ev && S.ev.phase === 'live') resolveEvent();
   if (S.ev) S.ev = null;
   const c = { wins: 0, deaths: 0, quests: 0, forks: 0, lvls: 0, items: [] };
@@ -2070,6 +1944,771 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV4) { delete S._migratedV4; diary('✨ В мир пришла Арена! Теперь бои идут по зонам (голова, грудь, живот, пояс, ноги), а в пещерах есть карта, ключи и боссы. Заглядывайте во вкладку «Арена» и в чат.', 'level'); }
+}
+
+/* =====================================================================
+   11) ПРОВАЙДЕРЫ v4: бои/арена и чат.
+   Вся «чужая воля» в боях (боты сейчас, живые игроки потом) идёт через
+   FightProvider, а чат — через ChatProvider. Для онлайна (например, Supabase
+   Realtime) достаточно реализовать NetworkFightProvider / NetworkChatProvider
+   с теми же методами и заменить две строки создания провайдеров ниже.
+   ===================================================================== */
+class FightProvider {
+  /** Ходы всех не-наших бойцов. view: {id, turn, fighters:[{id,team,cls,hp,max,alive,isMe}], tele}
+   *  @returns {Promise<Array<{fid,target,atk:string[],blk:string[]}>>|Array} — можно вернуть не всех: недостающих доберёт локальная логика. */
+  decideTurn(view) { throw new Error('not implemented'); }
+  /** Сила бога-соперника в дуэли богов на этот ход. @returns {Promise<{act}|null>|{act}|null} */
+  rivalPower(view) { return null; }
+  /** Обновить заявки арены (новые заявки, вступления). Возвращает заявки с игроком, которые пора начинать. */
+  arenaTick(arena, dt, ctx) { return []; }
+  /** Боец-бот под уровень. @returns {{name,race,cls,lvl,rating}} */
+  makeBot(lvl) { throw new Error('not implemented'); }
+  reportFight(result) { }
+}
+class ChatProvider {
+  /** onMsg({from, x, c}) — входящие сообщения (боты/игроки/система) */
+  connect(onMsg) { this.on = onMsg; }
+  send(from, text) { }
+  system(text) { }
+  tick(dt) { }
+}
+const FIGHT_POW_COST = DUEL_COST;
+class LocalBotFightProvider extends FightProvider {
+  constructor(getState) { super(); this.st = getState; }
+  decideTurn(view) {
+    const F = this.st().fight; if (!F || F.id !== view.id) return [];
+    return F.fighters.filter(f => !f.isMe && f.alive).map(f => Object.assign({ fid: f.id }, botBrain(F, f)));
+  }
+  rivalPower(view) {
+    const F = this.st().fight; const G = F && F.rivalGod; if (!G || G.left < 1 || R() > .4) return null;
+    const foe = F.fighters.find(f => f.team === 1), w = Object.assign({}, AI_W[G.pers] || AI_W.aggr);
+    if (foe && foe.hp / foe.max < .4) { w.heal = (w.heal || 0) + 6; w.rain = (w.rain || 0) + 3; }
+    const opts = Object.keys(w).filter(k => FIGHT_POW_COST[k] <= G.faith && w[k] > 0); if (!opts.length) return null;
+    let r = R() * opts.reduce((s, k) => s + w[k], 0); for (const k of opts) { r -= w[k]; if (r <= 0) return { act: k }; }
+    return { act: opts[0] };
+  }
+  makeBot(lvl) {
+    const used = new Set((this.st().arena.apps || []).flatMap(a => appBots(a).map(b => b.name)));
+    let name = pick(BOT_NAMES), k = 0; while (used.has(name) && k++ < 20) name = pick(BOT_NAMES);
+    const L = clamp(lvl + rnd(-1, 1), 1, MAX_LVL);
+    return { name, race: pick(Object.keys(RACES)), cls: pick(Object.keys(CLASSES)), lvl: L, rating: Math.round(1000 + (L - 1) * 25 + rnd(-120, 120)) };
+  }
+  arenaTick(A, dt, ctx) {
+    const start = [];
+    for (const a of A.apps.slice()) {
+      a.t -= dt;
+      const fillP = dt * (a.joined !== null ? .28 : .08);
+      if (!appFull(a) && R() < fillP && !(a.type === 'duel' && a.joined === null && !a.mine)) appAddBot(a, this.makeBot(ctx.lvl));
+      if (a.type === 'duel' && a.mine && !appFull(a) && a.t < a.T - rnd(4, 12)) appAddBot(a, this.makeBot(ctx.lvl));
+      if (appFull(a)) {
+        if (a.joined !== null) { start.push(a); continue; }
+        if (a.type !== 'duel') { chatSys(`⚔ На арене начался бой: ${ARENA_TYPES[a.type].n} (${appTitle(a)}).`); A.apps.splice(A.apps.indexOf(a), 1); continue; }
+      }
+      if (a.t <= 0) {
+        if (a.joined !== null) { while (!appFull(a)) appAddBot(a, this.makeBot(ctx.lvl)); start.push(a); }
+        else A.apps.splice(A.apps.indexOf(a), 1);
+      }
+    }
+    if (A.apps.filter(a => !a.mine).length < 5 && R() < dt * .15) A.apps.push(newBotApp(A, this.makeBot(ctx.lvl), ctx.lvl));
+    return start;
+  }
+}
+class LocalBotChatProvider extends ChatProvider {
+  constructor() { super(); this.t = 25; this.pending = []; }
+  tick(dt) {
+    if (SILENT || !this.on) return;
+    this.t -= dt;
+    if (this.t <= 0) { this.t = rnd(60, 150); this.on({ from: pick(BOT_NAMES), x: pick(CHAT_BOT_LINES), c: 'bot' }); }
+    for (const p of this.pending.slice()) { p.t -= dt; if (p.t <= 0) { this.pending.splice(this.pending.indexOf(p), 1); this.on({ from: p.from, x: p.x, c: 'bot' }); } }
+  }
+  send(from, text) {
+    if (!this.on) return; this.on({ from, x: text, c: 'me' });
+    if (R() < .6) { const rr = CHAT_REPLIES.find(r => r.re.test(text)); this.pending.push({ t: rnd(2, 6), from: pick(BOT_NAMES), x: pick(rr.r).split('{me}').join(from) }); }
+  }
+  system(text) { if (this.on) this.on({ from: '', x: text, c: 'sys' }); }
+  fightNews(text) { this.system(text); if (R() < .2) this.pending.push({ t: rnd(3, 8), from: pick(BOT_NAMES), x: pick(['удачи!', 'ставлю на наших', 'опять без меня 😢', 'бей в голову!', 'смотрю лог, болею']) }); }
+}
+const fightProv = new LocalBotFightProvider(() => S);
+const chat = new LocalBotChatProvider();
+let chatVer = 0;
+chat.connect(m => {
+  if (!S || SILENT) return;
+  const C = S.chat; C.msgs.push({ tm: nowStr(), from: String(m.from || '').slice(0, 30), x: String(m.x || '').slice(0, 200), c: m.c || 'bot' });
+  if (C.msgs.length > 60) C.msgs.splice(0, C.msgs.length - 60);
+  if (!C.open && m.c !== 'me') C.unread = Math.min(99, C.unread + 1);
+  chatVer++;
+});
+const chatSys = t => chat.system(t);
+function chatSend(text) { text = String(text || '').trim().slice(0, 120); if (!text) return; chat.send(S.god.name, text); }
+
+/* =====================================================================
+   12) БОЙ ПО ЗОНАМ (как в «Бойцовском клубе»)
+   ===================================================================== */
+const TURN_T = 30, AUTO_T = 2.5, DMG_K = 1.6, MAX_TURNS = 40;
+const ARENA_KINDS = ['duel', 'group', 'chaos', 'godduel'];
+let FSEQ = 0;
+const newFid = () => 'f' + (++FSEQ) + Math.random().toString(36).slice(2, 6);
+function armorOf(h, temple) { const a = h.eq.armor; return (a ? a.ac + a.plus : 0) + Math.floor((temple || 0) / 2) + (h.feats && h.feats.includes('ironskin') ? 1 : 0); }
+function heroUnit() {
+  const h = S.hero, sh = sheet(), st = STYLE[h.cls];
+  return { id: 'me', name: h.name, team: 0, kind: 'hero', isMe: true, race: h.race, cls: h.cls, lvl: h.lvl, hp: Math.max(1, h.hp), max: h.maxHp,
+    avg: sh.avg, armor: armorOf(h, S.flock.temple), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
+    atkN: st.atk, blkN: st.blk, habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0 };
+}
+function botUnit(b) {
+  const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], max = calcMaxHp(vh);
+  return { id: newFid(), name: b.name, team: 1, kind: 'bot', race: b.race, cls: b.cls, lvl: b.lvl, hp: b.hpPct ? Math.max(1, Math.round(max * b.hpPct / 100)) : max, max,
+    avg: sh.avg, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
+    atkN: st.atk, blkN: st.blk, habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
+}
+function monsterUnit(name, tier, o) {
+  o = o || {}; tier = Math.max(1, tier);
+  const max = Math.round((12 + tier * 15) * (.9 + R() * .2) * (o.hp || 1));
+  return { id: newFid(), name, team: 1, kind: o.boss ? 'boss' : 'monster', cls: null, lvl: tier, hp: max, max, avg: (2.2 * tier + 2) * (o.dmg || 1),
+    armor: Math.ceil(tier / 3) + (o.boss ? 2 : 0), dex: Math.floor(tier / 5), intu: Math.floor(tier / 6), wis: Math.floor(tier / 6),
+    atkN: 1, blkN: o.boss ? 2 : 1, habit: pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, boss: o.boss || null, dealt: 0 };
+}
+function blkSet(z, n) { const i = ZONES.indexOf(z), at = k => ZONES[(i + k + 5) % 5]; return n <= 1 ? [z] : n === 2 ? [z, at(1)] : [at(-1), z, at(1)]; }
+function flog(F, t, c) { F.log.unshift({ t, c: c || 'sys' }); if (F.log.length > 80) F.log.length = 80; }
+const fAlive = (F, team) => F.fighters.filter(f => f.alive && (team === undefined || f.team === team));
+const fEnemies = (F, f) => F.fighters.filter(x => x.alive && x.team !== f.team);
+const fMe = F => F.fighters.find(f => f.isMe);
+const hpTag = f => `[${Math.max(0, f.hp)}/${f.max}]`;
+function wpick(w) { let s = 0; for (const k in w) s += w[k]; let r = R() * s; for (const k in w) { r -= w[k]; if (r <= 0) return k; } return Object.keys(w)[0]; }
+/* «Мозг» бота (и привычки героя, когда бог молчит) */
+function botBrain(F, f) {
+  const en = fEnemies(F, f); if (!en.length) return { target: null, atk: [], blk: [] };
+  let target;
+  if (f.isMe && F.my.target && en.find(e => e.id === F.my.target)) target = F.my.target;
+  else {
+    const w = {}; for (const e of en) w[e.id] = 1 + (e.hp / e.max < .35 ? 2 : 0) + ((e.cls === 'warrior' || e.cls === 'barbarian') ? .8 : 0) + (e.kind === 'boss' ? 1 : 0) + (e.isMe && f.kind !== 'bot' ? .5 : 0);
+    target = R() < .55 && F.lastTarget && F.lastTarget[f.id] && en.find(e => e.id === F.lastTarget[f.id]) ? F.lastTarget[f.id] : wpick(w);
+  }
+  const tb = (F.lastBlk || {})[target] || [];
+  const atk = [];
+  while (atk.length < f.atkN) {
+    const w = {}; for (const z of ZONES) w[z] = 1 + (z === f.habit ? 2.2 : 0) - (tb.includes(z) ? .6 : 0) + (z === 'head' ? .4 : 0);
+    const z = wpick(w); if (!atk.includes(z) || atk.length >= 4) atk.push(z);
+  }
+  let bz;
+  if (F.tele && f.team !== F.fighters.find(x => x.id === F.tele.fid).team && R() < (f.isMe ? .7 : .6)) bz = F.tele.zone;
+  else { const la = (F.lastAtk || {})[f.id] || []; bz = la.length && R() < .5 ? pick(la) : (R() < .4 ? 'head' : pick(ZONES)); }
+  const blk = f.blkN === 2 && R() < .5 ? blkSet(ZONES[(ZONES.indexOf(bz) + 4) % 5], 2) : blkSet(bz, f.blkN);
+  return { target, atk, blk };
+}
+function fightView(F) { return { id: F.id, turn: F.turn, tele: F.tele, fighters: F.fighters.map(f => ({ id: f.id, team: f.team, cls: f.cls, hp: f.hp, max: f.max, alive: f.alive, isMe: !!f.isMe })) }; }
+/* Начало боя. allies/enemies — массивы бойцов (наш герой — в allies). */
+function beginBattle(kind, allies, enemies, o) {
+  o = o || {};
+  allies.forEach(u => u.team = 0); enemies.forEach(u => u.team = 1);
+  const F = { id: 'b' + Date.now().toString(36) + rnd(100, 999), kind, title: o.title || 'Бой', fighters: allies.concat(enemies), turn: 0, phase: 'intro', t: 3, T: 3,
+    my: { atk: [], blk: [], target: null }, choices: {}, ready: false, log: [], auto: !!S.fightAuto || !!o.auto, powersLeft: 3, usedTurn: 0,
+    result: null, rew: '', win: null, rivalGod: o.rivalGod || null, ctx: o.ctx || {}, tele: null, lastAtk: {}, lastBlk: {}, lastTarget: {}, stuck: 0 };
+  S.fight = F;
+  const n0 = allies.map(u => u.name).join(', '), n1 = enemies.map(u => u.name).join(', ');
+  flog(F, `Бой начался! ${n0} против ${n1}. ${o.intro || ''}`.trim());
+  if (!SILENT) chat.fightNews(`⚔ ${F.title}: ${allies.length > 1 ? 'команда ' + S.hero.name : S.hero.name} против ${enemies.length > 1 ? enemies.length + ' противников' : enemies[0].name}.`);
+  return F;
+}
+function nextTurn(F) {
+  const me0 = fMe(F);
+  F.turn++; F.phase = 'turn'; F.T = F.auto || !(me0 && me0.alive) ? AUTO_T : TURN_T; F.t = F.T; F.choices = {}; F.ready = false; F.usedTurn = 0;
+  for (const f of F.fighters) { f.buf.shield = 0; f.buf.dodge = 0; }
+  const me = fMe(F), en = me ? fEnemies(F, me) : [];
+  F.my.atk = []; F.my.blk = F.my.blk && F.my.blk.length === (me ? me.blkN : 2) ? F.my.blk : [];
+  if (!F.my.target || !en.find(e => e.id === F.my.target)) F.my.target = en[0] ? en[0].id : null;
+  bossPreTurn(F);
+  if (F.auto && me && me.alive) { const c = botBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target }; F.ready = true; }
+  const st = S, id = F.id, turn = F.turn;
+  Promise.resolve(fightProv.decideTurn(fightView(F))).then(list => { if (S !== st || !S.fight || S.fight.id !== id || S.fight.turn !== turn) return; for (const c of list || []) S.fight.choices[c.fid] = c; }).catch(() => { });
+  if (F.rivalGod && F.rivalGod.left > 0) Promise.resolve(fightProv.rivalPower(fightView(F))).then(p => { if (p && S === st && S.fight && S.fight.id === id && S.fight.turn === turn && S.fight.phase === 'turn') rivalGodAct(S.fight, p.act); }).catch(() => { });
+}
+function bossPreTurn(F) {
+  F.tele = null;
+  const b = F.fighters.find(f => f.boss && f.alive); if (!b) return;
+  const m = b.boss.m;
+  if (m === 'tele' && F.turn % 2 === 0) { const z = pick(ZONES); F.tele = { zone: z, fid: b.id }; flog(F, `⚠ ${b.name} замахивается ${ZONE_ACC[z]} по всему отряду! Блокируйте ${ZONE_GEN[z]}!`, 'warn'); }
+  if (m === 'adds' && (F.turn === 3 || F.turn === 6)) {
+    for (let i = 0; i < 2; i++) { const a = monsterUnit('Крысёныш', Math.max(1, b.lvl - 4), {}); a.team = b.team; F.fighters.push(a); }
+    flog(F, `⚠ ${b.name} свистнул — из нор лезут крысята!`, 'warn');
+  }
+  if (m === 'sweep' && F.turn % 3 === 0) flog(F, `⚠ ${b.name} раскручивает хвост — сейчас достанется всем!`, 'warn');
+  if (m === 'enrage' && !b.used.enr && b.hp < b.max / 2) { b.used.enr = 1; b.atkN = 2; b.avg *= 1.2; flog(F, `⚠ ${b.name} в ярости! Теперь бьёт дважды за ход.`, 'warn'); }
+}
+function fightTargetOk(F, f, t) { const x = F.fighters.find(e => e.id === t); return x && x.alive && x.team !== f.team; }
+function choiceFor(F, f) {
+  if (f.isMe) {
+    const c = { target: F.my.target, atk: F.my.atk.slice(), blk: F.my.blk.slice() };
+    if (c.atk.length < f.atkN || c.blk.length !== f.blkN || !fightTargetOk(F, f, c.target)) {
+      const b = botBrain(F, f); let note = false;
+      if (!fightTargetOk(F, f, c.target)) { c.target = b.target; note = true; }
+      while (c.atk.length < f.atkN) { c.atk.push(b.atk[c.atk.length] || pick(ZONES)); note = true; }
+      if (c.blk.length !== f.blkN) { c.blk = b.blk; note = true; }
+      if (note && !F.auto) flog(F, `${f.name} не дождался подсказки бога и действует по привычке.`, 'sys');
+    }
+    return c;
+  }
+  let c = F.choices[f.id];
+  if (!c || !Array.isArray(c.atk) || !Array.isArray(c.blk)) c = botBrain(F, f);
+  if (!fightTargetOk(F, f, c.target)) c = Object.assign({}, c, { target: botBrain(F, f).target });
+  return { target: c.target, atk: c.atk.filter(z => ZONES.includes(z)).slice(0, f.atkN), blk: c.blk.filter(z => ZONES.includes(z)).slice(0, 3) };
+}
+function hitOne(F, a, d, z, picks, o) {
+  o = o || {};
+  const P = picks[d.id] || { blk: [] };
+  const aimed = a.cls && STYLE[a.cls].aimed && R() < .15;
+  const blocked = !o.magic && !o.aoe && P.blk.includes(z) && !aimed || (o.aoe && P.blk.includes(z));
+  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
+  const bard = F.fighters.some(x => x.alive && x.team === a.team && x.cls === 'bard');
+  let critP = clamp(.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0), .03, .45);
+  if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
+  if (a.debuf > 0) critP = 0;
+  const zacc = ZONE_ACC[z];
+  if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
+  const crit = R() < critP;
+  if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
+  let dmg = a.avg * DMG_K * (.75 + R() * .5) * ZONE_MUL[z] * (o.mul || 1);
+  if (crit) dmg *= blocked ? 1 : 2;
+  if (a.cls === 'barbarian') dmg *= 1.15 * (a.hp < a.max / 2 ? 1.3 : 1);
+  if (a.cls === 'rogue' && F.turn === 1) dmg *= 1.5;
+  if (a.debuf > 0) dmg *= .6;
+  dmg *= 1 - Math.min(.5, d.armor * ZONE_ARM[z] * .035);
+  if (d.buf.shield) dmg *= .3;
+  dmg = Math.max(1, Math.round(dmg));
+  const adv = pick(F_ADV), verb = pick(F_VERB);
+  const line = crit ? `${a.name} ${pick(F_CRIT)} ${verb} ${zacc}${blocked ? ', пробив блок' : ''}! Критический удар` : `${a.name} ${adv} ${verb} ${zacc}${aimed ? ' (меткий выстрел сквозь блок)' : ''}…`;
+  return { dmg, line, c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe') };
+}
+function resolveTurn(F) {
+  const alive = F.fighters.filter(f => f.alive), picks = {}, pend = {};
+  for (const f of alive) picks[f.id] = choiceFor(F, f);
+  F.lastAtk = {}; F.lastBlk = {};
+  const add = (d, v) => { pend[d.id] = (pend[d.id] || 0) + v; };
+  const lines = [];
+  for (const a of alive) {
+    const P = picks[a.id], d = F.fighters.find(x => x.id === P.target);
+    if (!d || !d.alive) continue;
+    F.lastTarget[a.id] = d.id;
+    let zones = P.atk;
+    if (F.tele && F.tele.fid === a.id) zones = [];
+    for (const z of zones) {
+      const r = hitOne(F, a, d, z, picks);
+      (F.lastAtk[d.id] = F.lastAtk[d.id] || []).push(z);
+      if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; }
+      lines.push({ r, d });
+    }
+    if (a.cls === 'mage' && F.turn % 3 === 0) { const r = hitOne(F, a, d, 'chest', picks, { magic: 1, mul: .8 }); if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; r.line = `🔥 ${a.name} швыряет огненный шар!`; r.c = 'crit'; } lines.push({ r, d }); }
+    if (a.bear > 0) { a.bear--; const r = hitOne(F, a, d, pick(ZONES), picks, { mul: .8 }); if (r.dmg) { add(d, r.dmg); r.line = `🐻 Божий медведь ${a.isMe ? 'героя' : ''} кусает противника…`; } lines.push({ r, d }); }
+  }
+  // приёмы боссов по площади
+  for (const b of alive.filter(f => f.boss)) {
+    const foes = alive.filter(x => x.team !== b.team);
+    if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: 1.5 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
+    if (b.boss.m === 'sweep' && F.turn % 3 === 0) for (const d of foes) { const r = hitOne(F, b, d, 'legs', picks, { magic: 1, mul: .6 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `🌀 Хвост ${b.name} сбивает с ног…` : r.line; lines.push({ r, d }); }
+  }
+  for (const f of alive) { const P = picks[f.id]; F.lastBlk[f.id] = P.blk; }
+  // применяем урон одновременно
+  for (const f of alive) if (pend[f.id]) f.hp -= pend[f.id];
+  flog(F, `— Ход ${F.turn} —`, 'turn');
+  for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg} ${hpTag(d)}` : r.line, r.c);
+  for (const f of alive) {
+    if (f.hp <= 0) { f.hp = 0; f.alive = false; flog(F, '☠ ' + pick(F_DEATH).replace('{d}', f.name), 'dead'); continue; }
+    if (f.cls === 'warrior' && !f.used.wind && f.hp < f.max * .3) { f.used.wind = 1; const a = Math.round(f.max * .25); f.hp = Math.min(f.max, f.hp + a); flog(F, `💨 ${f.name}: второе дыхание! +${a} ${hpTag(f)}`, 'heal'); }
+    if (f.cls === 'cleric' && !f.used.word) {
+      const allies = F.fighters.filter(x => x.alive && x.team === f.team && x.hp > 0 && x.hp < x.max * .4).sort((a, b) => a.hp / a.max - b.hp / b.max);
+      if (allies.length) { const t = allies[0]; f.used.word = 1; const a = Math.round(t.max * .2); t.hp = Math.min(t.max, t.hp + a); flog(F, `✚ ${f.name} читает исцеляющее слово: ${t.name} +${a} ${hpTag(t)}`, 'heal'); }
+    }
+    if (f.debuf > 0) f.debuf--;
+  }
+  const me = fMe(F); if (me && F.kind !== 'monster') S.hero.hp = clamp(me.hp, 1, S.hero.maxHp); else if (me && me.hp > 0) S.hero.hp = Math.min(S.hero.maxHp, me.hp);
+  checkBattleEnd(F);
+}
+function checkBattleEnd(F) {
+  if (F.phase === 'end') return true;
+  const a0 = fAlive(F, 0).length, a1 = fAlive(F, 1).length;
+  if (!a0 || !a1 || F.turn >= MAX_TURNS) {
+    let win = a0 > 0 && !a1 ? 0 : a1 > 0 && !a0 ? 1 : null;
+    if (win === null) { const pct = t => F.fighters.filter(f => f.team === t).reduce((s, f) => s + Math.max(0, f.hp) / f.max, 0); win = pct(0) >= pct(1) ? 0 : 1; flog(F, 'Судья свистит: время вышло! Победа по очкам.', 'sys'); }
+    endBattle(F, win); return true;
+  }
+  if (F.phase !== 'end') nextTurn(F);
+  return false;
+}
+/* Силы бога в бою: не больше 3 за бой и 1 за ход */
+function applyFightPower(F, user, id, mu, who) {
+  const en = fEnemies(F, user), tgt = (user.isMe && en.find(e => e.id === F.my.target)) || (who === 'rival' ? en.find(e => e.isMe) : null) || en[0];
+  const name = DUEL_NAMES[id] || id;
+  let txt = '';
+  switch (id) {
+    case 'heal': { const a = Math.round(user.max * .25 * mu); user.hp = Math.min(user.max, user.hp + a); txt = `${user.name} +${a} ${hpTag(user)}`; break; }
+    case 'rain': for (const f of F.fighters.filter(x => x.alive && x.team === user.team)) f.hp = Math.min(f.max, f.hp + Math.round(f.max * .12 * mu)); txt = 'союзники подлечились'; break;
+    case 'bless': user.buf.crit = 1; txt = `следующий удар ${user.name} — критический`; break;
+    case 'shield': user.buf.shield = 1; txt = `урон по ${user.name} в этом ходу −70%`; break;
+    case 'luck': user.buf.dodge = .3; txt = `${user.name} скользкий, как угорь`; break;
+    case 'curse': if (tgt) { tgt.debuf = 2; txt = `${tgt.name} ослаблен на 2 хода`; } break;
+    case 'beast': user.bear = 2; txt = 'на помощь идёт медведь'; break;
+    case 'bolt': if (tgt) { const d = Math.max(1, Math.round(tgt.max * .12 * mu)); tgt.hp -= d; txt = `${tgt.name} −${d} ${hpTag(tgt)}`; } break;
+    case 'quake': for (const e of en) e.hp -= Math.max(1, Math.round(e.max * .07 * mu)); txt = 'противники попадали'; break;
+  }
+  flog(F, `${who === 'rival' ? '😈 Бог ' + F.rivalGod.name : '✨ Ваш бог'}: ${name} — ${txt}`, who === 'rival' ? 'foe' : 'god');
+  for (const f of F.fighters) if (f.alive && f.hp <= 0) { f.hp = 0; f.alive = false; flog(F, '☠ ' + pick(F_DEATH).replace('{d}', f.name), 'dead'); }
+  const me = fMe(F); if (me) S.hero.hp = clamp(me.hp, F.kind === 'monster' ? 0 : 1, S.hero.maxHp);
+  if (!fAlive(F, 0).length || !fAlive(F, 1).length) { const win = fAlive(F, 0).length ? 0 : 1; endBattle(F, win); }
+}
+function fightPower(id) {
+  const F = S.fight; if (!F || F.phase !== 'turn') return toast('Силы в бою — только во время хода.');
+  if (F.powersLeft < 1) return toast('Лимит сил на этот бой исчерпан (3).');
+  if (F.usedTurn >= 1) return toast('Одна сила за ход.');
+  if (!S.god.skills[id]) return toast('Сила не изучена.');
+  const me = fMe(F); if (!me || !me.alive) return toast('Ваш герой уже не в строю.');
+  const c = powerCost(id); if (S.god.faith < c) return toast('Не хватает веры.');
+  S.god.faith -= c; F.powersLeft--; F.usedTurn++; shiftAlign(POWERS[id].al); addGxp(c / 3);
+  applyFightPower(F, me, id, pmult(id), 'me');
+}
+function rivalGodAct(F, act) {
+  const G = F.rivalGod, foe = F.fighters.find(f => f.team === 1 && f.alive); if (!G || !foe || G.left < 1 || !FIGHT_POW_COST[act]) return;
+  if (G.faith < FIGHT_POW_COST[act]) return;
+  G.faith -= FIGHT_POW_COST[act]; G.left--;
+  applyFightPower(F, foe, act, 1 + .5 * Math.min(2, Math.floor(G.lvl / 3)), 'rival');
+}
+function fightZone(arg) {
+  const F = S.fight; if (!F || F.phase !== 'turn' || F.auto) return;
+  const me = fMe(F); if (!me || !me.alive) return;
+  const [k, z] = String(arg).split(':'); if (!ZONES.includes(z)) return;
+  if (k === 'a') { if (me.atkN === 1) F.my.atk = [z]; else { const i = F.my.atk.indexOf(z); if (i >= 0) F.my.atk.splice(i, 1); else { F.my.atk.push(z); if (F.my.atk.length > me.atkN) F.my.atk.shift(); } } }
+  else F.my.blk = blkSet(z, me.blkN);
+}
+function fightTarget(id) { const F = S.fight; if (!F || F.phase !== 'turn') return; const me = fMe(F); if (me && fightTargetOk(F, me, id)) F.my.target = id; }
+function fightGo() {
+  const F = S.fight; if (!F || F.phase !== 'turn') return;
+  const me = fMe(F);
+  if (me && me.alive && (F.my.atk.length < me.atkN || F.my.blk.length !== me.blkN)) return toast(`Выберите ${me.atkN > 1 ? 'две зоны удара' : 'зону удара'} и блок.`);
+  F.ready = true; resolveTurn(F);
+}
+function fightAuto(on) {
+  const F = S.fight; S.fightAuto = on === undefined ? !S.fightAuto : !!on;
+  if (F) { F.auto = S.fightAuto; if (F.phase === 'turn') { if (F.auto) { F.t = Math.min(F.t, AUTO_T); const me = fMe(F); if (me && me.alive) { const c = botBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target }; } } else { F.T = TURN_T; F.t = TURN_T; } } }
+}
+function fightTick(idt) {
+  const F = S.fight;
+  F.t -= idt;
+  if (F.phase === 'intro') { if (F.t <= 0) nextTurn(F); return; }
+  if (F.phase === 'end') { if (F.t <= 0) closeFight(); return; }
+  if (F.t <= 0) resolveTurn(F);
+}
+function closeFight() {
+  const F = S.fight; if (!F) return; S.fight = null;
+  if (F.kind === 'dungeon' && S.dun && S.dun.phase === 'fight') { S.dun.phase = 'explore'; S.dun.idle = 0; }
+}
+function autoResolveBattle(F) {
+  F.auto = true; let k = 0;
+  while (S.fight === F && F.phase !== 'end' && k++ < 200) { if (F.phase === 'intro') nextTurn(F); else resolveTurn(F); }
+  if (S.fight === F) closeFight();
+}
+/* Травмы после поражений: временный штраф к характеристике */
+function injure(sev, why) {
+  const h = S.hero; if (!INJURIES[sev]) return;
+  if (h.inj.length >= 4) h.inj.shift();
+  const s = pick(STATS), J = INJURIES[sev];
+  h.inj.push({ k: sev, s, t: J.t, n: INJ_TEXT[s] });
+  if (s === 'con') recalcHp();
+  diary(`🤕 ${why || 'После боя'}: ${J.n} — ${INJ_TEXT[s]} (${STAT_SHORT[s]} −${J.pen}). Пройдёт за ${fmtDur(J.t)} или после отдыха в храме.`, 'fight');
+}
+function healInjuries(kind) {
+  const h = S.hero; if (!h.inj.length) return 0; const n0 = h.inj.length;
+  if (kind === 'temple' || kind === 'all') h.inj = [];
+  else if (kind === 'one') h.inj.shift();
+  else { h.inj = h.inj.filter(j => j.k !== 'light'); h.inj.forEach(j => j.t = Math.floor(j.t / 2)); }
+  recalcHp(); return n0 - h.inj.length;
+}
+function endBattle(F, winTeam) {
+  if (F.phase === 'end') return;
+  F.phase = 'end'; F.t = F.kind === 'dungeon' ? 6 : 12; F.T = F.t; F.win = winTeam; F.tele = null;
+  const h = S.hero, me = fMe(F), won = winTeam === 0, L = h.lvl;
+  const foes = F.fighters.filter(f => f.team === 1), fx = [];
+  if (F.kind === 'monster') {
+    if (won && h.monster) { h.hp = Math.max(1, me.hp); h.monster.hp = 0; const bx = Math.round(xpUnit(L) * .8); winFight(); gainXp(bx); fx.push(`+${bx} опыта за ручной бой`); F.result = '🏆 Победа в ручном бою!'; }
+    else { h.hp = 0; h.monster = null; h.state = 'fight'; killHero(`Пал в ручном бою с противником «${foes[0].name}». Бог руководил, но не спас.`); F.result = '💀 Герой пал в бою.'; }
+  } else if (F.kind === 'dungeon') {
+    F.result = won ? '🏆 Отряд победил!' : '💀 Отряд разбит.';
+    dunAfterFight(F, won);
+  } else {
+    const fat = Math.max(.25, 1 - .15 * (S.arena.fat || 0));
+    const er = foes.reduce((s, f) => s + (f.rating || 1000), 0) / Math.max(1, foes.length);
+    const exp = 1 / (1 + Math.pow(10, (er - S.arena.rating) / 400)), dr = Math.round(32 * ((won ? 1 : 0) - exp));
+    S.arena.rating = Math.max(100, S.arena.rating + dr); S.arena.fat = (S.arena.fat || 0) + 1;
+    h.hp = clamp(me ? me.hp : 1, 1, h.maxHp); h.state = 'road';
+    if (won) {
+      S.arena.w++; S.stats.arenaW++;
+      const x = Math.round(xpUnit(L) * (3 + 1.5 * foes.length) * fat), g = Math.round(12 * goldScale(L) * foes.length * fat);
+      gainXp(x); h.gold += g; fx.push(`+${x} опыта`, `+${g} 💰`, `рейтинг ${dr >= 0 ? '+' : ''}${dr}`);
+      if (h.hp < h.maxHp * .2 && R() < .3) injure('light', 'Победа далась тяжело');
+    } else {
+      S.arena.l++; S.stats.arenaL++;
+      const x = Math.round(xpUnit(L) * 1 * fat); gainXp(x); fx.push(`+${x} опыта за опыт`, `рейтинг ${dr}`);
+      const r = R(); injure(r < .1 ? 'heavy' : r < .35 ? 'mid' : 'light', 'Поражение на арене');
+    }
+    if (F.kind === 'godduel') {
+      const G = F.rivalGod;
+      rivals.reportDuel({ godId: G.godId, playerWon: won });
+      if (won) { S.stats.dwins++; const n = rnd(2, 5) + Math.floor(S.flock.army / 5); S.flock.fol += n; addTrust(5); addGxp(30); fx.push(`+${n} паствы`, '+5 доверия'); }
+      else { const g = Math.floor(h.gold * .1), n = Math.min(Math.floor(S.flock.fol), rnd(1, 3)); h.gold -= g; S.flock.fol -= n; addTrust(-3); addGxp(12); fx.push(`−${g} 💰`, `−${n} паствы`, '−3 доверия'); }
+    } else addGxp(won ? 12 : 5);
+    if (fat < 1) fx.push(`усталость: награда ×${fat.toFixed(2)}`);
+    F.result = won ? `🏆 Победа! ${F.kind === 'godduel' ? 'Бог ' + F.rivalGod.name + ' посрамлён.' : ''}` : `💔 Поражение. ${F.kind === 'godduel' ? 'Бог ' + F.rivalGod.name + ' злорадствует.' : 'Бывает.'}`;
+    diary(won ? `🏆 ${F.title}: победа! ${pick(['Арена ревела.', 'Мой бог гордится мной (надеюсь).', 'Противники ушли зализывать раны.'])}` : `💔 ${F.title}: поражение. ${pick(['Где был мой бог?', 'Ничего, в следующий раз.', 'Зато красиво падал.'])}`, 'duel', fx.join(', '));
+    fightProv.reportFight({ kind: F.kind, won, rating: S.arena.rating });
+  }
+  F.rew = fx.join(', ');
+  flog(F, (F.result || '') + (F.rew ? ' ' + F.rew : ''), 'sys');
+  if (!SILENT && F.kind !== 'dungeon') chat.fightNews(`🏁 ${F.title} окончен: ${won ? 'победил' : 'проиграл'} ${h.name}.`);
+}
+
+/* ---------- Запуск боёв ---------- */
+const heroFree = () => S.hero.state !== 'dead' && (S.hero.state === 'road' || S.hero.state === 'town') && !S.fight && !S.dun && !S.fork && !duelPending && !dunPending;
+function startMonsterFight() {
+  const h = S.hero, m = h.monster;
+  if (!m || h.state !== 'fight' || S.fight || S.dun) return false;
+  const u = monsterUnit(m.n, m.tier || h.lvl, {}); u.max = m.max; u.hp = Math.max(1, m.hp);
+  beginBattle('monster', [heroUnit()], [u], { title: `Ручной бой: ${m.n}`, intro: 'Бог берёт бой под контроль!' });
+  return true;
+}
+async function startGodDuel(godId) {
+  if (!heroFree() || S.hero.state !== 'road') return false;
+  const h = S.hero, st = S; h.state = 'duel'; duelPending = true;
+  let opp;
+  try { opp = await rivals.findOpponent({ godLvl: S.god.lvl, heroLvl: h.lvl, godId }); } finally { duelPending = false; }
+  if (S !== st || h.state !== 'duel' || S.fight || S.dun) { if (S === st && h.state === 'duel' && !S.fight) h.state = 'road'; return false; }
+  const me = heroUnit(), foe = botUnit({ name: opp.hero, race: opp.race, cls: opp.cls, lvl: opp.heroLvl, rating: 1000 + opp.lvl * 30 });
+  me.avg *= 1 + Math.min(S.flock.army, 10) * .02; foe.avg *= 1 + Math.min(opp.army || 0, 10) * .02;
+  beginBattle('godduel', [me], [foe], { title: `Дуэль богов: ${S.god.name} против ${opp.god}`, rivalGod: { godId: opp.godId, name: opp.god, pers: opp.pers, lvl: opp.lvl, faith: 50 + opp.lvl * 12, left: 3 },
+    intro: `${opp.hero} (${RACES[opp.race].n.toLowerCase()}-${CLASSES[opp.cls].n.toLowerCase()}) говорит, что ваш бог — «так себе».` });
+  S.stats.duels++; S.timers.duel = Math.max(S.timers.duel, 1200);
+  diary(`⚔ Встретил героя по имени ${opp.hero} (его бог — ${opp.god}). Дуэль богов!`, 'duel');
+  toast('⚔ Дуэль богов! Выбирайте удар и блок.');
+  return true;
+}
+const startDuel = startGodDuel;
+
+/* ---------- Арена: заявки ---------- */
+const appBots = a => a.type === 'chaos' ? a.members.filter(m => !m.me) : a.teams.flat().filter(m => !m.me);
+const appCount = a => a.type === 'chaos' ? a.members.length : a.teams[0].length + a.teams[1].length;
+const appCap = a => a.type === 'chaos' ? a.size : a.size * 2;
+const appFull = a => appCount(a) >= appCap(a);
+const appTitle = a => a.type === 'duel' ? '1нс1' : a.type === 'group' ? `${a.size}нс${a.size}` : `${a.size} бойцов`;
+function appAddBot(a, b) {
+  if (appFull(a)) return;
+  if (a.type === 'chaos') a.members.push(b);
+  else { const t = a.teams[0].length < a.size && (a.teams[1].length >= a.size || a.teams[0].length <= a.teams[1].length) ? 0 : 1; a.teams[t].push(b); }
+}
+function newBotApp(A, author, lvl) {
+  const r = R(), type = r < .4 ? 'duel' : r < .75 ? 'group' : 'chaos';
+  const size = type === 'duel' ? 1 : type === 'group' ? (R() < .6 ? 3 : R() < .6 ? 5 : 2) : (R() < .6 ? 6 : 8);
+  const a = { id: 'a' + (++A.seq), type, size, author: author.name, lvl: [Math.max(1, lvl - 2), Math.min(MAX_LVL, lvl + 2)], teams: [[author], []], members: [author], joined: null, mine: false, t: rnd(90, 200), T: 0 };
+  if (type === 'chaos') { a.teams = [[], []]; const k = rnd(0, size - 3); for (let i = 0; i < k; i++) appAddBot(a, fightProv.makeBot(lvl)); }
+  else if (type === 'group') { a.members = []; const k = rnd(0, size); for (let i = 0; i < k; i++) appAddBot(a, fightProv.makeBot(lvl)); }
+  else a.members = [];
+  a.T = a.t; return a;
+}
+function arenaCanJoin(silent) {
+  const h = S.hero;
+  if (!heroFree()) { if (!silent) toast(h.state === 'dead' ? 'Герой мёртв.' : 'Герой сейчас занят.'); return false; }
+  if (h.hp < h.maxHp * .3) { if (!silent) toast('Герой слишком изранен для арены (нужно 30% HP). Пусть отдохнёт.'); return false; }
+  if (S.arena.apps.some(a => a.joined !== null)) { if (!silent) toast('Вы уже в заявке.'); return false; }
+  return true;
+}
+function arenaJoin(arg) {
+  const [id, side] = String(arg).split(':'), a = S.arena.apps.find(x => x.id === id); if (!a || !arenaCanJoin()) return;
+  const me = { me: true, name: S.hero.name };
+  if (a.type === 'duel') { if (a.mine || appFull(a)) return; a.teams[1].push(me); a.joined = 1; startArenaFight(a); return; }
+  if (appFull(a)) return toast('Заявка уже заполнена.');
+  if (a.type === 'chaos') { a.members.push(me); a.joined = 'chaos'; }
+  else { const t = +side === 1 ? 1 : 0; if (a.teams[t].length >= a.size) return toast('В этой команде нет мест.'); a.teams[t].push(me); a.joined = t; }
+  a.t = Math.min(a.t, 60); toast('📜 Вы в заявке. Бой начнётся, когда наберутся бойцы.');
+}
+function arenaLeave(id) {
+  const a = S.arena.apps.find(x => x.id === id); if (!a || a.joined === null) return;
+  if (a.mine) { S.arena.apps.splice(S.arena.apps.indexOf(a), 1); return; }
+  a.members = a.members.filter(m => !m.me); a.teams = a.teams.map(t => t.filter(m => !m.me)); a.joined = null;
+}
+function arenaPost(arg) {
+  if (!arenaCanJoin()) return;
+  const [type, sz] = String(arg).split(':'), A = S.arena, me = { me: true, name: S.hero.name };
+  if (!ARENA_TYPES[type]) return;
+  const size = type === 'duel' ? 1 : clamp(+sz || 3, 2, 8);
+  const a = { id: 'a' + (++A.seq), type, size, author: S.hero.name, lvl: [Math.max(1, S.hero.lvl - 2), Math.min(MAX_LVL, S.hero.lvl + 2)], teams: [[me], []], members: [me], joined: type === 'chaos' ? 'chaos' : 0, mine: true, t: 75, T: 75 };
+  if (type !== 'chaos') a.members = []; else a.teams = [[], []];
+  A.apps.unshift(a);
+  chatSys(`📜 ${S.hero.name} подал заявку: ${ARENA_TYPES[type].n} ${appTitle(a)}.`);
+  toast('📜 Заявка подана. Ждём соперников (не дольше 75 с — потом доберём ботов).');
+}
+function startArenaFight(a) {
+  const A = S.arena; A.apps = A.apps.filter(x => x !== a);
+  if (!heroFree() || S.hero.hp < S.hero.maxHp * .2) { toast('Бой по заявке начался без вашего героя — он был занят.'); return false; }
+  const mk = list => list.map(m => m.me ? heroUnit() : botUnit(m));
+  let allies, enemies;
+  if (a.type === 'chaos') {
+    const all = a.members.slice().sort(() => R() - .5), half = Math.ceil(all.length / 2);
+    let t0 = all.slice(0, half), t1 = all.slice(half); if (!t0.some(m => m.me)) [t0, t1] = [t1, t0];
+    allies = mk(t0); enemies = mk(t1);
+  } else { const mine = a.joined === 1 ? 1 : 0; allies = mk(a.teams[mine]); enemies = mk(a.teams[1 - mine]); }
+  S.hero.state = 'duel'; S.hero.monster = null; S.hero.restT = 0;
+  beginBattle(a.type, allies, enemies, { title: `${ARENA_TYPES[a.type].n} ${appTitle(a)}`, intro: a.type === 'chaos' ? 'Команды поделены случайно!' : '' });
+  return true;
+}
+function arenaStep(idt) {
+  const A = S.arena;
+  if ((A.fat || 0) > 0) A.fatT = (A.fatT || 0) + idt * S.speed;
+  if (A.fatT > 1200) { A.fatT = 0; A.fat = Math.max(0, A.fat - 1); }
+  const start = fightProv.arenaTick(A, idt, { lvl: S.hero.lvl });
+  for (const a of start) if (!S.fight) { if (!startArenaFight(a)) break; } else A.apps = A.apps.filter(x => x !== a);
+}
+
+/* =====================================================================
+   13) ПЕЩЕРЫ: карта комнат, отряд, ключи, ловушки, босс
+   ===================================================================== */
+let dunPending = false;
+const DW = 5, DH = 5;
+function ulog(t, c) { const U = S.dun; U.log.unshift({ t, c: c || 'sys' }); if (U.log.length > 40) U.log.length = 40; }
+const tileAt = (U, x, y) => x >= 0 && y >= 0 && x < DW && y < DH ? U.tiles[y * DW + x] : null;
+function genDungeon(lvl) {
+  const tiles = new Array(DW * DH).fill(null), sx = rnd(0, DW - 1), sy = DH - 1, N = rnd(12, 15);
+  const rooms = [[sx, sy]]; tiles[sy * DW + sx] = { t: 'start', seen: 1, done: 1 };
+  let guard = 0;
+  while (rooms.length < N && guard++ < 500) {
+    const [x, y] = pick(rooms), [dx, dy] = pick([[1, 0], [-1, 0], [0, 1], [0, -1], [0, -1]]), nx = x + dx, ny = y + dy;
+    if (nx < 0 || ny < 0 || nx >= DW || ny >= DH || tiles[ny * DW + nx]) continue;
+    tiles[ny * DW + nx] = { t: 'empty', seen: 0, done: 0 }; rooms.push([nx, ny]);
+  }
+  // расстояния от входа
+  const dist = new Array(DW * DH).fill(-1), q = [[sx, sy]]; dist[sy * DW + sx] = 0;
+  while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy, i = ny * DW + nx; if (nx >= 0 && ny >= 0 && nx < DW && ny < DH && tiles[i] && dist[i] < 0) { dist[i] = dist[y * DW + x] + 1; q.push([nx, ny]); } } }
+  const idx = rooms.map(([x, y]) => y * DW + x).filter(i => tiles[i].t !== 'start');
+  const boss = idx.reduce((b, i) => dist[i] > dist[b] ? i : b, idx[0]);
+  tiles[boss].t = 'boss';
+  const rest = idx.filter(i => i !== boss).sort(() => R() - .5);
+  const keyI = rest.findIndex(i => dist[i] >= 2); const key = rest.splice(keyI >= 0 ? keyI : 0, 1)[0]; tiles[key].t = 'key';
+  const plan = ['fight', 'fight', 'fight', 'fight', 'trap', 'trap', 'chest', 'chest', 'shrine'];
+  rest.forEach((i, k) => { if (plan[k]) tiles[i].t = plan[k]; });
+  const B = pick(BOSSES);
+  return { tiles, pos: { x: sx, y: sy }, boss: { n: B.n, m: B.m, d: B.d } };
+}
+function dunReveal(U) {
+  const r = U.party.some(p => p.cls === 'ranger' && (p.isMe || p.hp > 0)) ? 2 : 1;
+  for (let y = 0; y < DH; y++) for (let x = 0; x < DW; x++) { const t = tileAt(U, x, y); if (t && Math.abs(x - U.pos.x) + Math.abs(y - U.pos.y) <= r) t.seen = 1; }
+}
+const dunHas = (U, cls) => U.party.some(p => p.cls === cls && (p.isMe ? S.hero.state !== 'dead' : p.hp > 0));
+async function startDungeon(byCall) {
+  if (S.dun || S.fight || S.fork || duelPending || dunPending) return false;
+  const h = S.hero; if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon') return false;
+  if (!byCall && S.timers.dunCd > 0) return false;
+  const st = S; h.state = 'dungeon'; h.monster = null; h.restT = 0; dunPending = true;
+  let mates;
+  try { mates = await rivals.formParty({ heroLvl: h.lvl, godLvl: S.god.lvl }); } finally { dunPending = false; }
+  if (S !== st || h.state !== 'dungeon' || S.fight || S.dun) { if (S === st && h.state === 'dungeon' && !S.dun) h.state = 'road'; return false; }
+  const party = [{ godId: 'me', god: S.god.name, hero: h.name, race: h.race, cls: h.cls, lvl: h.lvl, isMe: true, hp: 100 }]
+    .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, hp: 100 })));
+  const G = genDungeon(h.lvl);
+  S.dun = { id: 'd' + Date.now().toString(36), name: pick(DUN_NAMES), tier: h.lvl, tiles: G.tiles, pos: G.pos, boss: G.boss, party, keys: 0, log: [], phase: 'explore', gold: 0, xp: 0, loot: [], fights: 0, idle: 0, auto: false, t: 0, result: null, byCall: !!byCall, picked: false };
+  dunReveal(S.dun);
+  S.stats.duns++; S.timers.dunCd = PACE.dunCd;
+  ulog(`Отряд у входа в «${S.dun.name}»: ${party.map(p => `${p.hero} (${CLASSES[p.cls].n.toLowerCase()})`).join(', ')}. Где-то в глубине ждёт ${G.boss.n}. Ищите ключ 🗝!`);
+  diary(`🏰 Спустился в «${S.dun.name}» с отрядом: ${mates.map(m => m.hero).join(', ')}. Факел взял. Совесть — тоже.`, 'event');
+  if (!SILENT) { chatSys(`🏰 Отряд ${h.name} спустился в «${S.dun.name}».`); toast('🏰 Пещера! Ведите отряд по карте: нажимайте на соседние комнаты.'); }
+  return true;
+}
+function partyUnits(U) {
+  const out = [heroUnit()];
+  for (const p of U.party) if (!p.isMe && p.hp > 0) out.push(botUnit({ name: p.hero, race: p.race, cls: p.cls, lvl: p.lvl, hpPct: p.hp, ref: p.godId }));
+  return out;
+}
+function dunMove(arg) {
+  const U = S.dun; if (!U || U.phase !== 'explore') return;
+  const [x, y] = String(arg).split(',').map(Number), t = tileAt(U, x, y);
+  if (!t || Math.abs(x - U.pos.x) + Math.abs(y - U.pos.y) !== 1) return;
+  if (t.t === 'boss' && !t.done && U.keys < 1) {
+    if (dunHas(U, 'rogue') && !U.picked) { U.picked = true; if (R() < .5) { ulog('🔓 Плут поковырялся в замке шпилькой — дверь открылась!', 'me'); U.keys++; } else { ulog('Плут сломал шпильку. Нужен ключ 🗝.', 'foe'); return; } }
+    else { ulog('🔒 Дверь в логово босса заперта. Нужен ключ 🗝.', 'foe'); return; }
+  }
+  U.pos = { x, y }; U.idle = 0; dunReveal(U); dunEnter(U, t);
+}
+function dunEnter(U, t) {
+  const h = S.hero, L = U.tier;
+  if (t.done) { ulog(pick(['Здесь уже были. Пахнет нами.', 'Знакомый зал. Тот же скелет машет рукой.'])); return; }
+  switch (t.t) {
+    case 'empty': ulog(pick(D_EMPTY)); t.done = 1; break;
+    case 'key': U.keys++; t.done = 1; ulog('🗝 Нашли ключ от логова босса! (Под ковриком. Как всегда.)', 'me'); break;
+    case 'shrine': { const a = healHero(h.maxHp * .4); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 40); }); t.done = 1; ulog(`⛲ Целебный источник: отряд подлечился (${h.name} +${a} HP).`, 'me'); break; }
+    case 'trap': {
+      t.done = 1; const tx = pick(D_TRAP);
+      if (dunHas(U, 'rogue')) { ulog(`🪤 ${tx} …но плут заметил растяжку и обезвредил ловушку.`, 'me'); break; }
+      const chk = check('dex', 11 + Math.ceil(L / 2));
+      if (chk.ok) { ulog(`🪤 ${tx} ${h.name} успел отпрыгнуть (${chk.label}).`, 'me'); break; }
+      let k = .15 + R() * .1; if (h.race === 'dwarf') k *= .67; if (hasFeat('sentinel')) k *= .3;
+      const d = Math.min(h.hp - 1, Math.round(h.maxHp * k)); if (d > 0) h.hp -= d;
+      U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.max(1, p.hp - rnd(10, 25)); });
+      ulog(`🪤 ${tx} Досталось всем (${chk.label}). ${h.name} −${Math.max(0, d)} HP.`, 'foe'); break;
+    }
+    case 'chest': {
+      if (R() < .15) { ulog('💎 Сундук открыл пасть — это мимик!', 'foe'); return dunFight(U, t, [monsterUnit('Сундук-мимик', L + 1, { hp: 1.1 })], 'Мимик!'); }
+      t.done = 1; const g = Math.round(rnd(15, 35) * goldScale(L)); U.gold += g; let txt = `${pick(D_CHEST)} +${g} 💰`;
+      if (R() < .45 || dunHas(U, 'rogue') && R() < .3) { const it = makeItem(undefined, L, rollRarity(.6)); U.loot.push(it); txt += `, «${it.n}» (${RARITY[it.rar].n})`; }
+      ulog('💎 ' + txt, 'me'); break;
+    }
+    case 'fight': {
+      const n = clamp(U.party.filter(p => p.isMe || p.hp > 0).length - 1 + rnd(0, 1), 1, 3), mons = [];
+      for (let i = 0; i < n; i++) { const tier = clamp(L + pick([-2, -1, -1, 0]), 1, 22), near = ALL_MONSTERS.filter(m => Math.abs(m[1] - tier) <= 1); mons.push(monsterUnit(pick(near.length ? near : ALL_MONSTERS)[0], tier, { hp: .85 })); }
+      return dunFight(U, t, mons, 'Засада!');
+    }
+    case 'boss': {
+      const pn = U.party.filter(p => p.isMe || p.hp > 0).length;
+      const b = monsterUnit(U.boss.n, L + 2, { hp: 1.6 + .45 * pn, dmg: 1.15, boss: { m: U.boss.m } });
+      const mons = [b]; if (pn >= 3) mons.push(monsterUnit('Прихвостень', Math.max(1, L - 1)));
+      ulog(`👑 ${U.boss.n}! ${U.boss.d}`, 'warn');
+      return dunFight(U, t, mons, `${U.boss.n}: ${U.boss.d}`);
+    }
+  }
+}
+function dunFight(U, t, mons, intro) {
+  U.phase = 'fight'; U.fightTile = U.tiles.indexOf(t);
+  const allies = partyUnits(U);
+  const F = beginBattle('dungeon', allies, mons, { title: `${U.name}: ${t.t === 'boss' ? 'босс' : 'бой'}`, intro, ctx: { tile: U.fightTile, boss: t.t === 'boss' } });
+  if (dunHas(U, 'mage')) { for (const m of mons) m.hp -= Math.max(1, Math.round(m.max * .12)); flog(F, '🔥 Маг отряда открывает бой огненным шаром: все противники обожжены!', 'crit'); }
+  if (SILENT) autoResolveBattle(F);
+}
+function dunAfterFight(F, won) {
+  const U = S.dun, h = S.hero; if (!U) return;
+  for (const f of F.fighters) if (f.team === 0 && f.ref) { const p = U.party.find(x => x.godId === f.ref); if (p) p.hp = f.alive ? Math.max(1, Math.round(f.hp / f.max * 100)) : 0; }
+  const me = fMe(F), t = U.tiles[F.ctx.tile];
+  if (!won) {
+    h.hp = Math.max(1, Math.min(h.maxHp, me.hp)); injure('mid', 'Вынесли из пещеры');
+    ulog(`🩹 Отряд разбит. ${h.name} без сознания — его вынесли на руках.`, 'foe');
+    return endDungeon(false, 'carried');
+  }
+  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * .15)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли и отряхнули.`, 'foe'); }
+  else h.hp = clamp(me.hp, 1, h.maxHp);
+  U.fights++;
+  const foes = F.fighters.filter(f => f.team === 1).length, boss = F.ctx.boss;
+  const x = Math.round(xpUnit(U.tier) * (boss ? 12 : 1.6 * foes)), g = Math.round(rnd(8, 18) * goldScale(U.tier) * (boss ? 4 : foes / 2));
+  U.xp += x; U.gold += g; if (t) t.done = 1;
+  let txt = `Победа! +${g} 💰, +${x} опыта в общий котёл.`;
+  if (!boss && R() < .3) { const it = makeItem(undefined, U.tier, rollRarity(.4)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
+  healHero(h.maxHp * .15); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 15); }); txt += ' Перевязались у костра.';
+  if (dunHas(U, 'cleric')) { healHero(h.maxHp * .2); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 20); }); txt += ' Жрец подлатал отряд.'; }
+  ulog('⚔ ' + txt, 'me');
+  if (boss) {
+    U.loot.push(makeItem(undefined, U.tier, Math.max(2, rollRarity(1.2)))); if (R() < .5) U.loot.push(makeItem(undefined, U.tier, Math.max(1, rollRarity(.8))));
+    S.stats.bosses++; endDungeon(true, 'boss');
+  }
+}
+function endDungeon(ok, why) {
+  const U = S.dun, h = S.hero; if (!U || U.phase === 'end') return;
+  const mult = why === 'carried' ? .4 : why === 'boss' ? 1 : .7;
+  const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 12 : 0)) * mult);
+  h.gold += gold; gainXp(xp); addGxp(20 + U.fights * 8 + (ok ? 25 : 0));
+  if (ok) { addTrust(3); S.stats.dwinsD++; }
+  const items = why === 'carried' ? U.loot.slice(0, 1) : U.loot, names = [];
+  for (const it of items) { const worn = equip(it, true); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
+  rivals.reportDungeon({ ok, godIds: U.party.filter(p => !p.isMe).map(p => p.godId) });
+  U.result = `${ok ? '🏆 Босс повержен, пещера пройдена!' : why === 'carried' ? '🩹 Героя вынесли на руках.' : why === 'left' ? '🚪 Отряд ушёл из пещеры.' : why === 'nokey' ? '🔒 Ключ так и не нашли — отряд ушёл.' : '😵 Отряд отступил.'} Добыча: ${gold} 💰, ${xp} опыта${names.length ? ', ' + names.join(', ') : ''}.`;
+  ulog(U.result, 'sys');
+  diary(`🏰 ${ok ? `Прошёл «${U.name}» и победил: ${U.boss.n}!` : `Вернулся из «${U.name}». Было темно и обидно.`}`, items.some(i => i.rar >= 2) ? 'rare' : 'event', `+${gold} 💰, +${xp} опыта${names.length ? ', ' + names.join(', ') : ''}`);
+  if (!SILENT) chatSys(`🏰 Отряд ${h.name} ${ok ? 'зачистил' : 'покинул'} «${U.name}».`);
+  U.phase = 'end'; U.t = 15; S.timers.dunCd = PACE.dunCd;
+  if (h.state === 'dungeon') h.state = 'road';
+}
+function dunLeave() { const U = S.dun; if (!U || U.phase !== 'explore') return; endDungeon(false, 'left'); }
+/* Автопроход: идём к ближайшей неисследованной комнате (босс — когда есть ключ) */
+function dunNextStep(U) {
+  const start = U.pos.y * DW + U.pos.x, prev = new Array(DW * DH).fill(-2), q = [start]; prev[start] = -1;
+  const passable = i => { const t = U.tiles[i]; return t && (t.t !== 'boss' || t.done || U.keys > 0); };
+  let found = -1, bossI = -1;
+  while (q.length) {
+    const i = q.shift(), x = i % DW, y = Math.floor(i / DW), t = U.tiles[i];
+    if (i !== start && !t.done) { if (t.t === 'boss') { if (bossI < 0) bossI = i; } else { found = i; break; } }
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy, j = ny * DW + nx; if (nx >= 0 && ny >= 0 && nx < DW && ny < DH && prev[j] === -2 && passable(j)) { prev[j] = i; q.push(j); } }
+  }
+  const goal = found >= 0 ? found : bossI; if (goal < 0) return null;
+  let j = goal; while (prev[j] !== start && prev[j] >= 0) j = prev[j];
+  return { x: j % DW, y: Math.floor(j / DW) };
+}
+function dunAutoStep() {
+  const U = S.dun; if (!U || U.phase !== 'explore') return;
+  const nx = dunNextStep(U);
+  if (!nx) { const boss = U.tiles.find(t => t && t.t === 'boss'); return endDungeon(false, boss && !boss.done && U.keys < 1 ? 'nokey' : 'left'); }
+  dunMove(nx.x + ',' + nx.y);
+}
+function dunToggleAuto() { if (S.dun) { S.dun.auto = !S.dun.auto; S.dun.idle = 0; } }
+function dunTick(idt) {
+  const U = S.dun;
+  if (U.phase === 'end') { U.t -= idt; if (U.t <= 0) S.dun = null; return; }
+  if (U.phase !== 'explore') return;
+  U.idle += idt;
+  if ((U.auto && U.idle >= 2.5) || U.idle >= 25) { if (!U.auto) ulog('Бог задумался — отряд пошёл сам.'); U.idle = 0; dunAutoStep(); }
+}
+function dunAutoFinish() {
+  let k = 0;
+  while (S.dun && k++ < 300) {
+    const U = S.dun;
+    if (S.fight) { autoResolveBattle(S.fight); continue; }
+    if (U.phase === 'end') { S.dun = null; break; }
+    if (U.phase === 'fight') { U.phase = 'explore'; continue; }
+    const p = { ...U.pos }; dunAutoStep();
+    if (S.dun && S.dun.phase === 'explore' && S.dun.pos.x === p.x && S.dun.pos.y === p.y && !S.fight) endDungeon(false, 'nokey');
+  }
+  if (S.dun) S.dun = null;
+  if (S.hero.state === 'dungeon') S.hero.state = 'road';
+}
+
+/* ---------- проверка сохранений v4 (вызывается из sanitize) ---------- */
+function validFight(F) {
+  if (!F || typeof F !== 'object' || !['monster', 'dungeon', ...ARENA_KINDS].includes(F.kind) || !['intro', 'turn', 'end'].includes(F.phase)) return false;
+  if (!Array.isArray(F.fighters) || F.fighters.length < 2 || !Array.isArray(F.log) || !F.my || typeof F.my !== 'object') return false;
+  for (const f of F.fighters) if (!(f && typeof f.id === 'string' && typeof f.name === 'string' && (f.team === 0 || f.team === 1) && isNum(f.hp) && isNum(f.max) && f.max > 0 && isNum(f.avg) && isNum(f.armor) && isNum(f.atkN) && isNum(f.blkN) && ZONES.includes(f.habit))) return false;
+  if (F.fighters.filter(f => f.isMe).length !== 1) return false;
+  for (const f of F.fighters) { f.hp = clamp(Math.round(f.hp), 0, f.max); f.alive = !!f.alive && f.hp > 0; f.atkN = clamp(Math.round(f.atkN), 1, 2); f.blkN = clamp(Math.round(f.blkN), 1, 3); if (!f.buf || typeof f.buf !== 'object') f.buf = {}; if (!f.used || typeof f.used !== 'object') f.used = {}; fixNum(f, 'debuf', 0, 0, 10); fixNum(f, 'bear', 0, 0, 10); fixNum(f, 'dealt', 0, 0); fixNum(f, 'dex', 0, -5, 10); fixNum(f, 'intu', 0, -5, 10); fixNum(f, 'wis', 0, -5, 10); }
+  const me = F.fighters.find(f => f.isMe), ids = F.fighters.map(f => f.id);
+  F.my.atk = Array.isArray(F.my.atk) ? [...new Set(F.my.atk.filter(z => ZONES.includes(z)))].slice(0, me.atkN) : [];
+  F.my.blk = Array.isArray(F.my.blk) ? [...new Set(F.my.blk.filter(z => ZONES.includes(z)))].slice(0, me.blkN) : [];
+  if (!ids.includes(F.my.target)) F.my.target = null;
+  if (!F.choices || typeof F.choices !== 'object') F.choices = {};
+  for (const k of ['lastAtk', 'lastBlk', 'lastTarget', 'ctx']) if (!F[k] || typeof F[k] !== 'object') F[k] = {};
+  fixNum(F, 'turn', 0, 0, 999); fixNum(F, 'T', TURN_T, 1, TURN_T); fixNum(F, 't', F.T, 0, F.T); fixNum(F, 'powersLeft', 3, 0, 3); F.powersLeft = Math.floor(F.powersLeft); fixNum(F, 'usedTurn', 0, 0, 3); fixNum(F, 'stuck', 0, 0);
+  F.auto = !!F.auto; F.ready = !!F.ready; if (F.log.length > 80) F.log.length = 80;
+  if (F.tele && !(F.tele && ids.includes(F.tele.fid))) F.tele = null;
+  if (F.rivalGod && !(typeof F.rivalGod === 'object' && typeof F.rivalGod.name === 'string')) F.rivalGod = null;
+  if (F.rivalGod) fixNum(F.rivalGod, 'left', 0, 0, 5);
+  if (F.phase === 'end' && !F.result) return false;
+  if (F.phase !== 'end' && (!F.fighters.some(f => f.alive && f.team === 0) || !F.fighters.some(f => f.alive && f.team === 1))) return false;
+  return true;
+}
+function validDun(U) {
+  if (!U || typeof U !== 'object' || !['explore', 'fight', 'end'].includes(U.phase) || !Array.isArray(U.tiles) || U.tiles.length !== DW * DH || !Array.isArray(U.party) || !Array.isArray(U.log) || !U.pos || !U.boss) return false;
+  if (!U.party.some(p => p && p.isMe)) return false;
+  for (const t of U.tiles) if (t !== null && !(t && DTILE[t.t])) return false;
+  if (!tileAt(U, U.pos.x, U.pos.y)) return false;
+  if (!U.tiles.some(t => t && t.t === 'boss')) return false;
+  U.party = U.party.filter(p => p && typeof p.hero === 'string' && CLASSES[p.cls] && RACES[p.race]).slice(0, 5);
+  for (const p of U.party) { fixNum(p, 'hp', 100, 0, 100); fixNum(p, 'lvl', 1, 1, MAX_LVL); }
+  U.loot = Array.isArray(U.loot) ? U.loot.filter(i => i && i.slot && validItem(i, i.slot)).map(sanitizeItem).slice(0, 10) : [];
+  fixNum(U, 'keys', 0, 0, 3); fixNum(U, 'gold', 0, 0); fixNum(U, 'xp', 0, 0); fixNum(U, 'fights', 0, 0); fixNum(U, 'idle', 0, 0, 60); fixNum(U, 't', 1, 0, 20); fixNum(U, 'tier', 1, 1, 30);
+  U.auto = !!U.auto; if (typeof U.name !== 'string') U.name = 'Пещера';
+  if (U.log.length > 40) U.log.length = 40;
+  return true;
+}
+function sanitizeArena(o, h) {
+  const d = { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 };
+  if (!o.arena || typeof o.arena !== 'object') o.arena = d;
+  const A = o.arena;
+  fixNum(A, 'rating', 1000, 0, 5000); A.rating = Math.round(A.rating); fixNum(A, 'w', 0, 0); fixNum(A, 'l', 0, 0); fixNum(A, 'fat', 0, 0, 10); fixNum(A, 'fatT', 0, 0, 100000); fixNum(A, 'seq', 0, 0);
+  A.apps = Array.isArray(A.apps) ? A.apps.filter(a => a && typeof a.id === 'string' && ARENA_TYPES[a.type] && isNum(a.size) && Array.isArray(a.teams) && a.teams.length === 2 && a.teams.every(Array.isArray) && Array.isArray(a.members) && isNum(a.t)).slice(0, 8) : [];
+  // своё участие в заявке после перезагрузки не держим (бот-арена всё равно локальная)
+  A.apps = A.apps.filter(a => !a.mine && a.joined === null && ![...a.teams[0], ...a.teams[1], ...a.members].some(m => m && m.me));
+  if (!o.chat || typeof o.chat !== 'object') o.chat = { msgs: [], unread: 0, open: false };
+  const C = o.chat;
+  C.msgs = Array.isArray(C.msgs) ? C.msgs.filter(m => m && typeof m.x === 'string' && typeof m.from === 'string').map(m => ({ tm: typeof m.tm === 'string' ? m.tm : '', from: m.from.slice(0, 30), x: m.x.slice(0, 200), c: ['bot', 'me', 'sys', 'fight'].includes(m.c) ? m.c : 'bot' })).slice(-60) : [];
+  fixNum(C, 'unread', 0, 0, 99); C.unread = Math.floor(C.unread); C.open = !!C.open;
 }
 
 /* =====================================================================
@@ -2098,7 +2737,7 @@ function setHTML(el, html) {
 const pct = (a, b) => clamp(b ? a / b * 100 : 0, 0, 100).toFixed(1) + '%';
 const bar = (cls, a, b, id) => `<div class="bar ${cls}"><i ${id ? 'id="' + id + '"' : ''} style="width:${pct(a, b)}"></i></div>`;
 const faithChip = () => `<span class="faithChip" title="Текущая вера">🔥 ${Math.floor(S.god.faith)} / ${maxFaith()}</span>`;
-const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене богов', rest: 'отдыхает 💤', dungeon: 'в подземелье 🏰' };
+const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене ⚔', rest: 'отдыхает 💤', dungeon: 'в пещере 🏰' };
 const SLOT_IC = { weapon: '⚔', armor: '🛡', amulet: '📿', ring: '💍' };
 const itemSpan = it => `<span class="r${it.rar}${it.curse ? ' cursed' : ''}" title="${esc(RARITY[it.rar].n + ': ' + itemDesc(it))}">${esc(it.n)}${it.curse ? ' ☠' : ''}</span>`;
 
@@ -2109,7 +2748,7 @@ function renderHeader() {
   $('hFaith').textContent = `🔥 Вера: ${Math.floor(g.faith)} / ${maxFaith()}  (+${faithRegen().toFixed(2)}/с)`;
   $('hFaithBar').style.width = pct(g.faith, maxFaith());
   $('hGxp').textContent = `${innerWidth <= 360 ? 'Бог' : 'Ур. бога'} ${g.lvl} · ${g.xp}/${gxpNext(g.lvl)}` + (g.sp ? ` · ★${g.sp}` : '');
-  const vb = $('voiceBtn'); vb.disabled = g.faith < 5 || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon';
+  const vb = $('voiceBtn'); vb.disabled = g.faith < 5 || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon' || !!S.fight;
   $('hGxpBar').style.width = pct(g.xp, gxpNext(g.lvl));
   const h = S.hero, hm = $('hpMeter'), dead = h.state === 'dead', narrow = innerWidth <= 430;
   $('hHp').innerHTML = dead ? `💀 мёртв${narrow ? '' : ` · встанет через ${fmtDur(Math.max(60, h.deadT))}`}` : `❤ HP: ${Math.max(0, h.hp)} / ${h.maxHp}<small>КД ${sheet().ac}</small>`;
@@ -2130,7 +2769,8 @@ function renderHero() {
   <div class="row"><span>${RACES[h.race].n} · ${CLASSES[h.cls].n}</span><button class="btn small" data-act="sheet">📋 Лист героя</button></div>
   <div class="stgrid">${STATS.map(k => `<div class="${CLASSES[h.cls].prim === k ? 'pr' : ''}">${STAT_SHORT[k]}<b>${statVal(k)}</b>${fmtMod(mod(statVal(k)))}</div>`).join('')}</div>
   <div class="row"><span>Состояние</span><b>${STATE_RU[h.state] || h.state}${m ? ': ' + esc(m.n) : ''}</b></div>
-  ${m ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div>` : ''}
+  ${m && !S.fight ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div><div class="btns"><button class="btn small red" data-act="fmanual">🎯 Бой под контроль</button></div>` : ''}
+  ${h.inj.length ? `<div class="injrow">🤕 Травмы: ${h.inj.map(j => `${esc(j.n)} (${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, ещё ${fmtDur(j.t)})`).join('; ')}. Лечат: время, долгий отдых, храм, «Исцеление».</div>` : ''}
   <div class="row"><span>Защита (КД) · атака</span><b>${sh.ac} · ${fmtMod(sh.atkB)}</b></div>
   <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}</span></label>${bar('trust', h.trust, 100)}</div>
@@ -2170,32 +2810,6 @@ function renderFeat() {
   setHTML(box, `<div class="card feat"><h2>🎖 Герой вырос: выберите черту</h2>
   <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам (и вам не понравится его логика).${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${body}</div>`);
 }
-const DUN_IC = { fight: '⚔', trap: '🪤', puzzle: '🧩', path: '🚪', treasure: '💎', boss: '👑' };
-function renderDun() {
-  const box = $('dunBox'), U = S.dun;
-  if (!U) { setHTML(box, ''); return; }
-  const party = `<div class="party">${U.party.map(p => `<div class="pm ${p.isMe ? 'me' : ''}"><b>${esc(p.hero)}</b><div class="muted">${RACES[p.race].n.toLowerCase()}-${CLASSES[p.cls].n.toLowerCase()}, ур. ${p.lvl}</div><div class="muted">${p.isMe ? 'ваш герой · ' + Math.max(0, S.hero.hp) + '/' + S.hero.maxHp + ' HP' : 'бог: ' + esc(p.god) + ' · ' + p.hp + '%'}</div></div>`).join('')}</div>`;
-  const rooms = `<div class="rooms">${U.rooms.map((t, i) => `<span class="${i < U.idx ? 'done' : i === U.idx && U.phase === 'room' ? 'cur' : ''}" title="${DUN_ROOMS[t].n}">${DUN_IC[t]}</span>`).join('')}</div>`;
-  let mid = '';
-  if (U.phase === 'intro') mid = '<div class="q">Отряд зажигает факелы у входа…</div>';
-  else if (U.phase === 'room') {
-    const rm = U.room, t = dunTally(U), ch = dunChoice(U);
-    const powOk = rm.type !== 'treasure' && rm.type !== 'path';
-    const ids = Object.keys(POWERS).filter(id => S.god.skills[id] && DUN_POW[id]);
-    mid = `<div class="q"><b>${DUN_IC[rm.type]} ${DUN_ROOMS[rm.type].n}.</b> ${esc(rm.text)}</div>
-    <div class="muted">Голосуйте за план. Ваш голос весит больше, если вы тратите веру на силы. Сейчас побеждает: «${esc(rm.opts[ch].l)}»</div>
-    <div class="opts">${rm.opts.map((o, k) => `<button class="btn ${rm.myVote === k ? 'on' : ''}" data-act="dvote" data-arg="${k}">${esc(o.l)}${o.s ? `<span class="tag chk">${STAT_SHORT[o.s]}</span>` : ''}${o.cls ? `<span class="tag cls">${o.cls.map(c => CLASSES[c].n.toLowerCase()).join('/')}${o.has ? ' ✓' : ' — нет в отряде'}</span>` : ''} <span class="muted">· голосов ${Math.round(t[k] * 10) / 10}</span></button>`).join('')}</div>
-    ${powOk ? `<div class="muted" style="margin-top:6px">Помочь силой (до 2 на комнату): ${faithChip()}</div>
-    <div class="acts">${ids.map(id => `<button class="btn small" data-act="power" data-arg="${id}" ${S.god.faith < powerCost(id) || rm.myActs.includes(id) || rm.myActs.length >= 2 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет подходящих изученных сил.</span>'}</div>
-    <div class="queued">${rm.bonus ? `Бонус к проверке: +${rm.bonus}. ` : ''}${rm.shield ? 'Щит: урон вдвое меньше. ' : ''}${rm.heal ? 'Лечение после комнаты. ' : ''}</div>` : ''}`;
-  } else if (U.phase === 'resolve') mid = `<div class="q">${esc(U.log[0] ? U.log[0].t : '')}</div>`;
-  else mid = `<div class="q"><b>${esc(U.result || '')}</b></div><div class="btns"><button class="btn" data-act="closeDun">Закрыть</button></div>`;
-  setHTML(box, `<div class="card dun"><h2>🏰 ${esc(U.name)}</h2>${party}${rooms}
-  <div class="stat"><label><span>${U.phase === 'room' ? 'До решения отряда' : U.phase === 'end' ? 'Закроется через' : 'Дальше через'}</span><span id="dunSec"></span></label><div class="bar time"><i id="dunBar"></i></div></div>
-  ${mid}<div class="dlog">${U.log.map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
-  $('dunSec').textContent = Math.max(0, Math.ceil(U.t)) + ' с';
-  $('dunBar').style.width = pct(U.t, U.T);
-}
 function renderDiary() {
   const el = $('diary');
   if (el._v === diaryVer) return; el._v = diaryVer;
@@ -2213,33 +2827,6 @@ function renderFork() {
     <div class="muted" style="margin-top:6px">Герой послушается с шансом ~${Math.round(obeyChance() * 100)}% (зависит от доверия). Исход зависит от его характеристик.</div></div>`);
   $('forkSec').textContent = Math.ceil(S.fork.t) + ' с';
   $('forkBar').style.width = pct(S.fork.t, S.fork.T);
-}
-function fighterHTML(f, title) {
-  return `<div class="fighter"><b>${esc(f.name)}</b><div class="muted">${title}</div>
-    <div class="stat"><label><span>HP</span><span>${Math.max(0, f.hp)}/${f.max}</span></label>${bar('hp', f.hp, f.max)}</div>
-    <div class="muted">Атака ${f.atk} · защита ${f.def}${f.beast > 0 ? ' · 🐻 медведь' : ''}</div></div>`;
-}
-function renderDuel() {
-  const box = $('duelBox'), D = S.duel;
-  if (!D) { setHTML(box, ''); return; }
-  let mid = '';
-  if (D.phase === 'intro') mid = `<div class="q">Герои сходятся на арене богов…</div>`;
-  else if (D.phase === 'fight') {
-    const ids = Object.keys(POWERS).filter(id => S.god.skills[id]);
-    mid = `<div class="muted">Вмешивайтесь до конца раунда (не более 2 сил + подбадривание). Соперник тоже действует в реальном времени — можно отвечать на его ходы!</div>
-      <div class="muted" style="margin-top:4px">Ваша вера: ${faithChip()}</div>
-      <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="dact" data-arg="${id}" ${S.god.faith < powerCost(id) || D.myActs.includes(id) || D.myActs.filter(a => a !== 'cheer').length >= 2 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('')}
-      <button class="btn small blue" data-act="dact" data-arg="cheer" ${D.myActs.includes('cheer') ? 'disabled' : ''}>📣 Подбодрить (0)</button></div>
-      <div class="queued">${D.myActs.length ? 'В этом раунде: ' + D.myActs.map(a => DUEL_NAMES[a]).join(', ') : 'Вы пока не вмешались.'}${D.foeActs.length ? ' · Соперник: ' + D.foeActs.map(a => DUEL_NAMES[a]).join(', ') : ''}</div>`;
-  } else mid = `<div class="q"><b>${esc(D.result || '')}</b></div><div class="btns"><button class="btn" data-act="closeDuel">Закрыть</button></div>`;
-  setHTML(box, `<div class="card duel"><h2>⚔ Дуэль богов: ${esc(S.god.name)} против ${esc(D.opp.god)}</h2>
-    <div class="muted">${D.phase === 'fight' ? `Раунд ${D.round} из ${DUEL_ROUNDS}` : D.phase === 'intro' ? 'Подготовка' : 'Итог'} · характер соперника: ${PERS[D.opp.pers]}, ур. ${D.opp.lvl} · вера соперника: ${D.phase === 'fight' ? '~' + Math.round(D.foeFaith / 10) * 10 : '?'}</div>
-    <div class="stat"><label><span>${D.phase === 'fight' ? 'До конца раунда' : D.phase === 'intro' ? 'Бой начнётся через' : 'Закроется через'}</span><span id="duelSec"></span></label><div class="bar time"><i id="duelBar"></i></div></div>
-    <div class="vs">${fighterHTML(D.me, 'ваш герой' + (S.flock.army ? ` · армия ${S.flock.army}` : ''))}<div class="vsx">VS</div>${fighterHTML(D.foe, 'герой ' + esc(D.opp.god) + (D.opp.army ? ` · армия ${D.opp.army}` : ''))}</div>
-    ${mid}
-    <div class="dlog">${D.log.map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
-  $('duelSec').textContent = Math.max(0, Math.ceil(D.t)) + ' с';
-  $('duelBar').style.width = pct(D.t, D.T);
 }
 function renderEvent() {
   const box = $('eventBox'), ev = S.ev;
@@ -2268,10 +2855,9 @@ function renderEvent() {
 }
 function powerDisabled(id, c) {
   if (S.god.faith < c || S.hero.state === 'dead') return true;
-  const D = S.duel, U = S.dun;
-  if (D) { if (D.phase !== 'fight') return true; if (D.myActs.includes(id) || D.myActs.filter(a => a !== 'cheer').length >= 2) return true; }
-  else if (U) { if (U.phase !== 'room' || !DUN_POW[id] || U.room.type === 'treasure' || U.room.type === 'path') return true; if (U.room.myActs.includes(id) || U.room.myActs.length >= 2) return true; }
-  else if (S.hero.state === 'duel' || S.hero.state === 'dungeon') return true;
+  const F = S.fight;
+  if (F) { if (F.phase !== 'turn' || F.powersLeft < 1 || F.usedTurn >= 1) return true; const me = fMe(F); if (!me || !me.alive) return true; }
+  else if (S.dun || S.hero.state === 'duel' || S.hero.state === 'dungeon') return true;
   return false;
 }
 function skillHTML(id) {
@@ -2282,7 +2868,7 @@ function skillHTML(id) {
   if (!L && !lvlOk) why = `Нужен ур. бога ${p.req}`; else if (!L && !preOk) why = `Сначала: ${POWERS[p.pre].n}`;
   return `<div class="skill ${L ? '' : 'locked'}"><div class="ic">${p.ic}</div>
     <div><div class="nm">${p.n} <span class="pips">${'●'.repeat(L)}${'○'.repeat(3 - L)}</span></div><div class="ds">${p.d}${why ? ` <b>${why}</b>` : ''}</div></div>
-    <div class="sb">${L ? `<button class="btn small" data-act="power" data-arg="${id}" ${powerDisabled(id, c) ? 'disabled' : ''}>${S.duel && S.duel.phase === 'fight' ? 'В дуэль' : S.dun ? 'В подземелье' : 'Применить'} (${c})</button>` : ''}
+    <div class="sb">${L ? `<button class="btn small" data-act="power" data-arg="${id}" ${powerDisabled(id, c) ? 'disabled' : ''}>${S.fight && S.fight.phase === 'turn' ? 'В бой' : 'Применить'} (${c})</button>` : ''}
     ${canLearn ? `<button class="btn small green" data-act="learn" data-arg="${id}">${L ? 'Улучшить ★' : 'Изучить ★'}</button>` : ''}</div></div>`;
 }
 function renderRight() {
@@ -2311,17 +2897,18 @@ function renderRight() {
       <div class="muted">Солдат = ${soldierCost()} веры + 2 последователя (они больше не молятся, а маршируют). В дуэли каждый солдат даёт +1.2 урона за раунд (до 10), в мировых событиях — +10 силы.</div>
       <div class="btns"><button class="btn small red" data-act="recruit" data-arg="1" ${g.faith < soldierCost() || fl.fol < 2 ? 'disabled' : ''}>Набрать 1 (${soldierCost()})</button><button class="btn small red" data-act="recruit" data-arg="5" ${g.faith < soldierCost() * 5 || fl.fol < 10 ? 'disabled' : ''}>Набрать 5 (${soldierCost() * 5})</button></div></div>
       <div class="muted">Стратегия: паства — это доход, храм — вложение на будущее, чудо — быстрый рост, армия — сила в дуэлях и событиях, но съедает паству.</div>`;
-  } else {
+  } else if (S.tab === 'arena') html = arenaTabHTML();
+  else {
     const st = S.stats;
-    html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей: ${st.duels} (побед ${st.dwins}) · Событий: ${st.events} (успешных ${st.evwins})</div></div>
+    html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
       <div class="muted" style="margin-bottom:6px">Другие боги этого мира. Сейчас ими управляет ИИ с характером; архитектура готова к настоящему серверу.</div>
-      <div class="box"><h3>🏰 Подземелья</h3><div class="muted">Герой иногда сам примыкает к отряду из 2–3 героев других богов. Можно собрать отряд и вручную. Пройдено: ${st.dwinsD} из ${st.duns}.</div><div class="btns"><button class="btn small" data-act="callDun" ${S.dun || S.duel || S.fork || S.hero.state !== 'road' || g.faith < 40 ? 'disabled' : ''}>🏰 Собрать отряд (40)</button></div></div>
+      ${godsDunHTML()}
       ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.duel || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 ? 'disabled' : ''}>Вызвать (10)</button></div></div>`).join('')}`;
+        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
   }
   setHTML($('rightBody'), html);
 }
-function render() { renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderDun(); renderDuel(); renderRight(); renderDiary(); }
+function render() { renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
 
 /* ---------- Модальные окна ---------- */
 function modal(html) { const m = $('modal'); m.innerHTML = `<div class="card">${html}</div>`; m.classList.add('on'); }
@@ -2329,7 +2916,7 @@ function closeModal() { $('modal').classList.remove('on'); $('modal').innerHTML 
 function onboarding() {
   const ro = Object.keys(RACES).map(k => `<option value="${k}">${RACES[k].n}</option>`).join(''), co = Object.keys(CLASSES).map(k => `<option value="${k}">${CLASSES[k].n}</option>`).join('');
   modal(`<h2>⚜ Добро пожаловать в БогоДел</h2>
-  <p>Вы — молодой бог. У вас есть один герой, который живёт своей жизнью, и он… не очень умный. Но вы можете вмешиваться: отвечать на молитвы, метать молнии, строить храм, водить отряды в подземелья и воевать с другими богами.</p>
+  <p>Вы — молодой бог. У вас есть один герой, который живёт своей жизнью, и он… не очень умный. Но вы можете вмешиваться: отвечать на молитвы, метать молнии, строить храм, водить отряды в пещеры, драться на арене и воевать с другими богами.</p>
   <label>Имя вашего бога</label><input id="inGod" maxlength="30" value="Великий Пельмень">
   <label>Имя героя</label><input id="inHero" maxlength="30" value="Геннадий Отважный">
   <label>Раса героя</label><select id="inRace" data-keep>${ro}</select><div class="desc" id="raceDesc"></div>
@@ -2355,7 +2942,10 @@ function help() {
   <p><b>🙏 Развилки.</b> Герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вкладывайте веру в храм по частям, в чудеса или в армию.</p>
-  <p><b>⚔ Дуэли богов</b> — 5 раундов по 10 секунд, оба бога вмешиваются в реальном времени. <b>🏰 Подземелья</b> — отряд героев разных богов, комнаты с голосованием и силами. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
+  <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
+  <p><b>🤺 Арена</b> — вкладка с заявками: дуэли 1нс1, группы 3нс3 и 5нс5, хаотичные бои. Принимайте чужие или подавайте свои. За бои — опыт, золото и рейтинг; после поражения — травмы (штраф к характеристике, лечатся временем, отдыхом и храмом). <b>⚜ Дуэль богов</b> — тот же бой, но соперничающий бог тоже колдует.</p>
+  <p><b>🏰 Пещеры</b> — карта 5×5: ведите отряд по комнатам, ищите 🗝 ключ, обходите ловушки и бейте 👑 босса (у каждого своя хитрость — читайте предупреждения!). Пещера не чаще раза в 4 часа. <b>💬 Чат</b> — пока с ботами, но они стараются. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
+  <p>Обычные стычки с монстрами герой решает сам, но кнопкой «🎯 Бой под контроль» можно взять любой бой в свои руки.</p>
   <p class="muted">Пока вас нет, герой живёт сам (примерно в 0,75 темпа, до 24 часов за раз), а по возвращении вас ждёт сводка. Скорость ×1–×10 ускоряет жизнь героя; таймеры решений ускоряются не больше чем в 2 раза.</p>
   <div class="btns"><button class="btn" data-act="closeModal">Понятно!</button></div>`);
 }
@@ -2366,8 +2956,8 @@ function settings() {
   <div class="btns"><button class="btn" data-act="rename">Сохранить</button><button class="btn" data-act="closeModal">Закрыть</button></div>
   ${pwaSettingsHTML()}
   <h3 style="margin-top:14px">Для тестирования</h3>
-  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">🙏 Развилка сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚔ Дуэль сейчас</button>
-  <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Подземелье сейчас</button>
+  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">🙏 Развилка сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
+  <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Пещера сейчас</button>
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
   <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
   <h3 style="margin-top:14px">Опасная зона</h3>
@@ -2392,10 +2982,6 @@ const ACT = {
   fork: a => answerFork(+a),
   power: a => usePower(a),
   learn: a => learn(a),
-  dact: a => duelAct(a),
-  dvote: a => dunVote(+a),
-  closeDuel: () => { if (S.duel && S.duel.phase === 'end') S.duel = null; },
-  closeDun: () => { if (S.dun && S.dun.phase === 'end') S.dun = null; },
   closeEv: () => { if (S.ev && S.ev.phase === 'done') S.ev = null; },
   evVote: a => evVote(a), evGive: a => evGive(a), evArmy: () => evArmy(),
   resurrect: () => resurrect(true),
@@ -2403,17 +2989,20 @@ const ACT = {
   lift: a => liftCurse(a),
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
-  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.duel || S.dun || S.fork || S.hero.state !== 'road') return toast('Герой сейчас занят.'); S.god.faith -= 10; startDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
-  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.duel || S.fork || S.hero.state !== 'road') return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true).then(ok => { if (!ok && S) addFaith(40); }); },
+  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
+  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true).then(ok => { if (!ok && S) addFaith(40); }); },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,
   rename: () => { S.god.name = ($('inGod').value || '').trim() || S.god.name; S.hero.name = ($('inHero').value || '').trim() || S.hero.name; closeModal(); save(); },
   reset: () => { if (!confirm('Точно стереть мир и начать заново?')) return; localStorage.removeItem(SAVE_KEY); S = null; onboarding(); },
   dbg: a => { closeModal(); const h = S.hero;
     const free = () => { if (h.state === 'dead') resurrect(false); if (h.state === 'fight' || h.state === 'town' || h.state === 'rest') { h.state = 'road'; h.monster = null; h.restT = 0; } };
-    if (a === 'fork') { if (S.duel || S.dun || h.state === 'duel' || h.state === 'dungeon') return toast('Сначала закончите дуэль/подземелье.'); if (h.state === 'dead') resurrect(true); if (!S.fork) startFork(); }
-    else if (a === 'duel') { if (S.duel || S.dun || h.state === 'duel' || h.state === 'dungeon') return toast('Герой уже занят.'); S.fork = null; free(); startDuel(); }
-    else if (a === 'dun') { if (S.duel || S.dun || h.state === 'duel' || h.state === 'dungeon') return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
+    const busy = S.fight || S.dun || h.state === 'duel' || h.state === 'dungeon' || duelPending || dunPending;
+    if (a === 'fork') { if (busy) return toast('Сначала закончите бой/пещеру.'); if (h.state === 'dead') resurrect(true); if (!S.fork) startFork(); }
+    else if (a === 'duel') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startGodDuel(); }
+    else if (a === 'arena' || a === 'group') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); h.hp = Math.max(h.hp, Math.ceil(h.maxHp * .5)); S.arena.apps = S.arena.apps.filter(x => x.joined === null); arenaPost(a === 'arena' ? 'duel' : 'group:3'); const ap = S.arena.apps.find(x => x.mine); if (ap) { while (!appFull(ap)) appAddBot(ap, fightProv.makeBot(h.lvl)); startArenaFight(ap); } }
+    else if (a === 'monster') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startFight(); startMonsterFight(); }
+    else if (a === 'dun') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
     else if (a === 'feat') { S.featQueue++; offerFeat(); }
     else if (a === 'h1' || a === 'h8') simulateAway(a === 'h1' ? 3600 : 8 * 3600, 'перемотка времени');
     else if (a === 'event') startEvent(); else if (a === 'faith') addFaith(100); }
@@ -2428,31 +3017,18 @@ $('voiceIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { AC
 window.addEventListener('beforeunload', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-/* ---------- Запуск ---------- */
-let lastT = performance.now();
-function loop() {
-  const now = performance.now(); let dt = (now - lastT) / 1000; lastT = now; if (dt > 1) dt = 1;
-  if (!S) return;
-  if (!S.paused) { try { step(dt); } catch (err) { console.error(err); } }
-  render();
-}
-S = load();
-if (S) { if (S.dun && S.dun.room) S.dun.room.planned = S.dun.room.plan.length > 0; offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
-setInterval(loop, 250);
-/* Отладочный доступ из консоли / тестов */
-window.GAME = { get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startEvent, startDungeon, answerFork, usePower, duelAct, dunAct, dunVote, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, get dunPending() { return dunPending; }, get duelPending() { return duelPending; } };
 
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261018-060304';
+const APP_BUILD = '20261018-161344';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 let swReg = null, waitingSW = null, installEvt = null, updating = false, updFallback = null;
 const PWA = { get waiting() { return !!waitingSW; }, get build() { return APP_BUILD; }, get reg() { return swReg; }, get installable() { return !!installEvt; }, updateShown: false };
 function showUpdateBar() { PWA.updateShown = true; const b = $('updBar'); if (b) b.classList.add('on'); }
-function calmMoment() { return !S || (!S.fork && !S.duel && !S.dun && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
+function calmMoment() { return !S || (!S.fork && !S.fight && !S.dun && !(S.arena && S.arena.apps.some(a => a.joined !== null)) && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
 function applyUpdate() {
   if (S) save();
   if (waitingSW) { updating = true; waitingSW.postMessage({ type: 'SKIP_WAITING' }); setTimeout(() => location.reload(), 3000); }
@@ -2536,7 +3112,6 @@ function doImport() {
   if (S && !confirm(`Заменить текущий мир на сохранение «${ns.god.name}» (герой ${ns.hero.name}, ур. ${ns.hero.lvl})?`)) return;
   try { if (S) localStorage.setItem(SAVE_KEY + '_before_import', JSON.stringify(S)); } catch (e) { }
   S = ns; duelPending = false; dunPending = false;
-  if (S.dun && S.dun.room) S.dun.room.planned = S.dun.room.plan.length > 0;
   offlineCatchUp();
   if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev);
   diary('📥 Мир перенесён в новое место. Герой огляделся, почесал затылок и пошёл дальше.', 'god');
@@ -2550,7 +3125,159 @@ Object.assign(ACT, {
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([exportText()], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('💾 Файл ' + name + ' скачан.'); }
 });
 /* Импорт доступен и без существующего мира (с экрана создания) */
-window.GAME.PWA = PWA; window.GAME.parseSave = parseSave; window.GAME.checkUpdate = checkUpdate; window.GAME.APP_BUILD = APP_BUILD;
+
+/* =====================================================================
+   14) ИНТЕРФЕЙС v4: бой по зонам, арена, пещера-карта, чат
+   ===================================================================== */
+const CLS_IC = { warrior: '🛡', mage: '🔮', rogue: '🗡', cleric: '✚', bard: '🎻', ranger: '🏹', barbarian: '🪓' };
+const ZONE_IC = { head: '🙂', chest: '👕', belly: '🍔', waist: '🩲', legs: '🦵' };
+const KIND_RU = { monster: 'Ручной бой', dungeon: 'Бой в пещере', duel: 'Дуэль', group: 'Групповой бой', chaos: 'Хаотичный бой', godduel: 'Дуэль богов' };
+function fighterRow(F, f, me, canTarget) {
+  const tg = canTarget && f.alive && me && f.team !== me.team, sel = F.my.target === f.id && f.team !== (me ? me.team : 0);
+  const tele = F.tele && F.tele.fid === f.id ? `<div class="tl">⚠ замах ${ZONE_ACC[F.tele.zone]}</div>` : '';
+  const sub = f.kind === 'boss' ? '👑 босс' : f.cls ? `${CLS_IC[f.cls] || ''} ${CLASSES[f.cls].n.toLowerCase()}` : 'чудище';
+  const inner = `<span class="nm"><b>${f.isMe ? '⭐ ' : ''}${esc(f.name)}</b><span class="muted">${sub} · ${f.lvl}</span></span>${bar('hp', f.hp, f.max)}<span class="nm"><span class="muted">${Math.max(0, f.hp)}/${f.max}${f.bear > 0 ? ' 🐻' : ''}${f.debuf > 0 ? ' ☠' : ''}${f.buf && f.buf.shield ? ' 🛡' : ''}</span>${sel ? '<span class="tl">🎯 цель</span>' : ''}</span>${tele}`;
+  return tg ? `<button class="fr tg ${sel ? 'sel' : ''}" data-act="ftarget" data-arg="${f.id}">${inner}</button>`
+    : `<div class="fr ${f.isMe ? 'me' : ''} ${f.alive ? '' : 'dead'} ${sel ? 'sel' : ''}">${inner}</div>`;
+}
+function zoneBody(F, me, k) {
+  const sel = k === 'a' ? F.my.atk : F.my.blk, dis = F.auto || F.phase !== 'turn' || !me.alive;
+  const n = k === 'a' ? me.atkN : me.blkN;
+  const lbl = k === 'a' ? `⚔ Удар${n > 1 ? ` (${n} зоны)` : ''}` : `🛡 Блок (${n} ${plural(n, 'зона', 'зоны', 'зон')})`;
+  return `<div class="body ${k === 'a' ? 'atk' : 'blk'}"><h4>${lbl}</h4>${ZONES.map(z => `<button class="zb ${z} ${sel.includes(z) ? 'on' : ''} ${k === 'b' && F.tele && F.tele.zone === z ? 'tele' : ''}" data-act="fz" data-arg="${k}:${z}" ${dis ? 'disabled' : ''} aria-label="${k === 'a' ? 'Удар' : 'Блок'}: ${ZONE_RU[z]}">${ZONE_RU[z]}</button>`).join('')}</div>`;
+}
+function renderFight() {
+  const box = $('fightBox'), F = S.fight;
+  if (!F) { setHTML(box, ''); return; }
+  const me = fMe(F), turn = F.phase === 'turn', mine = me && me.alive;
+  const t0 = F.fighters.filter(f => f.team === 0), t1 = F.fighters.filter(f => f.team === 1);
+  const teams = `<div class="teams"><div class="team"><h4>${t0.length > 1 ? 'Наши' : 'Вы'}</h4>${t0.map(f => fighterRow(F, f, me, false)).join('')}</div>
+    <div class="team"><h4>${t1.length > 1 ? `Противники${turn && mine ? ' · нажмите — цель' : ''}` : 'Противник'}</h4>${t1.map(f => fighterRow(F, f, me, turn && mine && fAlive(F, 1).length > 1)).join('')}</div></div>`;
+  let mid = '';
+  if (F.phase === 'intro') mid = `<div class="q">Бойцы выходят на арену и разминают шеи…</div>`;
+  else if (turn) {
+    const tele = F.tele ? `<div class="telewarn">⚠ ${esc(F.fighters.find(f => f.id === F.tele.fid).name)} ударит ${ZONE_ACC[F.tele.zone]} всех! Поставьте блок на «${ZONE_RU[F.tele.zone]}».</div>` : '';
+    const ok = mine && F.my.atk.length >= me.atkN && F.my.blk.length === me.blkN;
+    const ids = Object.keys(POWERS).filter(id => S.god.skills[id]);
+    mid = mine ? `${tele}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
+      <div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : '⚔ Ход (герой доберёт сам)'}</button>
+      <button class="btn small ${F.auto ? 'on green' : ''}" data-act="fauto">🤖 Автобой: ${F.auto ? 'вкл' : 'выкл'}</button></div>
+      <div class="muted" style="margin-top:6px">Силы бога в бою: ${F.powersLeft}/3 (1 за ход) · ${faithChip()}${F.rivalGod ? ` · у бога ${esc(F.rivalGod.name)} осталось ${F.rivalGod.left}` : ''}</div>
+      <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="fpow" data-arg="${id}" ${S.god.faith < powerCost(id) || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет изученных сил.</span>'}</div>`
+      : `<div class="q">Ваш герой выбыл из боя. Союзники бьются дальше…</div>`;
+  } else mid = `<div class="fend"><b>${esc(F.result || '')}</b>${F.rew ? `<div class="muted">${esc(F.rew)}</div>` : ''}</div><div class="btns"><button class="btn" data-act="fclose">Закрыть</button></div>`;
+  setHTML(box, `<div class="card zf"><h2>⚔ ${esc(F.title)} <span class="muted">${F.phase === 'turn' ? `ход ${F.turn}` : F.phase === 'intro' ? 'подготовка' : 'итог'}</span></h2>
+    ${teams}
+    <div class="stat"><label><span>${turn ? (F.auto ? 'Следующий ход через' : 'До конца хода (потом герой решит сам)') : F.phase === 'intro' ? 'Бой начнётся через' : 'Закроется через'}</span><span id="fSec"></span></label><div class="bar time"><i id="fBar"></i></div></div>
+    ${mid}
+    <div class="flog">${F.log.slice(0, 40).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
+  $('fSec').textContent = Math.max(0, Math.ceil(F.t)) + ' с';
+  $('fBar').style.width = pct(F.t, F.T);
+}
+/* ---------- Пещера ---------- */
+function renderDunMap() {
+  const box = $('dunBox'), U = S.dun;
+  if (!U || (S.fight && S.fight.kind === 'dungeon' && innerWidth <= 760)) { setHTML(box, U ? `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2><div class="muted">Отряд в бою — см. выше. Ключей: ${U.keys} 🗝</div></div>` : ''); return; }
+  const ex = U.phase === 'explore';
+  let cells = '';
+  for (let y = 0; y < DH; y++) for (let x = 0; x < DW; x++) {
+    const t = tileAt(U, x, y), cur = U.pos.x === x && U.pos.y === y, adj = ex && t && Math.abs(x - U.pos.x) + Math.abs(y - U.pos.y) === 1;
+    if (!t) { cells += '<span class="dc"></span>'; continue; }
+    const seen = t.seen || t.done, ic = cur ? '🧔' : !seen ? '?' : t.done && t.t !== 'start' ? (t.t === 'boss' ? '💀' : '·') : DTILE[t.t].ic;
+    const lock = t.t === 'boss' && !t.done && U.keys < 1;
+    const title = seen ? DTILE[t.t].n + (t.done ? ' (пройдено)' : '') + (lock ? ' — нужен ключ' : '') : 'Неизвестно';
+    cells += adj ? `<button class="dc room adj ${t.done ? 'done' : ''} ${seen ? '' : 'fog'} ${lock && seen ? 'lock' : ''}" data-act="dgo" data-arg="${x},${y}" title="${title}" aria-label="Идти: ${title}">${ic}</button>`
+      : `<span class="dc room ${cur ? 'cur' : ''} ${t.done ? 'done' : ''} ${seen ? '' : 'fog'}" title="${title}">${ic}</span>`;
+  }
+  const party = `<div class="party2">${U.party.map(p => { const hp = p.isMe ? Math.round(S.hero.hp / S.hero.maxHp * 100) : p.hp; return `<div class="pm ${p.isMe ? 'me' : ''} ${hp <= 0 ? 'down' : ''}"><b>${CLS_IC[p.cls]} ${esc(p.hero)}</b> <span class="muted">${CLASSES[p.cls].n.toLowerCase()} ${p.lvl}</span>${bar('hp', hp, 100)}</div>`; }).join('')}</div>`;
+  const roles = [dunHas(U, 'rogue') && '🗡 плут обезвредит ловушки и вскроет замок', dunHas(U, 'cleric') && '✚ жрец лечит после боя', dunHas(U, 'mage') && '🔮 маг начинает бой огненным шаром', dunHas(U, 'ranger') && '🏹 следопыт видит дальше', dunHas(U, 'bard') && '🎻 бард: +крит отряду'].filter(Boolean);
+  const mid = U.phase === 'end' ? `<div class="q"><b>${esc(U.result || '')}</b></div><div class="btns"><button class="btn" data-act="dclose">Закрыть</button></div>`
+    : U.phase === 'fight' ? '<div class="q">⚔ Отряд сражается!</div>'
+    : `<div class="muted">Нажмите на соседнюю комнату (жёлтая рамка). Найдите 🗝 и одолейте 👑. Бог задумается дольше 25 с — отряд пойдёт сам.</div>
+      <div class="btns"><button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Автопроход: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave">🚪 Уйти из пещеры</button></div>`;
+  setHTML(box, `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2>
+    <div class="row"><span>Ключей: <b>${U.keys} 🗝</b> · добыча: ${U.gold} 💰, ${U.loot.length} 🎁</span><span class="muted">босс: ${esc(U.boss.n)}</span></div>
+    ${party}<div class="dgrid">${cells}</div><div class="dleg">🚪 вход · ⚔ логово · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс · ? туман</div>
+    ${roles.length ? `<div class="muted">${roles.join(' · ')}</div>` : ''}
+    ${mid}<div class="dlog">${U.log.slice(0, 12).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
+}
+/* ---------- Арена ---------- */
+function appSide(list, cap) { return list.map(m => m.me ? `<b>⭐ ${esc(m.name)}</b>` : `${CLS_IC[m.cls] || ''} ${esc(m.name)} <span class="muted">${m.lvl || ''}</span>`).join('<br>') + (list.length < cap ? `<br><span class="muted">${'· '.repeat(cap - list.length)}свободно ${cap - list.length}</span>` : ''); }
+function arenaTabHTML() {
+  const A = S.arena, h = S.hero, inApp = A.apps.find(a => a.joined !== null), can = arenaCanJoin(true);
+  const busy = !can ? (h.state === 'dead' ? 'Герой мёртв.' : S.fight ? 'Герой уже в бою.' : inApp ? 'Вы уже в заявке — ждём бойцов.' : h.hp < h.maxHp * .3 ? 'Герою нужно хотя бы 30% HP.' : 'Герой занят (развилка, пещера или дуэль).') : '';
+  const apps = A.apps.slice().sort((a, b) => (b.joined !== null) - (a.joined !== null) || b.mine - a.mine);
+  return `<div class="box"><h3>🤺 Арена · рейтинг ${A.rating}</h3><div class="muted">Побед ${A.w}, поражений ${A.l}${A.fat ? ` · усталость ${A.fat} (награды ×${Math.max(.25, 1 - .15 * A.fat).toFixed(2)})` : ''}. Бой по зонам: каждый ход выберите, куда бить и что закрывать. На арене не умирают, но можно получить травму.</div>
+    ${h.inj.length ? `<div class="injrow">🤕 ${h.inj.map(j => `${esc(j.n)} (${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, ${fmtDur(j.t)})`).join('; ')}</div>` : ''}</div>
+    <div class="box"><h3>📜 Подать заявку</h3><div class="btns">
+      <button class="btn small" data-act="apost" data-arg="duel" ${can ? '' : 'disabled'}>🤺 1нс1</button><button class="btn small" data-act="apost" data-arg="group:3" ${can ? '' : 'disabled'}>👥 3нс3</button>
+      <button class="btn small" data-act="apost" data-arg="group:5" ${can ? '' : 'disabled'}>👥 5нс5</button><button class="btn small" data-act="apost" data-arg="chaos:6" ${can ? '' : 'disabled'}>🌀 Хаот на 6</button></div>
+      ${busy ? `<div class="muted">${busy}</div>` : ''}</div>
+    <div class="box"><h3>⚔ Заявки на бой (${A.apps.length})</h3><div class="apps">${apps.length ? apps.map(a => {
+      const ty = ARENA_TYPES[a.type], me = a.joined !== null, full = appFull(a);
+      let sides, btn = '';
+      if (a.type === 'chaos') sides = `<div>${appSide(a.members, a.size)}</div>`;
+      else sides = `<div class="sides"><div>${appSide(a.teams[0], a.size)}</div><div class="vsx">VS</div><div>${appSide(a.teams[1], a.size)}</div></div>`;
+      if (me) btn = `<button class="btn small red" data-act="aleave" data-arg="${a.id}">${a.mine ? 'Отозвать заявку' : 'Выйти'}</button>`;
+      else if (!full && can) btn = a.type === 'duel' ? `<button class="btn small green" data-act="ajoin" data-arg="${a.id}:1">Принять вызов</button>`
+        : a.type === 'chaos' ? `<button class="btn small green" data-act="ajoin" data-arg="${a.id}:0">Вступить в хаот</button>`
+        : `<button class="btn small" data-act="ajoin" data-arg="${a.id}:0" ${a.teams[0].length >= a.size ? 'disabled' : ''}>За команду A</button><button class="btn small" data-act="ajoin" data-arg="${a.id}:1" ${a.teams[1].length >= a.size ? 'disabled' : ''}>За команду B</button>`;
+      return `<div class="app ${me ? 'mine' : ''}"><div class="at"><b>${ty.ic} ${ty.n} ${appTitle(a)}</b><span class="tm">${me ? 'старт' : 'исчезнет'} через ${Math.max(0, Math.ceil(a.t))} с · ур. ${a.lvl[0]}–${a.lvl[1]}</span></div>
+        <div class="muted">${a.mine ? 'Ваша заявка' : 'Автор: ' + esc(a.author)} · ${appCount(a)}/${appCap(a)}</div>${sides}${btn ? `<div class="btns">${btn}</div>` : ''}</div>`;
+    }).join('') : '<div class="muted">Пока пусто. Боты скоро набегут — или подайте свою заявку.</div>'}</div></div>`;
+}
+function godsDunHTML() {
+  const st = S.stats, g = S.god, cd = S.timers.dunCd;
+  const dis = S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || g.faith < 40 || dunPending;
+  return `<div class="box"><h3>🏰 Пещеры</h3><div class="muted">Отряд из героя и 2–3 бойцов других богов идёт по карте комнат: ловушки, сундуки, ключ и босс. Классы важны: плут, жрец, маг, следопыт и бард помогают по-своему. Пройдено: ${st.dwinsD} из ${st.duns}, боссов: ${st.bosses}.</div>
+    <div class="muted">${cd > 0 ? `Сам герой полезет в пещеру не раньше чем через ${fmtDur(cd)}.` : 'Герой готов к пещере — может забрести сам.'}</div>
+    <div class="btns"><button class="btn small" data-act="callDun" ${dis ? 'disabled' : ''}>🏰 Собрать отряд (40)</button></div></div>`;
+}
+/* ---------- Чат ---------- */
+let chatSeen = -1;
+function renderChat() {
+  const C = S.chat, dock = $('chatDock');
+  dock.classList.toggle('open', C.open); dock.classList.toggle('closed', !C.open);
+  if (C.open && C.unread) C.unread = 0;
+  setHTML($('chatPill'), `💬 Чат${C.unread ? `<i>${C.unread}</i>` : ''}`);
+  $('chatOnline').textContent = `в сети ${12 + (Math.floor(Date.now() / 60000) % 9)} богов (боты)`;
+  if (chatSeen !== chatVer && C.open) {
+    chatSeen = chatVer; const el = $('chatLog'), stick = el.scrollTop + el.clientHeight >= el.scrollHeight - 30;
+    el.innerHTML = C.msgs.map(m => `<div class="cm ${m.c}"><span class="tm">${esc(m.tm)}</span>${m.c === 'sys' ? esc(m.x) : `<b>${esc(m.from)}:</b> ${esc(m.x)}`}</div>`).join('') || '<div class="muted">Тихо. Слышно, как где-то точат топор.</div>';
+    if (stick) el.scrollTop = el.scrollHeight;
+  }
+  const dot = S.arena.apps.filter(a => !a.mine && a.joined === null).length;
+  const ad = $('arenaDot'); if (ad) ad.textContent = S.tab !== 'arena' && dot ? String(dot) : '';
+}
+Object.assign(ACT, {
+  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a),
+  fclose: () => { if (S.fight && S.fight.phase === 'end') closeFight(); },
+  fmanual: () => { if (!startMonsterFight()) toast('Сейчас нечего брать под контроль.'); },
+  dgo: a => dunMove(a), dauto: () => dunToggleAuto(), dleave: () => { if (confirm('Увести отряд из пещеры? Добыча будет урезана.')) dunLeave(); },
+  dclose: () => { if (S.dun && S.dun.phase === 'end') S.dun = null; },
+  apost: a => arenaPost(a), ajoin: a => arenaJoin(a), aleave: a => arenaLeave(a),
+  chatToggle: () => { S.chat.open = !S.chat.open; chatSeen = -1; if (S.chat.open) { S.chat.unread = 0; setTimeout(() => { const i = $('chatIn'); if (i && innerWidth > 760) i.focus(); const l = $('chatLog'); if (l) l.scrollTop = l.scrollHeight; }, 0); } },
+  chatSend: () => { const i = $('chatIn'); chatSend(i.value); i.value = ''; chatSeen = -1; }
+});
+$('chatIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { ACT.chatSend(); render(); } });
+
+/* ---------- Запуск ---------- */
+let lastT = performance.now();
+function loop() {
+  const now = performance.now(); let dt = (now - lastT) / 1000; lastT = now; if (dt > 1) dt = 1;
+  if (!S) return;
+  if (!S.paused) { try { step(dt); } catch (err) { console.error(err); } }
+  render();
+}
+S = load();
+if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
+setInterval(loop, 250);
+/* Отладочный доступ из консоли / тестов */
+window.GAME = { get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+  fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
+  arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
+  get dunPending() { return dunPending; }, get duelPending() { return duelPending; },
+  PWA, parseSave, checkUpdate, APP_BUILD };
 </script>
 </body>
 </html>

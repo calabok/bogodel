@@ -10,6 +10,7 @@ const PACE = {
   duel: [2700, 4500],      // дуэль раз в 45–75 мин
   event: [7200, 10800],    // мировое событие раз в 2–3 ч
   dun: [10800, 18000],     // подземелье само раз в 3–5 ч (или по зову бога)
+  dunCd: 4 * 3600,         // пещера не чаще раза в 4 ч
   rivals: 3600,            // соперники растут раз в час
   feat: 1800,              // 30 мин на выбор черты, потом герой выберет сам
   dead: 600,               // 10 мин до самовоскрешения
@@ -65,13 +66,14 @@ function defaultState(god, hero, race, cls) {
     hero: { name: hero, race, cls, st: genStats(cls, race), feats: [], lvl: 1, xp: 0, hp: 30, maxHp: 30, gold: 30, potions: 1,
       eq: { weapon: starterItem('weapon', c.wpn), armor: starterItem('armor', c.arm), amulet: null, ring: null },
       inv: [], loc: 'Годград', state: 'road', monster: null, quest: newQuest(), trust: 40, deadT: 0, townStep: 0,
-      restT: 0, restKind: '', shortRests: 2, orcCd: 0 },
+      restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [] },
     flock: { fol: 3, temple: 0, templeProg: 0, army: 0 },
     buffs: { luck: 0, shield: 0, trade: 0 },
-    timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, rivals: PACE.rivals },
-    fork: null, duel: null, ev: null, dun: null, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
+    timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
+    fork: null, fight: null, ev: null, dun: null, fightAuto: false,
+    arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2) }, r)),
-    stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0 },
+    stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
     speed: 1, paused: false, tab: 'powers', lastSeen: Date.now()
   };
   return S0;
@@ -87,7 +89,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 3;
+const SAVE_VERSION = 4;
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -127,6 +129,15 @@ function migrate(o) {
     if (Array.isArray(o.rivals)) o.rivals.forEach(r => { const b = RIVALS_BASE.find(x => x.id === r.id); if (b) { r.race = b.race; r.cls = b.cls; } r.hlvl = clamp(newL + rnd(-1, 1), 1, MAX_LVL); });
     o._migratedV3 = { race: h.race, cls: h.cls, oldL, newL };
   }
+  if (v < 4) {
+    // v3 → v4: старая дуэль и подземелье заменены боем по зонам и пещерой-картой
+    const hadDun = !!o.dun;
+    o.duel = null; o.dun = null; o.fight = null;
+    if (o.hero) { const h = o.hero; if (['duel', 'dungeon'].includes(h.state)) h.state = 'road'; if (h.state === 'fight') { h.state = 'road'; h.monster = null; } h.inj = []; }
+    if (o.timers && typeof o.timers === 'object') { o.timers.dunCd = hadDun ? 3600 : 0; o.timers.duel = Math.min(isNum(o.timers.duel) ? o.timers.duel : 600, 900); }
+    o._migratedV4 = 1;
+  }
+  delete o.duel;
   o.v = SAVE_VERSION;
   return o;
 }
@@ -166,6 +177,7 @@ function sanitize(o) {
   if (typeof h.loc !== 'string') h.loc = 'Годград';
   if (!HERO_STATES.includes(h.state)) h.state = 'road';
   fixNum(f, 'fol', 0, 0); fixNum(f, 'temple', 0, 0, 10); f.temple = Math.floor(f.temple); fixNum(f, 'templeProg', 0, 0); fixNum(f, 'army', 0, 0); f.army = Math.floor(f.army);
+  h.inj = Array.isArray(h.inj) ? h.inj.filter(j => j && STATS.includes(j.s) && INJURIES[j.k] && isNum(j.t) && j.t > 0).map(j => ({ k: j.k, s: j.s, t: Math.min(j.t, INJURIES[j.k].t), n: INJ_TEXT[j.s] })).slice(-4) : [];
   // HP после пересчёта (максимум зависит от класса/ТЕЛ/черт)
   const oldMax = h.maxHp; h.maxHp = calcMaxHp(h);
   if (isNum(h._hpFrac)) { h.hp = Math.round(h.maxHp * h._hpFrac); delete h._hpFrac; }
@@ -184,23 +196,25 @@ function sanitize(o) {
   fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20);
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
-  if (!['powers', 'flock', 'gods'].includes(o.tab)) o.tab = 'powers';
+  if (!['powers', 'flock', 'arena', 'gods'].includes(o.tab)) o.tab = 'powers';
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
   if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;
   if (o.fork) { o.fork.T = 30; o.fork.t = clamp(o.fork.t, 1, 30); o.fork.cls = !!o.fork.cls; }
-  const D = o.duel;
-  if (D && !(['intro', 'fight', 'end'].includes(D.phase) && D.me && D.foe && D.opp && isNum(D.me.hp) && isNum(D.foe.hp) && Array.isArray(D.log))) o.duel = null;
-  if (o.duel) { const D2 = o.duel; ['myActs', 'foeActs', 'plan'].forEach(k => { if (!Array.isArray(D2[k])) D2[k] = []; }); fixNum(D2, 't', 1, 0, 10); fixNum(D2, 'foeFaith', 50, 0, 200); fixNum(D2, 'round', 1, 0, 5); }
-  const U = o.dun;
-  if (U && !(['intro', 'room', 'resolve', 'end'].includes(U.phase) && Array.isArray(U.party) && Array.isArray(U.rooms) && isNum(U.idx) && Array.isArray(U.log) && (U.phase !== 'room' || (U.room && Array.isArray(U.room.opts))))) o.dun = null;
-  if (o.dun) { fixNum(o.dun, 't', 1, 0, 20); if (o.dun.phase === 'end' && !o.dun.result) o.dun = null; }
-  if (o.duel && o.duel.phase !== 'end') h.state = 'duel';
-  else if (o.dun && o.dun.phase !== 'end') h.state = 'dungeon';
-  if (!o.duel && h.state === 'duel') h.state = 'road';
+  o.fightAuto = !!o.fightAuto;
+  sanitizeArena(o, h);
+  if (o.fight && !validFight(o.fight)) o.fight = null;
+  if (o.dun && !validDun(o.dun)) o.dun = null;
+  if (o.dun && o.dun.phase === 'end' && !o.dun.result) o.dun = null;
+  const FK = o.fight && o.fight.phase !== 'end' ? o.fight.kind : null;
+  if (FK === 'dungeon' && !o.dun) o.fight = null;
+  if (FK === 'monster' && !(h.state === 'fight' && h.monster)) o.fight = null;
+  if (o.dun && o.dun.phase === 'fight' && !(o.fight && o.fight.kind === 'dungeon')) o.dun.phase = 'explore';
+  if (o.fight && ['duel', 'group', 'chaos', 'godduel'].includes(o.fight.kind) && o.fight.phase !== 'end') { if (o.dun) o.fight = null; else { h.state = 'duel'; h.monster = null; } }
+  if (o.dun && o.dun.phase !== 'end') { h.state = h.state === 'dead' ? (h.hp = 1, 'dungeon') : 'dungeon'; h.monster = null; }
+  if (h.state === 'duel' && !(o.fight && o.fight.phase !== 'end')) h.state = 'road';
   if (!o.dun && h.state === 'dungeon') h.state = 'road';
-  if (o.duel && o.dun) o.dun = null;
-  if ((o.duel || o.dun) && o.fork) o.fork = null;
+  if ((o.fight || o.dun) && o.fork) o.fork = null;
   if (o.fork && h.state === 'dead') o.fork = null;
   const E = o.ev;
   if (E && !(WEVENTS.find(e => e.id === E.id) && ['live', 'done'].includes(E.phase) && E.my && Array.isArray(E.parts))) {

@@ -25,7 +25,7 @@ function setHTML(el, html) {
 const pct = (a, b) => clamp(b ? a / b * 100 : 0, 0, 100).toFixed(1) + '%';
 const bar = (cls, a, b, id) => `<div class="bar ${cls}"><i ${id ? 'id="' + id + '"' : ''} style="width:${pct(a, b)}"></i></div>`;
 const faithChip = () => `<span class="faithChip" title="Текущая вера">🔥 ${Math.floor(S.god.faith)} / ${maxFaith()}</span>`;
-const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене богов', rest: 'отдыхает 💤', dungeon: 'в подземелье 🏰' };
+const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене ⚔', rest: 'отдыхает 💤', dungeon: 'в пещере 🏰' };
 const SLOT_IC = { weapon: '⚔', armor: '🛡', amulet: '📿', ring: '💍' };
 const itemSpan = it => `<span class="r${it.rar}${it.curse ? ' cursed' : ''}" title="${esc(RARITY[it.rar].n + ': ' + itemDesc(it))}">${esc(it.n)}${it.curse ? ' ☠' : ''}</span>`;
 
@@ -36,7 +36,7 @@ function renderHeader() {
   $('hFaith').textContent = `🔥 Вера: ${Math.floor(g.faith)} / ${maxFaith()}  (+${faithRegen().toFixed(2)}/с)`;
   $('hFaithBar').style.width = pct(g.faith, maxFaith());
   $('hGxp').textContent = `${innerWidth <= 360 ? 'Бог' : 'Ур. бога'} ${g.lvl} · ${g.xp}/${gxpNext(g.lvl)}` + (g.sp ? ` · ★${g.sp}` : '');
-  const vb = $('voiceBtn'); vb.disabled = g.faith < 5 || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon';
+  const vb = $('voiceBtn'); vb.disabled = g.faith < 5 || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon' || !!S.fight;
   $('hGxpBar').style.width = pct(g.xp, gxpNext(g.lvl));
   const h = S.hero, hm = $('hpMeter'), dead = h.state === 'dead', narrow = innerWidth <= 430;
   $('hHp').innerHTML = dead ? `💀 мёртв${narrow ? '' : ` · встанет через ${fmtDur(Math.max(60, h.deadT))}`}` : `❤ HP: ${Math.max(0, h.hp)} / ${h.maxHp}<small>КД ${sheet().ac}</small>`;
@@ -57,7 +57,8 @@ function renderHero() {
   <div class="row"><span>${RACES[h.race].n} · ${CLASSES[h.cls].n}</span><button class="btn small" data-act="sheet">📋 Лист героя</button></div>
   <div class="stgrid">${STATS.map(k => `<div class="${CLASSES[h.cls].prim === k ? 'pr' : ''}">${STAT_SHORT[k]}<b>${statVal(k)}</b>${fmtMod(mod(statVal(k)))}</div>`).join('')}</div>
   <div class="row"><span>Состояние</span><b>${STATE_RU[h.state] || h.state}${m ? ': ' + esc(m.n) : ''}</b></div>
-  ${m ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div>` : ''}
+  ${m && !S.fight ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div><div class="btns"><button class="btn small red" data-act="fmanual">🎯 Бой под контроль</button></div>` : ''}
+  ${h.inj.length ? `<div class="injrow">🤕 Травмы: ${h.inj.map(j => `${esc(j.n)} (${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, ещё ${fmtDur(j.t)})`).join('; ')}. Лечат: время, долгий отдых, храм, «Исцеление».</div>` : ''}
   <div class="row"><span>Защита (КД) · атака</span><b>${sh.ac} · ${fmtMod(sh.atkB)}</b></div>
   <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}</span></label>${bar('trust', h.trust, 100)}</div>
@@ -97,32 +98,6 @@ function renderFeat() {
   setHTML(box, `<div class="card feat"><h2>🎖 Герой вырос: выберите черту</h2>
   <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам (и вам не понравится его логика).${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${body}</div>`);
 }
-const DUN_IC = { fight: '⚔', trap: '🪤', puzzle: '🧩', path: '🚪', treasure: '💎', boss: '👑' };
-function renderDun() {
-  const box = $('dunBox'), U = S.dun;
-  if (!U) { setHTML(box, ''); return; }
-  const party = `<div class="party">${U.party.map(p => `<div class="pm ${p.isMe ? 'me' : ''}"><b>${esc(p.hero)}</b><div class="muted">${RACES[p.race].n.toLowerCase()}-${CLASSES[p.cls].n.toLowerCase()}, ур. ${p.lvl}</div><div class="muted">${p.isMe ? 'ваш герой · ' + Math.max(0, S.hero.hp) + '/' + S.hero.maxHp + ' HP' : 'бог: ' + esc(p.god) + ' · ' + p.hp + '%'}</div></div>`).join('')}</div>`;
-  const rooms = `<div class="rooms">${U.rooms.map((t, i) => `<span class="${i < U.idx ? 'done' : i === U.idx && U.phase === 'room' ? 'cur' : ''}" title="${DUN_ROOMS[t].n}">${DUN_IC[t]}</span>`).join('')}</div>`;
-  let mid = '';
-  if (U.phase === 'intro') mid = '<div class="q">Отряд зажигает факелы у входа…</div>';
-  else if (U.phase === 'room') {
-    const rm = U.room, t = dunTally(U), ch = dunChoice(U);
-    const powOk = rm.type !== 'treasure' && rm.type !== 'path';
-    const ids = Object.keys(POWERS).filter(id => S.god.skills[id] && DUN_POW[id]);
-    mid = `<div class="q"><b>${DUN_IC[rm.type]} ${DUN_ROOMS[rm.type].n}.</b> ${esc(rm.text)}</div>
-    <div class="muted">Голосуйте за план. Ваш голос весит больше, если вы тратите веру на силы. Сейчас побеждает: «${esc(rm.opts[ch].l)}»</div>
-    <div class="opts">${rm.opts.map((o, k) => `<button class="btn ${rm.myVote === k ? 'on' : ''}" data-act="dvote" data-arg="${k}">${esc(o.l)}${o.s ? `<span class="tag chk">${STAT_SHORT[o.s]}</span>` : ''}${o.cls ? `<span class="tag cls">${o.cls.map(c => CLASSES[c].n.toLowerCase()).join('/')}${o.has ? ' ✓' : ' — нет в отряде'}</span>` : ''} <span class="muted">· голосов ${Math.round(t[k] * 10) / 10}</span></button>`).join('')}</div>
-    ${powOk ? `<div class="muted" style="margin-top:6px">Помочь силой (до 2 на комнату): ${faithChip()}</div>
-    <div class="acts">${ids.map(id => `<button class="btn small" data-act="power" data-arg="${id}" ${S.god.faith < powerCost(id) || rm.myActs.includes(id) || rm.myActs.length >= 2 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет подходящих изученных сил.</span>'}</div>
-    <div class="queued">${rm.bonus ? `Бонус к проверке: +${rm.bonus}. ` : ''}${rm.shield ? 'Щит: урон вдвое меньше. ' : ''}${rm.heal ? 'Лечение после комнаты. ' : ''}</div>` : ''}`;
-  } else if (U.phase === 'resolve') mid = `<div class="q">${esc(U.log[0] ? U.log[0].t : '')}</div>`;
-  else mid = `<div class="q"><b>${esc(U.result || '')}</b></div><div class="btns"><button class="btn" data-act="closeDun">Закрыть</button></div>`;
-  setHTML(box, `<div class="card dun"><h2>🏰 ${esc(U.name)}</h2>${party}${rooms}
-  <div class="stat"><label><span>${U.phase === 'room' ? 'До решения отряда' : U.phase === 'end' ? 'Закроется через' : 'Дальше через'}</span><span id="dunSec"></span></label><div class="bar time"><i id="dunBar"></i></div></div>
-  ${mid}<div class="dlog">${U.log.map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
-  $('dunSec').textContent = Math.max(0, Math.ceil(U.t)) + ' с';
-  $('dunBar').style.width = pct(U.t, U.T);
-}
 function renderDiary() {
   const el = $('diary');
   if (el._v === diaryVer) return; el._v = diaryVer;
@@ -140,33 +115,6 @@ function renderFork() {
     <div class="muted" style="margin-top:6px">Герой послушается с шансом ~${Math.round(obeyChance() * 100)}% (зависит от доверия). Исход зависит от его характеристик.</div></div>`);
   $('forkSec').textContent = Math.ceil(S.fork.t) + ' с';
   $('forkBar').style.width = pct(S.fork.t, S.fork.T);
-}
-function fighterHTML(f, title) {
-  return `<div class="fighter"><b>${esc(f.name)}</b><div class="muted">${title}</div>
-    <div class="stat"><label><span>HP</span><span>${Math.max(0, f.hp)}/${f.max}</span></label>${bar('hp', f.hp, f.max)}</div>
-    <div class="muted">Атака ${f.atk} · защита ${f.def}${f.beast > 0 ? ' · 🐻 медведь' : ''}</div></div>`;
-}
-function renderDuel() {
-  const box = $('duelBox'), D = S.duel;
-  if (!D) { setHTML(box, ''); return; }
-  let mid = '';
-  if (D.phase === 'intro') mid = `<div class="q">Герои сходятся на арене богов…</div>`;
-  else if (D.phase === 'fight') {
-    const ids = Object.keys(POWERS).filter(id => S.god.skills[id]);
-    mid = `<div class="muted">Вмешивайтесь до конца раунда (не более 2 сил + подбадривание). Соперник тоже действует в реальном времени — можно отвечать на его ходы!</div>
-      <div class="muted" style="margin-top:4px">Ваша вера: ${faithChip()}</div>
-      <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="dact" data-arg="${id}" ${S.god.faith < powerCost(id) || D.myActs.includes(id) || D.myActs.filter(a => a !== 'cheer').length >= 2 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('')}
-      <button class="btn small blue" data-act="dact" data-arg="cheer" ${D.myActs.includes('cheer') ? 'disabled' : ''}>📣 Подбодрить (0)</button></div>
-      <div class="queued">${D.myActs.length ? 'В этом раунде: ' + D.myActs.map(a => DUEL_NAMES[a]).join(', ') : 'Вы пока не вмешались.'}${D.foeActs.length ? ' · Соперник: ' + D.foeActs.map(a => DUEL_NAMES[a]).join(', ') : ''}</div>`;
-  } else mid = `<div class="q"><b>${esc(D.result || '')}</b></div><div class="btns"><button class="btn" data-act="closeDuel">Закрыть</button></div>`;
-  setHTML(box, `<div class="card duel"><h2>⚔ Дуэль богов: ${esc(S.god.name)} против ${esc(D.opp.god)}</h2>
-    <div class="muted">${D.phase === 'fight' ? `Раунд ${D.round} из ${DUEL_ROUNDS}` : D.phase === 'intro' ? 'Подготовка' : 'Итог'} · характер соперника: ${PERS[D.opp.pers]}, ур. ${D.opp.lvl} · вера соперника: ${D.phase === 'fight' ? '~' + Math.round(D.foeFaith / 10) * 10 : '?'}</div>
-    <div class="stat"><label><span>${D.phase === 'fight' ? 'До конца раунда' : D.phase === 'intro' ? 'Бой начнётся через' : 'Закроется через'}</span><span id="duelSec"></span></label><div class="bar time"><i id="duelBar"></i></div></div>
-    <div class="vs">${fighterHTML(D.me, 'ваш герой' + (S.flock.army ? ` · армия ${S.flock.army}` : ''))}<div class="vsx">VS</div>${fighterHTML(D.foe, 'герой ' + esc(D.opp.god) + (D.opp.army ? ` · армия ${D.opp.army}` : ''))}</div>
-    ${mid}
-    <div class="dlog">${D.log.map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
-  $('duelSec').textContent = Math.max(0, Math.ceil(D.t)) + ' с';
-  $('duelBar').style.width = pct(D.t, D.T);
 }
 function renderEvent() {
   const box = $('eventBox'), ev = S.ev;
@@ -195,10 +143,9 @@ function renderEvent() {
 }
 function powerDisabled(id, c) {
   if (S.god.faith < c || S.hero.state === 'dead') return true;
-  const D = S.duel, U = S.dun;
-  if (D) { if (D.phase !== 'fight') return true; if (D.myActs.includes(id) || D.myActs.filter(a => a !== 'cheer').length >= 2) return true; }
-  else if (U) { if (U.phase !== 'room' || !DUN_POW[id] || U.room.type === 'treasure' || U.room.type === 'path') return true; if (U.room.myActs.includes(id) || U.room.myActs.length >= 2) return true; }
-  else if (S.hero.state === 'duel' || S.hero.state === 'dungeon') return true;
+  const F = S.fight;
+  if (F) { if (F.phase !== 'turn' || F.powersLeft < 1 || F.usedTurn >= 1) return true; const me = fMe(F); if (!me || !me.alive) return true; }
+  else if (S.dun || S.hero.state === 'duel' || S.hero.state === 'dungeon') return true;
   return false;
 }
 function skillHTML(id) {
@@ -209,7 +156,7 @@ function skillHTML(id) {
   if (!L && !lvlOk) why = `Нужен ур. бога ${p.req}`; else if (!L && !preOk) why = `Сначала: ${POWERS[p.pre].n}`;
   return `<div class="skill ${L ? '' : 'locked'}"><div class="ic">${p.ic}</div>
     <div><div class="nm">${p.n} <span class="pips">${'●'.repeat(L)}${'○'.repeat(3 - L)}</span></div><div class="ds">${p.d}${why ? ` <b>${why}</b>` : ''}</div></div>
-    <div class="sb">${L ? `<button class="btn small" data-act="power" data-arg="${id}" ${powerDisabled(id, c) ? 'disabled' : ''}>${S.duel && S.duel.phase === 'fight' ? 'В дуэль' : S.dun ? 'В подземелье' : 'Применить'} (${c})</button>` : ''}
+    <div class="sb">${L ? `<button class="btn small" data-act="power" data-arg="${id}" ${powerDisabled(id, c) ? 'disabled' : ''}>${S.fight && S.fight.phase === 'turn' ? 'В бой' : 'Применить'} (${c})</button>` : ''}
     ${canLearn ? `<button class="btn small green" data-act="learn" data-arg="${id}">${L ? 'Улучшить ★' : 'Изучить ★'}</button>` : ''}</div></div>`;
 }
 function renderRight() {
@@ -238,17 +185,18 @@ function renderRight() {
       <div class="muted">Солдат = ${soldierCost()} веры + 2 последователя (они больше не молятся, а маршируют). В дуэли каждый солдат даёт +1.2 урона за раунд (до 10), в мировых событиях — +10 силы.</div>
       <div class="btns"><button class="btn small red" data-act="recruit" data-arg="1" ${g.faith < soldierCost() || fl.fol < 2 ? 'disabled' : ''}>Набрать 1 (${soldierCost()})</button><button class="btn small red" data-act="recruit" data-arg="5" ${g.faith < soldierCost() * 5 || fl.fol < 10 ? 'disabled' : ''}>Набрать 5 (${soldierCost() * 5})</button></div></div>
       <div class="muted">Стратегия: паства — это доход, храм — вложение на будущее, чудо — быстрый рост, армия — сила в дуэлях и событиях, но съедает паству.</div>`;
-  } else {
+  } else if (S.tab === 'arena') html = arenaTabHTML();
+  else {
     const st = S.stats;
-    html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей: ${st.duels} (побед ${st.dwins}) · Событий: ${st.events} (успешных ${st.evwins})</div></div>
+    html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
       <div class="muted" style="margin-bottom:6px">Другие боги этого мира. Сейчас ими управляет ИИ с характером; архитектура готова к настоящему серверу.</div>
-      <div class="box"><h3>🏰 Подземелья</h3><div class="muted">Герой иногда сам примыкает к отряду из 2–3 героев других богов. Можно собрать отряд и вручную. Пройдено: ${st.dwinsD} из ${st.duns}.</div><div class="btns"><button class="btn small" data-act="callDun" ${S.dun || S.duel || S.fork || S.hero.state !== 'road' || g.faith < 40 ? 'disabled' : ''}>🏰 Собрать отряд (40)</button></div></div>
+      ${godsDunHTML()}
       ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.duel || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 ? 'disabled' : ''}>Вызвать (10)</button></div></div>`).join('')}`;
+        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
   }
   setHTML($('rightBody'), html);
 }
-function render() { renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderDun(); renderDuel(); renderRight(); renderDiary(); }
+function render() { renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
 
 /* ---------- Модальные окна ---------- */
 function modal(html) { const m = $('modal'); m.innerHTML = `<div class="card">${html}</div>`; m.classList.add('on'); }
@@ -256,7 +204,7 @@ function closeModal() { $('modal').classList.remove('on'); $('modal').innerHTML 
 function onboarding() {
   const ro = Object.keys(RACES).map(k => `<option value="${k}">${RACES[k].n}</option>`).join(''), co = Object.keys(CLASSES).map(k => `<option value="${k}">${CLASSES[k].n}</option>`).join('');
   modal(`<h2>⚜ Добро пожаловать в БогоДел</h2>
-  <p>Вы — молодой бог. У вас есть один герой, который живёт своей жизнью, и он… не очень умный. Но вы можете вмешиваться: отвечать на молитвы, метать молнии, строить храм, водить отряды в подземелья и воевать с другими богами.</p>
+  <p>Вы — молодой бог. У вас есть один герой, который живёт своей жизнью, и он… не очень умный. Но вы можете вмешиваться: отвечать на молитвы, метать молнии, строить храм, водить отряды в пещеры, драться на арене и воевать с другими богами.</p>
   <label>Имя вашего бога</label><input id="inGod" maxlength="30" value="Великий Пельмень">
   <label>Имя героя</label><input id="inHero" maxlength="30" value="Геннадий Отважный">
   <label>Раса героя</label><select id="inRace" data-keep>${ro}</select><div class="desc" id="raceDesc"></div>
@@ -282,7 +230,10 @@ function help() {
   <p><b>🙏 Развилки.</b> Герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вкладывайте веру в храм по частям, в чудеса или в армию.</p>
-  <p><b>⚔ Дуэли богов</b> — 5 раундов по 10 секунд, оба бога вмешиваются в реальном времени. <b>🏰 Подземелья</b> — отряд героев разных богов, комнаты с голосованием и силами. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
+  <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
+  <p><b>🤺 Арена</b> — вкладка с заявками: дуэли 1нс1, группы 3нс3 и 5нс5, хаотичные бои. Принимайте чужие или подавайте свои. За бои — опыт, золото и рейтинг; после поражения — травмы (штраф к характеристике, лечатся временем, отдыхом и храмом). <b>⚜ Дуэль богов</b> — тот же бой, но соперничающий бог тоже колдует.</p>
+  <p><b>🏰 Пещеры</b> — карта 5×5: ведите отряд по комнатам, ищите 🗝 ключ, обходите ловушки и бейте 👑 босса (у каждого своя хитрость — читайте предупреждения!). Пещера не чаще раза в 4 часа. <b>💬 Чат</b> — пока с ботами, но они стараются. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
+  <p>Обычные стычки с монстрами герой решает сам, но кнопкой «🎯 Бой под контроль» можно взять любой бой в свои руки.</p>
   <p class="muted">Пока вас нет, герой живёт сам (примерно в 0,75 темпа, до 24 часов за раз), а по возвращении вас ждёт сводка. Скорость ×1–×10 ускоряет жизнь героя; таймеры решений ускоряются не больше чем в 2 раза.</p>
   <div class="btns"><button class="btn" data-act="closeModal">Понятно!</button></div>`);
 }
@@ -293,8 +244,8 @@ function settings() {
   <div class="btns"><button class="btn" data-act="rename">Сохранить</button><button class="btn" data-act="closeModal">Закрыть</button></div>
   ${pwaSettingsHTML()}
   <h3 style="margin-top:14px">Для тестирования</h3>
-  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">🙏 Развилка сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚔ Дуэль сейчас</button>
-  <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Подземелье сейчас</button>
+  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">🙏 Развилка сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
+  <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Пещера сейчас</button>
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
   <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
   <h3 style="margin-top:14px">Опасная зона</h3>
@@ -319,10 +270,6 @@ const ACT = {
   fork: a => answerFork(+a),
   power: a => usePower(a),
   learn: a => learn(a),
-  dact: a => duelAct(a),
-  dvote: a => dunVote(+a),
-  closeDuel: () => { if (S.duel && S.duel.phase === 'end') S.duel = null; },
-  closeDun: () => { if (S.dun && S.dun.phase === 'end') S.dun = null; },
   closeEv: () => { if (S.ev && S.ev.phase === 'done') S.ev = null; },
   evVote: a => evVote(a), evGive: a => evGive(a), evArmy: () => evArmy(),
   resurrect: () => resurrect(true),
@@ -330,17 +277,20 @@ const ACT = {
   lift: a => liftCurse(a),
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
-  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.duel || S.dun || S.fork || S.hero.state !== 'road') return toast('Герой сейчас занят.'); S.god.faith -= 10; startDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
-  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.duel || S.fork || S.hero.state !== 'road') return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true).then(ok => { if (!ok && S) addFaith(40); }); },
+  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
+  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true).then(ok => { if (!ok && S) addFaith(40); }); },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,
   rename: () => { S.god.name = ($('inGod').value || '').trim() || S.god.name; S.hero.name = ($('inHero').value || '').trim() || S.hero.name; closeModal(); save(); },
   reset: () => { if (!confirm('Точно стереть мир и начать заново?')) return; localStorage.removeItem(SAVE_KEY); S = null; onboarding(); },
   dbg: a => { closeModal(); const h = S.hero;
     const free = () => { if (h.state === 'dead') resurrect(false); if (h.state === 'fight' || h.state === 'town' || h.state === 'rest') { h.state = 'road'; h.monster = null; h.restT = 0; } };
-    if (a === 'fork') { if (S.duel || S.dun || h.state === 'duel' || h.state === 'dungeon') return toast('Сначала закончите дуэль/подземелье.'); if (h.state === 'dead') resurrect(true); if (!S.fork) startFork(); }
-    else if (a === 'duel') { if (S.duel || S.dun || h.state === 'duel' || h.state === 'dungeon') return toast('Герой уже занят.'); S.fork = null; free(); startDuel(); }
-    else if (a === 'dun') { if (S.duel || S.dun || h.state === 'duel' || h.state === 'dungeon') return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
+    const busy = S.fight || S.dun || h.state === 'duel' || h.state === 'dungeon' || duelPending || dunPending;
+    if (a === 'fork') { if (busy) return toast('Сначала закончите бой/пещеру.'); if (h.state === 'dead') resurrect(true); if (!S.fork) startFork(); }
+    else if (a === 'duel') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startGodDuel(); }
+    else if (a === 'arena' || a === 'group') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); h.hp = Math.max(h.hp, Math.ceil(h.maxHp * .5)); S.arena.apps = S.arena.apps.filter(x => x.joined === null); arenaPost(a === 'arena' ? 'duel' : 'group:3'); const ap = S.arena.apps.find(x => x.mine); if (ap) { while (!appFull(ap)) appAddBot(ap, fightProv.makeBot(h.lvl)); startArenaFight(ap); } }
+    else if (a === 'monster') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startFight(); startMonsterFight(); }
+    else if (a === 'dun') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
     else if (a === 'feat') { S.featQueue++; offerFeat(); }
     else if (a === 'h1' || a === 'h8') simulateAway(a === 'h1' ? 3600 : 8 * 3600, 'перемотка времени');
     else if (a === 'event') startEvent(); else if (a === 'faith') addFaith(100); }
@@ -355,16 +305,3 @@ $('voiceIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { AC
 window.addEventListener('beforeunload', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
-/* ---------- Запуск ---------- */
-let lastT = performance.now();
-function loop() {
-  const now = performance.now(); let dt = (now - lastT) / 1000; lastT = now; if (dt > 1) dt = 1;
-  if (!S) return;
-  if (!S.paused) { try { step(dt); } catch (err) { console.error(err); } }
-  render();
-}
-S = load();
-if (S) { if (S.dun && S.dun.room) S.dun.room.planned = S.dun.room.plan.length > 0; offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
-setInterval(loop, 250);
-/* Отладочный доступ из консоли / тестов */
-window.GAME = { get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startEvent, startDungeon, answerFork, usePower, duelAct, dunAct, dunVote, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, get dunPending() { return dunPending; }, get duelPending() { return duelPending; } };
