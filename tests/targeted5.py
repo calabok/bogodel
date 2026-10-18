@@ -26,7 +26,7 @@ async def main():
         pg.on('dialog', lambda d: asyncio.ensure_future(d.accept()))
         await pg.goto(URL); await pg.wait_for_timeout(300)
         await fresh(pg,'warrior')
-        ok('save version 5', await pg.evaluate('GAME.S.v===5 && !("duel" in GAME.S) && GAME.S.arena.rating===1000 && Array.isArray(GAME.S.hero.inj)'))
+        ok('save version 6', await pg.evaluate('GAME.S.v===6 && !("duel" in GAME.S) && GAME.S.arena.rating===1000 && Array.isArray(GAME.S.hero.inj)'))
         # ---------- 1нс1 по зонам ----------
         await dbg(pg,'arena')
         r=await pg.evaluate("[GAME.S.fight&&GAME.S.fight.kind, GAME.S.hero.state, GAME.S.fight&&GAME.S.fight.fighters.length]")
@@ -117,7 +117,7 @@ async def main():
         ok('god duel = zone fight vs rival god', r[0]=='godduel' and r[1] and r[2]==1 and r[3]=='road', r)
         # ---------- пещера ----------
         await pg.evaluate("GAME.S.hero.state='road';GAME.S.hero.hp=GAME.S.hero.maxHp;GAME.S.god.faith=200;GAME.S.timers.dunCd=0;GAME.S.tab='gods'"); await pg.wait_for_timeout(300)
-        await pg.click('[data-act=callDun]'); await pg.wait_for_timeout(500)
+        await pg.click('[data-act=callDun]'); await pg.wait_for_timeout(150); await pg.click('#modal [data-act=dunTier][data-arg=normal]'); await pg.wait_for_timeout(500)
         r=await pg.evaluate("[!!GAME.S.dun, GAME.S.hero.state, GAME.S.dun&&GAME.S.dun.party.length, GAME.S.dun&&GAME.S.dun.tiles.filter(Boolean).length, GAME.S.timers.dunCd]")
         ok('dungeon map started (party 3-4, 12-15 rooms, cooldown set)', r[0] and r[1]=='dungeon' and 3<=r[2]<=4 and 12<=r[3]<=15 and r[4]>0, r)
         n=await pg.locator('#dunBox [data-act=dgo]').count(); ok('adjacent rooms clickable', n>=1, n)
@@ -168,7 +168,7 @@ async def main():
             await q.add_init_script(f"if(!sessionStorage.getItem('x')){{localStorage.setItem('bogodel_save_v1', {json.dumps(save)});sessionStorage.setItem('x',1)}}")
             await q.goto(URL); await q.wait_for_timeout(800)
             r=await q.evaluate('''(()=>{const S=GAME.S,h=S.hero;return {v:S.v,duel:'duel' in S,dun:S.dun,fight:S.fight,state:h.state,inj:h.inj,arena:S.arena&&S.arena.rating,chat:S.chat&&S.chat.msgs.length,diary:S.diary.slice(0,4).map(e=>e.x.slice(0,60)),max:h.maxHp===GAME.calcMaxHp(h)}})()''')
-            ok(name+' migration', r['v']==5 and not r['duel'] and r['dun'] is None and r['fight'] is None and r['state'] in ('road','town','rest','fight','dead') and r['inj']==[] and r['arena']==1000 and r['max'], r)
+            ok(name+' migration', r['v']==6 and not r['duel'] and r['dun'] is None and r['fight'] is None and r['state'] in ('road','town','rest','fight','dead') and r['inj']==[] and r['arena']==1000 and r['max'], r)
             ok(name+' arena note in diary', any('Арена' in x for x in r['diary']), r['diary'])
             await q.screenshot(path=f'/workspace/godgame/shot4_mig_{name[:2]}.png')
             await c.close()

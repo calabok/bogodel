@@ -63,7 +63,7 @@ function renderHero() {
     <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span>${Math.min(100, Math.floor(h.quest.p))}%</span></label>${bar('quest', h.quest.p, 100)}</div>
     <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   </div>
-  <div class="hc-mini"><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
+  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
     ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}${equipped(h).some(it => it.curse) ? '<button class="linkbtn" data-act="sheet" style="color:#8c2e20">☠ проклятый предмет</button>' : ''}</div>`;
   setHTML($('colHero'), html);
 }
@@ -74,7 +74,7 @@ function sheetModal() {
   <div class="muted">Бой: атака ${fmtMod(sh.atkB)} · урон d${sh.die}${sh.dmgB ? fmtMod(sh.dmgB) : ''} (≈${Math.round(sh.avg)}) · КД ${sh.ac} · HP ${h.maxHp}. Владение ★: ${c.prof.map(k => STAT_SHORT[k]).join(', ')} (${fmtMod(profB(h.lvl))}).</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}, слушается ~${Math.round(obeyChance() * 100)}%</span></label>${bar('trust', h.trust, 100)}</div>
   ${h.inj.length ? `<h3>🤕 Травмы</h3>${h.inj.map(j => `<div class="injrow">${esc(j.n)}: ${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, пройдёт за ${fmtDur(j.t)}</div>`).join('')}<div class="muted">Лечат время, долгий отдых, храм и «Исцеление».</div>` : ''}
-  <h3>Снаряжение</h3><ul class="eq">${['weapon', 'armor', 'amulet', 'ring'].map(sl => { const it = h.eq[sl]; return `<li><span>${SLOT_IC[sl]}</span><span class="nm">${it ? `${itemSpan(it)}<div class="muted">${RARITY[it.rar].n} · ${esc(itemDesc(it))}</div>` : `<span class="muted">${SLOT_RU[sl]}: пусто</span>`}</span>${it && it.curse ? `<button class="btn small red" data-act="liftS" data-arg="${sl}" ${S.god.faith < liftCost(it) ? 'disabled' : ''}>Снять ☠ · ${liftCost(it)}</button>` : '<span></span>'}</li>`; }).join('')}</ul>
+  <h3>Снаряжение · ⚔ ГС ${gearScore(h)}</h3><div class="muted">Сила снаряжения решает в подземельях: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} ${DUN_TIERS[k].n.toLowerCase()} — рек. ${recGS(h.lvl, k)}`).join(' · ')}. Кузнец: +1 к предмету за золото (предел — от редкости: обычная +1 … легендарная +5).</div><ul class="eq">${['weapon', 'armor', 'amulet', 'ring'].map(sl => { const it = h.eq[sl]; return `<li><span>${SLOT_IC[sl]}</span><span class="nm">${it ? `${itemSpan(it)}<div class="muted">${RARITY[it.rar].n} · ГС ${itemGS(it)} · ${esc(itemDesc(it))}</div>` : `<span class="muted">${SLOT_RU[sl]}: пусто</span>`}</span><span class="eqb">${smithOk(it) ? `<button class="btn small" data-act="smith" data-arg="${sl}" ${h.gold < smithCost(it) || S.fight || S.dun ? 'disabled' : ''} title="Кузнец: +1 (ГС +4)">🔨 +1 · ${smithCost(it)} 💰</button>` : ''}${it && it.curse ? `<button class="btn small red" data-act="liftS" data-arg="${sl}" ${S.god.faith < liftCost(it) ? 'disabled' : ''}>Снять ☠ · ${liftCost(it)}</button>` : ''}</span></li>`; }).join('')}</ul>
   <h3>🎒 Рюкзак (${h.inv.length}/12)</h3><ul class="inv">${h.inv.length ? h.inv.map(i => `<li>${i.slot ? itemSpan(i) : esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
   <h3>Раса и класс</h3><div class="muted"><b>${r.tr}.</b> ${r.td}</div><div class="muted"><b>${c.ab}.</b> ${c.ad}</div>
   <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}
@@ -205,6 +205,17 @@ function renderNav() {
 function render() { renderNav(); renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
 
 /* ---------- Модальные окна ---------- */
+const DUN_TIER_KEYS = ['easy', 'normal', 'hard'];
+function gsTip(h) { return `Сила снаряжения: ${['weapon', 'armor', 'amulet', 'ring'].map(sl => `${SLOT_RU[sl]} ${itemGS(h.eq[sl])}`).join(', ')}. Средний ГС для ур. ${h.lvl}: ${typGS(h.lvl)}. Чем выше — тем легче подземелья.`; }
+function gsVerdict(q) { return q >= 1.25 ? ['легко', 'g'] : q >= 1.05 ? ['уверенно', 'g'] : q >= .92 ? ['по силам', 'n'] : q >= .78 ? ['трудно', 'w'] : ['опасно!', 'b']; }
+function tierModal() {
+  const h = S.hero, gs = gearScore(h), auto = autoTier(h);
+  modal(`<div class="sheet"><h2>🏰 Какое подземелье?</h2><div class="muted">Ваш ⚔ ГС <b>${gs}</b>. Недобор ГС — монстры бьют больнее и реже промахиваются; перебор — проще. Награда зависит только от сложности.</div>
+  <div class="opts tiers">${DUN_TIER_KEYS.map(k => { const T = DUN_TIERS[k], rec = recGS(h.lvl, k), q = (GS_K.hero * gs + (1 - GS_K.hero) * rec) / rec, m = gsMul(q) * T.m, v = gsVerdict(gs / rec);
+    return `<button class="btn tier" data-act="dunTier" data-arg="${k}"><b>${T.ic} ${T.n}</b>${k === auto ? ' <span class="tag cls">сам выбрал бы</span>' : ''}<span class="muted">рек. ГС ${rec} · у вас ${gs} — <span class="gv ${v[1]}">${v[0]}</span></span><span class="muted">монстры ${Math.round(m * 100)}% · награда ×${T.rew}${T.rar > 0 ? ' · вещи лучше' : T.rar < 0 ? ' · вещи попроще' : ''}</span></button>`; }).join('')}</div>
+  <div class="muted">Цена: 40 веры. Тяжёлая даёт больше золота и опыта, вещи лучше и выше уровнем.</div>
+  <div class="btns"><button class="btn small" data-act="closeModal">Отмена</button></div></div>`);
+}
 function modal(html) { const m = $('modal'); m.innerHTML = `<div class="card">${html}</div>`; m.classList.add('on'); }
 function closeModal() { $('modal').classList.remove('on'); $('modal').innerHTML = ''; }
 function onboarding() {
@@ -290,7 +301,9 @@ const ACT = {
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
   challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
-  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true).then(ok => { if (!ok && S) addFaith(40); }); },
+  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
+  dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
+  smith: sl => { if (!['weapon', 'armor', 'amulet', 'ring'].includes(sl)) return; if (smithUpgrade(sl) === true) { sheetModal(); render(); } },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,
   rename: () => { S.god.name = ($('inGod').value || '').trim() || S.god.name; S.hero.name = ($('inHero').value || '').trim() || S.hero.name; closeModal(); save(); },

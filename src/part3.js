@@ -89,7 +89,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 5;
+const SAVE_VERSION = 6;
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -141,6 +141,11 @@ function migrate(o) {
     // v4 → v5: новый интерфейс (нижние вкладки на телефоне) и пересчитанный баланс; бой/пещера сохраняются
     o.ui = { mtab: 'hero' };
     o._migratedV5 = 1;
+  }
+  if (v < 6) {
+    // v5 → v6: сила снаряжения (ГС), сложности подземелий, кузнец. Начатая пещера станет «обычной» (см. validDun)
+    if (o.dun && typeof o.dun === 'object' && !o.dun.diff) o.dun.diff = 'normal';
+    o._migratedV6 = 1;
   }
   delete o.duel;
   o.v = SAVE_VERSION;

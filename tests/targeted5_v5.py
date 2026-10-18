@@ -73,7 +73,7 @@ async def main():
         await pg.evaluate("(()=>{const s=JSON.parse(JSON.stringify(GAME.S)); s.v=4; delete s.ui; s.dun.tiles.forEach(t=>{if(t){delete t.d; if(t.t==='elite') t.t='fight';}}); delete s.dun.heals; const j=JSON.stringify(s); localStorage.setItem(GAME.SAVE_KEY, j); const w=()=>localStorage.setItem(GAME.SAVE_KEY, j); window.addEventListener('beforeunload',w); document.addEventListener('visibilitychange',w); window.addEventListener('pagehide',w);})()")
         await pg.reload(); await pg.wait_for_timeout(400)
         r=await pg.evaluate("({v:GAME.S.v, ui:GAME.S.ui&&GAME.S.ui.mtab, dun:!!GAME.S.dun, heals:GAME.S.dun&&GAME.S.dun.heals, note:GAME.S.diary.slice(0,5).some(d=>/Обновление мира/.test(d.x))})")
-        ok('v4->v5 migration keeps dungeon, adds ui + note', r['v']==5 and r['ui']=='hero' and r['dun'] and r['heals']==0 and r['note'], r)
+        ok('v4->v5 migration keeps dungeon, adds ui + note', r['v']>=5 and r['ui']=='hero' and r['dun'] and r['heals']==0 and r['note'], r)
         await pg.evaluate("GAME.S.paused=true"); 
         r=await pg.evaluate("(()=>{let k=0; while(GAME.S.dun&&k++<400){ if(GAME.S.fight) GAME.autoResolveBattle?GAME.autoResolveBattle(GAME.S.fight):autoResolveBattle(GAME.S.fight); else if(GAME.S.dun.phase==='explore') dunAutoStep(); else if(GAME.S.dun.phase==='end') GAME.S.dun=null; else GAME.S.dun.phase='explore'; } return {done:!GAME.S.dun}})()")
         ok('migrated dungeon playable to the end', r['done'], r)

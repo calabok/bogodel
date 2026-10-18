@@ -83,7 +83,7 @@ const BASES = {
 const PROP_DEF = {
   str: { n: 'Силача', d: '+{v} Сила', slots: 'all' }, dex: { n: 'Ловкача', d: '+{v} Ловкость', slots: 'all' }, con: { n: 'Здоровяка', d: '+{v} Телосложение', slots: 'all' },
   int: { n: 'Умника', d: '+{v} Интеллект', slots: 'all' }, wis: { n: 'Мудреца', d: '+{v} Мудрость', slots: 'all' }, cha: { n: 'Обаяшки', d: '+{v} Харизма', slots: 'all' },
-  fire: { n: 'Пламени', d: 'поджигает врагов', slots: 'weapon' }, vamp: { n: 'Кровососа', d: 'лечит при ударе', slots: 'weapon' }, crit: { n: 'Точности', d: 'шанс двойного удара', slots: 'weapon' },
+  fire: { n: 'Пламени', d: 'поджигает врагов', slots: 'weapon' }, vamp: { n: 'Кровососа', d: 'лечит при ударе', slots: 'weapon' }, crit: { n: 'Точности', d: 'шанс двойного удара', slots: 'weapon' }, holy: { n: 'Серебра', d: 'серебро: нечисть боится', slots: 'weapon' },
   thorns: { n: 'Ежа', d: 'шипы ранят обидчиков', slots: 'armor' }, regen: { n: 'Живучести', d: 'понемногу лечит в пути', slots: 'armor amulet' },
   gold: { n: 'Скупердяя', d: '+25% золота', slots: 'amulet ring' }, faith: { n: 'Благодати', d: '+вера богу', slots: 'amulet ring' },
   luck: { n: 'Удачи', d: '+1 ко всем проверкам', slots: 'ring amulet' }, preach: { n: 'Проповедника', d: '+паства от проповедей', slots: 'amulet' }

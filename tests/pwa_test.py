@@ -50,7 +50,7 @@ async def main():
         await pg.evaluate("document.querySelector('[data-act=settings]').click(); document.querySelector('[data-act=importSave]').click()")
         await pg.fill('#impText',json.dumps(v2,ensure_ascii=False)); await pg.click('[data-act=doImport]'); await pg.wait_for_timeout(400)
         r=await pg.evaluate('({n:GAME.S.hero.name,v:GAME.S.v,l:GAME.S.hero.lvl,race:GAME.S.hero.race,eq:!!GAME.S.hero.eq.weapon})')
-        ok('old v2 save imports via migration', r['n']=='Ветеран' and r['v']==5 and r['eq'], r)
+        ok('old v2 save imports via migration', r['n']=='Ветеран' and r['v']==6 and r['eq'], r)
         await pg.screenshot(path='/workspace/godgame/pwa_mobile.png')
         # update flow
         if DEPLOY:
@@ -71,8 +71,8 @@ async def main():
                 async with pg.expect_navigation(timeout=15000): await pg.click('#updBar [data-act=applyUpdate]')
                 await pg.wait_for_timeout(1500)
                 b1=await pg.evaluate('GAME.APP_BUILD'); ok('after «Обновить» new build running, save kept', b1==nb and await pg.evaluate('GAME.S.hero.name==="Ветеран"'), [b1,nb])
-                r=await pg.evaluate("({v:GAME.S.v, arena:!!document.querySelector('[data-act=tab][data-arg=arena]'), chat:!!document.getElementById('chatDock'), duel:'duel' in GAME.S, nav:!!document.getElementById('mnav'), ui:GAME.S.ui&&GAME.S.ui.mtab})")
-                ok('after update: save on v5, new layout (nav, ui), arena + chat present', r['v']==5 and r['arena'] and r['chat'] and not r['duel'] and r['nav'] and r['ui']=='hero', r)
+                r=await pg.evaluate("({v:GAME.S.v, arena:!!document.querySelector('[data-act=tab][data-arg=arena]'), chat:!!document.getElementById('chatDock'), duel:'duel' in GAME.S, nav:!!document.getElementById('mnav'), ui:GAME.S.ui&&GAME.S.ui.mtab, gs:!!document.querySelector('#colHero .gsc')})")
+                ok('after update: save on v6, GS chip, nav, ui, arena + chat present', r['v']==6 and r.get('gs') and r['arena'] and r['chat'] and not r['duel'] and r['nav'] and r['ui']=='hero', r)
                 await pg.screenshot(path='/workspace/godgame/pwa_after_update.png')
         R['js_errors']=errs
         ctx2=await br.new_context(viewport={'width':1440,'height':900}); p2=await ctx2.new_page(); await p2.goto(BASE); await p2.wait_for_timeout(600)

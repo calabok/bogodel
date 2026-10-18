@@ -48,6 +48,11 @@ function renderFight() {
   $('fBar').style.width = pct(F.t, F.T);
 }
 /* ---------- Пещера ---------- */
+function dunGsRow(U) {
+  const T = DUN_TIERS[U.diff] || DUN_TIERS.normal, g = dunGearMul(U), v = gsVerdict(g.q), B = BOSSES.find(b => U.boss && b.n === U.boss.n);
+  const br = B && (B.weak || B.res) ? `👑 ${esc(B.n)}: ${B.weak ? `боится ${PROP_IC[B.weak]} ${PROP_RU[B.weak]}` : ''}${B.weak && B.res ? ', ' : ''}${B.res ? `не берёт ${PROP_IC[B.res]} ${PROP_RU[B.res]}` : ''}` : '';
+  return `<div class="row dgs"><span>${T.ic} ${T.n} · ⚔ ГС отряда <b>${Math.round(g.q * (U.rec || 1))}</b> / рек. ${U.rec} — <span class="gv ${v[1]}">${v[0]}</span> · монстры ${Math.round(dunMonMul(U) * 100)}%</span>${br ? `<span class="hint">${br}</span>` : ''}</div>`;
+}
 function renderDunMap() {
   const box = $('dunBox'), U = S.dun;
   if (!U || (S.fight && S.fight.kind === 'dungeon' && innerWidth <= 760)) { setHTML(box, U ? `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2><div class="muted">Отряд в бою — см. выше. Ключей: ${U.keys} 🗝</div></div>` : ''); return; }
@@ -72,7 +77,7 @@ function renderDunMap() {
       <div class="btns">${S.god.skills.heal ? `<button class="btn small green" data-act="dheal" ${hl < 1 || S.god.faith < hc ? 'disabled' : ''} title="Герой +30% HP, отряд +20%">✚ Лечить отряд · ${hc} (${hl})</button>` : ''}<button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Авто: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave" title="Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи">🚪 Отступить с добычей</button></div>`;
   setHTML(box, `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2>
     <div class="row"><span>🗝 <b>${U.keys}</b> · ${U.gold} 💰 · ${U.loot.length} 🎁</span>${roles.length ? `<span class="hint">${roles.join(' · ')}</span>` : ''}</div>
-    ${party}<div class="dgrid">${cells}</div><div class="dleg">⚔ логово · 💀 элита · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс</div>
+    ${dunGsRow(U)}${party}<div class="dgrid">${cells}</div><div class="dleg">⚔ логово · 💀 элита · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс</div>
     <div class="bossInfo">👑 <b>${esc(U.boss.n)}</b>: ${esc((BOSSES.find(b => b.n === U.boss.n) || U.boss).d)}</div>
     ${mid}<div class="dlog">${U.log.slice(0, 12).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
 }
@@ -106,6 +111,7 @@ function godsDunHTML() {
   const dis = S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || g.faith < 40 || dunPending;
   return `<div class="box"><h3>🏰 Пещеры</h3><div class="muted">Отряд из героя и 2–3 бойцов других богов идёт по карте комнат: ловушки, сундуки, ключ и босс. Классы важны: плут, жрец, маг, следопыт и бард помогают по-своему. Пройдено: ${st.dwinsD} из ${st.duns}, боссов: ${st.bosses}.</div>
     <div class="muted">${cd > 0 ? `Сам герой полезет в пещеру не раньше чем через ${fmtDur(cd)}.` : 'Герой готов к пещере — может забрести сам.'}</div>
+    <div class="muted">⚔ Ваш ГС: <b>${gearScore(S.hero)}</b> (рек.: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} ${recGS(S.hero.lvl, k)}`).join(' · ')}).</div>
     <div class="btns"><button class="btn small" data-act="callDun" ${dis ? 'disabled' : ''}>🏰 Собрать отряд (40)</button></div></div>`;
 }
 /* ---------- Чат ---------- */
@@ -149,7 +155,7 @@ S = load();
 if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
 setInterval(loop, 250);
 /* Отладочный доступ из консоли / тестов */
-window.GAME = { closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+window.GAME = { gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },

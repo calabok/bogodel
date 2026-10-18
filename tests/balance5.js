@@ -70,13 +70,25 @@ window.BAL.smartRoute = function (U) {
   let j = goals[0][1]; while (prev[j] !== start && prev[j] >= 0) j = prev[j];
   return { x: j % DW, y: Math.floor(j / DW) };
 };
-window.BAL.dun = async function (L, cls, N, policy) {
-  const out = { bossFight: 0, boss: 0, carried: 0, left: 0, nokey: 0, fights: 0, heroHp: 0, gold: 0, xp: 0 };
+// Подогнать снаряжение героя под целевой ГС (±2): +N, затем кольцо/амулет, затем базовая вещь
+window.BAL.fitGS = function (target) {
+  const h = S.hero, sl = ['weapon', 'armor', 'amulet', 'ring']; let k = 0;
+  while (gearScore(h) < target - 2 && k++ < 80) { const c = sl.filter(x => h.eq[x] && (h.eq[x].plus || 0) < smithCap(h.eq[x])); if (!h.eq.amulet) { h.eq.amulet = makeItem('amulet', h.lvl, 1); h.eq.amulet.curse = null; continue; } if (!h.eq.ring) { h.eq.ring = makeItem('ring', h.lvl, 1); h.eq.ring.curse = null; continue; } if (!c.length) { const r = sl.filter(x => h.eq[x].rar < 4); if (!r.length) break; h.eq[r[Math.floor(Math.random() * r.length)]].rar++; continue; } h.eq[c[Math.floor(Math.random() * c.length)]].plus++; }
+  while (gearScore(h) > target + 2 && k++ < 160) { const c = sl.filter(x => h.eq[x] && h.eq[x].plus > 0); if (c.length) { h.eq[c[Math.floor(Math.random() * c.length)]].plus--; continue; }
+    if (h.eq.ring) { h.eq.ring = null; continue; } if (h.eq.amulet) { h.eq.amulet = null; continue; }
+    const w = h.eq.weapon, ar = h.eq.armor; if (w && w.props.length) { w.props.pop(); continue; } if (ar && ar.props.length) { ar.props.pop(); continue; }
+    if (w && w.rar > 0) { w.rar--; continue; } if (ar && ar.rar > 0) { ar.rar--; continue; } if (ar && ar.ac > 1) { ar.ac--; continue; } if (w && w.die > 4) { w.die -= 2; continue; } break; }
+  for (const x of sl) { const it = h.eq[x]; if (it && !it.unique) it.n = it.base + (it.plus ? ` +${it.plus}` : '') + (it.props[0] ? ' ' + PROP_DEF[it.props[0].k].n : ''); }
+  h.maxHp = calcMaxHp(h); h.hp = h.maxHp; return gearScore(h);
+};
+window.BAL.dun = async function (L, cls, N, policy, tier, q) {
+  const out = { bossFight: 0, boss: 0, carried: 0, left: 0, nokey: 0, fights: 0, heroHp: 0, gold: 0, xp: 0, gs: 0 };
   for (let i = 0; i < N; i++) {
     const s = BAL.hero(L, cls); s.god.skills.bless = s.god.lvl >= 2 ? 1 : 0; s.god.skills.shield = s.god.lvl >= 4 ? 1 : 0;
     s.god.faith = Math.round(maxFaith() * .7); s.timers.dunCd = 0; S.hero.inj = [];
+    if (q) { out.gs += BAL.fitGS(Math.round(q * recGS(L, tier || 'normal'))); }
     const xp0 = S.hero.xp + 0, g0 = S.hero.gold, lv0 = S.hero.lvl;
-    await startDungeon(true); if (!S.dun) { i--; continue; }
+    await startDungeon(true, tier); if (!S.dun) { i--; continue; }
     const U = S.dun; U.auto = true; let k = 0, res = null;
     while (S.dun && k++ < 400) {
       if (S.fight) { const F = S.fight; if (F.ctx.boss && !F._c) { F._c = 1; out.bossFight++; }
@@ -91,7 +103,7 @@ window.BAL.dun = async function (L, cls, N, policy) {
     }
     const r = res || '';
     if (r.includes('Босс повержен')) out.boss++; else if (r.includes('вынесли')) out.carried++; else if (r.includes('Ключ')) out.nokey++; else out.left++;
-    out.fights += U.fights; out.heroHp += S.hero.hp / S.hero.maxHp; out.gold += S.hero.gold - g0;
+    out.fights += U.fights; out.heroHp += S.hero.hp / S.hero.maxHp; out.gold += S.hero.gold - g0; out.xp += S.hero.xp - xp0 + (S.hero.lvl - lv0) * 1e3;
   }
   for (const k in out) out[k] = +(out[k] / N).toFixed(3);
   return out;

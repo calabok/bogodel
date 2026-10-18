@@ -154,6 +154,33 @@ function itemScore(it) {
   if (it.slot === 'armor') return it.ac + it.plus + props * 1.2;
   return props + it.plus * .5;
 }
+/* ---------- Сила снаряжения (ГС) ---------- */
+function itemGS(it) {
+  if (!it) return 0;
+  const base = it.slot === 'weapon' ? 4 + ((it.die || 4) - 4) * 1.5 : it.slot === 'armor' ? 4 + (it.ac || 0) * 2 : 2;
+  const pr = (it.props || []).reduce((s, p) => s + (STATS.includes(p.k) ? (p.v || 1) * 2 : 3), 0);
+  return Math.max(0, Math.round(base + (it.plus || 0) * 4 + (it.rar || 0) * 3 + pr + (it.curse ? 2 : 0)));
+}
+const gearScore = h => ['weapon', 'armor', 'amulet', 'ring'].reduce((s, sl) => s + itemGS(h.eq[sl]), 0);
+/* Типичный ГС героя уровня L — медиана по прогонам реальной прокачки (7 героев × 200 ч, v6), дальше медленный рост к потолку */
+const TYP_GS_T = [0, 20, 33, 62, 92, 120, 138, 150, 157, 162];
+function typGS(L) { L = clamp(Math.round(L) || 1, 1, MAX_LVL + 5); return L < TYP_GS_T.length ? TYP_GS_T[L] : Math.min(205, 162 + 4 * (L - 9)); }
+const recGS = (L, tier) => Math.round(typGS(L) * (DUN_TIERS[tier] || DUN_TIERS.normal).g);
+/* Кузнец: +1 к предмету за золото (до +5) */
+const smithCap = it => Math.min(5, (it.rar || 0) + 1 + (it.curse ? 1 : 0)); /* редкость решает, сколько выдержит металл; проклятое — на +1 больше */
+function smithCost(it) { return it ? Math.round((20 + 10 * S.hero.lvl) * Math.pow((it.plus || 0) + 1, 2) * priceMul()) : 0; }
+function smithOk(it) { return !!it && (it.plus || 0) < smithCap(it) && !it.unique; }
+function smithUpgrade(sl, auto) {
+  const h = S.hero, it = h.eq[sl];
+  if (!smithOk(it)) return auto ? false : toast(`Кузнец: «${it ? `больше +${smithCap(it)} этот металл не выдержит` : 'нечего точить'}». Редкие вещи держат больше.`);
+  if (!auto && (S.fight || S.dun || ['duel', 'dungeon', 'dead'].includes(h.state))) return toast('Герой сейчас занят — кузнец подождёт.');
+  const c = smithCost(it); if (h.gold < c) return auto ? false : toast(`Нужно ${c} 💰.`);
+  h.gold -= c; it.plus = (it.plus || 0) + 1;
+  it.n = it.n.replace(/ \+\d+/, '').replace(it.base, it.base + ` +${it.plus}`);
+  if (sl === 'armor' || sl === 'amulet' || sl === 'ring') recalcHp();
+  diary(auto ? `Заглянул к кузнецу: «${it.n}». Стучал молотком час, звенит до сих пор.` : `Бог послал меня к кузнецу. Теперь у меня «${it.n}»!`, 'loot', `−${c} 💰, ГС ${gearScore(h)}`);
+  return true;
+}
 function itemDesc(it) {
   const p = [];
   if (it.slot === 'weapon') p.push(`урон d${it.die}${it.plus ? '+' + it.plus : ''}`);
@@ -445,6 +472,7 @@ function townStep() {
     const price = Math.max(3, Math.round((10 + 4 * L) * priceMul())); let bought = 0;
     while (h.potions < 3 && h.gold > price * 2) { h.gold -= price; h.potions++; bought++; }
     if (bought) parts.push(`Купил ${bought} ${plural(bought, 'зелье', 'зелья', 'зелий')} у подозрительного алхимика.`);
+    { const sl = ['weapon', 'armor', 'amulet', 'ring'].filter(x => smithOk(h.eq[x])).sort((a, b) => smithCost(h.eq[a]) - smithCost(h.eq[b]))[0]; if (sl && h.gold >= smithCost(h.eq[sl]) * 4) smithUpgrade(sl, true); }
     if (R() < .5) {
       const it = makeItem(pick(['weapon', 'armor', 'amulet', 'ring']), L, R() < .25 ? 1 : 0); it.curse = null;
       const cost = Math.round(it.v * 2.5 * priceMul()), cur = h.eq[it.slot];

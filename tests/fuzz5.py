@@ -72,7 +72,7 @@ ACT='''(r)=>{const modal=document.getElementById('modal').classList.contains('on
  const root=modal?document.getElementById('modal'):document;
  let bs=[...root.querySelectorAll('[data-act]')].filter(b=>!b.disabled&&b.offsetParent!==null&&!['reset','newGame'].includes(b.dataset.act));
  if(!modal) bs=bs.filter(b=>(!['speed','speedCycle','sheet','help','pause'].includes(b.dataset.act))||Math.random()<.05);
- const pri=bs.filter(b=>['fork','fz','fz','fz','fgo','ftarget','fpow','fauto','fclose','fmanual','dgo','dgo','dgo','dauto','dclose','apost','ajoin','aleave','chatToggle','evGive','evVote','evArmy','power','learn','temple','miracle','recruit','challenge','resurrect','closeEv','feat','asi','asiOpen','lift','liftS','callDun','mtab','mtab','dheal','skillInfo','dleave'].includes(b.dataset.act));
+ const pri=bs.filter(b=>['fork','fz','fz','fz','fgo','ftarget','fpow','fauto','fclose','fmanual','dgo','dgo','dgo','dauto','dclose','apost','ajoin','aleave','chatToggle','evGive','evVote','evArmy','power','learn','temple','miracle','recruit','challenge','resurrect','closeEv','feat','asi','asiOpen','lift','liftS','callDun','dunTier','dunTier','smith','sheet','mtab','mtab','dheal','skillInfo','dleave'].includes(b.dataset.act));
  const pool=(pri.length&&r<.8)?pri:bs; if(!pool.length) return 'none';
  const b=pool[Math.floor(Math.random()*pool.length)]; b.click(); return b.dataset.act+':'+(b.dataset.arg||'');}'''
 async def main():

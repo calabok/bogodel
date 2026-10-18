@@ -106,12 +106,14 @@ function heroUnit() {
   const h = S.hero, sh = sheet(), st = STYLE[h.cls];
   return { id: 'me', name: h.name, team: 0, kind: 'hero', isMe: true, race: h.race, cls: h.cls, lvl: h.lvl, hp: Math.max(1, h.hp), max: h.maxHp,
     avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
-    atkN: st.atk, blkN: st.blk, habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0 };
+    atkN: st.atk, blkN: st.blk, habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
 }
+/* Боевые свойства снаряжения, которые видны в бою по зонам */
+function gearProps(h) { const o = []; for (const sl of ['weapon', 'armor']) { const it = h.eq[sl]; if (it) for (const p of it.props || []) if (PROP_IC[p.k] && !o.includes(p.k)) o.push(p.k); } return o; }
 function botUnit(b) {
-  const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], max = calcMaxHp(vh);
+  const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], gk = clamp(b.gk || 1, .5, 2), max = Math.round(calcMaxHp(vh) * gk);
   return { id: newFid(), name: b.name, team: 1, kind: 'bot', race: b.race, cls: b.cls, lvl: b.lvl, hp: b.hpPct ? Math.max(1, Math.round(max * b.hpPct / 100)) : max, max,
-    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
+    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * gk, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
     atkN: st.atk, blkN: st.blk, habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
 }
 const MON_REF = {};
@@ -128,8 +130,10 @@ function monsterUnit(name, tier, o) {
   return { id: newFid(), name: el ? `${name} (элита)` : name, team: 1, kind: o.boss ? 'boss' : el ? 'elite' : 'monster', cls: null, lvl: tier, hp: max, max,
     avg: Math.max(1, ref.avg * MON_K.d * (o.dmg || 1) * (el ? 1.12 : 1)), armor: Math.round(ref.arm * MON_K.arm) + (o.boss ? 2 : el ? 1 : 0),
     dex: Math.floor(tier / 5), intu: Math.floor(tier / 6) + (el ? 1 : 0), wis: Math.floor(tier / 6), elite: el,
-    atkN: 1, blkN: o.boss || el ? 2 : 1, habit: pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, boss: o.boss || null, dealt: 0 };
+    atkN: 1, blkN: o.boss || el ? 2 : 1, habit: pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, boss: o.boss || null, dealt: 0,
+    weak: el && UNDEAD_RE.test(name) ? 'holy' : null, res: el && UNDEAD_RE.test(name) ? 'vamp' : el && /Голем|Огр|Медвед/.test(name) ? 'thorns' : null };
 }
+const UNDEAD_RE = /Скелет|Некромант|Дух|Призрак|Лич|Зомби|Упыр|Мертв|Вампир/;
 function blkSet(z, n) { const i = ZONES.indexOf(z), at = k => ZONES[(i + k + 5) % 5]; return n <= 1 ? [z] : n === 2 ? [z, at(1)] : [at(-1), z, at(1)]; }
 function flog(F, t, c) { F.log.unshift({ t, c: c || 'sys' }); if (F.log.length > 80) F.log.length = 80; }
 const fAlive = (F, team) => F.fighters.filter(f => f.alive && (team === undefined || f.team === team));
@@ -153,7 +157,7 @@ function botBrain(F, f) {
     const z = wpick(w); if (!atk.includes(z) || atk.length >= 4) atk.push(z);
   }
   let bz;
-  if (F.tele && f.team !== F.fighters.find(x => x.id === F.tele.fid).team && R() < (f.isMe ? .5 : .6)) bz = F.tele.zone;
+  if (F.tele && f.team !== F.fighters.find(x => x.id === F.tele.fid).team && R() < (f.isMe ? DUN_K.ablk : .6)) bz = F.tele.zone;
   else { const la = (F.lastAtk || {})[f.id] || []; bz = la.length && R() < .5 ? pick(la) : (R() < .4 ? 'head' : pick(ZONES)); }
   const blk = f.blkN === 2 && R() < .5 ? blkSet(ZONES[(ZONES.indexOf(bz) + 4) % 5], 2) : blkSet(bz, f.blkN);
   return { target, atk, blk };
@@ -230,7 +234,8 @@ function hitOne(F, a, d, z, picks, o) {
   const blocked = !o.magic && !o.aoe && P.blk.includes(z) && !aimed || (o.aoe && P.blk.includes(z));
   const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
   const bard = F.fighters.some(x => x.alive && x.team === a.team && x.cls === 'bard');
-  let critP = clamp(.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0), .03, .45);
+  const ap = a.props || [], bw = d.weak || d.boss && d.boss.weak, br = d.res || d.boss && d.boss.res;
+  let critP = clamp(.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (ap.includes('crit') && br !== 'crit' ? .06 : 0), .03, .5);
   if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
   if (a.debuf > 0) critP = 0;
   const zacc = ZONE_ACC[z];
@@ -243,18 +248,24 @@ function hitOne(F, a, d, z, picks, o) {
   if (a.cls === 'rogue' && F.turn === 1) dmg *= 1.5;
   if (a.debuf > 0) dmg *= .6;
   if (a.boss && a.buf.adds) dmg *= 1 + .15 * a.buf.adds;
+  let tag = '';
+  if (ap.includes('fire') && br !== 'fire') { dmg *= 1.12; tag += '🔥'; }
+  if (ap.includes('holy') && br !== 'holy') dmg *= 1.05;
+  if (bw && ap.includes(bw)) { dmg *= 1.4; tag += ` ${PROP_IC[bw]} слабость!`; }
+  if (br && ap.includes(br)) { dmg *= .8; tag += ` ${PROP_IC[br]} не берёт`; }
   dmg *= 1 - Math.min(.5, d.armor * ZONE_ARM[z] * .035);
   if (d.buf.shield) dmg *= .3;
   dmg = Math.max(1, Math.round(dmg));
   const adv = pick(F_ADV), verb = pick(F_VERB);
-  const line = crit ? `${a.name} ${pick(F_CRIT)} ${verb} ${zacc}${blocked ? ', пробив блок' : ''}! Критический удар` : `${a.name} ${adv} ${verb} ${zacc}${aimed ? ' (меткий выстрел сквозь блок)' : ''}…`;
-  return { dmg, line, c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe') };
+  const line = (crit ? `${a.name} ${pick(F_CRIT)} ${verb} ${zacc}${blocked ? ', пробив блок' : ''}! Критический удар` : `${a.name} ${adv} ${verb} ${zacc}${aimed ? ' (меткий выстрел сквозь блок)' : ''}…`) + (tag ? ` ${tag.trim()}` : '');
+  const dp = d.props || [], ar = a.res || a.boss && a.boss.res;
+  return { dmg, line, c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe'), vamp: ap.includes('vamp') && br !== 'vamp' ? Math.round(dmg * .15) : 0, thorn: dp.includes('thorns') && ar !== 'thorns' ? Math.max(1, Math.round(dmg * .15)) : 0 };
 }
 function resolveTurn(F) {
   const alive = F.fighters.filter(f => f.alive), picks = {}, pend = {};
   for (const f of alive) picks[f.id] = choiceFor(F, f);
   F.lastAtk = {}; F.lastBlk = {};
-  const add = (d, v) => { pend[d.id] = (pend[d.id] || 0) + v; };
+  const add = (d, v) => { pend[d.id] = (pend[d.id] || 0) + v; }, heal = {};
   const lines = [];
   for (const a of alive) {
     const P = picks[a.id], d = F.fighters.find(x => x.id === P.target);
@@ -265,7 +276,7 @@ function resolveTurn(F) {
     for (const z of zones) {
       const r = hitOne(F, a, d, z, picks);
       (F.lastAtk[d.id] = F.lastAtk[d.id] || []).push(z);
-      if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; }
+      if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; if (r.vamp) { heal[a.id] = (heal[a.id] || 0) + r.vamp; r.line += ` 🩸+${r.vamp}`; } if (r.thorn) { add(a, r.thorn); r.line += ` 🌵−${r.thorn} обидчику`; } }
       lines.push({ r, d });
     }
     if (a.cls === 'mage' && F.turn % 3 === 0) { const r = hitOne(F, a, d, 'chest', picks, { magic: 1, mul: .8 }); if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; r.line = `🔥 ${a.name} швыряет огненный шар!`; r.c = 'crit'; } lines.push({ r, d }); }
@@ -279,6 +290,7 @@ function resolveTurn(F) {
   for (const f of alive) { const P = picks[f.id]; F.lastBlk[f.id] = P.blk; }
   // применяем урон одновременно
   for (const f of alive) if (pend[f.id]) f.hp -= pend[f.id];
+  for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);
   flog(F, `— Ход ${F.turn} —`, 'turn');
   for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg} ${hpTag(d)}` : r.line, r.c);
   for (const f of alive) {
