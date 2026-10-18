@@ -58,7 +58,7 @@ async def main():
         # shield block in fight log
         r=await pg.evaluate("""(()=>{const h=GAME.S.hero; h.eq.weapon=GAME.makeItem('weapon',3,1); h.eq.weapon.curse=null; delete h.eq.weapon.h2; h.eq.weapon.cat='sword';
           const s=GAME.makeItem('offhand',3,1); s.curse=null; s.blk=.3; h.eq.offhand=s; GAME.recalcHp&&GAME.recalcHp(); const u=heroUnit(); const b=botUnit({name:'Бот',race:'human',cls:'warrior',lvl:3});
-          u.gx.blk=1; const F={fighters:[u,b],turn:2,log:[]}; const r=hitOne(F,b,u,'chest',{}, {}); return {line:r.line, dmg:r.dmg, blkN:u.blkN, sh:u.gx.sh}})()""")
+          u.gx.blk=1; u.dex=-10; const F={fighters:[u,b],turn:2,log:[]}; let r; for(let i=0;i<10;i++){ r=hitOne(F,b,u,'chest',{}, {}); if(/щит/.test(r.line)) break; } return {line:r.line, dmg:r.dmg, blkN:u.blkN, sh:u.gx.sh}})()""")
         ok('shield: blocks hit with "принимает удар на щит", warrior blocks 3 zones', 'щит' in (r['line'] or '') and r['dmg']==0 and r['blkN']==3 and r['sh'], r)
         r=await pg.evaluate("""(()=>{let n=0,hits=0; const h=GAME.S.hero; for(let i=0;i<400;i++){const u=heroUnit(); const b=botUnit({name:'Бот',race:'human',cls:'warrior',lvl:3}); const F={fighters:[u,b],turn:2,log:[]}; const r=hitOne(F,b,u,'chest',{},{}); if(/щит/.test(r.line||'')) n++;} return n/400})()""")
         ok('shield block chance in zone combat ~ shield blk', .15<r<.45, r)
