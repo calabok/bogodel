@@ -1523,7 +1523,7 @@ function resurrect(byGod) {
     S.god.faith -= 30; h.hp = Math.round(h.maxHp * .6); addTrust(6); addGxp(10); shiftAlign(2);
     diary('✨ Божественный свет поднял меня из пыли! Я снова жив и бесконечно благодарен своему богу!', 'god', '+6 доверия');
   } else {
-    h.hp = Math.round(h.maxHp * .3); addTrust(SILENT ? -1 : -5);
+    h.hp = Math.round(h.maxHp * .5); addTrust(SILENT ? -1 : -5);
     diary('Воскрес сам, без божьей помощи. Обидно, {god}. Очень обидно.', 'god', SILENT ? '' : '−5 доверия');
   }
   h.state = 'road'; h.shortRests = Math.max(h.shortRests, 1);
@@ -1575,7 +1575,7 @@ function fightStep() {
     if (m.hp <= 0) break;
     const mr = rnd(1, 20); let md = 0;
     if (mr === 20 || (mr !== 1 && mr + m.atk - (hasFeat('swift') ? 1 : 0) >= sh.ac)) {
-      md = Math.round((rnd(1, 6) + m.dmg) * ((CLASS_BAL[h.cls] || {}).r || 1) * (h.lvl <= 2 ? .7 : 1));
+      md = Math.round((rnd(1, 6) + m.dmg) * ((CLASS_BAL[h.cls] || {}).r || 1) * (h.lvl <= 2 ? .7 : h.lvl <= 5 ? .85 : 1));
       if (mr === 20) md += rnd(1, 6);
       if (m.curse) md = Math.ceil(md / 2);
       if (S.buffs.shield > 0) md = Math.ceil(md / 2);
@@ -1594,6 +1594,11 @@ function fightStep() {
   if (h.hp <= 0) { h.hp = 0; killHero(`Пал в бою с существом «${m.n}».`); if (h.state === 'dead') return; }
   if (m.hp <= 0) return winFight();
   if (h.hp < h.maxHp * .3 && h.potions > 0) { h.potions--; const a = healHero(h.maxHp * .4 * (hasFeat('gourmet') ? 1.5 : 1)); diary('Выпил зелье здоровья. Вкус как у носка, но помогает.', '', `+${a} HP`); }
+  else if (h.hp < h.maxHp * .3 && m.hp > m.max * .3 && R() < .55 + .05 * mod(statVal('dex'))) {
+    // бегство: живой трус лучше мёртвого героя
+    const lost = Math.floor(h.gold * .05); h.gold -= lost; h.monster = null; h.state = 'road';
+    diary(`Сделал стратегическое отступление от «${m.n}». Бегом. Не оглядываясь.`, 'fight', lost ? `−${lost} 💰` : '');
+  }
 }
 function winFight() {
   const h = S.hero, m = h.monster; if (!m) return;
@@ -1692,12 +1697,12 @@ function heroStep() {
   if (h.state === 'fight') return fightStep();
   if (h.state === 'rest') return restStep();
   if (h.state === 'town') return townStep();
-  if ((h.hp < h.maxHp * .35 && h.shortRests <= 0) || h.inv.length >= 10) {
+  if ((h.hp < h.maxHp * .4 && h.shortRests <= 0) || h.inv.length >= 10) {
     h.state = 'town'; h.townStep = 0; h.loc = pick(TOWNS);
-    diary(h.hp < h.maxHp * .35 ? `Здоровье на исходе. Иду в ${h.loc} отлежаться.` : `Рюкзак трещит по швам. Пора в ${h.loc} на рынок.`);
+    diary(h.hp < h.maxHp * .4 ? `Здоровье на исходе. Иду в ${h.loc} отлежаться.` : `Рюкзак трещит по швам. Пора в ${h.loc} на рынок.`);
     return;
   }
-  if (h.hp < h.maxHp * .5 && shortRest()) return;
+  if (h.hp < h.maxHp * .6 && shortRest()) return;
   const r = R(), fightP = curseOn('magnet') ? .45 : .28;
   if (r < fightP) startFight();
   else if (r < fightP + .10 + (hasFeat('treasure') ? .04 : 0)) { if (R() < .2) lootDrop(0, 'Нашёл в кустах'); else { const it = addItem(); diary(pick(['Нашёл под кустом «{i}». Беру, в хозяйстве пригодится.', 'В канаве лежал «{i}». Теперь он лежит в рюкзаке.', 'Выиграл в напёрстки «{i}». Напёрсточник плакал.']).replace('{i}', it.n), 'loot'); } }
@@ -3167,7 +3172,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) save(
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261018-191824';
+const APP_BUILD = '20261018-192438';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
