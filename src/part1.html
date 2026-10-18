@@ -73,9 +73,9 @@ header{position:sticky;top:0;z-index:40;padding:8px 14px 10px;
 .bar.trust>i{background:linear-gradient(90deg,#8a5cc0,#d29bff)}
 .bar.quest>i{background:linear-gradient(90deg,#3b8a7a,#6fd6be)}
 .bar.time>i{background:linear-gradient(90deg,#e67e22,#f1c40f);transition:width .25s linear}
-main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
-  grid-template-columns:300px minmax(0,1fr) 360px;grid-template-areas:"hero center right";align-items:start}
-#colHero{grid-area:hero}#colCenter{grid-area:center;display:flex;flex-direction:column;gap:14px;min-width:0}#colRight{grid-area:right}
+main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
+  grid-template-columns:minmax(0,1fr) 390px;grid-template-areas:"center right";align-items:start}
+#colCenter{grid-area:center;display:flex;flex-direction:column;gap:16px;min-width:0}#colRight{grid-area:right;position:sticky;top:96px;max-height:calc(100vh - 110px);overflow:auto}
 .card{background:linear-gradient(180deg,var(--parch),var(--parch2));border-radius:14px;box-shadow:var(--shadow);padding:14px;border:1px solid #d9c290;position:relative}
 .card h2{font-size:18px;color:#5a3b12;margin-bottom:8px;border-bottom:1px dashed #c8ad74;padding-bottom:6px}
 .row{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin:4px 0}
@@ -293,11 +293,11 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
 @media (max-width:360px){.stgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:360px){.logoTxt{display:none}.meter.gxpM>span{font-size:10px}}
 @media (max-width:430px){.hrow2{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}.hrow2 .faithM{grid-column:1/-1}.meter.hpM{height:22px}.meter.hpM>span{font-size:12px;padding:0 4px}.meter.hpM>span small{display:none}.meter.gxpM{height:22px}.meter.gxpM>span{font-size:11px;padding:0 4px}}
-@media (max-width:1150px){
-  main{grid-template-columns:minmax(0,1fr) 340px;grid-template-areas:"center hero" "center right"}
+@media (max-width:1050px){
+  main{grid-template-columns:minmax(0,1fr) 340px;gap:14px;padding:14px}
 }
 @media (max-width:760px){
-  main{grid-template-columns:minmax(0,1fr);grid-template-areas:"center" "hero" "right";padding:8px;gap:10px}
+  main{grid-template-columns:minmax(0,1fr);grid-template-areas:"center" "right";padding:8px;gap:10px}
   header{padding:6px 8px 8px}
   .hrow{gap:6px}
   .logo{font-size:17px}.logo small,.speedLbl,.hideS{display:none}
@@ -309,6 +309,68 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
   #diary{max-height:50vh}
   .vs{grid-template-columns:1fr;}.vsx{text-align:center;font-size:18px}
 }
+/* ===== v5: спокойный интерфейс ===== */
+.spdC,#mnav,#moreLinks,#diaryMini,#mBanner{display:none}
+.hcard h2{border:none;margin:0;padding:0;font-size:19px}
+.hc-top{display:flex;align-items:center;gap:12px}
+.hc-av{width:46px;height:46px;flex:none;border-radius:50%;background:#2a1f45;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--gold)}
+.hc-id{flex:1;min-width:0}.hc-sub{font-size:13px;color:var(--ink2);margin-top:2px}
+.hc-now{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:12px 0 8px}
+.hc-now .st{font-weight:700}
+.hc-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 18px}
+.hc-mini{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink2);margin-top:8px;align-items:center}
+.hc-mini b{color:var(--ink)}
+.linkbtn{background:none;border:none;padding:2px 0;color:#7a4d10;text-decoration:underline dotted;font-size:13px}
+.btn.ghost{background:#fff6e0;border-color:#c8ad74;box-shadow:none;color:#5a3b12}
+.entry .fx{white-space:normal}
+.fxc{display:inline-block;font-size:11.5px;line-height:1.5;color:#6b5233;background:#0000000d;border-radius:8px;padding:0 6px;margin:2px 4px 0 0;white-space:nowrap}
+.entry{padding:9px 4px;font-size:14.5px}
+.entry .tm{opacity:.75}
+.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.chips::-webkit-scrollbar{display:none}.chip{flex:none}
+.skill .ds{display:none}.skill.open .ds{display:block}
+.skill .nm{cursor:pointer}.skill .nm .i{font-size:11px;color:#9a7f55;margin-left:4px}
+.skill{padding:9px 0}
+.alignLine{display:flex;align-items:center;gap:10px;font-size:13px;margin:4px 0 10px}.alignLine .align{flex:1;margin:0}
+.hint{font-size:12px;color:var(--ink2)}
+.dkey{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12.5px;margin:6px 0}
+.bossInfo{background:#2a1f45;color:#f3e6c4;border-radius:10px;padding:8px 10px;font-size:13px;margin:6px 0}
+.bossInfo b{color:var(--gold2)}
+.dc.room.elite{box-shadow:inset 0 0 0 2px #b8412f}
+#chatDock .chatPill{padding:6px 10px;font-size:13px;opacity:.85}
+#chatDock .chatPill:hover{opacity:1}
+@media (min-width:761px){#colHero{order:-2}}
+@media (max-width:760px){
+  .speed,.dsk{display:none}.spdC{display:inline-block}
+  #mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:#1c1638f7;border-top:2px solid var(--gold);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}
+  #mnav button{background:none;border:none;color:#cdb98b;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 0;min-height:48px;position:relative}
+  #mnav button b{font-size:19px;font-weight:400}
+  #mnav button.on{color:var(--gold2)}#mnav button.on b{transform:scale(1.1)}
+  #mnav i{position:absolute;top:4px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:#e74c3c;display:none}
+  #mnav i.on{display:block}
+  main{padding-bottom:84px}
+  #toasts{bottom:76px}
+  #chatDock{display:none}
+  body.chatOpen #chatDock{display:block;left:0;right:0;bottom:0;z-index:50}
+  body[data-mtab] #colRight{display:none}
+  body[data-mtab=powers] #colRight,body[data-mtab=arena] #colRight,body[data-mtab=more] #colRight{display:block}
+  body[data-mtab=powers] #colCenter>*,body[data-mtab=arena] #colCenter>*,body[data-mtab=more] #colCenter>*{display:none}
+  body[data-mtab=powers] #colCenter>#mBanner,body[data-mtab=arena] #colCenter>#mBanner,body[data-mtab=more] #colCenter>#mBanner{display:block}
+  body[data-mtab=diary] #colHero{display:none}
+  body[data-mtab=hero] #diaryCard{display:none}
+  body[data-mtab=hero] #diaryMini{display:block}
+  body[data-mtab] #colRight .tabs{display:none}
+  body[data-mtab=more] #colRight .tabs{display:flex}
+  body[data-mtab=more] #colRight .tabs button[data-arg=powers],body[data-mtab=more] #colRight .tabs button[data-arg=arena]{display:none}
+  body[data-mtab=more] #moreLinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  #colRight{position:static;max-height:none}
+  #mBanner:empty{display:none!important}
+  .mban{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#2a1f45;color:#f3e6c4;border:2px solid var(--gold);border-radius:12px;padding:8px 12px;font-size:14px}
+  #diary{max-height:none}
+  .hc-grid{grid-template-columns:1fr}
+}
+#chatDot2,#moreDot{display:none}
+#mnav button.dot::after{content:'';position:absolute;top:4px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:#f1c40f}
+#chatDot2.on{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e74c3c;margin-left:4px}
 </style>
 </head>
 <body>
@@ -322,8 +384,9 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
       <button data-act="speed" data-arg="5">×5</button><button data-act="speed" data-arg="10">×10</button>
       <button data-act="pause" id="pauseBtn" title="Пауза">⏸</button>
     </div>
-    <button class="hbtn" data-act="help" title="Как играть">❔<span class="hideS"> Как играть</span></button>
-    <button class="hbtn" data-act="settings" title="Настройки">⚙</button>
+    <button class="hbtn spdC" data-act="speedCycle" id="spdC" title="Скорость (нажмите, чтобы сменить)">×1</button><button class="hbtn spdC" data-act="pause" id="pauseBtn2" title="Пауза">⏸</button>
+    <button class="hbtn dsk" data-act="help" title="Как играть">❔<span class="hideS"> Как играть</span></button>
+    <button class="hbtn dsk" data-act="settings" title="Настройки">⚙</button>
   </div>
   <div class="hrow2">
     <div class="meter faithM" id="faithMeter" title="Вера (прана) — главная валюта бога. Копится от паствы и храма, тратится на силы, чудеса, армию и события."><i id="hFaithBar"></i><span id="hFaith">🔥 Вера: 0/0</span></div>
@@ -332,30 +395,36 @@ main{display:grid;gap:14px;padding:14px;max-width:1500px;margin:0 auto;
   </div>
 </header>
 <main>
-  <section id="colHero" class="card"></section>
   <section id="colCenter">
+    <section id="colHero" class="card hcard"></section>
+    <div id="mBanner"></div>
     <div id="featBox"></div>
     <div id="forkBox"></div>
     <div id="fightBox"></div>
     <div id="dunBox"></div>
     <div id="eventBox"></div>
-    <div class="card">
+    <div id="diaryMini" class="card"></div>
+    <div class="card" id="diaryCard">
       <h2>📜 Дневник героя</h2>
-      <div class="voice"><input id="voiceIn" maxlength="80" placeholder="Глас божий: напишите герою, например «лечись» или «копай клад»"><button class="btn" data-act="voice" id="voiceBtn">📣 Глас (5 веры)</button></div>
+      <div class="voice"><input id="voiceIn" maxlength="80" placeholder="Глас божий: «лечись», «копай клад»…"><button class="btn" data-act="voice" id="voiceBtn">📣 Глас · 5</button></div>
       <div class="chips">
         <button class="chip" data-act="voiceq" data-arg="Лечись!">лечись</button><button class="chip" data-act="voiceq" data-arg="Бей его!">бей</button>
         <button class="chip" data-act="voiceq" data-arg="Копай клад!">копай клад</button><button class="chip" data-act="voiceq" data-arg="Проповедуй!">проповедуй</button>
         <button class="chip" data-act="voiceq" data-arg="Иди в город!">в город</button><button class="chip" data-act="voiceq" data-arg="Беги!">беги</button>
-        <button class="chip" data-act="voiceq" data-arg="Вперёд, к цели!">вперёд по квесту</button><button class="chip" data-act="voiceq" data-arg="Отдыхай!">отдыхай</button>
+        <button class="chip" data-act="voiceq" data-arg="Вперёд, к цели!">вперёд</button><button class="chip" data-act="voiceq" data-arg="Отдыхай!">отдыхай</button>
       </div>
       <div id="diary"></div>
     </div>
   </section>
   <section id="colRight" class="card">
     <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="arena">🤺 Арена<i id="arenaDot"></i></button><button data-act="tab" data-arg="gods">⚜ Пантеон</button></div>
+    <div id="moreLinks"><button class="btn small" data-act="help">❔ Как играть</button><button class="btn small" data-act="settings">⚙ Настройки</button><button class="btn small" data-act="chatToggle">💬 Чат<i id="chatDot2"></i></button></div>
     <div id="rightBody"></div>
   </section>
 </main>
+<nav id="mnav" aria-label="Разделы">
+  <button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button><button data-act="mtab" data-arg="diary"><b>📜</b>Дневник</button><button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="more"><b>☰</b>Ещё<i id="moreDot"></i></button>
+</nav>
 <div id="modal"></div>
 <div id="toasts"></div>
 <div id="chatDock" class="closed"><button class="chatPill" data-act="chatToggle" id="chatPill">💬 Чат</button>

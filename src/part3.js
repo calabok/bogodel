@@ -74,7 +74,7 @@ function defaultState(god, hero, race, cls) {
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
-    speed: 1, paused: false, tab: 'powers', lastSeen: Date.now()
+    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
   };
   return S0;
 }
@@ -89,7 +89,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 4;
+const SAVE_VERSION = 5;
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -136,6 +136,11 @@ function migrate(o) {
     if (o.hero) { const h = o.hero; if (['duel', 'dungeon'].includes(h.state)) h.state = 'road'; if (h.state === 'fight') { h.state = 'road'; h.monster = null; } h.inj = []; }
     if (o.timers && typeof o.timers === 'object') { o.timers.dunCd = hadDun ? 3600 : 0; o.timers.duel = Math.min(isNum(o.timers.duel) ? o.timers.duel : 600, 900); }
     o._migratedV4 = 1;
+  }
+  if (v < 5) {
+    // v4 → v5: новый интерфейс (нижние вкладки на телефоне) и пересчитанный баланс; бой/пещера сохраняются
+    o.ui = { mtab: 'hero' };
+    o._migratedV5 = 1;
   }
   delete o.duel;
   o.v = SAVE_VERSION;
@@ -197,6 +202,8 @@ function sanitize(o) {
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
   if (!['powers', 'flock', 'arena', 'gods'].includes(o.tab)) o.tab = 'powers';
+  if (!o.ui || typeof o.ui !== 'object' || Array.isArray(o.ui)) o.ui = { mtab: 'hero' };
+  if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(o.ui.mtab)) o.ui.mtab = 'hero';
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
   if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;

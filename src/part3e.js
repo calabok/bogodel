@@ -23,8 +23,12 @@ function genDungeon(lvl) {
   tiles[boss].t = 'boss';
   const rest = idx.filter(i => i !== boss).sort(() => R() - .5);
   const keyI = rest.findIndex(i => dist[i] >= 2); const key = rest.splice(keyI >= 0 ? keyI : 0, 1)[0]; tiles[key].t = 'key';
-  const plan = ['fight', 'fight', 'fight', 'fight', 'trap', 'trap', 'chest', 'chest', 'shrine'];
+  const plan = ['fight', 'fight', 'fight', 'fight', 'fight', 'trap', 'trap', 'chest', 'chest', 'shrine'];
   rest.forEach((i, k) => { if (plan[k]) tiles[i].t = plan[k]; });
+  // глубина комнаты: чем дальше от входа, тем злее; дальние логова — элитные
+  for (const i of idx) tiles[i].d = dist[i];
+  const deep = idx.filter(i => tiles[i].t === 'fight').sort((a, b) => dist[b] - dist[a]);
+  deep.slice(0, 2).forEach(i => { if (dist[i] >= 2) tiles[i].t = 'elite'; });
   const B = pick(BOSSES);
   return { tiles, pos: { x: sx, y: sy }, boss: { n: B.n, m: B.m, d: B.d } };
 }
@@ -44,7 +48,7 @@ async function startDungeon(byCall) {
   const party = [{ godId: 'me', god: S.god.name, hero: h.name, race: h.race, cls: h.cls, lvl: h.lvl, isMe: true, hp: 100 }]
     .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, hp: 100 })));
   const G = genDungeon(h.lvl);
-  S.dun = { id: 'd' + Date.now().toString(36), name: pick(DUN_NAMES), tier: h.lvl, tiles: G.tiles, pos: G.pos, boss: G.boss, party, keys: 0, log: [], phase: 'explore', gold: 0, xp: 0, loot: [], fights: 0, idle: 0, auto: false, t: 0, result: null, byCall: !!byCall, picked: false };
+  S.dun = { id: 'd' + Date.now().toString(36), name: pick(DUN_NAMES), tier: h.lvl, tiles: G.tiles, pos: G.pos, boss: G.boss, party, keys: 0, log: [], phase: 'explore', gold: 0, xp: 0, loot: [], fights: 0, heals: 0, idle: 0, auto: false, t: 0, result: null, byCall: !!byCall, picked: false };
   dunReveal(S.dun);
   S.stats.duns++; S.timers.dunCd = PACE.dunCd;
   ulog(`Отряд у входа в «${S.dun.name}»: ${party.map(p => `${p.hero} (${CLASSES[p.cls].n.toLowerCase()})`).join(', ')}. Где-то в глубине ждёт ${G.boss.n}. Ищите ключ 🗝!`);
@@ -73,31 +77,36 @@ function dunEnter(U, t) {
   switch (t.t) {
     case 'empty': ulog(pick(D_EMPTY)); t.done = 1; break;
     case 'key': U.keys++; t.done = 1; ulog('🗝 Нашли ключ от логова босса! (Под ковриком. Как всегда.)', 'me'); break;
-    case 'shrine': { const a = healHero(h.maxHp * .4); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 40); }); t.done = 1; ulog(`⛲ Целебный источник: отряд подлечился (${h.name} +${a} HP).`, 'me'); break; }
+    case 'shrine': { const a = healHero(h.maxHp * DUN_K.shrine); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.shrine * 100); }); t.done = 1; ulog(`⛲ Целебный источник: отряд подлечился (${h.name} +${a} HP). Он один на всю пещеру.`, 'me'); break; }
     case 'trap': {
       t.done = 1; const tx = pick(D_TRAP);
-      if (dunHas(U, 'rogue')) { ulog(`🪤 ${tx} …но плут заметил растяжку и обезвредил ловушку.`, 'me'); break; }
-      const chk = check('dex', 11 + Math.ceil(L / 2));
-      if (chk.ok) { ulog(`🪤 ${tx} ${h.name} успел отпрыгнуть (${chk.label}).`, 'me'); break; }
-      let k = .15 + R() * .1; if (h.race === 'dwarf') k *= .67; if (hasFeat('sentinel')) k *= .3;
+      if (dunHas(U, 'rogue') && R() < DUN_K.disarm) { ulog(`🪤 ${tx} …но плут заметил растяжку и обезвредил ловушку.`, 'me'); break; }
+      const chk = check('dex', 13 + Math.ceil(L / 2));
+      if (chk.ok) { ulog(`🪤 ${tx} ${h.name} успел отпрыгнуть (${chk.label}), остальным досталось.`, 'me'); }
+      let k = DUN_K.trap[0] + R() * (DUN_K.trap[1] - DUN_K.trap[0]); if (h.race === 'dwarf') k *= .67; if (hasFeat('sentinel')) k *= .3; if (chk.ok) k = 0;
       const d = Math.min(h.hp - 1, Math.round(h.maxHp * k)); if (d > 0) h.hp -= d;
-      U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.max(1, p.hp - rnd(10, 25)); });
+      U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.max(1, p.hp - Math.round(100 * (DUN_K.trap[0] + R() * (DUN_K.trap[1] - DUN_K.trap[0])))); });
+      if (chk.ok) break;
       ulog(`🪤 ${tx} Досталось всем (${chk.label}). ${h.name} −${Math.max(0, d)} HP.`, 'foe'); break;
     }
     case 'chest': {
-      if (R() < .15) { ulog('💎 Сундук открыл пасть — это мимик!', 'foe'); return dunFight(U, t, [monsterUnit('Сундук-мимик', L + 1, { hp: 1.1 })], 'Мимик!'); }
+      if (R() < .2) { ulog('💎 Сундук открыл пасть — это мимик!', 'foe'); return dunFight(U, t, [monsterUnit('Сундук-мимик', L + 1, { elite: 1 })], 'Мимик!'); }
       t.done = 1; const g = Math.round(rnd(15, 35) * goldScale(L)); U.gold += g; let txt = `${pick(D_CHEST)} +${g} 💰`;
       if (R() < .45 || dunHas(U, 'rogue') && R() < .3) { const it = makeItem(undefined, L, rollRarity(.6)); U.loot.push(it); txt += `, «${it.n}» (${RARITY[it.rar].n})`; }
       ulog('💎 ' + txt, 'me'); break;
     }
-    case 'fight': {
-      const n = clamp(U.party.filter(p => p.isMe || p.hp > 0).length - 1 + rnd(0, 1), 1, 3), mons = [];
-      for (let i = 0; i < n; i++) { const tier = clamp(L + pick([-2, -1, -1, 0]), 1, 22), near = ALL_MONSTERS.filter(m => Math.abs(m[1] - tier) <= 1); mons.push(monsterUnit(pick(near.length ? near : ALL_MONSTERS)[0], tier, { hp: .85 })); }
-      return dunFight(U, t, mons, 'Засада!');
+    case 'fight': case 'elite': {
+      const alive = U.party.filter(p => p.isMe || p.hp > 0).length, el = t.t === 'elite', depth = t.d || 1, mons = [];
+      const n = clamp(alive - 1 + (depth >= 3 ? 1 : 0) + rnd(0, 1) - (el ? 1 : 0), 1, 4);
+      for (let i = 0; i < n; i++) {
+        const tier = clamp(L - 1 + Math.floor(depth / 3) + pick([-1, 0, 0]), 1, 25), near = ALL_MONSTERS.filter(m => Math.abs(m[1] - tier) <= 1);
+        mons.push(monsterUnit(pick(near.length ? near : ALL_MONSTERS)[0], tier, { hp: DUN_K.mhp, dmg: DUN_K.mdmg, elite: el && i === 0 }));
+      }
+      return dunFight(U, t, mons, el ? `💀 Элита: ${mons[0].name}. Злее, толще, на половине здоровья звереет.` : depth >= 3 ? 'Засада в глубине!' : 'Засада!');
     }
     case 'boss': {
       const pn = U.party.filter(p => p.isMe || p.hp > 0).length;
-      const b = monsterUnit(U.boss.n, L + 2, { hp: 1.6 + .45 * pn, dmg: 1.15, boss: { m: U.boss.m } });
+      const b = monsterUnit(U.boss.n, L + 2, { hp: DUN_K.bhp[0] + DUN_K.bhp[1] * pn, dmg: DUN_K.bdmg, boss: { m: U.boss.m } });
       const mons = [b]; if (pn >= 3) mons.push(monsterUnit('Прихвостень', Math.max(1, L - 1)));
       ulog(`👑 ${U.boss.n}! ${U.boss.d}`, 'warn');
       return dunFight(U, t, mons, `${U.boss.n}: ${U.boss.d}`);
@@ -108,7 +117,7 @@ function dunFight(U, t, mons, intro) {
   U.phase = 'fight'; U.fightTile = U.tiles.indexOf(t);
   const allies = partyUnits(U);
   const F = beginBattle('dungeon', allies, mons, { title: `${U.name}: ${t.t === 'boss' ? 'босс' : 'бой'}`, intro, ctx: { tile: U.fightTile, boss: t.t === 'boss' } });
-  if (dunHas(U, 'mage')) { for (const m of mons) m.hp -= Math.max(1, Math.round(m.max * .12)); flog(F, '🔥 Маг отряда открывает бой огненным шаром: все противники обожжены!', 'crit'); }
+  if (dunHas(U, 'mage')) { for (const m of mons) m.hp -= Math.max(1, Math.round(m.max * .08)); flog(F, '🔥 Маг отряда открывает бой огненным шаром: все противники обожжены!', 'crit'); }
   if (SILENT) autoResolveBattle(F);
 }
 function dunAfterFight(F, won) {
@@ -120,26 +129,26 @@ function dunAfterFight(F, won) {
     ulog(`🩹 Отряд разбит. ${h.name} без сознания — его вынесли на руках.`, 'foe');
     return endDungeon(false, 'carried');
   }
-  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * .15)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли и отряхнули.`, 'foe'); }
+  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * .1)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли и отряхнули.`, 'foe'); }
   else h.hp = clamp(me.hp, 1, h.maxHp);
   U.fights++;
   const foes = F.fighters.filter(f => f.team === 1).length, boss = F.ctx.boss;
-  const x = Math.round(xpUnit(U.tier) * (boss ? 12 : 1.6 * foes)), g = Math.round(rnd(8, 18) * goldScale(U.tier) * (boss ? 4 : foes / 2));
+  const elite = F.fighters.some(f => f.elite), x = Math.round(xpUnit(U.tier) * (boss ? 20 : 2.2 * foes * (elite ? 1.5 : 1))), g = Math.round(rnd(8, 18) * goldScale(U.tier) * (boss ? 7 : foes / 2 * (elite ? 1.6 : 1)));
   U.xp += x; U.gold += g; if (t) t.done = 1;
   let txt = `Победа! +${g} 💰, +${x} опыта в общий котёл.`;
-  if (!boss && R() < .3) { const it = makeItem(undefined, U.tier, rollRarity(.4)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
-  healHero(h.maxHp * .15); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 15); }); txt += ' Перевязались у костра.';
-  if (dunHas(U, 'cleric')) { healHero(h.maxHp * .2); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 20); }); txt += ' Жрец подлатал отряд.'; }
+  if (!boss && (elite || R() < .3)) { const it = makeItem(undefined, U.tier, elite ? Math.max(1, rollRarity(.8)) : rollRarity(.4)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
+  if (DUN_K.camp) { healHero(h.maxHp * DUN_K.camp); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.camp * 100); }); }
+  if (dunHas(U, 'cleric')) { healHero(h.maxHp * DUN_K.cleric); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.cleric * 100); }); txt += ' Жрец чуть подлатал отряд.'; }
   ulog('⚔ ' + txt, 'me');
   if (boss) {
-    U.loot.push(makeItem(undefined, U.tier, Math.max(2, rollRarity(1.2)))); if (R() < .5) U.loot.push(makeItem(undefined, U.tier, Math.max(1, rollRarity(.8))));
+    U.loot.push(makeItem(undefined, U.tier + 1, Math.max(2, rollRarity(1.4)))); U.loot.push(makeItem(undefined, U.tier, Math.max(1, rollRarity(1)))); if (R() < .35) U.loot.push(makeItem(undefined, U.tier + 1, Math.max(2, rollRarity(1.6))));
     S.stats.bosses++; endDungeon(true, 'boss');
   }
 }
 function endDungeon(ok, why) {
   const U = S.dun, h = S.hero; if (!U || U.phase === 'end') return;
-  const mult = why === 'carried' ? .4 : why === 'boss' ? 1 : .7;
-  const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 12 : 0)) * mult);
+  const mult = why === 'carried' ? DUN_K.carried : why === 'boss' ? 1 : DUN_K.left;
+  const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 15 : 0)) * mult);
   h.gold += gold; gainXp(xp); addGxp(20 + U.fights * 8 + (ok ? 25 : 0));
   if (ok) { addTrust(3); S.stats.dwinsD++; }
   const items = why === 'carried' ? U.loot.slice(0, 1) : U.loot, names = [];
@@ -151,6 +160,17 @@ function endDungeon(ok, why) {
   if (!SILENT) chatSys(`🏰 Отряд ${h.name} ${ok ? 'зачистил' : 'покинул'} «${U.name}».`);
   U.phase = 'end'; U.t = 15; S.timers.dunCd = PACE.dunCd;
   if (h.state === 'dungeon') h.state = 'road';
+}
+/* Лечение отряда между комнатами — силой бога, за веру, не больше DUN_K.heals раз за пещеру */
+function dunHealCost() { return Math.round(powerCost('heal') * 1.5); }
+function dunHeal() {
+  const U = S.dun; if (!U || U.phase !== 'explore') return;
+  if (!S.god.skills.heal) return toast('Нужна изученная сила «Лечение».');
+  if ((U.heals || 0) >= DUN_K.heals) return toast(`В пещере можно лечить отряд не больше ${DUN_K.heals} раз.`);
+  const c = dunHealCost(); if (S.god.faith < c) return toast('Не хватает веры.');
+  S.god.faith -= c; U.heals = (U.heals || 0) + 1; addGxp(c / 3); shiftAlign(POWERS.heal.al);
+  const a = healHero(S.hero.maxHp * Math.min(.5, .3 * pmult('heal'))); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + 20); });
+  ulog(`✨ Бог лечит отряд: ${S.hero.name} +${a} HP, остальным +20%. (${U.heals}/${DUN_K.heals})`, 'me');
 }
 function dunLeave() { const U = S.dun; if (!U || U.phase !== 'explore') return; endDungeon(false, 'left'); }
 /* Автопроход: идём к ближайшей неисследованной комнате (босс — когда есть ключ) */
@@ -210,7 +230,8 @@ function validFight(F) {
   for (const k of ['lastAtk', 'lastBlk', 'lastTarget', 'ctx']) if (!F[k] || typeof F[k] !== 'object') F[k] = {};
   fixNum(F, 'turn', 0, 0, 999); fixNum(F, 'T', TURN_T, 1, TURN_T); fixNum(F, 't', F.T, 0, F.T); fixNum(F, 'powersLeft', 3, 0, 3); F.powersLeft = Math.floor(F.powersLeft); fixNum(F, 'usedTurn', 0, 0, 3); fixNum(F, 'stuck', 0, 0);
   F.auto = !!F.auto; F.ready = !!F.ready; if (F.log.length > 80) F.log.length = 80;
-  if (F.tele && !(F.tele && ids.includes(F.tele.fid))) F.tele = null;
+  if (F.tele && !(F.tele && ids.includes(F.tele.fid) && ZONES.includes(F.tele.zone))) F.tele = null;
+  if (F.tele) fixNum(F.tele, 'mul', 1.5, 1, 3);
   if (F.rivalGod && !(typeof F.rivalGod === 'object' && typeof F.rivalGod.name === 'string')) F.rivalGod = null;
   if (F.rivalGod) fixNum(F.rivalGod, 'left', 0, 0, 5);
   if (F.phase === 'end' && !F.result) return false;
@@ -226,7 +247,7 @@ function validDun(U) {
   U.party = U.party.filter(p => p && typeof p.hero === 'string' && CLASSES[p.cls] && RACES[p.race]).slice(0, 5);
   for (const p of U.party) { fixNum(p, 'hp', 100, 0, 100); fixNum(p, 'lvl', 1, 1, MAX_LVL); }
   U.loot = Array.isArray(U.loot) ? U.loot.filter(i => i && i.slot && validItem(i, i.slot)).map(sanitizeItem).slice(0, 10) : [];
-  fixNum(U, 'keys', 0, 0, 3); fixNum(U, 'gold', 0, 0); fixNum(U, 'xp', 0, 0); fixNum(U, 'fights', 0, 0); fixNum(U, 'idle', 0, 0, 60); fixNum(U, 't', 1, 0, 20); fixNum(U, 'tier', 1, 1, 30);
+  fixNum(U, 'keys', 0, 0, 3); fixNum(U, 'gold', 0, 0); fixNum(U, 'xp', 0, 0); fixNum(U, 'fights', 0, 0); fixNum(U, 'heals', 0, 0, 9); fixNum(U, 'idle', 0, 0, 60); fixNum(U, 't', 1, 0, 20); fixNum(U, 'tier', 1, 1, 30);
   U.auto = !!U.auto; if (typeof U.name !== 'string') U.name = 'Пещера';
   if (U.log.length > 40) U.log.length = 40;
   return true;

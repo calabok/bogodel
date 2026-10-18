@@ -73,6 +73,7 @@ function calcMaxHp(h) {
   let hp = 10 + 2 * (c.die + cm) + (h.lvl - 1) * 2 * Math.max(1, c.die / 2 + 1 + cm);
   if (h.race === 'dwarf') hp += h.lvl;
   if (h.feats && h.feats.includes('tough')) hp += 2 * h.lvl;
+  hp *= (CLASS_BAL[h.cls] || CLASS_BAL.warrior).h;
   return Math.max(10, Math.round(hp));
 }
 function recalcHp() { const h = S.hero, old = h.maxHp; h.maxHp = calcMaxHp(h); if (h.state !== 'dead') h.hp = clamp(h.hp + (h.maxHp - old), 1, h.maxHp); }
@@ -86,15 +87,19 @@ function sheetOf(h, temple) {
   let ac = 10 + (a ? a.ac + a.plus : 0) + Math.min(mod(statValOf(h, 'dex')), 3) + Math.floor((temple || 0) / 2) + (feats.includes('ironskin') ? 1 : 0);
   if (h.cls === 'barbarian') ac += Math.max(0, mod(statValOf(h, 'con')));
   if (equipped(h).some(it => it.curse && it.curse.k === 'clumsy')) ac -= 2;
-  const scale = 1 + 0.2 * (h.lvl - 1);
+  const scale = (1 + 0.2 * (h.lvl - 1)) * (CLASS_BAL[h.cls] || CLASS_BAL.warrior).d;
   return { atkB, die, dmgB, ac, scale, avg: Math.max(1, ((die + 1) / 2 + dmgB) * scale) };
 }
 const sheet = () => sheetOf(S.hero, S.flock.temple);
+/* Типичное снаряжение и характеристики героя уровня L (для ботов арены/отряда и эталона монстров) */
+const typRar = L => L < 3 ? 0 : L < 7 ? 1 : L < 12 ? 2 : 3;
 function virtualHero(race, cls, lvl) {
-  const c = CLASSES[cls], st = genStats(cls, race);
-  for (let i = 2; i <= lvl; i++) st[c.prim] = Math.min(20, st[c.prim] + (i % 2));
-  const plus = Math.min(3, Math.floor(lvl / 4));
-  return { race, cls, lvl, st, feats: [], eq: { weapon: { die: c.wpn[1], plus, props: [] }, armor: { ac: c.arm[1] + Math.floor(lvl / 5), plus: 0, props: [] }, amulet: null, ring: null } };
+  const c = CLASSES[cls], st = genStats(cls, race), L = lvl, rar = typRar(L), plus = [0, L >= 5 ? 1 : 0, 1, 2, 3][rar];
+  for (let i = 2; i <= L; i++) { st[c.prim] = Math.min(20, st[c.prim] + 1); if (i % 2 === 0) st.con = Math.min(20, st.con + 1); }
+  for (let i = 4; i <= L; i += 4) st[c.prim] = Math.min(20, st[c.prim] + 1); // свойства предметов
+  const die = Math.max(c.wpn[1], L < 3 ? 6 : L < 8 ? 8 : L < 12 ? 10 : 11);
+  const ac = Math.max(c.arm[1], L < 2 ? 1 : L < 4 ? 3 : L < 6 ? 4 : L < 8 ? 5 : L < 12 ? 6 : 7);
+  return { race, cls, lvl, st, feats: [], eq: { weapon: { die, plus, props: [] }, armor: { ac, plus, props: [] }, amulet: null, ring: null } };
 }
 /* Скрытая проверка характеристики (d20 + модификатор + мастерство) */
 function check(s, dc, bonus) {
@@ -315,8 +320,10 @@ function startFight() {
   const tier = clamp(h.lvl + pick([-2, -1, -1, 0, 0, 0, 0, 1]), 1, 22);
   const near = ALL_MONSTERS.filter(m => Math.abs(m[1] - tier) <= 1);
   const name = pick(near.length ? near : ALL_MONSTERS)[0];
-  const hp = Math.round((12 + tier * 15) * (.85 + R() * .3));
-  h.monster = { n: name, tier, hp, max: hp, ac: Math.min(20, 10 + Math.ceil(tier / 2)), atk: 1 + tier, dmg: Math.round(tier * 1.9), curse: false, hit: 0, healed: 0 };
+  const vet = h.lvl >= 2 && R() < ROAD_K.vet;
+  const hp = Math.round((12 + tier * 15) * (1 + .02 * tier) * ROAD_K.hp * (vet ? 1.5 : 1) * (.85 + R() * .3));
+  h.monster = { n: vet ? 'Матёрый ' + name.toLowerCase() : name, tier: tier + (vet ? 1 : 0), hp, max: hp, ac: Math.min(21, 10 + Math.ceil(tier / 2) + (vet ? 1 : 0)), atk: 1 + tier + (vet ? 1 : 0),
+    dmg: Math.round((tier * 1.9 + 1) * ROAD_K.d * (vet ? 1.2 : 1)), curse: false, hit: 0, healed: 0, vet };
   h.state = 'fight';
   diary(pick(['На пути возник {m}. Выглядит голодным и нечистоплотным.', 'Из кустов выпрыгнуло нечто под названием «{m}»! Я тоже выпрыгнул. Мы оба испугались.',
     'Встретил противника — {m}. Пытался договориться, но тут не понимают по-человечески.', 'Дорогу преградило существо «{m}» и потребовало «кошелёк или жизнь». Выбрал драку.']).split('{m}').join(name), 'fight');
@@ -352,7 +359,7 @@ function fightStep() {
     if (m.hp <= 0) break;
     const mr = rnd(1, 20); let md = 0;
     if (mr === 20 || (mr !== 1 && mr + m.atk - (hasFeat('swift') ? 1 : 0) >= sh.ac)) {
-      md = rnd(1, 6) + m.dmg;
+      md = Math.round((rnd(1, 6) + m.dmg) * ((CLASS_BAL[h.cls] || {}).r || 1) * (h.lvl <= 2 ? .7 : 1));
       if (mr === 20) md += rnd(1, 6);
       if (m.curse) md = Math.ceil(md / 2);
       if (S.buffs.shield > 0) md = Math.ceil(md / 2);
@@ -375,7 +382,7 @@ function fightStep() {
 function winFight() {
   const h = S.hero, m = h.monster; if (!m) return;
   const rel = clamp(1 + .25 * (m.tier - h.lvl), .4, 2);
-  const xp = Math.round(xpUnit(h.lvl) * 3.2 * rel);
+  const xp = Math.round(xpUnit(h.lvl) * 3.2 * rel * (m.vet ? 1.6 : 1));
   const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1));
   h.gold += gold; let fx = `+${gold} 💰, +${xp} опыта`;
   if (SILENT) SILENT.c.wins++;
@@ -487,7 +494,7 @@ function heroStep() {
 /* ---------- Силы бога вне дуэли ---------- */
 function usePower(id) {
   if (S.fight && S.fight.phase === 'turn') return fightPower(id);
-  if (S.fight || S.hero.state === 'duel' || S.hero.state === 'dungeon' || duelPending || dunPending) return toast(S.dun && !S.fight ? 'В пещере силы помогают только в бою. Ведите отряд к врагам!' : 'Подождите начала хода — тогда силы сработают в бою.');
+  if (S.fight || S.hero.state === 'duel' || S.hero.state === 'dungeon' || duelPending || dunPending) return toast(S.dun && !S.fight ? 'В пещере между комнатами работает только «Лечить отряд» на карте; остальные силы — в бою.' : 'Подождите начала хода — тогда силы сработают в бою.');
   const h = S.hero, p = POWERS[id], L = S.god.skills[id] || 0, mu = pmult(id);
   if (!L) return toast('Эта сила ещё не изучена.');
   if (h.state === 'dead') return toast('Герой мёртв. Сначала воскресите его.');
@@ -544,6 +551,7 @@ function voice(text) {
   if (S.god.faith < 5) return toast('Нужно 5 веры.');
   if (S.hero.state === 'dead') return toast('Мёртвые плохо слышат.');
   if (S.hero.state === 'duel' || S.hero.state === 'dungeon') return toast('Герой занят — используйте силы прямо в дуэли или подземелье.');
+  if (S.fight) return toast('Идёт бой — командуйте зонами и силами бога.');
   S.god.faith -= 5; addGxp(2);
   if (R() > obeyChance()) { diary(`Услышал что-то вроде «${text}», но сделал вид, что это ветер.`, 'god'); return; }
   const v = VOICE.find(x => x.re.test(text));

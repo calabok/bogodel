@@ -124,7 +124,7 @@ function step(realDt) {
   if (S.fight) fightTick(idt);
   else if (!S.fork && !S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
   if (S.dun) dunTick(idt);
-  else if (!S.fork && !S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { S.timers.dun = rspan(PACE.dun); startDungeon(false); } }
+  else if (!S.fork && !S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { if (h.hp < h.maxHp * .7) S.timers.dun = 120; else { S.timers.dun = rspan(PACE.dun); startDungeon(false); } } }
   if (S.ev) evTick(idt);
   else { S.timers.event -= gdt; if (S.timers.event <= 0) { S.timers.event = rspan(PACE.event); startEvent(); } }
   arenaStep(idt);
@@ -178,5 +178,6 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV5) { delete S._migratedV5; diary('✨ Обновление мира: пещеры стали опаснее (элитные логова, один источник, боссы бьют по объявленной зоне — блокируйте её!), зато добыча богаче. Интерфейс стал спокойнее: подробности героя — по кнопке «📋 Герой».', 'level'); }
   if (S._migratedV4) { delete S._migratedV4; diary('✨ В мир пришла Арена! Теперь бои идут по зонам (голова, грудь, живот, пояс, ноги), а в пещерах есть карта, ключи и боссы. Заглядывайте во вкладку «Арена» и в чат.', 'level'); }
 }

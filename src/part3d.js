@@ -105,21 +105,30 @@ function armorOf(h, temple) { const a = h.eq.armor; return (a ? a.ac + a.plus : 
 function heroUnit() {
   const h = S.hero, sh = sheet(), st = STYLE[h.cls];
   return { id: 'me', name: h.name, team: 0, kind: 'hero', isMe: true, race: h.race, cls: h.cls, lvl: h.lvl, hp: Math.max(1, h.hp), max: h.maxHp,
-    avg: sh.avg, armor: armorOf(h, S.flock.temple), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
+    avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
     atkN: st.atk, blkN: st.blk, habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0 };
 }
 function botUnit(b) {
   const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], max = calcMaxHp(vh);
   return { id: newFid(), name: b.name, team: 1, kind: 'bot', race: b.race, cls: b.cls, lvl: b.lvl, hp: b.hpPct ? Math.max(1, Math.round(max * b.hpPct / 100)) : max, max,
-    avg: sh.avg, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
+    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
     atkN: st.atk, blkN: st.blk, habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
+}
+const MON_REF = {};
+function monsterRef(t) {
+  if (MON_REF[t]) return MON_REF[t];
+  let avg = 0, hp = 0, arm = 0; const cl = Object.keys(CLASSES);
+  for (const c of cl) { const vh = virtualHero('human', c, t); avg += sheetOf(vh, 0).avg * (CLASS_BAL[c].z || 1); hp += calcMaxHp(vh); arm += armorOf(vh, 0); }
+  return (MON_REF[t] = { avg: avg / cl.length, hp: hp / cl.length, arm: arm / cl.length });
 }
 function monsterUnit(name, tier, o) {
   o = o || {}; tier = Math.max(1, tier);
-  const max = Math.round((12 + tier * 15) * (.9 + R() * .2) * (o.hp || 1));
-  return { id: newFid(), name, team: 1, kind: o.boss ? 'boss' : 'monster', cls: null, lvl: tier, hp: max, max, avg: (2.2 * tier + 2) * (o.dmg || 1),
-    armor: Math.ceil(tier / 3) + (o.boss ? 2 : 0), dex: Math.floor(tier / 5), intu: Math.floor(tier / 6), wis: Math.floor(tier / 6),
-    atkN: 1, blkN: o.boss ? 2 : 1, habit: pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, boss: o.boss || null, dealt: 0 };
+  const ref = monsterRef(Math.min(tier, MAX_LVL + 5)), el = !!o.elite;
+  const max = Math.max(8, Math.round(ref.hp * MON_K.hp * (o.hp || 1) * (el ? 1.25 : 1) * (.9 + R() * .2)));
+  return { id: newFid(), name: el ? `${name} (элита)` : name, team: 1, kind: o.boss ? 'boss' : el ? 'elite' : 'monster', cls: null, lvl: tier, hp: max, max,
+    avg: Math.max(1, ref.avg * MON_K.d * (o.dmg || 1) * (el ? 1.12 : 1)), armor: Math.round(ref.arm * MON_K.arm) + (o.boss ? 2 : el ? 1 : 0),
+    dex: Math.floor(tier / 5), intu: Math.floor(tier / 6) + (el ? 1 : 0), wis: Math.floor(tier / 6), elite: el,
+    atkN: 1, blkN: o.boss || el ? 2 : 1, habit: pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, boss: o.boss || null, dealt: 0 };
 }
 function blkSet(z, n) { const i = ZONES.indexOf(z), at = k => ZONES[(i + k + 5) % 5]; return n <= 1 ? [z] : n === 2 ? [z, at(1)] : [at(-1), z, at(1)]; }
 function flog(F, t, c) { F.log.unshift({ t, c: c || 'sys' }); if (F.log.length > 80) F.log.length = 80; }
@@ -144,7 +153,7 @@ function botBrain(F, f) {
     const z = wpick(w); if (!atk.includes(z) || atk.length >= 4) atk.push(z);
   }
   let bz;
-  if (F.tele && f.team !== F.fighters.find(x => x.id === F.tele.fid).team && R() < (f.isMe ? .7 : .6)) bz = F.tele.zone;
+  if (F.tele && f.team !== F.fighters.find(x => x.id === F.tele.fid).team && R() < (f.isMe ? .5 : .6)) bz = F.tele.zone;
   else { const la = (F.lastAtk || {})[f.id] || []; bz = la.length && R() < .5 ? pick(la) : (R() < .4 ? 'head' : pick(ZONES)); }
   const blk = f.blkN === 2 && R() < .5 ? blkSet(ZONES[(ZONES.indexOf(bz) + 4) % 5], 2) : blkSet(bz, f.blkN);
   return { target, atk, blk };
@@ -178,15 +187,23 @@ function nextTurn(F) {
 }
 function bossPreTurn(F) {
   F.tele = null;
+  for (const e of F.fighters) if (e.elite && e.alive && !e.used.enr && e.hp < e.max / 2) { e.used.enr = 1; e.atkN = 2; flog(F, `⚠ ${e.name} звереет: теперь бьёт дважды!`, 'warn'); }
   const b = F.fighters.find(f => f.boss && f.alive); if (!b) return;
-  const m = b.boss.m;
-  if (m === 'tele' && F.turn % 2 === 0) { const z = pick(ZONES); F.tele = { zone: z, fid: b.id }; flog(F, `⚠ ${b.name} замахивается ${ZONE_ACC[z]} по всему отряду! Блокируйте ${ZONE_GEN[z]}!`, 'warn'); }
-  if (m === 'adds' && (F.turn === 3 || F.turn === 6)) {
-    for (let i = 0; i < 2; i++) { const a = monsterUnit('Крысёныш', Math.max(1, b.lvl - 4), {}); a.team = b.team; F.fighters.push(a); }
-    flog(F, `⚠ ${b.name} свистнул — из нор лезут крысята!`, 'warn');
+  const m = b.boss.m, T = F.turn, K = (typeof DUN_K !== 'undefined' ? DUN_K.tele : 2.3);
+  const heavy = (z, mul, txt) => { F.tele = { zone: z, fid: b.id, mul }; flog(F, `⚠ ${txt || `${b.name} замахивается ${ZONE_ACC[z]} по всему отряду!`} Блокируйте ${ZONE_GEN[z]}!`, 'warn'); };
+  if (m === 'tele' && T % 2 === 0) heavy(pick(ZONES), K);
+  if (m === 'adds') {
+    if (T % 3 === 2) flog(F, `⚠ ${b.name} набирает воздуха — на следующем ходу позовёт крысят. Пока они живы, он бьёт больнее.`, 'warn');
+    if (T % 3 === 0 && T <= 12) { for (let i = 0; i < 2; i++) { const a = monsterUnit('Крысёныш', Math.max(1, b.lvl - 4), { hp: .6, dmg: .7 }); a.team = b.team; F.fighters.push(a); } flog(F, `⚠ ${b.name} свистнул — из нор лезут крысята!`, 'warn'); }
+    if (T % 4 === 0) heavy(pick(ZONES), K * .9);
+    const adds = F.fighters.filter(f => f.alive && f.team === b.team && !f.boss).length; b.buf.adds = adds;
   }
-  if (m === 'sweep' && F.turn % 3 === 0) flog(F, `⚠ ${b.name} раскручивает хвост — сейчас достанется всем!`, 'warn');
-  if (m === 'enrage' && !b.used.enr && b.hp < b.max / 2) { b.used.enr = 1; b.atkN = 2; b.avg *= 1.2; flog(F, `⚠ ${b.name} в ярости! Теперь бьёт дважды за ход.`, 'warn'); }
+  if (m === 'sweep' && T % 3 === 0) { const z = pick(['legs', 'belly']); heavy(z, K * .85, `${b.name} раскручивает хвост — он летит низко, ${ZONE_ACC[z]}!`); }
+  if (m === 'enrage') {
+    if (!b.used.warn && b.hp < b.max * .65) { b.used.warn = 1; flog(F, `⚠ ${b.name} закипает: ещё немного — и впадёт в ярость. Добивайте быстрее или готовьте щит!`, 'warn'); }
+    if (!b.used.enr && b.hp < b.max / 2) { b.used.enr = 1; b.atkN = 2; b.avg *= 1.25; flog(F, `⚠ ${b.name} в ярости! Теперь бьёт дважды за ход.`, 'warn'); }
+    if (T % 3 === 0) heavy(pick(ZONES), K);
+  }
 }
 function fightTargetOk(F, f, t) { const x = F.fighters.find(e => e.id === t); return x && x.alive && x.team !== f.team; }
 function choiceFor(F, f) {
@@ -225,6 +242,7 @@ function hitOne(F, a, d, z, picks, o) {
   if (a.cls === 'barbarian') dmg *= 1.15 * (a.hp < a.max / 2 ? 1.3 : 1);
   if (a.cls === 'rogue' && F.turn === 1) dmg *= 1.5;
   if (a.debuf > 0) dmg *= .6;
+  if (a.boss && a.buf.adds) dmg *= 1 + .15 * a.buf.adds;
   dmg *= 1 - Math.min(.5, d.armor * ZONE_ARM[z] * .035);
   if (d.buf.shield) dmg *= .3;
   dmg = Math.max(1, Math.round(dmg));
@@ -256,8 +274,7 @@ function resolveTurn(F) {
   // приёмы боссов по площади
   for (const b of alive.filter(f => f.boss)) {
     const foes = alive.filter(x => x.team !== b.team);
-    if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: 1.5 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
-    if (b.boss.m === 'sweep' && F.turn % 3 === 0) for (const d of foes) { const r = hitOne(F, b, d, 'legs', picks, { magic: 1, mul: .6 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `🌀 Хвост ${b.name} сбивает с ног…` : r.line; lines.push({ r, d }); }
+    if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: F.tele.mul || 1.5 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
   }
   for (const f of alive) { const P = picks[f.id]; F.lastBlk[f.id] = P.blk; }
   // применяем урон одновременно
@@ -381,7 +398,10 @@ function endBattle(F, winTeam) {
   const foes = F.fighters.filter(f => f.team === 1), fx = [];
   if (F.kind === 'monster') {
     if (won && h.monster) { h.hp = Math.max(1, me.hp); h.monster.hp = 0; const bx = Math.round(xpUnit(L) * .8); winFight(); gainXp(bx); fx.push(`+${bx} опыта за ручной бой`); F.result = '🏆 Победа в ручном бою!'; }
-    else { h.hp = 0; h.monster = null; h.state = 'fight'; killHero(`Пал в ручном бою с противником «${foes[0].name}». Бог руководил, но не спас.`); F.result = '💀 Герой пал в бою.'; }
+    else {
+      h.hp = 0; h.monster = null; h.state = 'fight'; killHero(`Пал в ручном бою с противником «${foes[0].name}». Бог руководил, но не спас.`);
+      if (h.state !== 'dead') { h.state = 'road'; h.hp = Math.max(1, h.hp); F.result = '😤 Должен был пасть, но орки так просто не умирают.'; } else F.result = '💀 Герой пал в бою.';
+    }
   } else if (F.kind === 'dungeon') {
     F.result = won ? '🏆 Отряд победил!' : '💀 Отряд разбит.';
     dunAfterFight(F, won);

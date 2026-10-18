@@ -56,22 +56,24 @@ function renderDunMap() {
   for (let y = 0; y < DH; y++) for (let x = 0; x < DW; x++) {
     const t = tileAt(U, x, y), cur = U.pos.x === x && U.pos.y === y, adj = ex && t && Math.abs(x - U.pos.x) + Math.abs(y - U.pos.y) === 1;
     if (!t) { cells += '<span class="dc"></span>'; continue; }
-    const seen = t.seen || t.done, ic = cur ? '🧔' : !seen ? '?' : t.done && t.t !== 'start' ? (t.t === 'boss' ? '💀' : '·') : DTILE[t.t].ic;
+    const seen = t.seen || t.done, ic = cur ? '🧔' : !seen ? '?' : t.done && t.t !== 'start' ? (t.t === 'boss' ? '✔' : '·') : DTILE[t.t].ic;
     const lock = t.t === 'boss' && !t.done && U.keys < 1;
     const title = seen ? DTILE[t.t].n + (t.done ? ' (пройдено)' : '') + (lock ? ' — нужен ключ' : '') : 'Неизвестно';
-    cells += adj ? `<button class="dc room adj ${t.done ? 'done' : ''} ${seen ? '' : 'fog'} ${lock && seen ? 'lock' : ''}" data-act="dgo" data-arg="${x},${y}" title="${title}" aria-label="Идти: ${title}">${ic}</button>`
-      : `<span class="dc room ${cur ? 'cur' : ''} ${t.done ? 'done' : ''} ${seen ? '' : 'fog'}" title="${title}">${ic}</span>`;
+    const el = seen && !t.done && t.t === 'elite' ? 'elite' : '';
+    cells += adj ? `<button class="dc room adj ${el} ${t.done ? 'done' : ''} ${seen ? '' : 'fog'} ${lock && seen ? 'lock' : ''}" data-act="dgo" data-arg="${x},${y}" title="${title}" aria-label="Идти: ${title}">${ic}</button>`
+      : `<span class="dc room ${el} ${cur ? 'cur' : ''} ${t.done ? 'done' : ''} ${seen ? '' : 'fog'}" title="${title}">${ic}</span>`;
   }
   const party = `<div class="party2">${U.party.map(p => { const hp = p.isMe ? Math.round(S.hero.hp / S.hero.maxHp * 100) : p.hp; return `<div class="pm ${p.isMe ? 'me' : ''} ${hp <= 0 ? 'down' : ''}"><b>${CLS_IC[p.cls]} ${esc(p.hero)}</b> <span class="muted">${CLASSES[p.cls].n.toLowerCase()} ${p.lvl}</span>${bar('hp', hp, 100)}</div>`; }).join('')}</div>`;
-  const roles = [dunHas(U, 'rogue') && '🗡 плут обезвредит ловушки и вскроет замок', dunHas(U, 'cleric') && '✚ жрец лечит после боя', dunHas(U, 'mage') && '🔮 маг начинает бой огненным шаром', dunHas(U, 'ranger') && '🏹 следопыт видит дальше', dunHas(U, 'bard') && '🎻 бард: +крит отряду'].filter(Boolean);
+  const roles = [dunHas(U, 'rogue') && '🗡 ловушки, замок', dunHas(U, 'cleric') && '✚ лечит после боя', dunHas(U, 'mage') && '🔮 огонь в начале боя', dunHas(U, 'ranger') && '🏹 видит дальше', dunHas(U, 'bard') && '🎻 +крит'].filter(Boolean);
+  const hc = dunHealCost(), hl = DUN_K.heals - (U.heals || 0);
   const mid = U.phase === 'end' ? `<div class="q"><b>${esc(U.result || '')}</b></div><div class="btns"><button class="btn" data-act="dclose">Закрыть</button></div>`
     : U.phase === 'fight' ? '<div class="q">⚔ Отряд сражается!</div>'
-    : `<div class="muted">Нажмите на соседнюю комнату (жёлтая рамка). Найдите 🗝 и одолейте 👑. Бог задумается дольше 25 с — отряд пойдёт сам.</div>
-      <div class="btns"><button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Автопроход: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave">🚪 Уйти из пещеры</button></div>`;
+    : `<div class="hint">Ходите по соседним комнатам (жёлтая рамка). Лечения почти нет — берегите отряд.</div>
+      <div class="btns">${S.god.skills.heal ? `<button class="btn small green" data-act="dheal" ${hl < 1 || S.god.faith < hc ? 'disabled' : ''} title="Герой +30% HP, отряд +20%">✚ Лечить отряд · ${hc} (${hl})</button>` : ''}<button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Авто: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave" title="Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи">🚪 Отступить с добычей</button></div>`;
   setHTML(box, `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2>
-    <div class="row"><span>Ключей: <b>${U.keys} 🗝</b> · добыча: ${U.gold} 💰, ${U.loot.length} 🎁</span><span class="muted">босс: ${esc(U.boss.n)}</span></div>
-    ${party}<div class="dgrid">${cells}</div><div class="dleg">🚪 вход · ⚔ логово · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс · ? туман</div>
-    ${roles.length ? `<div class="muted">${roles.join(' · ')}</div>` : ''}
+    <div class="row"><span>🗝 <b>${U.keys}</b> · ${U.gold} 💰 · ${U.loot.length} 🎁</span>${roles.length ? `<span class="hint">${roles.join(' · ')}</span>` : ''}</div>
+    ${party}<div class="dgrid">${cells}</div><div class="dleg">⚔ логово · 💀 элита · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс</div>
+    <div class="bossInfo">👑 <b>${esc(U.boss.n)}</b>: ${esc((BOSSES.find(b => b.n === U.boss.n) || U.boss).d)}</div>
     ${mid}<div class="dlog">${U.log.slice(0, 12).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
 }
 /* ---------- Арена ---------- */
@@ -121,12 +123,13 @@ function renderChat() {
   }
   const dot = S.arena.apps.filter(a => !a.mine && a.joined === null).length;
   const ad = $('arenaDot'); if (ad) ad.textContent = S.tab !== 'arena' && dot ? String(dot) : '';
+  const ad2 = $('arenaDot2'); if (ad2) ad2.classList.toggle('on', !!dot && S.ui.mtab !== 'arena');
 }
 Object.assign(ACT, {
   fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a),
   fclose: () => { if (S.fight && S.fight.phase === 'end') closeFight(); },
   fmanual: () => { if (!startMonsterFight()) toast('Сейчас нечего брать под контроль.'); },
-  dgo: a => dunMove(a), dauto: () => dunToggleAuto(), dleave: () => { if (confirm('Увести отряд из пещеры? Добыча будет урезана.')) dunLeave(); },
+  dgo: a => dunMove(a), dheal: () => dunHeal(), dauto: () => dunToggleAuto(), dleave: () => { if (confirm(`Отступить? Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи. Босс останется непобеждённым.`)) dunLeave(); },
   dclose: () => { if (S.dun && S.dun.phase === 'end') S.dun = null; },
   apost: a => arenaPost(a), ajoin: a => arenaJoin(a), aleave: a => arenaLeave(a),
   chatToggle: () => { S.chat.open = !S.chat.open; chatSeen = -1; if (S.chat.open) { S.chat.unread = 0; setTimeout(() => { const i = $('chatIn'); if (i && innerWidth > 760) i.focus(); const l = $('chatLog'); if (l) l.scrollTop = l.scrollHeight; }, 0); } },
@@ -146,8 +149,8 @@ S = load();
 if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
 setInterval(loop, 250);
 /* Отладочный доступ из консоли / тестов */
-window.GAME = { get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
-  fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
+window.GAME = { closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+  startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },
   PWA, parseSave, checkUpdate, APP_BUILD };
