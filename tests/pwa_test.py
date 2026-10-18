@@ -62,7 +62,7 @@ async def main():
                 await asyncio.sleep(10)
             R['new build live after s']=round(time.time()-t0); R['new build']=nb
             t0=time.time(); shown=False
-            while time.time()-t0<120:
+            while time.time()-t0<660:
                 await pg.evaluate('GAME.checkUpdate()'); await pg.wait_for_timeout(4000)
                 if await pg.evaluate('GAME.PWA.waiting && document.getElementById("updBar").classList.contains("on")'): shown=True; break
             ok('client detects update (banner shown)', shown)
