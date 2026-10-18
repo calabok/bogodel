@@ -1,0 +1,21 @@
+{
+  "name": "БогоДел",
+  "short_name": "БогоДел",
+  "description": "Игра, где вы — бог, а ваш герой живёт сам: развилки, дуэли богов, подземелья с отрядом и мировые события.",
+  "lang": "ru",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#14122b",
+  "theme_color": "#1c1638",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
