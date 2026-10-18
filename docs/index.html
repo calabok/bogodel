@@ -186,6 +186,28 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
 .stgrid b{display:block;font-size:15px;color:#5a3b12}
 .stgrid .pr{border-color:var(--gold);background:#fff6d8}
 .sheet h3{font-size:15px;margin:10px 0 4px;color:#5a3b12}
+.doll{display:grid;grid-template-columns:minmax(0,1fr) minmax(84px,1.05fr) minmax(0,1fr);gap:6px;margin:4px 0 6px}
+.dcol{display:flex;flex-direction:column;gap:5px;min-width:0}
+.slotc{display:grid;grid-template-columns:24px minmax(0,1fr);grid-template-rows:auto auto;align-items:center;column-gap:4px;min-height:50px;padding:4px 5px;border:2px solid #b89a63;border-radius:8px;background:#fffaf0;font:inherit;font-size:11px;line-height:1.15;text-align:left;cursor:pointer;color:#3a2a10;min-width:0}
+.slotc .ci{grid-row:1/3;font-size:19px;text-align:center}
+.slotc .cn{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:break-word;hyphens:auto}
+@media (max-width:400px){.doll{gap:4px;grid-template-columns:minmax(0,1fr) minmax(76px,.9fr) minmax(0,1fr)}.slotc{grid-template-columns:auto minmax(0,1fr);padding:3px 4px;min-height:48px;font-size:10.5px}.slotc .ci{grid-row:1;grid-column:1;font-size:16px;text-align:left}.slotc .cb{grid-row:1;grid-column:2;justify-content:flex-end}.slotc .cn{grid-row:2;grid-column:1/3}.dav{font-size:32px}}
+.slotc .cb{display:flex;gap:3px;font-style:normal}.slotc .cb i{font-style:normal;font-size:10px;font-weight:700;color:#5a3b12}.slotc .cb i.cur{color:#8c2e20}
+.slotc.empty{border-style:dashed;border-color:#cdb88d;background:transparent;color:#9c8762;cursor:default}.slotc.empty .ci{opacity:.5}
+.slotc.r2,.slotc.r3,.slotc.r4{box-shadow:0 0 0 1px rgba(0,0,0,.05),0 0 6px -1px currentColor}
+.slotc:not(.empty):hover{background:#fff3d6}
+.dmid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 4px;border:1px solid #d6bf8e;border-radius:10px;background:linear-gradient(#fbf1dc,#f2e2bf);text-align:center;font-size:11px;min-width:0}
+.dav{font-size:40px;line-height:1}.dgsv{font-size:13px}.dst{color:#5a4a2a}
+.dza{display:flex;flex-direction:column;gap:1px;width:100%;font-size:10.5px;color:#6b5a3a}.dza span{display:flex;justify-content:space-between;padding:0 2px}
+.sets{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 4px}.setc{font-size:11.5px;padding:2px 7px;border-radius:10px;background:#efe3c8;color:#5a4a2a}.setc.on{background:#dcecd2;color:#2e5b22;font-weight:600}
+.rqb{color:#b02a1a;font-weight:600}.small{font-size:11.5px}.upg{color:#2e8b3a;font-weight:700}.invb{text-align:left;padding:0}
+.itemd .ist{list-style:none;padding:0;margin:6px 0;font-size:13px}.itemd .ist li{padding:2px 0}.itemd .aff{color:#2e6b2a}.itemd .cur{color:#8c2e20}
+.itemd .req{font-size:13px;margin:4px 0}.itemd .fl{font-style:italic;color:#6b5a3a;font-size:12.5px;margin:4px 0}
+.setbox{border:1px solid #cdb88d;border-radius:8px;padding:6px 8px;margin:6px 0;background:#fbf4e3;font-size:12.5px}
+.setp{display:flex;flex-wrap:wrap;gap:3px 10px;margin:4px 0}.setp span{color:#8a7a5a}.setp span.on{color:#2e6b2a;font-weight:600}.setp span.bag{color:#6b5a2a}
+.setb{color:#8a7a5a}.setb.on{color:#2e6b2a;font-weight:600}
+.cmp{font-size:12.5px;margin:6px 0}.cmp .up{color:#2e6b2a}.cmp .dn{color:#8c2e20}
+.cur{color:#8c2e20}
 .sheet .itm{padding:5px 0;border-bottom:1px dotted #d6bf8e;font-size:13px}
 .sheet table{width:100%;border-collapse:collapse;font-size:13px}.sheet td{padding:3px 4px;border-bottom:1px dotted #e0cfa5}
 .entry.rare .tx{color:#2a64c4;font-weight:700}.entry.death .tx{color:#7a1a10;font-weight:700}
@@ -726,35 +748,7 @@ const RARITY = [
   { n: 'обычное', c: '#6b6b6b', mul: 1 }, { n: 'необычное', c: '#2e8b3a', mul: 2 }, { n: 'редкое', c: '#2a64c4', mul: 4 },
   { n: 'эпическое', c: '#8a3cc4', mul: 8 }, { n: 'легендарное', c: '#d9731a', mul: 15 }
 ];
-const SLOT_RU = { weapon: 'Оружие', armor: 'Броня', amulet: 'Амулет', ring: 'Кольцо' };
-const BASES = {
-  weapon: [['Деревянная ложка', 4, 1], ['Дубинка с гвоздём', 6, 1], ['Кинжал «Ой»', 4, 1], ['Меч-кладенец (б/у)', 8, 2], ['Боевая сковорода', 6, 1], ['Двуручная скалка', 10, 3],
-    ['Посох на батарейках', 6, 1], ['Лук с верёвочкой от штанов', 8, 2], ['Топор лесоруба-пацифиста', 10, 4], ['Лютня-дубинка', 6, 1], ['Алебарда «Ну-ка, отойди»', 10, 6], ['Секира судного понедельника', 12, 8]],
-  armor: [['Кастрюля на голову', 1, 1], ['Мантия с заплатками', 1, 1], ['Кожанка с чужого плеча', 2, 1], ['Кольчуга из колечек от банок', 4, 2], ['Латы с принтом котика', 5, 4],
-    ['Бронетрусы', 3, 2], ['Мифриловый свитер', 6, 6], ['Доспех из одной драконьей чешуйки', 7, 8]],
-  amulet: [['Амулет из бабушкиной пуговицы', 0, 1], ['Медальон «Лучший герой»', 0, 2], ['Клык неизвестного зверя', 0, 3], ['Подвеска с прядью бороды гнома', 0, 4]],
-  ring: [['Кольцо из гвоздя', 0, 1], ['Перстень с кривым камнем', 0, 2], ['Колечко от шторы', 0, 1], ['Печатка тёмного властелина (б/у)', 0, 5]]
-};
-const PROP_DEF = {
-  str: { n: 'Силача', d: '+{v} Сила', slots: 'all' }, dex: { n: 'Ловкача', d: '+{v} Ловкость', slots: 'all' }, con: { n: 'Здоровяка', d: '+{v} Телосложение', slots: 'all' },
-  int: { n: 'Умника', d: '+{v} Интеллект', slots: 'all' }, wis: { n: 'Мудреца', d: '+{v} Мудрость', slots: 'all' }, cha: { n: 'Обаяшки', d: '+{v} Харизма', slots: 'all' },
-  fire: { n: 'Пламени', d: 'поджигает врагов', slots: 'weapon' }, vamp: { n: 'Кровососа', d: 'лечит при ударе', slots: 'weapon' }, crit: { n: 'Точности', d: 'шанс двойного удара', slots: 'weapon' }, holy: { n: 'Серебра', d: 'серебро: нечисть боится', slots: 'weapon' },
-  thorns: { n: 'Ежа', d: 'шипы ранят обидчиков', slots: 'armor' }, regen: { n: 'Живучести', d: 'понемногу лечит в пути', slots: 'armor amulet' },
-  gold: { n: 'Скупердяя', d: '+25% золота', slots: 'amulet ring' }, faith: { n: 'Благодати', d: '+вера богу', slots: 'amulet ring' },
-  luck: { n: 'Удачи', d: '+1 ко всем проверкам', slots: 'ring amulet' }, preach: { n: 'Проповедника', d: '+паства от проповедей', slots: 'amulet' }
-};
-const CURSES = {
-  chatty: { n: 'болтливости', d: '−1 Харизма, иногда распугивает паству' }, greed: { n: 'жадности', d: 'в каждом городе тратит деньги на ерунду' },
-  clumsy: { n: 'неуклюжести', d: '−2 к КД' }, hiccup: { n: 'икоты', d: '−2 ко всем проверкам' },
-  hunger: { n: 'вечного голода', d: 'лечение на 25% слабее' }, magnet: { n: 'монстромагнита', d: 'монстры лезут вдвое чаще' }
-};
-const LEGENDARY = [
-  { slot: 'weapon', n: 'Тапок Судьбы', die: 10, props: [{ k: 'crit' }, { k: 'str', v: 2 }] },
-  { slot: 'weapon', n: 'Сковорода Последнего Аргумента', die: 12, props: [{ k: 'fire' }, { k: 'con', v: 1 }] },
-  { slot: 'armor', n: 'Халат Абсолютной Неуязвимости (почти)', ac: 7, props: [{ k: 'thorns' }, { k: 'regen' }] },
-  { slot: 'amulet', n: 'Амулет Бабушкиной Любви', props: [{ k: 'regen' }, { k: 'faith' }, { k: 'wis', v: 2 }] },
-  { slot: 'ring', n: 'Кольцо Всевластия (настоящее!)', props: [{ k: 'luck' }, { k: 'gold' }, { k: 'cha', v: 2 }] }
-];
+/* Слоты, базы, свойства, проклятия, комплекты и легендарки — в part2d.js */
 /* ---------- Подземелья ---------- */
 const DUN_NAMES = ['Подземелье Забытых Носков', 'Логово Кракозябры', 'Склеп Невыплаченных Долгов', 'Пещера Вечного Эха… эха… эха', 'Катакомбы Тёщи Некроманта', 'Подвал Злого Трактирщика', 'Шахта «Последний Гном»', 'Лабиринт Бюрократии'];
 const DUN_ROOMS = {
@@ -784,27 +778,26 @@ const ZONE_MUL = { head: 1.25, chest: 1, belly: 1.05, waist: .95, legs: .85 };
 const ZONE_ARM = { head: .4, chest: 1, belly: .9, waist: .7, legs: .5 };
 /* Стиль боя класса: число атак и блоков (как в «Бойцовском клубе»: щит = 3 блока, два клинка = 2 удара) */
 const STYLE = {
-  warrior: { atk: 1, blk: 3, n: 'меч и щит', h: 'head' }, cleric: { atk: 1, blk: 3, n: 'булава и щит', h: 'chest' },
+  warrior: { atk: 1, blk: 3, n: 'меч и щит', h: 'head', shield: 1 }, cleric: { atk: 1, blk: 3, n: 'булава и щит', h: 'chest', shield: 1 },
   rogue: { atk: 2, blk: 1, n: 'два кинжала', h: 'belly' }, ranger: { atk: 1, blk: 2, n: 'лук и нож', h: 'chest', aimed: 1 },
   mage: { atk: 1, blk: 2, n: 'посох', h: 'head' }, bard: { atk: 1, blk: 2, n: 'лютня-дубинка', h: 'legs' },
   barbarian: { atk: 1, blk: 2, n: 'двуручный топор', h: 'head', heavy: 1 }
 };
 /* Баланс классов (подбирается симуляциями balance5.js): d — множитель урона, h — здоровья (везде);
    z — доп. множитель урона только в бою по зонам */
-const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .78 }, mage: { d: 1, h: 1, r: 0.78, z: 1.07 }, rogue: { d: 1, h: 1, r: 0.85, z: .70 }, cleric: { d: 1, h: 1, r: 0.8, z: .81 }, bard: { d: 1, h: 1, r: 0.76, z: 1.55 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.12 }, barbarian: { d: 1, h: 1, r: 1.6, z: .96 } };
+const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .91 }, mage: { d: 1, h: 1, r: 0.78, z: 1.11 }, rogue: { d: 1, h: 1, r: 0.85, z: .69 }, cleric: { d: 1, h: 1, r: 0.8, z: .84 }, bard: { d: 1, h: 1, r: 0.76, z: 1.30 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.15 }, barbarian: { d: 1, h: 1, r: 1.6, z: .88 } };
 const BOT_K = 1.06;
 /* Монстры: в бою по зонам — доли от «типичного героя» того же уровня; на дороге — множители старой формулы */
-const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.2, vet: .07 };
+const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.55, vet: .07 };
 /* Пещеры v5: меньше бесплатного лечения, злее комнаты и боссы, отступление с частью добычи */
-const DUN_K = { shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: .9, mdmg: .8, bhp: [1.5, .42], bdmg: 1.25, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
+const DUN_K = { shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.5, .42], bdmg: 1.35, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
 /* v6: сила снаряжения (ГС) и уровни сложности пещер. g — доля «типичного» ГС уровня, m — сила монстров, rew — награда, rar — бонус редкости */
 const DUN_TIERS = {
   easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .93, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
   normal: { n: 'Обычная', ic: '🟡', g: 1, m: 1, rew: 1, rar: 0, nm: 'Пещера' },
-  hard: { n: 'Тяжёлая', ic: '🔴', g: 1.2, m: 1.03, rew: 1.6, rar: .7, nm: 'Глубины' }
+  hard: { n: 'Тяжёлая', ic: '🔴', g: 1.2, m: 1.06, rew: 1.6, rar: .7, nm: 'Глубины' }
 };
-const GS_K = { k: 1.1, ku: 1.7, hero: .6, min: .6, max: 1.7 };
-const PROP_IC = { fire: '🔥', vamp: '🩸', crit: '🎯', thorns: '🌵', holy: '✝' }, PROP_RU = { fire: 'огонь', vamp: 'вампиризм', crit: 'точность', thorns: 'шипы', holy: 'серебро' };
+const GS_K = { k: 1.1, ku: 1.45, hero: .6, min: .6, max: 1.7 };
 const MONSTER_STYLE = { atk: 1, blk: 1, n: 'когти и зубы', h: 'chest' };
 const F_ADV = ['неожиданно', 'украдкой', 'с размаху', 'не глядя', 'по-богатырски', 'исподтишка', 'мощно', 'от души', 'лениво', 'вдохновенно', 'случайно', 'со злости', 'хитро', 'с разворота', 'зажмурившись'];
 const F_VERB = ['стукнул', 'врезал', 'треснул', 'приложил', 'ткнул', 'огрел', 'заехал', 'пнул', 'боднул', 'шлёпнул', 'двинул'];
@@ -843,6 +836,113 @@ const CHAT_REPLIES = [
   { re: /дур|туп|лох|нуб/i, r: ['сам такой 😤', 'на арене поговорим, {me}', 'фу таким быть', 'модератор, тут хамят'] },
   { re: /.*/, r: ['ага', '+1', 'жиза', 'не, не слышал', 'это ты зря, {me}', 'хаха', 'кто-нибудь понял, что он сказал?', 'согласен'] }
 ];
+/* =====================================================================
+   ПРЕДМЕТЫ v7: 10 слотов, категории оружия, требования, комплекты, легендарки
+   ===================================================================== */
+const EQ_KEYS = ['weapon', 'offhand', 'helm', 'armor', 'belt', 'gloves', 'boots', 'amulet', 'ring', 'ring2'];
+const SLOT_RU = { weapon: 'Оружие', offhand: 'Щит / левая рука', helm: 'Шлем', armor: 'Броня', belt: 'Пояс', gloves: 'Перчатки', boots: 'Сапоги', amulet: 'Амулет', ring: 'Кольцо', ring2: 'Кольцо' };
+const SLOT_IC = { weapon: '⚔', offhand: '🛡', helm: '⛑', armor: '🥋', belt: '🎗', gloves: '🧤', boots: '🥾', amulet: '📿', ring: '💍', ring2: '💍' };
+/* Категории оружия: st — требуемая характеристика (через «/» — любая из), cls — любимое оружие класса, t — особенность */
+const WCAT = {
+  sword:  { n: 'меч', ic: '🗡', st: 'str/dex', cls: ['warrior'], t: 'точный: +1 к попаданию' },
+  axe:    { n: 'топор', ic: '🪓', st: 'str', cls: ['barbarian'], t: 'рубящий: +5% к шансу крита' },
+  mace:   { n: 'дубина', ic: '🔨', st: 'str/wis', cls: ['cleric'], t: 'дробящий: пробивает 25% брони' },
+  dagger: { n: 'кинжал', ic: '🔪', st: 'dex', cls: ['rogue'], t: 'быстрый: 12% шанс добавочного удара' },
+  staff:  { n: 'посох', ic: '🪄', st: 'int/wis', cls: ['mage'], t: 'чары: +12% урона заклинателям (ИНТ/МДР)', h2: 1 },
+  bow:    { n: 'лук', ic: '🏹', st: 'dex', cls: ['ranger'], t: 'меткий: 12% стрелы летят сквозь блок', h2: 1 },
+  two:    { n: 'двуручное', ic: '⚒', st: 'str', cls: ['barbarian', 'warrior'], t: 'тяжёлое: +10% урона, но без щита', h2: 1 },
+  music:  { n: 'инструмент', ic: '🎻', st: 'cha/dex', cls: ['bard'], t: 'звонкий: +4% крита союзникам… и себе' }
+};
+const ARM_KIND = { c: { n: 'ткань', st: 'int/wis' }, l: { n: 'лёгкое', st: 'dex' }, h: { n: 'тяжёлое', st: 'str/con' } };
+/* Базы: оружие [имя, категория, кость, ур.]; доспехи [имя, КД, ур., вид]; перчатки [имя, точность, ур., вид]; щиты [имя, КД, блок, ур., вид]; бижутерия [имя, ур.] */
+const BASES = {
+  weapon: [
+    ['Меч-кладенец (б/у)', 'sword', 8, 1], ['Шпага для намазывания масла', 'sword', 6, 1], ['Палаш «Паспорт не нужен»', 'sword', 8, 4], ['Меч Справедливой Очереди', 'sword', 10, 8], ['Клинок «Последний довод бухгалтера»', 'sword', 10, 12], ['Меч «Пожизненный абонемент»', 'sword', 12, 15],
+    ['Топорик для разделки салата', 'axe', 6, 1], ['Топор лесоруба-пацифиста', 'axe', 10, 4], ['Колун «Тёщин язык»', 'axe', 10, 7], ['Секира судного понедельника', 'axe', 12, 10],
+    ['Деревянная ложка', 'mace', 4, 1], ['Дубинка с гвоздём', 'mace', 6, 1], ['Боевая сковорода', 'mace', 6, 1], ['Булава «Аргумент»', 'mace', 8, 4], ['Моргенштерн с бубенчиками', 'mace', 10, 8], ['Кистень «Привет из девяностых»', 'mace', 10, 11],
+    ['Кинжал «Ой»', 'dagger', 4, 1], ['Стилет для писем с угрозами', 'dagger', 4, 3], ['Нож-бабочка (моль)', 'dagger', 6, 5], ['Кинжал Подлого Удара', 'dagger', 6, 9], ['Клык Ночного Бухгалтера', 'dagger', 8, 13], ['Кинжал Окончательного Аргумента', 'dagger', 8, 16],
+    ['Посох на батарейках', 'staff', 6, 1], ['Посох из швабры', 'staff', 6, 3], ['Жезл-пульт от телевизора', 'staff', 8, 6], ['Посох Мудрого Деда', 'staff', 10, 10], ['Посох Вселенского Знания (демо)', 'staff', 12, 15],
+    ['Лук с верёвочкой от штанов', 'bow', 8, 1], ['Рогатка дальнобойная', 'bow', 6, 1], ['Арбалет из табуретки', 'bow', 10, 5], ['Лук Робин Гуда (подделка)', 'bow', 10, 9], ['Лук Дальнего Прицела', 'bow', 12, 15],
+    ['Двуручная скалка', 'two', 10, 1], ['Алебарда «Ну-ка, отойди»', 'two', 10, 6], ['Двуручный меч «Компенсатор»', 'two', 12, 9], ['Оглобля богатырская', 'two', 12, 13],
+    ['Лютня-дубинка', 'music', 6, 1], ['Балалайка-убийца', 'music', 8, 5], ['Волынка Страдания', 'music', 10, 10]
+  ],
+  armor: [['Мантия с заплатками', 1, 1, 'c'], ['Кожанка с чужого плеча', 2, 1, 'l'], ['Кастрюля на голову', 1, 1, 'h'], ['Бронетрусы', 3, 2, 'h'], ['Кольчуга из колечек от банок', 4, 2, 'h'], ['Халат звездочёта', 3, 3, 'c'], ['Камуфляжная пижама', 3, 3, 'l'],
+    ['Латы с принтом котика', 5, 4, 'h'], ['Кираса из сковородок', 5, 5, 'h'], ['Мифриловый свитер', 6, 6, 'l'], ['Бригантина «Бригада»', 6, 7, 'h'], ['Доспех из одной драконьей чешуйки', 7, 8, 'h'], ['Мантия Архимага-заочника', 5, 8, 'c'], ['Кольчуга Невидимости (не видно, есть ли)', 7, 10, 'l'], ['Латы Последнего Довода', 8, 12, 'h']],
+  helm: [['Шапка-ушанка с рогами', 1, 1, 'l'], ['Ведро с прорезями', 2, 2, 'h'], ['Капюшон таинственности', 1, 2, 'c'], ['Каска «Строитель»', 2, 4, 'h'], ['Корона из фольги', 1, 4, 'c'], ['Шлем с забралом-форточкой', 3, 6, 'h'], ['Бандана ниндзя-любителя', 2, 6, 'l'],
+    ['Рогатый шлем викинга-пенсионера', 3, 8, 'h'], ['Тиара Мудрости', 2, 9, 'c'], ['Шлем Великого Лба', 4, 11, 'h']],
+  boots: [['Тапки с помпонами', 0, 1, 'c'], ['Лапти-скороходы', 1, 1, 'l'], ['Сапоги-кирзачи', 1, 2, 'h'], ['Ботфорты мушкетёра', 2, 4, 'l'], ['Валенки огнеупорные', 2, 5, 'h'], ['Кеды ниндзя', 1, 5, 'l'], ['Сапоги-всмятку', 3, 7, 'h'], ['Сабатоны чугунные', 3, 9, 'h'], ['Сапоги-самоходы', 4, 12, 'l']],
+  belt: [['Верёвка от штанов', 0, 1, 'c'], ['Кушак чемпиона двора', 1, 2, 'l'], ['Ремень с бляхой «Батя»', 1, 3, 'h'], ['Пояс-кошелёк', 1, 4, 'l'], ['Патронташ без патронов', 1, 5, 'l'], ['Пояс верности диете', 2, 6, 'h'], ['Пояс силы (почти)', 2, 9, 'h'], ['Пояс Чемпиона Мира', 3, 12, 'h']],
+  gloves: [['Перчатки для мытья посуды', 0, 1, 'c'], ['Бабушкины варежки', 1, 1, 'c'], ['Краги кузнеца', 1, 3, 'h'], ['Перчатки вора-карманника', 1, 4, 'l'], ['Латные рукавицы', 1, 6, 'h'], ['Боксёрские перчатки «Бум»', 2, 7, 'l'], ['Перчатки Цепкости', 2, 10, 'l'], ['Длани Тысячи Пощёчин', 3, 12, 'h']],
+  offhand: [['Крышка от кастрюли', 1, .08, 1, 'l'], ['Щит-табуретка', 1, .1, 2, 'h'], ['Баклер-тарелка', 1, .12, 3, 'l'], ['Щит «Стоп, полиция»', 2, .12, 5, 'h'], ['Дверь от сарая', 3, .13, 7, 'h'], ['Щит Ежа', 2, .15, 8, 'l'], ['Павеза Бюрократа', 3, .17, 10, 'h'], ['Эгида Отговорок', 4, .2, 12, 'h']],
+  amulet: [['Амулет из бабушкиной пуговицы', 1], ['Кулон «Не сглазь»', 2], ['Медальон «Лучший герой»', 2], ['Клык неизвестного зверя', 3], ['Подвеска с прядью бороды гнома', 4], ['Ожерелье из зубов (не моих)', 5],
+    ['Медальон с фото тёщи', 6], ['Подвеска «Ключ от всех дверей, кроме нужной»', 8], ['Амулет Вечного Дедлайна', 10], ['Кулон Обаяния Кота', 12]],
+  ring: [['Кольцо из гвоздя', 1], ['Колечко от шторы', 1], ['Перстень с кривым камнем', 2], ['Кольцо от гранаты', 3], ['Печатка тёмного властелина (б/у)', 5], ['Перстень с печатью «Оплачено»', 6], ['Кольцо Мудреца-самоучки', 8], ['Кольцо Бесконечной Петли', 10], ['Кольцо Хвастуна', 12]]
+};
+/* Свойства: slots — куда выпадают ('all' — везде, кроме оружия для защитных и т.п.) */
+const PROP_DEF = {
+  str: { n: 'Силача', d: '+{v} Сила', slots: 'all' }, dex: { n: 'Ловкача', d: '+{v} Ловкость', slots: 'all' }, con: { n: 'Здоровяка', d: '+{v} Телосложение', slots: 'all' },
+  int: { n: 'Умника', d: '+{v} Интеллект', slots: 'all' }, wis: { n: 'Мудреца', d: '+{v} Мудрость', slots: 'all' }, cha: { n: 'Обаяшки', d: '+{v} Харизма', slots: 'all' },
+  fire: { n: 'Пламени', d: 'поджигает врагов', slots: 'weapon' }, vamp: { n: 'Кровососа', d: 'лечит при ударе', slots: 'weapon' }, crit: { n: 'Точности', d: 'чаще бьёт критом', slots: 'weapon gloves ring' },
+  holy: { n: 'Серебра', d: 'серебро: нечисть боится', slots: 'weapon' }, ice: { n: 'Стужи', d: 'лёд: иногда замораживает врага (слабее бьёт)', slots: 'weapon' },
+  poison: { n: 'Отравителя', d: 'яд: противник теряет здоровье 3 хода', slots: 'weapon gloves' }, stun: { n: 'Оглушения', d: 'иногда оглушает: враг пропускает удар', slots: 'weapon offhand' },
+  pierce: { n: 'Пробивания', d: 'пробивает треть брони', slots: 'weapon gloves' }, acc: { n: 'Меткости', d: '+1 к попаданию', slots: 'gloves ring helm' },
+  thorns: { n: 'Ежа', d: 'шипы ранят обидчиков', slots: 'armor offhand' }, regen: { n: 'Живучести', d: 'понемногу лечит в пути', slots: 'armor amulet belt' },
+  hp: { n: 'Богатыря', d: '+6% здоровья', slots: 'armor belt helm amulet boots' }, dodge: { n: 'Уворота', d: '+4% к уклонению', slots: 'boots belt armor' },
+  acrit: { n: 'Непробиваемости', d: 'антикрит: по вам на 40% реже критуют', slots: 'helm armor offhand' }, blockp: { n: 'Стойкости', d: 'доп. блок: +5% закрыть пропущенный удар', slots: 'offhand gloves helm' },
+  gold: { n: 'Скупердяя', d: '+25% золота', slots: 'amulet ring belt' }, faith: { n: 'Благодати', d: 'реген веры: +вера богу', slots: 'amulet ring' },
+  luck: { n: 'Удачи', d: '+1 ко всем проверкам', slots: 'ring amulet' }, preach: { n: 'Проповедника', d: '+паства от проповедей', slots: 'amulet' }
+};
+const PROP_IC = { fire: '🔥', vamp: '🩸', crit: '🎯', thorns: '🌵', holy: '✝', ice: '❄', poison: '☠', stun: '💫', pierce: '⛏', dodge: '💨', acrit: '🪖', blockp: '🛡' };
+const PROP_RU = { fire: 'огонь', vamp: 'вампиризм', crit: 'точность', thorns: 'шипы', holy: 'серебро', ice: 'лёд', poison: 'яд', stun: 'оглушение', pierce: 'пробитие', dodge: 'уворот', acrit: 'антикрит', blockp: 'доп. блок' };
+const CURSES = {
+  chatty: { n: 'болтливости', d: '−1 Харизма, иногда распугивает паству' }, greed: { n: 'жадности', d: 'в каждом городе тратит деньги на ерунду' },
+  clumsy: { n: 'неуклюжести', d: '−2 к КД' }, hiccup: { n: 'икоты', d: '−2 ко всем проверкам' },
+  hunger: { n: 'вечного голода', d: 'лечение на 25% слабее' }, magnet: { n: 'монстромагнита', d: 'монстры лезут вдвое чаще' },
+  weak: { n: 'вялости', d: '−2 Сила (руки как макароны)' }, slowc: { n: 'улитки', d: '−2 Ловкость' }, dull: { n: 'тупизны', d: '−2 Интеллект, герой путает «право» и «лево»' },
+  fragile: { n: 'хрупкости', d: '−10% здоровья, синяки от сквозняка' }, pacifist: { n: 'пацифизма', d: '−10% урона: жалко бить' }
+};
+/* Мелкие словесные украшения: префиксы (без рода) и хвостики */
+const NAME_PRE = ['Супер-', 'Мега-', 'Турбо-', 'Квази-', 'Экстра-', 'Псевдо-', 'Гипер-', 'Ультра-', 'Нано-', 'Анти-'];
+const NAME_SUF = ['с гарантией', 'из ломбарда', 'от Деда Мороза', 'с ценником', 'на удачу', 'для своих', 'без инструкции', 'из Годграда', 'с подвохом', 'по акции'];
+/* Легендарки: уникальные, с историей; lv — требуемый уровень */
+const LEGENDARY = [
+  { slot: 'weapon', cat: 'mace', n: 'Тапок Судьбы', die: 10, lv: 4, props: [{ k: 'crit' }, { k: 'str', v: 2 }, { k: 'stun' }], fl: 'Им отшлёпали трёх королей и одного дракона. Дракон до сих пор стесняется.' },
+  { slot: 'weapon', cat: 'mace', n: 'Сковорода Последнего Аргумента', die: 12, lv: 8, props: [{ k: 'fire' }, { k: 'con', v: 1 }, { k: 'pierce' }], fl: 'Ещё тёплая. Пахнет блинами и победой.' },
+  { slot: 'weapon', cat: 'sword', n: 'Экскалибур (из камня у дороги)', die: 12, lv: 10, props: [{ k: 'holy' }, { k: 'str', v: 2 }, { k: 'crit' }], fl: 'Камень, кстати, тоже забрали — на сдачу.' },
+  { slot: 'weapon', cat: 'dagger', n: 'Кинжал «А что, так можно было?»', die: 8, lv: 7, props: [{ k: 'poison' }, { k: 'dex', v: 2 }, { k: 'crit' }], fl: 'Бьёт в спину даже тех, кто стоит лицом.' },
+  { slot: 'weapon', cat: 'staff', n: 'Посох Деда, Который Всё Помнит', die: 12, lv: 9, props: [{ k: 'ice' }, { k: 'int', v: 2 }, { k: 'wis', v: 1 }], fl: '«А вот в наше время файерболы были с горошину!»' },
+  { slot: 'weapon', cat: 'bow', n: 'Лук Амура (сломанный)', die: 10, lv: 6, props: [{ k: 'vamp' }, { k: 'dex', v: 2 }, { k: 'cha', v: 1 }], fl: 'Попадает в сердце. Обычно ножом.' },
+  { slot: 'armor', n: 'Халат Абсолютной Неуязвимости (почти)', ac: 7, kind: 'c', lv: 7, props: [{ k: 'thorns' }, { k: 'regen' }, { k: 'acrit' }], fl: 'Почти — это левый рукав. Не подставляйте левый рукав.' },
+  { slot: 'helm', n: 'Шапка-невидимка (видимая)', ac: 3, kind: 'l', lv: 6, props: [{ k: 'dodge' }, { k: 'dex', v: 2 }], fl: 'Невидимой её делает только темнота и ваша вера.' },
+  { slot: 'boots', n: 'Сапоги-скороходы (с пробегом)', ac: 3, kind: 'l', lv: 5, props: [{ k: 'dodge' }, { k: 'hp' }, { k: 'dex', v: 1 }], fl: 'Пробег 40 000 вёрст. Один раз меняли подмётки.' },
+  { slot: 'belt', n: 'Пояс Богатыря Ильи (он не против)', ac: 3, kind: 'h', lv: 9, props: [{ k: 'hp' }, { k: 'str', v: 2 }, { k: 'con', v: 1 }], fl: 'Тридцать лет и три года на печи — и пояс как новый.' },
+  { slot: 'gloves', n: 'Рукавицы Мидаса (золотые по краям)', hit: 3, kind: 'l', lv: 8, props: [{ k: 'gold' }, { k: 'crit' }, { k: 'acc' }], fl: 'Всё, к чему прикасаешься, дорожает. Особенно счёт в трактире.' },
+  { slot: 'offhand', n: 'Щит Отказа «Не сегодня»', ac: 4, blk: .2, kind: 'h', lv: 9, props: [{ k: 'blockp' }, { k: 'thorns' }, { k: 'acrit' }], fl: 'Отбивает удары, просьбы в долг и звонки с незнакомых номеров.' },
+  { slot: 'amulet', n: 'Амулет Бабушкиной Любви', lv: 3, props: [{ k: 'regen' }, { k: 'faith' }, { k: 'wis', v: 2 }], fl: 'Греет сердце и заставляет надевать шапку.' },
+  { slot: 'ring', n: 'Кольцо Всевластия (настоящее!)', lv: 5, props: [{ k: 'luck' }, { k: 'gold' }, { k: 'cha', v: 2 }], fl: 'Прошлый хозяин очень просил вернуть. Шипел при этом.' },
+  { slot: 'ring', n: 'Перстень Вечного Понедельника', lv: 11, props: [{ k: 'acc' }, { k: 'con', v: 2 }, { k: 'faith' }], fl: 'Носитель не устаёт. Он просто перестал надеяться.' }
+];
+/* Комплекты: pcs — куски (slot, имя, cat/kind), b — бонусы по числу надетых кусков (свойства), lv — уровни */
+const SETS = {
+  ogorod: { n: 'Огородник', lv: [1, 4], pcs: [['helm', 'Панама огородника', 'l'], ['armor', 'Телогрейка огородника', 'l'], ['boots', 'Галоши огородника', 'l'], ['weapon', 'Тяпка огородника', 'mace']],
+    b: { 2: [{ k: 'con', v: 1 }], 4: [{ k: 'hp' }, { k: 'regen' }] }, fl: 'Шесть соток — и никакой пощады сорнякам.' },
+  santeh: { n: 'Сантехник', lv: [3, 6], pcs: [['helm', 'Каска сантехника', 'h'], ['armor', 'Комбинезон сантехника', 'h'], ['weapon', 'Разводной ключ', 'mace'], ['gloves', 'Резиновые перчатки сантехника', 'c'], ['boots', 'Болотные сапоги сантехника', 'h']],
+    b: { 2: [{ k: 'pierce' }], 4: [{ k: 'str', v: 1 }, { k: 'stun' }], 5: [{ k: 'str', v: 2 }, { k: 'hp' }] }, fl: '«Хозяин, тут всё менять надо». Особенно врагов.' },
+  mage: { n: 'Деревенский маг', lv: [4, 8], pcs: [['helm', 'Колпак со звёздочками', 'c'], ['armor', 'Халат в горошек', 'c'], ['weapon', 'Посох-кочерга', 'staff'], ['boots', 'Тапки-телепорты', 'c'], ['amulet', 'Амулет из луковицы', null]],
+    b: { 2: [{ k: 'int', v: 1 }], 4: [{ k: 'ice' }, { k: 'wis', v: 1 }], 5: [{ k: 'int', v: 2 }, { k: 'faith' }] }, fl: 'Колдует по объявлениям. Сводит бородавки и врагов.' },
+  buh: { n: 'Ночной бухгалтер', lv: [5, 9], pcs: [['gloves', 'Нарукавники бухгалтера', 'l'], ['weapon', 'Кинжал-скрепкосшиватель', 'dagger'], ['armor', 'Жилет с тайными карманами', 'l'], ['ring', 'Печатка «Сдано»', null]],
+    b: { 2: [{ k: 'dex', v: 1 }], 4: [{ k: 'poison' }, { k: 'dodge' }, { k: 'gold' }] }, fl: 'Дебет сходится с кредитом. Враги — с землёй.' },
+  bard: { n: 'Бард-неудачник', lv: [6, 10], pcs: [['helm', 'Берет с облезлым пером', 'l'], ['armor', 'Камзол с блёстками (концертный)', 'l'], ['weapon', 'Балалайка «Последний гастроль»', 'music'], ['ring', 'Кольцо фальшивой ноты', null]],
+    b: { 2: [{ k: 'cha', v: 1 }], 4: [{ k: 'crit' }, { k: 'luck' }, { k: 'cha', v: 1 }] }, fl: 'Публика рыдает. От смеха, но рыдает.' },
+  knight: { n: 'Рыцарь Печального Образа', lv: [7, 11], pcs: [['helm', 'Ведро с плюмажем', 'h'], ['armor', 'Латы из самовара', 'h'], ['weapon', 'Меч Печального Образа', 'sword'], ['offhand', 'Щит-тазик', 'h'], ['boots', 'Шпоры без коня', 'h'], ['belt', 'Пояс верности Прекрасной Даме', 'h']],
+    b: { 2: [{ k: 'str', v: 1 }], 4: [{ k: 'acrit' }, { k: 'blockp' }], 6: [{ k: 'str', v: 2 }, { k: 'con', v: 2 }, { k: 'hp' }] }, fl: 'Сражается с мельницами. Иногда мельницы проигрывают.' },
+  pious: { n: 'Божий одуванчик', lv: [8, 12], pcs: [['helm', 'Нимб на проволочке', 'c'], ['armor', 'Ряса бронированная', 'h'], ['weapon', 'Кадило-моргенштерн', 'mace'], ['offhand', 'Щит «Не убий (сильно)»', 'h'], ['gloves', 'Чётки-кастет', 'l']],
+    b: { 2: [{ k: 'wis', v: 1 }], 4: [{ k: 'regen' }, { k: 'faith' }], 5: [{ k: 'wis', v: 2 }, { k: 'acrit' }, { k: 'holy' }] }, fl: 'Благословляет так, что неделю звенит в ушах.' },
+  hunter: { n: 'Охотник на тёщ', lv: [9, 13], pcs: [['helm', 'Треуголка охотника', 'l'], ['armor', 'Плащ-невидимка от родни', 'l'], ['weapon', 'Арбалет «Без приглашения»', 'bow'], ['gloves', 'Перчатки стрелка', 'l'], ['boots', 'Сапоги тихого ухода', 'l']],
+    b: { 2: [{ k: 'dex', v: 1 }], 4: [{ k: 'holy' }, { k: 'acc' }], 5: [{ k: 'dex', v: 2 }, { k: 'crit' }] }, fl: 'Приходит на юбилей заранее. Уходит, не прощаясь.' },
+  intel: { n: 'Варвар-интеллигент', lv: [10, 15], pcs: [['helm', 'Рогатый шлем с очками', 'h'], ['armor', 'Шкура с галстуком', 'h'], ['weapon', 'Двуручный топор «Логика»', 'two'], ['belt', 'Пояс чемпиона шахматного кружка', 'h'], ['boots', 'Ботинки на шнурках (завязаны!)', 'h']],
+    b: { 2: [{ k: 'str', v: 1 }], 4: [{ k: 'fire' }, { k: 'hp' }], 5: [{ k: 'str', v: 2 }, { k: 'int', v: 2 }, { k: 'pierce' }] }, fl: 'Сначала цитирует Канта. Потом бьёт. Иногда Кантом.' }
+};
 
 /* =====================================================================
    2) ТЕМП ИГРЫ (все времена — в игровых секундах при скорости ×1)
@@ -899,9 +999,21 @@ function genStats(cls, race) {
   return st;
 }
 function starterItem(slot, base) {
-  return { id: 'it' + Math.random().toString(36).slice(2, 9), slot, base: base[0], n: base[0], rar: 0, plus: 0,
-    die: slot === 'weapon' ? base[1] : 0, ac: slot === 'armor' ? base[1] : 0, props: [], curse: null, v: 5 };
+  const it = { id: 'it' + Math.random().toString(36).slice(2, 9), slot, base: base[0], n: base[0], rar: 0, plus: 0,
+    die: slot === 'weapon' ? base[1] : 0, ac: slot !== 'weapon' ? base[1] : 0, props: [], curse: null, v: 5, req: { lvl: 1 } };
+  if (slot === 'offhand') it.blk = base[2] || .08;
+  return upgradeItem(it);
 }
+/* Стартовые щиты/второй кинжал: воин и жрец — со щитом, плут — с двумя кинжалами */
+function starterEq(cls) {
+  const c = CLASSES[cls], eq = {}; for (const k of EQ_KEYS) eq[k] = null;
+  eq.weapon = starterItem('weapon', c.wpn); eq.armor = starterItem('armor', c.arm);
+  if (STYLE[cls].shield) eq.offhand = starterItem('offhand', ['Крышка от кастрюли', 1, .08]);
+  if (cls === 'rogue') eq.offhand = starterItem('weapon', ['Кинжал «Ой»', 4]);
+  return eq;
+}
+/* Проверка вещи для слота сохранения */
+function itemFitsKey(it, k) { if (!it || typeof it !== 'object' || typeof it.slot !== 'string') return false; return k === 'ring2' ? it.slot === 'ring' : k === 'offhand' ? it.slot === 'offhand' || (it.slot === 'weapon' && it.cat === 'dagger') : it.slot === k; }
 function defaultState(god, hero, race, cls) {
   race = RACES[race] ? race : 'human'; cls = CLASSES[cls] ? cls : 'warrior';
   const c = CLASSES[cls];
@@ -909,7 +1021,7 @@ function defaultState(god, hero, race, cls) {
     v: SAVE_VERSION,
     god: { name: god, lvl: 1, xp: 0, faith: 60, sp: 1, align: 0, skills: { heal: 1, bolt: 1, rain: 0, bless: 0, shield: 0, curse: 0, quake: 0, luck: 0, beast: 0 } },
     hero: { name: hero, race, cls, st: genStats(cls, race), feats: [], lvl: 1, xp: 0, hp: 30, maxHp: 30, gold: 30, potions: 1,
-      eq: { weapon: starterItem('weapon', c.wpn), armor: starterItem('armor', c.arm), amulet: null, ring: null },
+      eq: starterEq(cls),
       inv: [], loc: 'Годград', state: 'road', monster: null, quest: newQuest(), trust: 40, deadT: 0, townStep: 0,
       restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [] },
     flock: { fol: 3, temple: 0, templeProg: 0, army: 0 },
@@ -934,7 +1046,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 6;
+const SAVE_VERSION = 7;
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -992,16 +1104,34 @@ function migrate(o) {
     if (o.dun && typeof o.dun === 'object' && !o.dun.diff) o.dun.diff = 'normal';
     o._migratedV6 = 1;
   }
+  if (v < 7) {
+    // v6 → v7: 10 слотов (шлем, щит, пояс, перчатки, сапоги, 2-е кольцо), категории оружия, требования, комплекты.
+    // Старые вещи остаются надетыми (требований у них нет), новые слоты пустые.
+    const h = o.hero;
+    if (h && h.eq && typeof h.eq === 'object') for (const k of ['offhand', 'helm', 'belt', 'gloves', 'boots', 'ring2']) if (!(k in h.eq)) h.eq[k] = null;
+    o._migratedV7 = 1;
+  }
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
 }
+const ITEM_SLOTS = ['weapon', 'offhand', 'helm', 'armor', 'belt', 'gloves', 'boots', 'amulet', 'ring'];
 function validItem(it, slot) {
-  return it && typeof it === 'object' && it.slot === slot && typeof it.n === 'string' && isNum(it.rar) && isNum(it.plus) && Array.isArray(it.props);
+  return it && typeof it === 'object' && it.slot === slot && ITEM_SLOTS.includes(slot) && typeof it.n === 'string' && isNum(it.rar) && isNum(it.plus) && Array.isArray(it.props);
 }
 function sanitizeItem(it) {
   it.rar = clamp(Math.floor(it.rar), 0, 4); it.plus = clamp(Math.floor(it.plus), 0, 5);
   fixNum(it, 'die', it.slot === 'weapon' ? 4 : 0, 0, 12); fixNum(it, 'ac', 0, 0, 10); fixNum(it, 'v', 5, 0);
+  upgradeItem(it);
+  if (it.slot === 'weapon') { if (!WCAT[it.cat]) it.cat = 'sword'; it.h2 = WCAT[it.cat].h2 ? 1 : 0; } else { delete it.cat; delete it.h2; }
+  if (it.kind && !ARM_KIND[it.kind]) it.kind = 'l';
+  if (it.slot === 'offhand') fixNum(it, 'blk', .08, 0, .3); else delete it.blk;
+  if (it.slot === 'gloves') fixNum(it, 'hit', 0, 0, 4); else delete it.hit;
+  if (!it.req || typeof it.req !== 'object') it.req = { lvl: 1 };
+  fixNum(it.req, 'lvl', 1, 1, MAX_LVL); it.req.lvl = Math.floor(it.req.lvl);
+  if (typeof it.req.s !== 'string' || !it.req.s.split('/').every(k => STATS.includes(k)) || !isNum(it.req.v)) { delete it.req.s; delete it.req.v; } else it.req.v = clamp(Math.round(it.req.v), 0, 20);
+  if (it.set && !SETS[it.set]) delete it.set;
+  for (const k of ['pre', 'suf', 'fl']) if (it[k] !== undefined && typeof it[k] !== 'string') delete it[k];
   it.props = it.props.filter(p => p && PROP_DEF[p.k]).map(p => STATS.includes(p.k) ? { k: p.k, v: clamp(isNum(p.v) ? p.v : 1, 1, 3) } : { k: p.k });
   if (it.curse && !(CURSES[it.curse.k])) it.curse = null;
   if (!it.id) it.id = 'it' + Math.random().toString(36).slice(2, 9);
@@ -1022,10 +1152,13 @@ function sanitize(o) {
   h.feats = Array.isArray(h.feats) ? [...new Set(h.feats.filter(x => FEATS[x]))] : [];
   fixNum(h, 'lvl', 1, 1, MAX_LVL); h.lvl = Math.floor(h.lvl); fixNum(h, 'xp', 0, 0, Math.max(0, xpNext(h.lvl) - 1)); if (h.lvl >= MAX_LVL) h.xp = 0;
   if (!h.eq || typeof h.eq !== 'object') h.eq = d.hero.eq;
-  for (const sl of ['weapon', 'armor', 'amulet', 'ring']) { if (h.eq[sl] && !validItem(h.eq[sl], sl)) h.eq[sl] = null; if (h.eq[sl]) sanitizeItem(h.eq[sl]); }
+  for (const k of Object.keys(h.eq)) if (!EQ_KEYS.includes(k)) delete h.eq[k];
+  for (const sl of EQ_KEYS) { const it = h.eq[sl]; if (!it || !itemFitsKey(it, sl) || !validItem(it, it.slot)) h.eq[sl] = null; else sanitizeItem(it); }
+  if (h.eq.offhand && h.eq.offhand.slot === 'weapon' && h.cls !== 'rogue') h.eq.offhand = null;
   if (!h.eq.weapon) h.eq.weapon = starterItem('weapon', CLASSES[h.cls].wpn);
   if (!h.eq.armor) h.eq.armor = starterItem('armor', CLASSES[h.cls].arm);
-  h.inv = Array.isArray(h.inv) ? h.inv.filter(i => i && typeof i.n === 'string' && (i.slot ? validItem(i, i.slot) : true)).map(i => i.slot ? sanitizeItem(i) : { n: i.n, v: isNum(i.v) ? Math.max(0, i.v) : 3 }).slice(-12) : [];
+  if (h.eq.weapon.h2 && h.eq.offhand) { if (!Array.isArray(h.inv)) h.inv = []; h.inv.push(h.eq.offhand); h.eq.offhand = null; }
+  h.inv = Array.isArray(h.inv) ? h.inv.filter(i => i && typeof i.n === 'string' && (i.slot ? validItem(i, i.slot) : true)).map(i => i.slot ? sanitizeItem(i) : { n: i.n, v: isNum(i.v) ? Math.max(0, i.v) : 3 }).slice(-16) : [];
   fixNum(h, 'gold', 0, 0); h.gold = Math.floor(h.gold); fixNum(h, 'potions', 0, 0, 20); h.potions = Math.floor(h.potions); fixNum(h, 'trust', 40, 0, 100);
   fixNum(h, 'deadT', 0, 0, PACE.dead); fixNum(h, 'townStep', 0, 0, 5); fixNum(h, 'restT', 0, 0, 10); fixNum(h, 'shortRests', 2, 0, 2); fixNum(h, 'orcCd', 0, 0, 10800);
   if (!h.quest || typeof h.quest.n !== 'string') h.quest = newQuest(); fixNum(h.quest, 'p', 0, 0, 99);
@@ -1289,52 +1422,7 @@ function addGxp(v) {
 const mod = v => Math.floor((v - 10) / 2);
 const fmtMod = m => (m >= 0 ? '+' : '') + m;
 const hasFeat = id => S.hero.feats.includes(id);
-const equipped = (h) => ['weapon', 'armor', 'amulet', 'ring'].map(s => (h || S.hero).eq[s]).filter(Boolean);
-const eqCount = k => S && S.hero ? equipped().reduce((n, it) => n + it.props.filter(p => p.k === k).length, 0) : 0;
-const eqHas = (k, slot) => slot ? !!(S.hero.eq[slot] && S.hero.eq[slot].props.some(p => p.k === k)) : eqCount(k) > 0;
-const curseOn = k => equipped().some(it => it.curse && it.curse.k === k);
 const profB = l => 2 + Math.floor((l - 1) / 4);
-function statValOf(h, s) {
-  let v = h.st[s];
-  for (const it of equipped(h)) for (const p of it.props) if (p.k === s) v += p.v || 1;
-  if (s === 'cha' && equipped(h).some(it => it.curse && it.curse.k === 'chatty')) v -= 1;
-  if (h.inj) for (const j of h.inj) if (j.s === s && INJURIES[j.k]) v -= INJURIES[j.k].pen;
-  return clamp(v, 1, 30);
-}
-const statVal = s => statValOf(S.hero, s);
-function calcMaxHp(h) {
-  const c = CLASSES[h.cls], cm = mod(statValOf(h, 'con'));
-  let hp = 10 + 2 * (c.die + cm) + (h.lvl - 1) * 2 * Math.max(1, c.die / 2 + 1 + cm);
-  if (h.race === 'dwarf') hp += h.lvl;
-  if (h.feats && h.feats.includes('tough')) hp += 2 * h.lvl;
-  hp *= (CLASS_BAL[h.cls] || CLASS_BAL.warrior).h;
-  return Math.max(10, Math.round(hp));
-}
-function recalcHp() { const h = S.hero, old = h.maxHp; h.maxHp = calcMaxHp(h); if (h.state !== 'dead') h.hp = clamp(h.hp + (h.maxHp - old), 1, h.maxHp); }
-/* Боевой лист: работает и для героя игрока, и для виртуального героя соперника */
-function sheetOf(h, temple) {
-  const c = CLASSES[h.cls], w = h.eq.weapon, a = h.eq.armor, feats = h.feats || [];
-  const am = mod(statValOf(h, c.atk));
-  const atkB = profB(h.lvl) + am + (w ? w.plus : 0) + (feats.includes('wmaster') ? 1 : 0);
-  const die = w ? w.die || 4 : 4;
-  const dmgB = am + (w ? w.plus : 0) + (feats.includes('wmaster') ? 2 : 0);
-  let ac = 10 + (a ? a.ac + a.plus : 0) + Math.min(mod(statValOf(h, 'dex')), 3) + Math.floor((temple || 0) / 2) + (feats.includes('ironskin') ? 1 : 0);
-  if (h.cls === 'barbarian') ac += Math.max(0, mod(statValOf(h, 'con')));
-  if (equipped(h).some(it => it.curse && it.curse.k === 'clumsy')) ac -= 2;
-  const scale = (1 + 0.2 * (h.lvl - 1)) * (CLASS_BAL[h.cls] || CLASS_BAL.warrior).d;
-  return { atkB, die, dmgB, ac, scale, avg: Math.max(1, ((die + 1) / 2 + dmgB) * scale) };
-}
-const sheet = () => sheetOf(S.hero, S.flock.temple);
-/* Типичное снаряжение и характеристики героя уровня L (для ботов арены/отряда и эталона монстров) */
-const typRar = L => L < 3 ? 0 : L < 7 ? 1 : L < 12 ? 2 : 3;
-function virtualHero(race, cls, lvl) {
-  const c = CLASSES[cls], st = genStats(cls, race), L = lvl, rar = typRar(L), plus = [0, L >= 5 ? 1 : 0, 1, 2, 3][rar];
-  for (let i = 2; i <= L; i++) { st[c.prim] = Math.min(20, st[c.prim] + 1); if (i % 2 === 0) st.con = Math.min(20, st.con + 1); }
-  for (let i = 4; i <= L; i += 4) st[c.prim] = Math.min(20, st[c.prim] + 1); // свойства предметов
-  const die = Math.max(c.wpn[1], L < 3 ? 6 : L < 8 ? 8 : L < 12 ? 10 : 11);
-  const ac = Math.max(c.arm[1], L < 2 ? 1 : L < 4 ? 3 : L < 6 ? 4 : L < 8 ? 5 : L < 12 ? 6 : 7);
-  return { race, cls, lvl, st, feats: [], eq: { weapon: { die, plus, props: [] }, armor: { ac, plus, props: [] }, amulet: null, ring: null } };
-}
 /* Скрытая проверка характеристики (d20 + модификатор + мастерство) */
 function check(s, dc, bonus) {
   const h = S.hero; let b = mod(statVal(s)) + (bonus || 0) + eqCount('luck') - (curseOn('hiccup') ? 2 : 0) + (S.buffs.luck > 0 ? 2 : 0);
@@ -1356,102 +1444,6 @@ function rollRarity(boost) {
   for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) return i; }
   return 0;
 }
-function itemValue(it, lvl) { return Math.round((5 + lvl * 4) * RARITY[it.rar].mul * (.8 + R() * .4)); }
-function makeItem(slot, lvl, rar) {
-  const fixedSlot = !!slot;
-  slot = slot || pick(['weapon', 'weapon', 'armor', 'armor', 'amulet', 'ring']);
-  if (rar === undefined) rar = rollRarity(0);
-  if (rar === 4 && R() < .5) {
-    const owned = equipped().concat(S.hero.inv).map(i => i.n);
-    const L = LEGENDARY.filter(x => !owned.includes(x.n) && (!fixedSlot || x.slot === slot));
-    if (L.length) { const t = pick(L); return { id: 'it' + Math.random().toString(36).slice(2, 9), slot: t.slot, base: t.n, n: t.n, rar: 4, plus: 3, die: t.die || 0, ac: t.ac || 0, props: t.props.map(p => Object.assign({}, p)), curse: null, v: Math.round((5 + lvl * 4) * 15), unique: 1 }; }
-  }
-  const bases = BASES[slot].filter(b => b[2] <= lvl + 1);
-  const base = pick(bases.length > 2 ? bases.slice(-4) : bases.length ? bases : BASES[slot]);
-  const it = { id: 'it' + Math.random().toString(36).slice(2, 9), slot, base: base[0], n: '', rar, plus: [0, rnd(0, 1), 1, 2, 3][rar],
-    die: slot === 'weapon' ? base[1] : 0, ac: slot === 'armor' ? base[1] : 0, props: [], curse: null, v: 0 };
-  let np = [0, 1, 1 + (R() < .5 ? 1 : 0), 2, 3][rar]; if ((slot === 'amulet' || slot === 'ring') && np < 1) np = 1;
-  const pool = Object.keys(PROP_DEF).filter(k => PROP_DEF[k].slots === 'all' || PROP_DEF[k].slots.split(' ').includes(slot));
-  while (it.props.length < np) {
-    const k = pick(pool); if (it.props.some(p => p.k === k)) continue;
-    it.props.push(STATS.includes(k) ? { k, v: rar >= 3 ? 2 : 1 } : { k });
-  }
-  if (rar >= 1 && R() < (S.hero.race === 'tiefling' ? .04 : .08)) { it.curse = { k: pick(Object.keys(CURSES)) }; it.plus = Math.min(5, it.plus + 1); }
-  it.n = it.base + (it.plus ? ` +${it.plus}` : '') + (it.props[0] ? ' ' + PROP_DEF[it.props[0].k].n : '');
-  it.v = itemValue(it, lvl);
-  return it;
-}
-function itemScore(it) {
-  if (!it) return -1;
-  const props = it.props.reduce((s, p) => s + (STATS.includes(p.k) ? (p.v || 1) : 1.5), 0);
-  if (it.slot === 'weapon') return (it.die + 1) / 2 + it.plus * 1.5 + props * 1.2;
-  if (it.slot === 'armor') return it.ac + it.plus + props * 1.2;
-  return props + it.plus * .5;
-}
-/* ---------- Сила снаряжения (ГС) ---------- */
-function itemGS(it) {
-  if (!it) return 0;
-  const base = it.slot === 'weapon' ? 4 + ((it.die || 4) - 4) * 1.5 : it.slot === 'armor' ? 4 + (it.ac || 0) * 2 : 2;
-  const pr = (it.props || []).reduce((s, p) => s + (STATS.includes(p.k) ? (p.v || 1) * 2 : 3), 0);
-  return Math.max(0, Math.round(base + (it.plus || 0) * 4 + (it.rar || 0) * 3 + pr + (it.curse ? 2 : 0)));
-}
-const gearScore = h => ['weapon', 'armor', 'amulet', 'ring'].reduce((s, sl) => s + itemGS(h.eq[sl]), 0);
-/* Типичный ГС героя уровня L — медиана по прогонам реальной прокачки (7 героев × 200 ч, v6), дальше медленный рост к потолку */
-const TYP_GS_T = [0, 20, 33, 62, 92, 120, 138, 150, 157, 162];
-function typGS(L) { L = clamp(Math.round(L) || 1, 1, MAX_LVL + 5); return L < TYP_GS_T.length ? TYP_GS_T[L] : Math.min(205, 162 + 4 * (L - 9)); }
-const recGS = (L, tier) => Math.round(typGS(L) * (DUN_TIERS[tier] || DUN_TIERS.normal).g);
-/* Кузнец: +1 к предмету за золото (до +5) */
-const smithCap = it => Math.min(5, (it.rar || 0) + 1 + (it.curse ? 1 : 0)); /* редкость решает, сколько выдержит металл; проклятое — на +1 больше */
-function smithCost(it) { return it ? Math.round((20 + 10 * S.hero.lvl) * Math.pow((it.plus || 0) + 1, 2) * priceMul()) : 0; }
-function smithOk(it) { return !!it && (it.plus || 0) < smithCap(it) && !it.unique; }
-function smithUpgrade(sl, auto) {
-  const h = S.hero, it = h.eq[sl];
-  if (!smithOk(it)) return auto ? false : toast(`Кузнец: «${it ? `больше +${smithCap(it)} этот металл не выдержит` : 'нечего точить'}». Редкие вещи держат больше.`);
-  if (!auto && (S.fight || S.dun || ['duel', 'dungeon', 'dead'].includes(h.state))) return toast('Герой сейчас занят — кузнец подождёт.');
-  const c = smithCost(it); if (h.gold < c) return auto ? false : toast(`Нужно ${c} 💰.`);
-  h.gold -= c; it.plus = (it.plus || 0) + 1;
-  it.n = it.n.replace(/ \+\d+/, '').replace(it.base, it.base + ` +${it.plus}`);
-  if (sl === 'armor' || sl === 'amulet' || sl === 'ring') recalcHp();
-  diary(auto ? `Заглянул к кузнецу: «${it.n}». Стучал молотком час, звенит до сих пор.` : `Бог послал меня к кузнецу. Теперь у меня «${it.n}»!`, 'loot', `−${c} 💰, ГС ${gearScore(h)}`);
-  return true;
-}
-function itemDesc(it) {
-  const p = [];
-  if (it.slot === 'weapon') p.push(`урон d${it.die}${it.plus ? '+' + it.plus : ''}`);
-  if (it.slot === 'armor') p.push(`КД +${it.ac + it.plus}`);
-  for (const pr of it.props) p.push(PROP_DEF[pr.k].d.replace('{v}', pr.v || 1));
-  if (it.curse) p.push(`☠ проклятие ${CURSES[it.curse.k].n}: ${CURSES[it.curse.k].d}`);
-  return p.join(', ');
-}
-const liftCost = it => 25 + it.rar * 15;
-function equip(it, silentNote) {
-  const h = S.hero, cur = h.eq[it.slot];
-  if (cur && cur.curse) { addItem(it); return false; }
-  if (cur && itemScore(it) <= itemScore(cur)) { addItem(it); return false; }
-  h.eq[it.slot] = it; if (cur) addItem(cur);
-  recalcHp();
-  if (it.curse) diary(`Надел «${it.n}». Ой. Кажется, оно проклято: ${CURSES[it.curse.k].d}. И не снимается!`, 'fight');
-  else if (!silentNote) diary(`Надел «${it.n}» (${RARITY[it.rar].n}). Чувствую себя модным.`, it.rar >= 2 ? 'rare' : 'loot');
-  return true;
-}
-function liftCurse(slot) {
-  const it = S.hero.eq[slot]; if (!it || !it.curse) return;
-  const c = liftCost(it); if (S.god.faith < c) return toast('Не хватает веры.');
-  S.god.faith -= c; const k = it.curse.k; it.curse = null; addTrust(3); addGxp(c / 3); shiftAlign(1); recalcHp();
-  diary(`✨ Бог снял с «${it.n}» проклятие ${CURSES[k].n}. Предмет перестал хихикать по ночам.`, 'god', '+3 доверия');
-}
-function randJunk() { const tier = Math.max(1, Math.round(S.hero.lvl / 2)); return { n: pick(ITEMS), v: rnd(3, 12) * tier }; }
-function addItem(it) { if (S.hero.inv.length >= 12) S.hero.inv.shift(); S.hero.inv.push(it || randJunk()); return S.hero.inv[S.hero.inv.length - 1]; }
-function lootDrop(boost, source) {
-  const it = makeItem(undefined, S.hero.lvl, rollRarity(boost));
-  const worn = equip(it, true);
-  const rareCls = it.rar >= 2 ? 'rare' : 'loot';
-  diary(`${source || 'Нашёл'}: «${it.n}» — ${RARITY[it.rar].n}${worn ? '. Сразу надел!' : '. Положил в рюкзак.'}`, rareCls, itemDesc(it));
-  if (worn && it.curse) diary(`Надел и пожалел: проклятие ${CURSES[it.curse.k].n}! ${CURSES[it.curse.k].d}.`, 'fight');
-  if (SILENT && it.rar >= 2) SILENT.c.items.push(it.n);
-  return it;
-}
-
 /* ---------- Опыт, уровни, черты ---------- */
 function gainXp(v) {
   const h = S.hero; if (h.lvl >= MAX_LVL) return;
@@ -1460,7 +1452,7 @@ function gainXp(v) {
   while (h.lvl < MAX_LVL && h.xp >= xpNext(h.lvl)) {
     h.xp -= xpNext(h.lvl); h.lvl++;
     const s = R() < .5 ? CLASSES[h.cls].prim : pick(STATS); h.st[s] = Math.min(20, h.st[s] + 1);
-    recalcHp(); h.hp = h.maxHp;
+    recalcHp(); h.hp = h.maxHp; tryEquipInv();
     diary(`🎉 Достиг ${h.lvl}-го уровня! ${STAT_RU[s]} +1, здоровья теперь ${h.maxHp}.`, 'level');
     if (SILENT) SILENT.c.lvls++;
     addGxp(15);
@@ -1597,7 +1589,7 @@ function heroAttack(sh, m, notes) {
     const roll = rnd(1, 20);
     if (roll === 20 || (roll !== 1 && roll + sh.atkB >= m.ac)) {
       d = Math.round((rnd(1, sh.die) + sh.dmgB) * sh.scale);
-      if (roll === 20 || (eqHas('crit', 'weapon') && R() < .15)) { d *= 2; notes.add('крит'); }
+      if (roll === 20 || (eqHas('crit') && R() < .15) || (sh.cat === 'axe' && R() < .05)) { d *= 2; notes.add('крит'); }
     }
   }
   if (d > 0 && !m.hit) {
@@ -1606,26 +1598,33 @@ function heroAttack(sh, m, notes) {
     if (hasFeat('brawler')) { d *= 2; notes.add('удар драчуна'); }
   }
   if (d > 0 && h.cls === 'barbarian' && h.hp < h.maxHp / 2) { d = Math.round(d * 1.5); notes.add('ярость'); }
-  if (d > 0 && (eqHas('fire', 'weapon') || (h.race === 'tiefling' && R() < .2))) { d += Math.round(rnd(1, 6) * sh.scale * .7); notes.add('огонь'); }
-  if (d > 0 && eqHas('vamp', 'weapon')) healHero(d * .15);
+  if (d > 0 && (eqHas('fire') || (h.race === 'tiefling' && R() < .2))) { d += Math.round(rnd(1, 6) * sh.scale * .7); notes.add('огонь'); }
+  if (d > 0 && eqHas('poison') && R() < .3) { d += Math.round(rnd(1, 4) * sh.scale * .6); notes.add('яд'); }
+  if (d > 0 && eqHas('ice') && R() < .15) { m.frozen = 1; notes.add('лёд'); }
+  if (d > 0 && eqHas('stun') && R() < .08) { m.frozen = 1; notes.add('оглушил'); }
+  if (d > 0 && (eqHas('pierce') || sh.cat === 'mace')) d = Math.round(d * 1.05);
+  if (d > 0 && eqHas('vamp')) healHero(d * .15);
   return Math.max(0, d);
 }
 function fightStep() {
-  const h = S.hero, m = h.monster, sh = sheet(), notes = new Set();
+  const h = S.hero, m = h.monster, sh = Object.assign(sheet(), roadFx(S.hero)), notes = new Set();
   let dealt = 0, taken = 0;
   for (let r = 0; r < 2 && m.hp > 0 && h.hp > 0; r++) {
     let d = heroAttack(sh, m, notes);
     if (h.cls === 'ranger' && R() < .3) { const d2 = heroAttack(sh, m, notes); if (d2) { d += d2; notes.add('меткий выстрел'); } }
+    if (sh.xatk && R() < sh.xatk) { const d2 = heroAttack(sh, m, notes); if (d2) { d += Math.round(d2 * .7); notes.add('добавочный удар'); } }
     m.hp -= d; dealt += d;
     if (m.hp <= 0) break;
     const mr = rnd(1, 20); let md = 0;
-    if (mr === 20 || (mr !== 1 && mr + m.atk - (hasFeat('swift') ? 1 : 0) >= sh.ac)) {
+    if (m.frozen) { m.frozen = 0; notes.add('враг пропустил удар'); }
+    else if (sh.blk && R() < sh.blk) notes.add('щит');
+    else if (mr === 20 || (mr !== 1 && mr + m.atk - (hasFeat('swift') ? 1 : 0) - sh.dodgeN >= sh.ac)) {
       md = Math.round((rnd(1, 6) + m.dmg) * ((CLASS_BAL[h.cls] || {}).r || 1) * (h.lvl <= 2 ? .7 : h.lvl <= 5 ? .85 : 1));
-      if (mr === 20) md += rnd(1, 6);
+      if (mr === 20 && !(sh.acrit && R() < sh.acrit)) md += rnd(1, 6);
       if (m.curse) md = Math.ceil(md / 2);
       if (S.buffs.shield > 0) md = Math.ceil(md / 2);
       if (hasFeat('ironskin')) md = Math.ceil(md * .9);
-      if (eqHas('thorns', 'armor')) m.hp -= Math.ceil(md * .3);
+      if (eqHas('thorns')) m.hp -= Math.ceil(md * .3);
     }
     h.hp -= md; taken += md;
     if (h.hp > 0 && !m.healed && h.hp < h.maxHp * .4 && (h.cls === 'warrior' || h.cls === 'cleric')) {
@@ -1688,11 +1687,13 @@ const sellMul = () => (1 + .04 * mod(statVal('cha'))) * (hasFeat('trader') ? 1.2
 function townStep() {
   const h = S.hero, L = h.lvl;
   if (h.townStep === 0) {
-    if (h.inv.length) {
-      let sum = 0; for (const i of h.inv) sum += i.v * (!i.slot && h.race === 'gnome' ? 1.2 : 1);
+    tryEquipInv();
+    const keep = h.inv.filter(i => keepInInv(h, i)).slice(-6), sell = h.inv.filter(i => !keep.includes(i));
+    if (sell.length) {
+      let sum = 0; for (const i of sell) sum += i.v * (!i.slot && h.race === 'gnome' ? 1.2 : 1);
       sum = Math.round(sum * sellMul());
-      const names = h.inv.slice(0, 3).map(i => i.n).join(', ') + (h.inv.length > 3 ? ' и прочее' : '');
-      h.gold += sum; h.inv = [];
+      const names = sell.slice(0, 3).map(i => i.n).join(', ') + (sell.length > 3 ? ' и прочее' : '') + (keep.length ? `; оставил ${keep.length} ${plural(keep.length, 'вещь', 'вещи', 'вещей')} на вырост` : '');
+      h.gold += sum; h.inv = keep;
       diary(`Пришёл в ${h.loc}. Продал добро (${names}).` + (S.buffs.trade > 0 ? ' Проклятые торговцы переплатили!' : ''), 'loot', `+${sum} 💰`);
     } else diary(`Пришёл в ${h.loc}. Продавать нечего, так что просто поглазел на витрины.`);
     if (curseOn('greed') && h.gold > 10) { const g = Math.ceil(h.gold * .05); h.gold -= g; diary(`Проклятие жадности заставило купить «${pick(ITEMS)}» за ${g} 💰. Зачем?!`, 'fight'); }
@@ -1706,12 +1707,8 @@ function townStep() {
     const price = Math.max(3, Math.round((10 + 4 * L) * priceMul())); let bought = 0;
     while (h.potions < 3 && h.gold > price * 2) { h.gold -= price; h.potions++; bought++; }
     if (bought) parts.push(`Купил ${bought} ${plural(bought, 'зелье', 'зелья', 'зелий')} у подозрительного алхимика.`);
-    { const sl = ['weapon', 'armor', 'amulet', 'ring'].filter(x => smithOk(h.eq[x])).sort((a, b) => smithCost(h.eq[a]) - smithCost(h.eq[b]))[0]; if (sl && h.gold >= smithCost(h.eq[sl]) * 4) smithUpgrade(sl, true); }
-    if (R() < .5) {
-      const it = makeItem(pick(['weapon', 'armor', 'amulet', 'ring']), L, R() < .25 ? 1 : 0); it.curse = null;
-      const cost = Math.round(it.v * 2.5 * priceMul()), cur = h.eq[it.slot];
-      if (h.gold >= cost * 1.2 && itemScore(it) > itemScore(cur) && !(cur && cur.curse)) { h.gold -= cost; equip(it, true); parts.push(`Купил «${it.n}» за ${cost} 💰.`); }
-    }
+    { const sl = EQ_KEYS.filter(x => smithOk(h.eq[x])).sort((a, b) => smithCost(h.eq[a]) - smithCost(h.eq[b]))[0]; if (sl && h.gold >= smithCost(h.eq[sl]) * 4) smithUpgrade(sl, true); }
+    { const it = shopPick(h, L); if (it) { const cost = Math.round(it.v * 2.5 * priceMul()); if (h.gold >= cost * 1.2 && bestPlace(h, it)) { h.gold -= cost; equip(it, true); parts.push(`Купил «${it.n}» за ${cost} 💰.`); } } }
     const rich = Math.round(250 * goldScale(L) * L);
     if (h.gold > rich) { const sp = Math.round((h.gold - rich * .5) * (.4 + R() * .3)); h.gold -= sp; parts.push(pick([`Закатил пир на весь ${h.loc} и потратил ${sp} 💰. Друзей стало много, денег — мало.`, `Проиграл в кости ${sp} 💰. Кости были гномьи, с подвохом.`, `Купил титул «Почётный герой квартала» за ${sp} 💰. Табличку повесили криво.`, `Вложил ${sp} 💰 в «гарантированно прибыльную» гильдию. Гильдия исчезла.`])); }
     diary(parts.length ? parts.join(' ') : 'Побродил по рынку. Всё дорого, всё блестит.', parts.length ? 'loot' : '');
@@ -1907,6 +1904,377 @@ function recruit(n) {
   S.god.faith -= c * n; S.flock.fol -= 2 * n; S.flock.army += n; shiftAlign(-1 * Math.ceil(n / 3)); addGxp(n * 3);
   diary(`⚔ ${n * 2} ${plural(n * 2, 'последователь сменил', 'последователя сменили', 'последователей сменили')} молитвенники на вилы. В божьей армии +${n}.`, 'god');
 }
+/* =====================================================================
+   СНАРЯЖЕНИЕ v7: слоты, требования, комплекты, авто-экипировка, ГС, кузнец
+   ===================================================================== */
+const newIid = () => 'it' + Math.random().toString(36).slice(2, 9);
+const isShield = it => !!it && it.slot === 'offhand';
+const lcFirst = s => s && s[0] !== '«' ? s[0].toLowerCase() + s.slice(1) : s;
+const equipped = h => { h = h || S.hero; const o = []; for (const k of EQ_KEYS) if (h.eq[k]) o.push(h.eq[k]); return o; };
+/* Комплекты: считаем разные надетые куски */
+function setCounts(h) { const c = {}, seen = {}; for (const it of equipped(h)) if (it.set && SETS[it.set] && !seen[it.set + it.base]) { seen[it.set + it.base] = 1; c[it.set] = (c[it.set] || 0) + 1; } return c; }
+function setBonusProps(h) { const out = [], c = setCounts(h); for (const id in c) { const B = SETS[id].b; for (const n in B) if (c[id] >= +n) for (const p of B[n]) out.push(p); } return out; }
+function allProps(h) { const o = []; for (const it of equipped(h)) for (const p of it.props) o.push(p); return o.concat(setBonusProps(h)); }
+const propCnt = (h, k) => { let n = 0; for (const p of allProps(h)) if (p.k === k) n++; return n; };
+const eqCount = k => S && S.hero ? propCnt(S.hero, k) : 0;
+const eqHas = k => eqCount(k) > 0;
+const curseOfH = (h, k) => equipped(h).some(it => it.curse && it.curse.k === k);
+const curseOn = k => !!(S && S.hero) && curseOfH(S.hero, k);
+function statValOf(h, s) {
+  let v = h.st[s];
+  for (const p of allProps(h)) if (p.k === s) v += p.v || 1;
+  if (s === 'cha' && curseOfH(h, 'chatty')) v -= 1;
+  if (s === 'str' && curseOfH(h, 'weak')) v -= 2; if (s === 'dex' && curseOfH(h, 'slowc')) v -= 2; if (s === 'int' && curseOfH(h, 'dull')) v -= 2;
+  if (h.inj) for (const j of h.inj) if (j.s === s && INJURIES[j.k]) v -= INJURIES[j.k].pen;
+  return clamp(v, 1, 30);
+}
+const statVal = s => statValOf(S.hero, s);
+function calcMaxHp(h) {
+  const c = CLASSES[h.cls], cm = mod(statValOf(h, 'con'));
+  let hp = 10 + 2 * (c.die + cm) + (h.lvl - 1) * 2 * Math.max(1, c.die / 2 + 1 + cm);
+  if (h.race === 'dwarf') hp += h.lvl;
+  if (h.feats && h.feats.includes('tough')) hp += 2 * h.lvl;
+  hp *= (CLASS_BAL[h.cls] || CLASS_BAL.warrior).h * (1 + .06 * propCnt(h, 'hp')) * (curseOfH(h, 'fragile') ? .9 : 1);
+  return Math.max(10, Math.round(hp));
+}
+function recalcHp() { const h = S.hero, old = h.maxHp; h.maxHp = calcMaxHp(h); if (h.state !== 'dead') h.hp = clamp(h.hp + (h.maxHp - old), 1, h.maxHp); }
+/* Особенности оружия и любимое оружие класса */
+function wTraits(h) { const w = h.eq.weapon, c = w && WCAT[w.cat]; return { cat: c ? w.cat : null, aff: !!(c && c.cls.includes(h.cls)) }; }
+const effAc = it => it ? (it.ac || 0) + (it.plus || 0) : 0;
+const secAc = h => effAc(h.eq.helm) + effAc(h.eq.belt) + effAc(h.eq.boots) + (isShield(h.eq.offhand) ? effAc(h.eq.offhand) : 0);
+const glovesHit = h => { const g = h.eq.gloves; return g ? (g.hit || 0) + Math.floor((g.plus || 0) / 2) : 0; };
+/* Боевой лист: работает и для героя игрока, и для виртуального героя соперника */
+function sheetOf(h, temple) {
+  const c = CLASSES[h.cls], w = h.eq.weapon, a = h.eq.armor, off = h.eq.offhand, feats = h.feats || [], wt = wTraits(h);
+  const am = mod(statValOf(h, c.atk));
+  const atkB = profB(h.lvl) + am + (w ? w.plus : 0) + (feats.includes('wmaster') ? 1 : 0) + glovesHit(h) + propCnt(h, 'acc') + (wt.cat === 'sword' ? 1 : 0) + (wt.aff ? 1 : 0);
+  const die = w ? w.die || 4 : 4;
+  const dmgB = am + (w ? w.plus : 0) + (feats.includes('wmaster') ? 2 : 0);
+  const offD = off && off.slot === 'weapon' ? .3 * ((off.die || 4) + 1) / 2 + .3 * (off.plus || 0) : 0;
+  const dm = (wt.cat === 'two' ? 1.1 : 1) * (wt.aff ? 1.08 : 1) * (wt.cat === 'staff' && (c.atk === 'int' || c.atk === 'wis') ? 1.12 : 1) * (curseOfH(h, 'pacifist') ? .9 : 1);
+  let ac = 10 + effAc(a) + Math.floor(secAc(h) / 4) + Math.min(mod(statValOf(h, 'dex')), 3) + Math.floor((temple || 0) / 2) + (feats.includes('ironskin') ? 1 : 0);
+  if (h.cls === 'barbarian') ac += Math.max(0, mod(statValOf(h, 'con')));
+  if (curseOfH(h, 'clumsy')) ac -= 2;
+  const scale = (1 + 0.2 * (h.lvl - 1)) * (CLASS_BAL[h.cls] || CLASS_BAL.warrior).d;
+  return { atkB, die, dmgB, ac, scale, avg: Math.max(1, ((die + 1) / 2 + dmgB + offD) * scale * dm), dm };
+}
+const sheet = () => sheetOf(S.hero, S.flock.temple);
+/* Броня по зонам (как в БК): шлем — голова, броня — грудь/живот, пояс — пояс, сапоги — ноги, щит — понемногу везде */
+const ZONE_BODY = { head: .2, chest: 1, belly: .85, waist: .4, legs: .25 };
+function zoneArmor(h, temple) {
+  const b = effAc(h.eq.armor), sh = isShield(h.eq.offhand) ? effAc(h.eq.offhand) * .3 : 0;
+  const base = Math.floor((temple || 0) / 2) + (h.feats && h.feats.includes('ironskin') ? 1 : 0) - (curseOfH(h, 'clumsy') ? 1 : 0), o = {};
+  for (const z of ZONES) o[z] = b * ZONE_BODY[z] + sh + base;
+  o.head += effAc(h.eq.helm); o.waist += effAc(h.eq.belt); o.legs += effAc(h.eq.boots);
+  for (const z of ZONES) o[z] = Math.max(0, Math.round(o[z] * 10) / 10);
+  return o;
+}
+/* Особые эффекты снаряжения в бою по зонам */
+function gearFx(h) {
+  const off = h.eq.offhand, wt = wTraits(h), pc = k => propCnt(h, k), sh = isShield(off);
+  return { blk: Math.min(.4, (sh ? (off.blk || 0) + .01 * (off.plus || 0) : 0) + .05 * pc('blockp')), xatk: (wt.cat === 'dagger' ? .12 : 0) + (off && off.slot === 'weapon' ? .25 : 0),
+    pierce: Math.min(.6, (wt.cat === 'mace' ? .25 : 0) + (pc('pierce') ? .33 : 0)), dodge: Math.min(.16, .04 * pc('dodge')), acrit: Math.min(.8, .4 * pc('acrit')),
+    crit: .06 * pc('crit') + (wt.cat === 'axe' ? .05 : 0) + (wt.cat === 'music' ? .04 : 0) + .01 * glovesHit(h), aim: wt.cat === 'bow' ? .12 : 0, sh: sh ? 1 : 0 };
+}
+function blkFor(cls, h) { const st = STYLE[cls]; return Math.min(3, st.blk - (st.shield ? 1 : 0) + (isShield(h.eq.offhand) ? 1 : 0)); }
+/* Типичное снаряжение и характеристики героя уровня L (для ботов арены/отряда и эталона монстров) */
+const typRar = L => L < 3 ? 0 : L < 7 ? 1 : L < 12 ? 2 : 3;
+const CLS_WCAT = { warrior: 'sword', mage: 'staff', rogue: 'dagger', cleric: 'mace', bard: 'music', ranger: 'bow', barbarian: 'two' };
+function virtualHero(race, cls, lvl) {
+  const c = CLASSES[cls], st = genStats(cls, race), L = lvl, rar = typRar(L), plus = [0, L >= 5 ? 1 : 0, 1, 2, 3][rar];
+  for (let i = 2; i <= L; i++) { st[c.prim] = Math.min(20, st[c.prim] + 1); if (i % 2 === 0) st.con = Math.min(20, st.con + 1); }
+  for (let i = 4; i <= L; i += 4) st[c.prim] = Math.min(20, st[c.prim] + 1); // свойства предметов
+  const die = Math.max(c.wpn[1], L < 3 ? 6 : L < 8 ? 8 : L < 12 ? 10 : 11);
+  const ac = Math.max(c.arm[1], L < 2 ? 1 : L < 4 ? 3 : L < 6 ? 4 : L < 8 ? 5 : L < 12 ? 6 : 7);
+  const sec = L < 3 ? 1 : L < 7 ? 2 : L < 11 ? 3 : 4, sp = Math.max(0, plus - 1), cat = CLS_WCAT[cls];
+  const P = (slot, o) => Object.assign({ slot, plus: sp, props: [], rar }, o);
+  return { race, cls, lvl, st, feats: [], eq: { weapon: P('weapon', { cat, h2: !!WCAT[cat].h2, die, plus, props: [rar >= 1 && { k: 'crit' }, rar >= 2 && { k: c.prim, v: 1 }, rar >= 3 && { k: 'vamp' }].filter(Boolean) }), armor: P('armor', { ac, plus, props: [rar >= 2 && { k: 'hp' }, rar >= 3 && { k: 'con', v: 1 }].filter(Boolean) }),
+    helm: P('helm', { ac: sec }), belt: P('belt', { ac: Math.max(1, sec - 1) }), boots: P('boots', { ac: sec }), gloves: P('gloves', { hit: L < 6 ? 0 : L < 11 ? 1 : 2 }),
+    offhand: STYLE[cls].shield ? P('offhand', { ac: L < 6 ? 1 : 2, blk: .1 + .005 * L }) : cls === 'rogue' ? P('weapon', { cat: 'dagger', die: Math.max(4, Math.min(8, die - 2)) }) : null,
+    amulet: L >= 4 ? P('amulet', { props: [{ k: 'hp' }] }) : null, ring: L >= 6 ? P('ring', { props: [{ k: c.prim, v: 1 }] }) : null, ring2: L >= 10 ? P('ring', { props: [{ k: 'con', v: 1 }] }) : null } };
+}
+/* ---------- Требования ---------- */
+const reqStatVal = (h, s) => Math.max(...s.split('/').map(k => statValOf(h, k)));
+function reqOk(h, it) { const r = it && it.req; if (!r) return true; if (h.lvl < (r.lvl || 1)) return false; return !(r.s && r.v && reqStatVal(h, r.s) < r.v); }
+function reqHtml(h, it) {
+  const r = it.req; if (!r || ((r.lvl || 1) <= 1 && !r.v)) return '';
+  const p = []; if ((r.lvl || 1) > 1) p.push(`<span class="${h.lvl < r.lvl ? 'rqb' : ''}">ур. ${r.lvl}</span>`);
+  if (r.s && r.v) p.push(`<span class="${reqStatVal(h, r.s) < r.v ? 'rqb' : ''}">${r.s.split('/').map(k => STAT_SHORT[k]).join(' или ')} ${r.v}</span>`);
+  return `Требуется: ${p.join(', ')}`;
+}
+function mkReq(slot, lv, rar, st) {
+  const lvl = Math.max(1, lv - 1 + (rar >= 3 ? 1 : 0));
+  if (!st || lv <= 1) return { lvl };
+  const off = slot === 'weapon' ? 0 : slot === 'armor' || slot === 'offhand' ? -1 : -2;
+  return { lvl, s: st, v: clamp(9 + Math.round(lv * .6) + off + (rar >= 3 ? 1 : 0), 10, 18) };
+}
+/* ---------- Создание предметов ---------- */
+function rollRarity(boost) {
+  boost = boost || 0;
+  const w = [60, 26, 10, 3.5, .5].map((x, i) => i ? x * (1 + boost * i * .6) : Math.max(5, x - boost * 25));
+  let r = R() * w.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) return i; }
+  return 0;
+}
+function itemValue(it, lvl) { return Math.round((5 + lvl * 4) * RARITY[it.rar].mul * (.8 + R() * .4) * (it.set ? 1.5 : 1)); }
+const SLOT_W = [['weapon', 2], ['armor', 1.6], ['helm', 1.1], ['boots', 1.1], ['belt', .9], ['gloves', .9], ['offhand', .8], ['amulet', .7], ['ring', 1.1]];
+function pickSlot() { let r = R() * SLOT_W.reduce((s, x) => s + x[1], 0); for (const [k, w] of SLOT_W) { r -= w; if (r <= 0) return k; } return 'weapon'; }
+const CLS_KIND = { mage: 'c', rogue: 'l', bard: 'l', ranger: 'l', warrior: 'h', cleric: 'h', barbarian: 'h' };
+const baseLvl = (slot, b) => slot === 'weapon' || slot === 'offhand' ? b[3] : slot === 'amulet' || slot === 'ring' ? b[1] : b[2];
+function fromBase(slot, b, rar) {
+  const it = { id: newIid(), slot, base: b[0], n: '', rar, plus: [0, rnd(0, 1), 1, 2, 3][rar], die: 0, ac: 0, props: [], curse: null, v: 0, blvl: baseLvl(slot, b) };
+  if (slot === 'weapon') { it.cat = b[1]; it.die = b[2]; if (WCAT[b[1]].h2) it.h2 = 1; }
+  else if (slot === 'offhand') { it.ac = b[1]; it.blk = b[2]; it.kind = b[4]; }
+  else if (slot === 'gloves') { it.hit = b[1]; it.kind = b[3]; }
+  else if (slot !== 'amulet' && slot !== 'ring') { it.ac = b[1]; it.kind = b[3]; }
+  return it;
+}
+const reqStatFor = it => it.slot === 'weapon' ? WCAT[it.cat].st : it.kind && it.kind !== 'c' ? ARM_KIND[it.kind].st : it.kind === 'c' && it.slot === 'armor' ? ARM_KIND.c.st : null;
+function addProps(it, n) {
+  const pool = Object.keys(PROP_DEF).filter(k => PROP_DEF[k].slots === 'all' || PROP_DEF[k].slots.split(' ').includes(it.slot));
+  let guard = 0; while (it.props.length < n && guard++ < 50) { const k = pick(pool); if (it.props.some(p => p.k === k)) continue; it.props.push(STATS.includes(k) ? { k, v: it.rar >= 3 ? 2 : 1 } : { k }); }
+}
+function nameOf(it) {
+  if (it.unique) return it.base;
+  return (it.pre ? it.pre + lcFirst(it.base) : it.base) + (it.plus ? ` +${it.plus}` : '') + (it.props[0] && !it.set ? ' ' + PROP_DEF[it.props[0].k].n : '') + (it.suf ? ' ' + it.suf : '');
+}
+function makeItem(slot, lvl, rar, o) {
+  o = o || {}; lvl = Math.max(1, Math.round(lvl || 1));
+  const fixedSlot = !!slot; slot = slot || pickSlot();
+  if (rar === undefined) rar = rollRarity(0);
+  if (o.set && SETS[o.set]) return makeSetItem(o.set, lvl, rar);
+  if (rar === 4 && R() < .5) {
+    const owned = S && S.hero ? equipped().concat(S.hero.inv).map(i => i.n) : [];
+    const L = LEGENDARY.filter(x => !owned.includes(x.n) && x.lv <= lvl + 2 && (!fixedSlot || x.slot === slot));
+    if (L.length) return makeLegend(pick(L), lvl);
+  }
+  const H = S && S.hero, pool = BASES[slot];
+  let bases = pool.filter(b => baseLvl(slot, b) <= lvl + 1 && baseLvl(slot, b) >= lvl - 5);
+  if (!bases.length) bases = pool.filter(b => baseLvl(slot, b) <= lvl + 1); if (!bases.length) bases = pool;
+  if (H && R() < .5) { const f = slot === 'weapon' ? bases.filter(b => WCAT[b[1]].cls.includes(H.cls)) : bases.filter(b => b[b.length - 1] === CLS_KIND[H.cls]); if (f.length) bases = f; }
+  const it = fromBase(slot, pick(bases), rar);
+  let np = [0, 1, 1 + (R() < .5 ? 1 : 0), 2, 3][rar]; if ((slot === 'amulet' || slot === 'ring') && np < 1) np = 1;
+  addProps(it, np);
+  if (rar >= 1 && R() < (H && H.race === 'tiefling' ? .04 : .08)) { it.curse = { k: pick(Object.keys(CURSES)) }; it.plus = Math.min(5, it.plus + 1); }
+  if (rar >= 2 && R() < .35) it.pre = pick(NAME_PRE); if (rar >= 1 && R() < .25) it.suf = pick(NAME_SUF);
+  it.req = mkReq(slot, it.blvl, rar, reqStatFor(it));
+  it.n = nameOf(it); it.v = itemValue(it, lvl);
+  return it;
+}
+function makeLegend(t, lvl) {
+  const it = { id: newIid(), slot: t.slot, base: t.n, n: t.n, rar: 4, plus: 3, die: t.die || 0, ac: t.ac || 0, props: t.props.map(p => Object.assign({}, p)), curse: null, unique: 1, fl: t.fl, blvl: t.lv };
+  if (t.cat) { it.cat = t.cat; if (WCAT[t.cat].h2) it.h2 = 1; } if (t.kind) it.kind = t.kind; if (t.hit) it.hit = t.hit; if (t.blk) it.blk = t.blk;
+  it.req = mkReq(t.slot, t.lv, 4, reqStatFor(it)); it.v = Math.round((5 + Math.max(lvl, t.lv) * 4) * 15);
+  return it;
+}
+/* Комплект, подходящий уровню (предпочтение — тот, что уже начат) */
+function setFor(lvl, h) {
+  const ok = Object.keys(SETS).filter(id => SETS[id].lv[0] <= lvl + 1 && SETS[id].lv[1] >= lvl - 1);
+  if (!ok.length) return null;
+  if (h) { const own = ok.filter(id => equipped(h).concat(h.inv).some(i => i.set === id)); if (own.length && R() < .65) return pick(own); }
+  return pick(ok);
+}
+function makeSetItem(id, lvl, rar) {
+  const S0 = SETS[id], h = S && S.hero, have = h ? equipped(h).concat(h.inv).filter(i => i.set === id).map(i => i.base) : [];
+  const missing = S0.pcs.filter(p => !have.includes(p[1])), pc = pick(missing.length && R() < .8 ? missing : S0.pcs);
+  const slot = pc[0], sl = clamp(lvl, S0.lv[0], S0.lv[1]); rar = Math.max(2, Math.min(3, rar));
+  const pool = BASES[slot].filter(b => baseLvl(slot, b) <= sl && (slot === 'weapon' ? b[1] === pc[2] : slot === 'amulet' || slot === 'ring' || b[b.length - 1] === pc[2]));
+  const b = (pool.length ? pool : BASES[slot].filter(x => baseLvl(slot, x) <= sl).concat([BASES[slot][0]])).slice(-1)[0];
+  const it = fromBase(slot, b, rar); it.base = pc[1]; it.set = id; it.blvl = sl;
+  if (slot === 'weapon') { it.cat = pc[2]; if (WCAT[pc[2]].h2) it.h2 = 1; else delete it.h2; } else if (pc[2]) it.kind = pc[2];
+  addProps(it, rar >= 3 ? 2 : 1);
+  it.req = mkReq(slot, sl, rar, reqStatFor(it)); it.n = nameOf(it); it.v = itemValue(it, sl);
+  return it;
+}
+/* ---------- Оценка вещей для авто-экипировки ---------- */
+function itemScore(it, h) {
+  if (!it) return 0; h = h || S.hero; const c = CLASSES[h.cls];
+  let s = 0;
+  for (const p of it.props) s += STATS.includes(p.k) ? (p.v || 1) * (p.k === c.prim ? 1.6 : p.k === 'con' ? 1.1 : .5) * 1.2 : 1.8;
+  const sl = it.slot, pl = it.plus || 0;
+  if (sl === 'weapon') { const off = h.eq.offhand === it; s += off ? ((it.die || 4) + 1) / 2 * .4 + pl * .5 : ((it.die || 4) + 1) / 2 + pl * 1.5 + (WCAT[it.cat] && WCAT[it.cat].cls.includes(h.cls) ? 1.5 : 0) + (it.cat === 'two' ? .6 : 0); }
+  else if (sl === 'armor') s += effAc(it);
+  else if (sl === 'offhand') s += effAc(it) * .5 + (it.blk || 0) * 22;
+  else if (sl === 'gloves') s += (it.hit || 0) + pl * .5;
+  else if (sl === 'helm' || sl === 'belt' || sl === 'boots') s += effAc(it) * .7;
+  else s += pl * .5;
+  if (it.curse) s -= 1.5;
+  return s;
+}
+function loadoutScore(h, eq) {
+  const hh = { cls: h.cls, eq }, c = CLASSES[h.cls]; let s = 0;
+  for (const k of EQ_KEYS) if (eq[k]) s += itemScore(eq[k], hh);
+  for (const p of setBonusProps(hh)) s += STATS.includes(p.k) ? (p.v || 1) * (p.k === c.prim ? 1.6 : .6) * 1.2 : 1.8;
+  return s;
+}
+function fitsKey(h, k, it) {
+  if (!it || !it.slot) return false;
+  if (k === 'ring2') return it.slot === 'ring';
+  if (k === 'offhand') return it.slot === 'offhand' || (h.cls === 'rogue' && it.slot === 'weapon' && it.cat === 'dagger');
+  return it.slot === k;
+}
+function placeOptions(h, it) {
+  const out = [];
+  for (const k of EQ_KEYS) {
+    if (!fitsKey(h, k, it)) continue;
+    const cur = h.eq[k]; if (cur && cur.curse) continue;
+    const eq = Object.assign({}, h.eq); eq[k] = it; const gone = cur ? [cur] : [];
+    for (const kk of EQ_KEYS) if (kk !== k && eq[kk] === it) eq[kk] = null;
+    if (k === 'weapon' && it.h2 && eq.offhand) { if (eq.offhand.curse) continue; gone.push(eq.offhand); eq.offhand = null; }
+    if (k === 'offhand' && eq.weapon && eq.weapon.h2) continue;
+    out.push({ k, eq, gone });
+  }
+  return out;
+}
+function bestPlace(h, it, force, noReq) {
+  if (!noReq && !reqOk(h, it)) return null;
+  const base = loadoutScore(h, h.eq); let best = null;
+  for (const o of placeOptions(h, it)) { o.sc = loadoutScore(h, o.eq) - base; if ((force || o.sc > .01) && (!best || o.sc > best.sc)) best = o; }
+  return best;
+}
+function applyPlace(h, it, b) {
+  for (const k of EQ_KEYS) h.eq[k] = b.eq[k] || null;
+  const i = h.inv.indexOf(it); if (i >= 0) h.inv.splice(i, 1);
+  for (const g of b.gone) if (g !== it) addItem(g);
+}
+function equip(it, silentNote, force) {
+  const h = S.hero, b = bestPlace(h, it, force);
+  if (!b) { if (!h.inv.includes(it)) addItem(it); return false; }
+  applyPlace(h, it, b); recalcHp();
+  if (it.curse) diary(`Надел «${it.n}». Ой. Кажется, оно проклято: ${CURSES[it.curse.k].d}. И не снимается!`, 'fight');
+  else if (!silentNote) diary(`Надел «${it.n}» (${RARITY[it.rar].n}). Чувствую себя модным.`, it.rar >= 2 ? 'rare' : 'loot');
+  if (it.set) { const n = setCounts(h)[it.set] || 0; if (SETS[it.set].b[n]) diary(`🧩 Комплект «${SETS[it.set].n}»: надето ${n} из ${SETS[it.set].pcs.length} — заработал бонус!`, 'rare', setBonusText(it.set, n)); }
+  return true;
+}
+/* Ручная экипировка из рюкзака (по совету бога) */
+function equipInv(id) {
+  const h = S.hero, it = h.inv.find(i => i.id === id); if (!it || !it.slot) return false;
+  if (!reqOk(h, it)) { toast('Герой не может это надеть: ' + reqHtml(h, it).replace(/<[^>]+>/g, '')); return false; }
+  const b = bestPlace(h, it, true); if (!b) { toast('Слот занят проклятой вещью или нужен одноручный хват.'); return false; }
+  applyPlace(h, it, b); recalcHp(); addTrust(.5);
+  diary(`Бог посоветовал надеть «${it.n}». Ну раз бог говорит…`, it.rar >= 2 ? 'rare' : 'loot', `ГС ${gearScore(h)}`);
+  return true;
+}
+/* После роста уровня или в городе: надеть то, что раньше было не по силам */
+function tryEquipInv() {
+  const h = S.hero; let n = 0;
+  for (const it of h.inv.slice()) if (it.slot && reqOk(h, it) && bestPlace(h, it)) { if (equip(it, true)) { n++; diary(`Достал из рюкзака «${it.n}» — наконец-то по силам!`, it.rar >= 2 ? 'rare' : 'loot'); } }
+  if (trySetCombo(h)) n++;
+  return n;
+}
+/* Комплект целиком: надеть сразу несколько кусков из рюкзака, если вместе с бонусом это лучше */
+function trySetCombo(h) {
+  const ids = [...new Set(h.inv.filter(i => i.set && reqOk(h, i)).map(i => i.set))];
+  for (const id of ids) {
+    const pcs = h.inv.filter(i => i.set === id && reqOk(h, i)); if (!pcs.length) continue;
+    let eq = Object.assign({}, h.eq); const gone = [], used = [];
+    for (const it of pcs) { const o = placeOptions({ cls: h.cls, eq }, it).filter(x => !(x.eq[x.k] === it && used.some(u => u.k === x.k)))[0]; if (!o) continue; eq = o.eq; gone.push(...o.gone); used.push({ it, k: o.k }); }
+    if (used.length && loadoutScore(h, eq) > loadoutScore(h, h.eq) + .01) {
+      for (const k of EQ_KEYS) h.eq[k] = eq[k] || null;
+      for (const u of used) { const i = h.inv.indexOf(u.it); if (i >= 0) h.inv.splice(i, 1); }
+      for (const g of gone) if (!used.some(u => u.it === g) && !equipped(h).includes(g)) addItem(g);
+      recalcHp(); const n = setCounts(h)[id] || 0;
+      diary(`🧩 Собрал комплект «${SETS[id].n}» (${n} из ${SETS[id].pcs.length}): ${used.map(u => '«' + u.it.n + '»').join(', ')}.`, 'rare', setBonusText(id, Object.keys(SETS[id].b).filter(x => n >= +x).pop() || 2));
+      return true;
+    }
+  }
+  return false;
+}
+const keepInInv = (h, it) => !!it.slot && (!!it.set || (!reqOk(h, it) && !!bestPlace(h, it, false, true)));
+/* ---------- Сила снаряжения (ГС) ---------- */
+function itemGS(it) {
+  if (!it) return 0;
+  const sl = it.slot;
+  const base = sl === 'weapon' ? 4 + ((it.die || 4) - 4) * 1.5 + (it.h2 ? 8 : 0) : sl === 'armor' ? 4 + (it.ac || 0) * 2 : sl === 'offhand' ? 3 + (it.ac || 0) * 2 + Math.round((it.blk || 0) * 30)
+    : sl === 'gloves' ? 3 + (it.hit || 0) * 3 : sl === 'helm' || sl === 'belt' || sl === 'boots' ? 3 + (it.ac || 0) * 2 : 2;
+  const pr = (it.props || []).reduce((s, p) => s + (STATS.includes(p.k) ? (p.v || 1) * 2 : 3), 0);
+  return Math.max(0, Math.round(base + (it.plus || 0) * 4 + (it.rar || 0) * 3 + pr + (it.curse ? 2 : 0) + (it.set ? 3 : 0)));
+}
+const gearScore = h => EQ_KEYS.reduce((s, k) => s + itemGS(h.eq[k]), 0) + 3 * setBonusProps(h).length;
+/* Типичный ГС героя уровня L — медиана прогонов реальной прокачки (pace, v7), дальше медленный рост к потолку */
+const TYP_GS_T = [0, 40, 60, 125, 180, 235, 285, 325, 345, 355]; // по прогонам pace7 (21×200 ч, v7)
+function typGS(L) { L = clamp(Math.round(L) || 1, 1, MAX_LVL + 5); return L < TYP_GS_T.length ? TYP_GS_T[L] : Math.min(470, TYP_GS_T[9] + 8 * (L - 9)); }
+const recGS = (L, tier) => Math.round(typGS(L) * (DUN_TIERS[tier] || DUN_TIERS.normal).g);
+/* ---------- Кузнец: +1 к предмету за золото ---------- */
+const smithCap = it => Math.min(5, (it.rar || 0) + 1 + (it.curse ? 1 : 0)); /* редкость решает, сколько выдержит металл; проклятое — на +1 больше */
+function smithCost(it) { return it ? Math.round((20 + 10 * S.hero.lvl) * Math.pow((it.plus || 0) + 1, 2) * priceMul() * (it.slot === 'weapon' || it.slot === 'armor' ? 1 : .6)) : 0; }
+function smithOk(it) { return !!it && (it.plus || 0) < smithCap(it) && !it.unique; }
+function smithUpgrade(sl, auto) {
+  const h = S.hero, it = h.eq[sl];
+  if (!smithOk(it)) return auto ? false : toast(`Кузнец: «${it ? `больше +${smithCap(it)} этот металл не выдержит` : 'нечего точить'}». Редкие вещи держат больше.`);
+  if (!auto && (S.fight || S.dun || ['duel', 'dungeon', 'dead'].includes(h.state))) return toast('Герой сейчас занят — кузнец подождёт.');
+  const c = smithCost(it); if (h.gold < c) return auto ? false : toast(`Нужно ${c} 💰.`);
+  h.gold -= c; it.plus = (it.plus || 0) + 1; it.n = nameOf(it);
+  if (sl !== 'weapon') recalcHp();
+  diary(auto ? `Заглянул к кузнецу: «${it.n}». Стучал молотком час, звенит до сих пор.` : `Бог послал меня к кузнецу. Теперь у меня «${it.n}»!`, 'loot', `−${c} 💰, ГС ${gearScore(h)}`);
+  return true;
+}
+/* ---------- Описания ---------- */
+function itemStats(it) {
+  const p = [], pl = it.plus || 0;
+  if (it.slot === 'weapon') { const c = WCAT[it.cat]; p.push(`${c ? c.n : 'оружие'}${it.h2 ? ', двуручное' : ''}, урон d${it.die}${pl ? '+' + pl : ''}`); }
+  else if (it.slot === 'offhand') p.push(`щит: КД +${effAc(it)}, блок ${Math.round(((it.blk || 0) + .01 * pl) * 100)}%`);
+  else if (it.slot === 'gloves') p.push(`точность +${(it.hit || 0) + Math.floor(pl / 2)}`);
+  else if (it.slot !== 'amulet' && it.slot !== 'ring') p.push(`КД +${effAc(it)}${it.kind ? ` (${ARM_KIND[it.kind].n})` : ''}`);
+  else if (pl) p.push(`+${pl}`);
+  return p;
+}
+const propText = p => PROP_DEF[p.k].d.replace('{v}', p.v || 1);
+function itemDesc(it) {
+  const p = itemStats(it);
+  for (const pr of it.props) p.push(propText(pr));
+  if (it.curse) p.push(`☠ проклятие ${CURSES[it.curse.k].n}: ${CURSES[it.curse.k].d}`);
+  if (it.set) p.push(`🧩 комплект «${SETS[it.set].n}»`);
+  return p.join(', ');
+}
+const setBonusText = (id, n) => (SETS[id].b[n] || []).map(propText).join(', ');
+const liftCost = it => 25 + it.rar * 15;
+function liftCurse(slot) {
+  const it = S.hero.eq[slot]; if (!it || !it.curse) return;
+  const c = liftCost(it); if (S.god.faith < c) return toast('Не хватает веры.');
+  S.god.faith -= c; const k = it.curse.k; it.curse = null; addTrust(3); addGxp(c / 3); shiftAlign(1); recalcHp();
+  diary(`✨ Бог снял с «${it.n}» проклятие ${CURSES[k].n}. Предмет перестал хихикать по ночам.`, 'god', '+3 доверия');
+}
+const INV_MAX = 16;
+function randJunk() { const tier = Math.max(1, Math.round(S.hero.lvl / 2)); return { n: pick(ITEMS), v: rnd(3, 12) * tier }; }
+function addItem(it) {
+  const inv = S.hero.inv;
+  if (inv.length >= INV_MAX) { let i = inv.findIndex(x => !x.slot); if (i < 0) i = inv.findIndex(x => !x.set); inv.splice(Math.max(0, i), 1); }
+  inv.push(it || randJunk()); return inv[inv.length - 1];
+}
+function lootDrop(boost, source, o) {
+  const h = S.hero; o = o || {};
+  if (!o.set && R() < (o.setP || .015)) { const id = setFor(h.lvl, h); if (id) o.set = id; }
+  const it = makeItem(undefined, h.lvl, rollRarity(boost), o);
+  const worn = equip(it, true);
+  const rareCls = it.rar >= 2 || it.set ? 'rare' : 'loot';
+  diary(`${source || 'Нашёл'}: «${it.n}» — ${RARITY[it.rar].n}${it.set ? ' (комплект!)' : ''}${worn ? '. Сразу надел!' : !reqOk(h, it) ? '. Пока не по силам — в рюкзак.' : '. Положил в рюкзак.'}`, rareCls, itemDesc(it));
+  if (worn && it.curse) diary(`Надел и пожалел: проклятие ${CURSES[it.curse.k].n}! ${CURSES[it.curse.k].d}.`, 'fight');
+  if (SILENT && (it.rar >= 2 || it.set)) SILENT.c.items.push(it.n);
+  return it;
+}
+/* Предметы из сохранений v6 и старше → структура v7 */
+const BASE_IDX = {}; for (const sl in BASES) for (const b of BASES[sl]) BASE_IDX[sl + ':' + b[0]] = b;
+function upgradeItem(it) {
+  if (it.slot === 'weapon' && !WCAT[it.cat]) { const b = BASE_IDX['weapon:' + it.base]; const L = LEGENDARY.find(x => x.n === it.base); it.cat = b ? b[1] : L && L.cat ? L.cat : /лук|рогат|арбал/i.test(it.base) ? 'bow' : /посох|жезл/i.test(it.base) ? 'staff' : /кинжал|нож|стилет/i.test(it.base) ? 'dagger' : /топор|секир/i.test(it.base) ? 'axe' : /лютн|балалай/i.test(it.base) ? 'music' : /двуруч|алебард|скалк/i.test(it.base) ? 'two' : 'sword'; if (WCAT[it.cat].h2) it.h2 = 1; }
+  if (it.slot === 'armor' && !ARM_KIND[it.kind]) { const b = BASE_IDX['armor:' + it.base]; it.kind = b ? b[3] : 'l'; }
+  if (it.unique && !it.fl) { const L = LEGENDARY.find(x => x.n === it.base); if (L) it.fl = L.fl; }
+  if (!it.req) it.req = { lvl: 1 };
+  return it;
+}
+/* Эффекты снаряжения в бою на дороге */
+function roadFx(h) { const g = gearFx(h); return { cat: wTraits(h).cat, xatk: g.xatk, blk: g.blk * .8, dodgeN: propCnt(h, 'dodge'), acrit: g.acrit }; }
+/* Лавка в городе: вещи по уровню героя, сначала в пустые слоты */
+function shopPick(h, L) {
+  if (R() > .6) return null;
+  const empty = EQ_KEYS.filter(k => !h.eq[k] && !(k === 'offhand' && h.eq.weapon && h.eq.weapon.h2));
+  for (let i = 0; i < 3; i++) {
+    const k = empty.length && R() < .7 ? pick(empty) : pick(EQ_KEYS), slot = k === 'ring2' ? 'ring' : k === 'offhand' && h.cls === 'rogue' ? 'weapon' : k;
+    const it = makeItem(slot, L, R() < .05 ? 2 : R() < .3 ? 1 : 0); it.curse = null; it.n = nameOf(it);
+    if (reqOk(h, it) && bestPlace(h, it)) return it;
+  }
+  return null;
+}
 
 /* =====================================================================
    6) ОБЩЕЕ ДЛЯ БОЁВ (старая дуэль заменена боем по зонам — см. раздел 12)
@@ -2087,6 +2455,7 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV7) { delete S._migratedV7; diary(`🧥 Обновление мира: у героя теперь 10 слотов — шлем, перчатки, сапоги, пояс, щит и второе кольцо. Новые слоты пока пусты; у вещей появились требования, 9 комплектов и 15 легендарок. Старое снаряжение на месте.`, 'rare'); }
   if (S._migratedV6) { delete S._migratedV6; diary(`⚒ Обновление мира: у снаряжения появилась сила — ⚔ ГС (сейчас ${gearScore(S.hero)}). Подземелья теперь трёх сложностей с рекомендуемым ГС: недобор — монстры злее, перебор — легче. Огонь, вампиризм, шипы и серебро работают в бою, у боссов есть слабости. Кузнец в городе точит вещи за золото.`, 'level'); }
   if (S._migratedV5) { delete S._migratedV5; diary('✨ Обновление мира: пещеры стали опаснее (элитные логова, один источник, боссы бьют по объявленной зоне — блокируйте её!), зато добыча богаче. Интерфейс стал спокойнее: подробности героя — по кнопке «📋 Герой».', 'level'); }
   if (S._migratedV4) { delete S._migratedV4; diary('✨ В мир пришла Арена! Теперь бои идут по зонам (голова, грудь, живот, пояс, ноги), а в пещерах есть карта, ключи и боссы. Заглядывайте во вкладку «Арена» и в чат.', 'level'); }
@@ -2198,16 +2567,16 @@ function armorOf(h, temple) { const a = h.eq.armor; return (a ? a.ac + a.plus : 
 function heroUnit() {
   const h = S.hero, sh = sheet(), st = STYLE[h.cls];
   return { id: 'me', name: h.name, team: 0, kind: 'hero', isMe: true, race: h.race, cls: h.cls, lvl: h.lvl, hp: Math.max(1, h.hp), max: h.maxHp,
-    avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
-    atkN: st.atk, blkN: st.blk, habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
+    avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), za: zoneArmor(h, S.flock.temple), gx: gearFx(h), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
+    atkN: st.atk, blkN: blkFor(h.cls, h), habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
 }
 /* Боевые свойства снаряжения, которые видны в бою по зонам */
-function gearProps(h) { const o = []; for (const sl of ['weapon', 'armor']) { const it = h.eq[sl]; if (it) for (const p of it.props || []) if (PROP_IC[p.k] && !o.includes(p.k)) o.push(p.k); } return o; }
+function gearProps(h) { const o = []; for (const p of allProps(h)) if (PROP_IC[p.k] && !o.includes(p.k)) o.push(p.k); return o; }
 function botUnit(b) {
   const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], gk = clamp(b.gk || 1, .5, 2), max = Math.round(calcMaxHp(vh) * gk);
   return { id: newFid(), name: b.name, team: 1, kind: 'bot', race: b.race, cls: b.cls, lvl: b.lvl, hp: b.hpPct ? Math.max(1, Math.round(max * b.hpPct / 100)) : max, max,
-    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * gk, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
-    atkN: st.atk, blkN: st.blk, habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
+    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * (1 + Math.max(0, b.lvl - 9) * .045) * gk, armor: armorOf(vh, 0), za: zoneArmor(vh, 0), gx: gearFx(vh), props: gearProps(vh), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
+    atkN: st.atk, blkN: blkFor(b.cls, vh), habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
 }
 const MON_REF = {};
 function monsterRef(t) {
@@ -2323,16 +2692,18 @@ function choiceFor(F, f) {
 function hitOne(F, a, d, z, picks, o) {
   o = o || {};
   const P = picks[d.id] || { blk: [] };
-  const aimed = a.cls && STYLE[a.cls].aimed && R() < .15;
+  const ag = a.gx || {}, dg = d.gx || {};
+  const aimed = (a.cls && STYLE[a.cls].aimed && R() < .15) || (ag.aim && R() < ag.aim);
   const blocked = !o.magic && !o.aoe && P.blk.includes(z) && !aimed || (o.aoe && P.blk.includes(z));
-  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
+  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) + (dg.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
   const bard = F.fighters.some(x => x.alive && x.team === a.team && x.cls === 'bard');
   const ap = a.props || [], bw = d.weak || d.boss && d.boss.weak, br = d.res || d.boss && d.boss.res;
-  let critP = clamp(.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (ap.includes('crit') && br !== 'crit' ? .06 : 0), .03, .5);
+  let critP = clamp((.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (br !== 'crit' ? ag.crit || 0 : 0)) * (1 - (dg.acrit || 0)), .02, .5);
   if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
   if (a.debuf > 0) critP = 0;
   const zacc = ZONE_ACC[z];
   if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
+  if (!blocked && !o.magic && !o.aoe && dg.blk && R() < dg.blk) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss' };
   const crit = R() < critP;
   if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
   let dmg = a.avg * DMG_K * (.75 + R() * .5) * ZONE_MUL[z] * (o.mul || 1);
@@ -2346,7 +2717,8 @@ function hitOne(F, a, d, z, picks, o) {
   if (ap.includes('holy') && br !== 'holy') dmg *= 1.05;
   if (bw && ap.includes(bw)) { dmg *= 1.4; tag += ` ${PROP_IC[bw]} слабость!`; }
   if (br && ap.includes(br)) { dmg *= .8; tag += ` ${PROP_IC[br]} не берёт`; }
-  dmg *= 1 - Math.min(.5, d.armor * ZONE_ARM[z] * .035);
+  dmg *= 1 - Math.min(.5, (d.za ? d.za[z] || 0 : d.armor * ZONE_ARM[z]) * (1 - (ag.pierce || 0)) * .035);
+  if (!o.aoe && !o.magic) { const fx = k => ap.includes(k) && br !== k; if (fx('ice') && R() < .12) { d.debuf = Math.max(d.debuf, 2); tag += ' ❄ заморозка'; } if (fx('poison') && R() < .25) { d.buf.psn = 3; tag += ' ☠ яд'; } if (fx('stun') && R() < .08) { d.buf.stun = 1; tag += ' 💫 оглушение'; } }
   if (d.buf.shield) dmg *= .3;
   dmg = Math.max(1, Math.round(dmg));
   const adv = pick(F_ADV), verb = pick(F_VERB);
@@ -2366,12 +2738,14 @@ function resolveTurn(F) {
     F.lastTarget[a.id] = d.id;
     let zones = P.atk;
     if (F.tele && F.tele.fid === a.id) zones = [];
+    if (a.buf.stun) { a.buf.stun = 0; if (zones.length) lines.push({ r: { dmg: 0, line: `💫 ${a.name} оглушён и пропускает удар.`, c: 'miss' }, d }); zones = []; }
     for (const z of zones) {
       const r = hitOne(F, a, d, z, picks);
       (F.lastAtk[d.id] = F.lastAtk[d.id] || []).push(z);
       if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; if (r.vamp) { heal[a.id] = (heal[a.id] || 0) + r.vamp; r.line += ` 🩸+${r.vamp}`; } if (r.thorn) { add(a, r.thorn); r.line += ` 🌵−${r.thorn} обидчику`; } }
       lines.push({ r, d });
     }
+    if (zones.length && a.gx && a.gx.xatk && R() < a.gx.xatk) { const r = hitOne(F, a, d, pick(ZONES), picks, { mul: .7 }); if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; } r.line = '🗡 Добавочный удар: ' + r.line; lines.push({ r, d }); }
     if (a.cls === 'mage' && F.turn % 3 === 0) { const r = hitOne(F, a, d, 'chest', picks, { magic: 1, mul: .8 }); if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; r.line = `🔥 ${a.name} швыряет огненный шар!`; r.c = 'crit'; } lines.push({ r, d }); }
     if (a.bear > 0) { a.bear--; const r = hitOne(F, a, d, pick(ZONES), picks, { mul: .8 }); if (r.dmg) { add(d, r.dmg); r.line = `🐻 Божий медведь ${a.isMe ? 'героя' : ''} кусает противника…`; } lines.push({ r, d }); }
   }
@@ -2381,6 +2755,7 @@ function resolveTurn(F) {
     if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: F.tele.mul || 1.5 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
   }
   for (const f of alive) { const P = picks[f.id]; F.lastBlk[f.id] = P.blk; }
+  for (const f of alive) if (f.buf.psn > 0) { f.buf.psn--; const v = Math.max(1, Math.round(f.max * .03)); add(f, v); lines.push({ r: { dmg: v, line: `☠ Яд жжёт: ${f.name}`, c: 'foe' }, d: f }); }
   // применяем урон одновременно
   for (const f of alive) if (pend[f.id]) f.hp -= pend[f.id];
   for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);
@@ -2752,7 +3127,7 @@ function dunEnter(U, t) {
       if (R() < .2) { ulog('💎 Сундук открыл пасть — это мимик!', 'foe'); return dunFight(U, t, [monsterUnit('Сундук-мимик', L + 1, { elite: 1, hp: dunMonMul(U), dmg: dunMonMul(U) })], 'Мимик!'); }
       const T = DUN_TIERS[U.diff] || DUN_TIERS.normal;
       t.done = 1; const g = Math.round(rnd(15, 35) * goldScale(L) * T.rew); U.gold += g; let txt = `${pick(D_CHEST)} +${g} 💰`;
-      if (R() < .45 || dunHas(U, 'rogue') && R() < .3) { const it = makeItem(undefined, L, rollRarity(.6 + T.rar)); U.loot.push(it); txt += `, «${it.n}» (${RARITY[it.rar].n})`; }
+      if (R() < .45 || dunHas(U, 'rogue') && R() < .3) { const it = makeItem(undefined, L, rollRarity(.6 + T.rar), dunSetOpt(U, .1)); U.loot.push(it); txt += `, «${it.n}» (${RARITY[it.rar].n})`; }
       ulog('💎 ' + txt, 'me'); break;
     }
     case 'fight': case 'elite': {
@@ -2774,6 +3149,8 @@ function dunEnter(U, t) {
     }
   }
 }
+/* Комплектные вещи падают в основном в подземельях: чем тяжелее, тем чаще */
+function dunSetOpt(U, p) { const k = { easy: .6, normal: 1, hard: 1.5 }[U.diff] || 1; if (R() >= p * k) return undefined; const id = setFor(U.tier, S.hero); return id ? { set: id } : undefined; }
 function dunFight(U, t, mons, intro) {
   U.phase = 'fight'; U.fightTile = U.tiles.indexOf(t);
   const ga = Math.round(((U.gm || 1) * (DUN_TIERS[U.diff] || DUN_TIERS.normal).m - 1) * 4); /* недобор ГС — по монстрам труднее попасть */
@@ -2802,13 +3179,13 @@ function dunAfterFight(F, won) {
   const elite = F.fighters.some(f => f.elite), x = Math.round(xpUnit(U.tier) * (boss ? 20 : 2.2 * foes * (elite ? 1.5 : 1)) * T.rew), g = Math.round(rnd(8, 18) * goldScale(U.tier) * (boss ? 7 : foes / 2 * (elite ? 1.6 : 1)) * T.rew);
   U.xp += x; U.gold += g; if (t) t.done = 1;
   let txt = `Победа! +${g} 💰, +${x} опыта в общий котёл.`;
-  if (!boss && (elite || R() < .3)) { const it = makeItem(undefined, U.tier, elite ? Math.max(1, rollRarity(.8 + T.rar)) : rollRarity(.4 + T.rar)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
+  if (!boss && (elite || R() < .3)) { const it = makeItem(undefined, U.tier, elite ? Math.max(1, rollRarity(.8 + T.rar)) : rollRarity(.4 + T.rar), dunSetOpt(U, elite ? .25 : .06)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
   if (DUN_K.camp) { healHero(h.maxHp * DUN_K.camp); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.camp * 100); }); }
   if (dunHas(U, 'cleric')) { healHero(h.maxHp * DUN_K.cleric); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.cleric * 100); }); txt += ' Жрец чуть подлатал отряд.'; }
   ulog('⚔ ' + txt, 'me');
   if (boss) {
     const lb = U.diff === 'hard' ? 1 : 0, lr = U.diff === 'easy' ? 1 : 2;
-    U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(lr + lb, rollRarity(1.4 + T.rar)))); U.loot.push(makeItem(undefined, U.tier + lb, Math.max(1, rollRarity(1 + T.rar)))); if (R() < .35 + lb * .3) U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(2, rollRarity(1.6 + T.rar))));
+    U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(lr + lb, rollRarity(1.4 + T.rar)), dunSetOpt(U, .45))); U.loot.push(makeItem(undefined, U.tier + lb, Math.max(1, rollRarity(1 + T.rar)))); if (R() < .35 + lb * .3) U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(2, rollRarity(1.6 + T.rar))));
     S.stats.bosses++; endDungeon(true, 'boss');
   }
 }
@@ -2888,7 +3265,7 @@ function validFight(F) {
   if (!Array.isArray(F.fighters) || F.fighters.length < 2 || !Array.isArray(F.log) || !F.my || typeof F.my !== 'object') return false;
   for (const f of F.fighters) if (!(f && typeof f.id === 'string' && typeof f.name === 'string' && (f.team === 0 || f.team === 1) && isNum(f.hp) && isNum(f.max) && f.max > 0 && isNum(f.avg) && isNum(f.armor) && isNum(f.atkN) && isNum(f.blkN) && ZONES.includes(f.habit))) return false;
   if (F.fighters.filter(f => f.isMe).length !== 1) return false;
-  for (const f of F.fighters) { f.hp = clamp(Math.round(f.hp), 0, f.max); f.alive = !!f.alive && f.hp > 0; f.atkN = clamp(Math.round(f.atkN), 1, 2); f.blkN = clamp(Math.round(f.blkN), 1, 3); if (!f.buf || typeof f.buf !== 'object') f.buf = {}; if (!f.used || typeof f.used !== 'object') f.used = {}; f.props = Array.isArray(f.props) ? f.props.filter(k => PROP_IC[k]).slice(0, 5) : []; if (!PROP_IC[f.weak]) f.weak = null; if (!PROP_IC[f.res]) f.res = null; if (f.boss && typeof f.boss === 'object') { if (!PROP_IC[f.boss.weak]) f.boss.weak = null; if (!PROP_IC[f.boss.res]) f.boss.res = null; } fixNum(f, 'debuf', 0, 0, 10); fixNum(f, 'bear', 0, 0, 10); fixNum(f, 'dealt', 0, 0); fixNum(f, 'dex', 0, -5, 10); fixNum(f, 'intu', 0, -5, 10); fixNum(f, 'wis', 0, -5, 10); }
+  for (const f of F.fighters) { f.hp = clamp(Math.round(f.hp), 0, f.max); f.alive = !!f.alive && f.hp > 0; f.atkN = clamp(Math.round(f.atkN), 1, 2); f.blkN = clamp(Math.round(f.blkN), 1, 3); if (!f.buf || typeof f.buf !== 'object') f.buf = {}; if (!f.used || typeof f.used !== 'object') f.used = {}; f.props = Array.isArray(f.props) ? f.props.filter(k => PROP_IC[k]).slice(0, 5) : []; if (f.za && typeof f.za === 'object') { for (const z of ZONES) fixNum(f.za, z, 0, 0, 40); } else delete f.za; if (f.gx && typeof f.gx === 'object') { for (const k of ['blk', 'xatk', 'pierce', 'dodge', 'acrit', 'crit', 'aim', 'sh']) fixNum(f.gx, k, 0, 0, 1); } else delete f.gx; if (f.buf.psn !== undefined) fixNum(f.buf, 'psn', 0, 0, 3); if (!PROP_IC[f.weak]) f.weak = null; if (!PROP_IC[f.res]) f.res = null; if (f.boss && typeof f.boss === 'object') { if (!PROP_IC[f.boss.weak]) f.boss.weak = null; if (!PROP_IC[f.boss.res]) f.boss.res = null; } fixNum(f, 'debuf', 0, 0, 10); fixNum(f, 'bear', 0, 0, 10); fixNum(f, 'dealt', 0, 0); fixNum(f, 'dex', 0, -5, 10); fixNum(f, 'intu', 0, -5, 10); fixNum(f, 'wis', 0, -5, 10); }
   const me = F.fighters.find(f => f.isMe), ids = F.fighters.map(f => f.id);
   F.my.atk = Array.isArray(F.my.atk) ? [...new Set(F.my.atk.filter(z => ZONES.includes(z)))].slice(0, me.atkN) : [];
   F.my.blk = Array.isArray(F.my.blk) ? [...new Set(F.my.blk.filter(z => ZONES.includes(z)))].slice(0, me.blkN) : [];
@@ -2962,7 +3339,59 @@ const pct = (a, b) => clamp(b ? a / b * 100 : 0, 0, 100).toFixed(1) + '%';
 const bar = (cls, a, b, id) => `<div class="bar ${cls}"><i ${id ? 'id="' + id + '"' : ''} style="width:${pct(a, b)}"></i></div>`;
 const faithChip = () => `<span class="faithChip" title="Текущая вера">🔥 ${Math.floor(S.god.faith)} / ${maxFaith()}</span>`;
 const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене ⚔', rest: 'отдыхает 💤', dungeon: 'в пещере 🏰' };
-const SLOT_IC = { weapon: '⚔', armor: '🛡', amulet: '📿', ring: '💍' };
+/* ---------- Кукла героя (как в БК) и карточка предмета ---------- */
+const itemIc = it => it.slot === 'weapon' && WCAT[it.cat] ? WCAT[it.cat].ic : SLOT_IC[it.slot];
+function dollCell(h, k) {
+  const it = h.eq[k];
+  if (!it) { const blocked = k === 'offhand' && h.eq.weapon && h.eq.weapon.h2;
+    return `<div class="slotc empty" title="${SLOT_RU[k]}: ${blocked ? 'занято двуручным оружием' : 'пусто'}"><span class="ci">${blocked ? '🚫' : SLOT_IC[k]}</span><span class="cn">${blocked ? 'двуручное' : SLOT_RU[k]}</span></div>`; }
+  return `<button class="slotc r${it.rar}" style="border-color:${RARITY[it.rar].c}" data-act="itemD" data-arg="eq:${k}" title="${esc(it.n)}" aria-label="${esc(SLOT_RU[k] + ': ' + it.n)}"><span class="ci">${itemIc(it)}</span><span class="cn">${esc(it.base)}</span><span class="cb">${it.plus ? `<i>+${it.plus}</i>` : ''}${it.set ? '<i>🧩</i>' : ''}${it.curse ? '<i class="cur">☠</i>' : ''}</span></button>`;
+}
+function setProgress(h) {
+  const c = setCounts(h), ids = new Set(Object.keys(c)); for (const i of h.inv) if (i.set) ids.add(i.set);
+  return [...ids].map(id => { const n = c[id] || 0, S0 = SETS[id], next = Object.keys(S0.b).map(Number).find(x => x > n);
+    return `<span class="setc ${n >= 2 ? 'on' : ''}" title="${esc(Object.keys(S0.b).map(x => `${x}: ${setBonusText(id, x)}`).join(' · '))}">🧩 ${esc(S0.n)} ${n}/${S0.pcs.length}${next ? ` · бонус на ${next}` : ''}</span>`; }).join('');
+}
+function dollHTML(h) {
+  const sh = sheet(), za = zoneArmor(h, S.flock.temple), sp = setProgress(h);
+  return `<h3>Снаряжение</h3><div class="doll">
+    <div class="dcol">${['helm', 'amulet', 'armor', 'belt', 'boots'].map(k => dollCell(h, k)).join('')}</div>
+    <div class="dmid"><div class="dav">${CLS_IC[h.cls] || '🧔'}</div><div class="dgsv" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></div>
+      <div class="dst">урон ≈${Math.round(sh.avg)}<br>КД ${sh.ac} · ❤ ${h.maxHp}</div>
+      <div class="dza" title="Броня по зонам в бою: шлем — голова, броня — грудь и живот, пояс — пояс, сапоги — ноги">${ZONES.map(z => `<span>${ZONE_RU[z]} <b>${Math.round(za[z])}</b></span>`).join('')}</div></div>
+    <div class="dcol">${['weapon', 'offhand', 'gloves', 'ring', 'ring2'].map(k => dollCell(h, k)).join('')}</div>
+  </div>${sp ? `<div class="sets">${sp}</div>` : ''}
+  <div class="muted">Нажмите на вещь — подробности. Подземелья: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} рек. ГС ${recGS(h.lvl, k)}`).join(' · ')}.</div>`;
+}
+function findItemRef(ref) {
+  const h = S.hero, [t, id] = String(ref || '').split(':');
+  if (t === 'eq' && EQ_KEYS.includes(id) && h.eq[id]) return { it: h.eq[id], key: id };
+  if (t === 'inv') { const it = h.inv.find(i => i.id === id && i.slot); if (it) return { it, inv: true }; }
+  return null;
+}
+function itemModal(ref) {
+  const h = S.hero, f = findItemRef(ref); if (!f) return sheetModal();
+  const it = f.it, c = it.slot === 'weapon' ? WCAT[it.cat] : null, rq = reqHtml(h, it);
+  let set = '';
+  if (it.set) { const S0 = SETS[it.set], n = setCounts(h)[it.set] || 0, eqB = equipped(h).map(i => i.set === it.set && i.base), invB = h.inv.filter(i => i.set === it.set).map(i => i.base);
+    set = `<div class="setbox"><b>🧩 Комплект «${esc(S0.n)}» — надето ${n} из ${S0.pcs.length}</b>
+      <div class="setp">${S0.pcs.map(p => `<span class="${eqB.includes(p[1]) ? 'on' : invB.includes(p[1]) ? 'bag' : ''}">${eqB.includes(p[1]) ? '✔' : invB.includes(p[1]) ? '🎒' : '·'} ${SLOT_IC[p[0]]} ${esc(p[1])}</span>`).join('')}</div>
+      ${Object.keys(S0.b).map(x => `<div class="setb ${n >= +x ? 'on' : ''}">${x} ${plural(+x, 'предмет', 'предмета', 'предметов')}: ${esc(setBonusText(it.set, x))}</div>`).join('')}
+      <div class="fl">${esc(S0.fl)}</div></div>`; }
+  let cmp = '';
+  if (f.inv) { const b = bestPlace(h, it, true, true); if (b) { const cur = h.eq[b.k]; const d = gearScore({ eq: b.eq, cls: h.cls }) - gearScore(h);
+    cmp = `<div class="cmp">Вместо: ${cur ? itemSpan(cur) : `<span class="muted">${SLOT_RU[b.k]} пусто</span>`}${b.gone.length > 1 ? ' и щита (двуручное!)' : ''} · ГС <b class="${d >= 0 ? 'up' : 'dn'}">${d >= 0 ? '+' : ''}${d}</b>${b.sc > .01 ? ' · герой считает это улучшением' : ''}</div>`; } }
+  const btns = [];
+  if (f.inv) btns.push(`<button class="btn green" data-act="equipInv" data-arg="${it.id}" ${reqOk(h, it) ? '' : 'disabled'}>Надеть</button>`);
+  if (f.key && smithOk(it)) btns.push(`<button class="btn small" data-act="smith" data-arg="${f.key}" ${h.gold < smithCost(it) || S.fight || S.dun ? 'disabled' : ''}>🔨 +1 · ${smithCost(it)} 💰</button>`);
+  if (f.key && it.curse) btns.push(`<button class="btn small red" data-act="liftS" data-arg="${f.key}" ${S.god.faith < liftCost(it) ? 'disabled' : ''}>Снять ☠ · ${liftCost(it)}</button>`);
+  modal(`<div class="sheet itemd"><h2 style="color:${RARITY[it.rar].c}">${itemIc(it)} ${esc(it.n)}</h2>
+    <div class="muted">${RARITY[it.rar].n} · ${SLOT_RU[f.key || it.slot]} · ГС ${itemGS(it)}${f.key ? ' · надето' : ' · в рюкзаке'}</div>
+    <ul class="ist">${itemStats(it).map(x => `<li>${esc(x)}</li>`).join('')}${c ? `<li>${c.ic} ${esc(c.t)}</li>${c.cls.includes(h.cls) ? `<li class="aff">✦ любимое оружие класса «${CLASSES[h.cls].n}»: +1 к попаданию, +8% урона</li>` : ''}` : ''}
+    ${it.props.map(p => `<li>${PROP_IC[p.k] || '✧'} ${esc(propText(p))}</li>`).join('')}${it.curse ? `<li class="cur">☠ проклятие ${esc(CURSES[it.curse.k].n)}: ${esc(CURSES[it.curse.k].d)}</li>` : ''}</ul>
+    <div class="req">${rq || 'Требований нет'}</div>${it.fl ? `<div class="fl">«${esc(it.fl)}»</div>` : ''}${set}${cmp}
+    <div class="btns">${btns.join('')}<button class="btn small" data-act="sheet">← К герою</button></div></div>`);
+}
 const itemSpan = it => `<span class="r${it.rar}${it.curse ? ' cursed' : ''}" title="${esc(RARITY[it.rar].n + ': ' + itemDesc(it))}">${esc(it.n)}${it.curse ? ' ☠' : ''}</span>`;
 
 function renderHeader() {
@@ -2999,8 +3428,8 @@ function renderHero() {
     <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span>${Math.min(100, Math.floor(h.quest.p))}%</span></label>${bar('quest', h.quest.p, 100)}</div>
     <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   </div>
-  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
-    ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}${equipped(h).some(it => it.curse) ? '<button class="linkbtn" data-act="sheet" style="color:#8c2e20">☠ проклятый предмет</button>' : ''}</div>`;
+  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
+    ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div>`;
   setHTML($('colHero'), html);
 }
 function sheetModal() {
@@ -3010,8 +3439,8 @@ function sheetModal() {
   <div class="muted">Бой: атака ${fmtMod(sh.atkB)} · урон d${sh.die}${sh.dmgB ? fmtMod(sh.dmgB) : ''} (≈${Math.round(sh.avg)}) · КД ${sh.ac} · HP ${h.maxHp}. Владение ★: ${c.prof.map(k => STAT_SHORT[k]).join(', ')} (${fmtMod(profB(h.lvl))}).</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}, слушается ~${Math.round(obeyChance() * 100)}%</span></label>${bar('trust', h.trust, 100)}</div>
   ${h.inj.length ? `<h3>🤕 Травмы</h3>${h.inj.map(j => `<div class="injrow">${esc(j.n)}: ${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, пройдёт за ${fmtDur(j.t)}</div>`).join('')}<div class="muted">Лечат время, долгий отдых, храм и «Исцеление».</div>` : ''}
-  <h3>Снаряжение · ⚔ ГС ${gearScore(h)}</h3><div class="muted">Сила снаряжения решает в подземельях: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} ${DUN_TIERS[k].n.toLowerCase()} — рек. ${recGS(h.lvl, k)}`).join(' · ')}. Кузнец: +1 к предмету за золото (предел — от редкости: обычная +1 … легендарная +5).</div><ul class="eq">${['weapon', 'armor', 'amulet', 'ring'].map(sl => { const it = h.eq[sl]; return `<li><span>${SLOT_IC[sl]}</span><span class="nm">${it ? `${itemSpan(it)}<div class="muted">${RARITY[it.rar].n} · ГС ${itemGS(it)} · ${esc(itemDesc(it))}</div>` : `<span class="muted">${SLOT_RU[sl]}: пусто</span>`}</span><span class="eqb">${smithOk(it) ? `<button class="btn small" data-act="smith" data-arg="${sl}" ${h.gold < smithCost(it) || S.fight || S.dun ? 'disabled' : ''} title="Кузнец: +1 (ГС +4)">🔨 +1 · ${smithCost(it)} 💰</button>` : ''}${it && it.curse ? `<button class="btn small red" data-act="liftS" data-arg="${sl}" ${S.god.faith < liftCost(it) ? 'disabled' : ''}>Снять ☠ · ${liftCost(it)}</button>` : ''}</span></li>`; }).join('')}</ul>
-  <h3>🎒 Рюкзак (${h.inv.length}/12)</h3><ul class="inv">${h.inv.length ? h.inv.map(i => `<li>${i.slot ? itemSpan(i) : esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
+  ${dollHTML(h)}
+  <h3>🎒 Рюкзак (${h.inv.length}/${INV_MAX})</h3><ul class="inv">${h.inv.length ? h.inv.map(i => i.slot ? `<li><button class="linkbtn invb" data-act="itemD" data-arg="inv:${i.id}">${itemSpan(i)}</button>${!reqOk(h, i) ? ` <span class="rqb small">${esc(reqHtml(h, i).replace(/<[^>]+>/g, ''))}</span>` : bestPlace(h, i) ? ' <span class="upg" title="Лучше надетого">▲</span>' : ''} <span class="muted">~${i.v}💰</span></li>` : `<li>${esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
   <h3>Раса и класс</h3><div class="muted"><b>${r.tr}.</b> ${r.td}</div><div class="muted"><b>${c.ab}.</b> ${c.ad}</div>
   <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}
   <div class="btns"><button class="btn" data-act="closeModal">Закрыть</button></div></div>`);
@@ -3142,7 +3571,7 @@ function render() { renderNav(); renderHeader(); renderHero(); renderEvent(); re
 
 /* ---------- Модальные окна ---------- */
 const DUN_TIER_KEYS = ['easy', 'normal', 'hard'];
-function gsTip(h) { return `Сила снаряжения: ${['weapon', 'armor', 'amulet', 'ring'].map(sl => `${SLOT_RU[sl]} ${itemGS(h.eq[sl])}`).join(', ')}. Средний ГС для ур. ${h.lvl}: ${typGS(h.lvl)}. Чем выше — тем легче подземелья.`; }
+function gsTip(h) { return `Сила снаряжения: ${EQ_KEYS.filter(k => h.eq[k]).map(sl => `${SLOT_RU[sl]} ${itemGS(h.eq[sl])}`).join(', ')}${setBonusProps(h).length ? `, комплекты +${3 * setBonusProps(h).length}` : ''}. Средний ГС для ур. ${h.lvl}: ${typGS(h.lvl)}. Чем выше — тем легче подземелья.`; }
 function gsVerdict(q) { return q >= 1.25 ? ['легко', 'g'] : q >= 1.05 ? ['уверенно', 'g'] : q >= .92 ? ['по силам', 'n'] : q >= .78 ? ['трудно', 'w'] : ['опасно!', 'b']; }
 function tierModal() {
   const h = S.hero, gs = gearScore(h), auto = autoTier(h);
@@ -3179,7 +3608,7 @@ function help() {
   <p><b>Герой живёт сам</b>: бродит, дерётся, торгует, отдыхает и пишет дневник. Ваша валюта — <b>вера</b>: копится от паствы и храма, а ещё герой жертвует золото, если доверяет вам. Это неспешная игра: до 10-го уровня — пара недель.</p>
   <p><b>📋 Характеристики.</b> СИЛ, ЛОВ, ТЕЛ, ИНТ, МДР, ХАР — как в настольных ролевых играх. Они влияют на бой, торговлю (Харизма), проповеди и исходы развилок: в дневнике видно «проверка Харизмы: успех». Раса и класс дают бонусы и особые умения.</p>
   <p><b>🎖 Черты.</b> На каждом чётном уровне герой выбирает черту или +2 к характеристике. Подскажите ему, иначе выберет сам.</p>
-  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру.</p>
+  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение.</p>
   <p><b>🙏 Развилки.</b> Герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
@@ -3223,7 +3652,9 @@ const ACT = {
   mtab: a => { if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(a)) return; S.ui.mtab = a; if (a === 'powers' || a === 'arena') S.tab = a; else if (a === 'more' && !['flock', 'gods'].includes(S.tab)) S.tab = 'flock'; window.scrollTo(0, 0); },
   speedCycle: () => { const L = [1, 2, 5, 10]; S.speed = L[(L.indexOf(S.speed) + 1) % L.length]; S.paused = false; },
   skillInfo: a => { openSkill = openSkill === a ? null : a; },
-  liftS: a => { liftCurse(a); sheetModal(); },
+  liftS: a => { if (!EQ_KEYS.includes(a)) return; liftCurse(a); itemModal('eq:' + a); },
+  itemD: a => itemModal(a),
+  equipInv: id => { if (equipInv(id)) { render(); sheetModal(); } },
   voice: () => { const i = $('voiceIn'); voice(i.value); i.value = ''; },
   voiceq: a => voice(a),
   fork: a => answerFork(+a),
@@ -3239,7 +3670,7 @@ const ACT = {
   challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
   callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
   dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
-  smith: sl => { if (!['weapon', 'armor', 'amulet', 'ring'].includes(sl)) return; if (smithUpgrade(sl) === true) { sheetModal(); render(); } },
+  smith: sl => { if (!EQ_KEYS.includes(sl)) return; if (smithUpgrade(sl) === true) { render(); itemModal('eq:' + sl); } },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,
   rename: () => { S.god.name = ($('inGod').value || '').trim() || S.god.name; S.hero.name = ($('inHero').value || '').trim() || S.hero.name; closeModal(); save(); },
@@ -3270,7 +3701,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) save(
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261018-205956';
+const APP_BUILD = '20261018-232515';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -3531,7 +3962,7 @@ S = load();
 if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
 setInterval(loop, 250);
 /* Отладочный доступ из консоли / тестов */
-window.GAME = { gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+window.GAME = { EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },

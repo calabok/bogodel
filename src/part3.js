@@ -54,9 +54,21 @@ function genStats(cls, race) {
   return st;
 }
 function starterItem(slot, base) {
-  return { id: 'it' + Math.random().toString(36).slice(2, 9), slot, base: base[0], n: base[0], rar: 0, plus: 0,
-    die: slot === 'weapon' ? base[1] : 0, ac: slot === 'armor' ? base[1] : 0, props: [], curse: null, v: 5 };
+  const it = { id: 'it' + Math.random().toString(36).slice(2, 9), slot, base: base[0], n: base[0], rar: 0, plus: 0,
+    die: slot === 'weapon' ? base[1] : 0, ac: slot !== 'weapon' ? base[1] : 0, props: [], curse: null, v: 5, req: { lvl: 1 } };
+  if (slot === 'offhand') it.blk = base[2] || .08;
+  return upgradeItem(it);
 }
+/* Стартовые щиты/второй кинжал: воин и жрец — со щитом, плут — с двумя кинжалами */
+function starterEq(cls) {
+  const c = CLASSES[cls], eq = {}; for (const k of EQ_KEYS) eq[k] = null;
+  eq.weapon = starterItem('weapon', c.wpn); eq.armor = starterItem('armor', c.arm);
+  if (STYLE[cls].shield) eq.offhand = starterItem('offhand', ['Крышка от кастрюли', 1, .08]);
+  if (cls === 'rogue') eq.offhand = starterItem('weapon', ['Кинжал «Ой»', 4]);
+  return eq;
+}
+/* Проверка вещи для слота сохранения */
+function itemFitsKey(it, k) { if (!it || typeof it !== 'object' || typeof it.slot !== 'string') return false; return k === 'ring2' ? it.slot === 'ring' : k === 'offhand' ? it.slot === 'offhand' || (it.slot === 'weapon' && it.cat === 'dagger') : it.slot === k; }
 function defaultState(god, hero, race, cls) {
   race = RACES[race] ? race : 'human'; cls = CLASSES[cls] ? cls : 'warrior';
   const c = CLASSES[cls];
@@ -64,7 +76,7 @@ function defaultState(god, hero, race, cls) {
     v: SAVE_VERSION,
     god: { name: god, lvl: 1, xp: 0, faith: 60, sp: 1, align: 0, skills: { heal: 1, bolt: 1, rain: 0, bless: 0, shield: 0, curse: 0, quake: 0, luck: 0, beast: 0 } },
     hero: { name: hero, race, cls, st: genStats(cls, race), feats: [], lvl: 1, xp: 0, hp: 30, maxHp: 30, gold: 30, potions: 1,
-      eq: { weapon: starterItem('weapon', c.wpn), armor: starterItem('armor', c.arm), amulet: null, ring: null },
+      eq: starterEq(cls),
       inv: [], loc: 'Годград', state: 'road', monster: null, quest: newQuest(), trust: 40, deadT: 0, townStep: 0,
       restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [] },
     flock: { fol: 3, temple: 0, templeProg: 0, army: 0 },
@@ -89,7 +101,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 6;
+const SAVE_VERSION = 7;
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -147,16 +159,34 @@ function migrate(o) {
     if (o.dun && typeof o.dun === 'object' && !o.dun.diff) o.dun.diff = 'normal';
     o._migratedV6 = 1;
   }
+  if (v < 7) {
+    // v6 → v7: 10 слотов (шлем, щит, пояс, перчатки, сапоги, 2-е кольцо), категории оружия, требования, комплекты.
+    // Старые вещи остаются надетыми (требований у них нет), новые слоты пустые.
+    const h = o.hero;
+    if (h && h.eq && typeof h.eq === 'object') for (const k of ['offhand', 'helm', 'belt', 'gloves', 'boots', 'ring2']) if (!(k in h.eq)) h.eq[k] = null;
+    o._migratedV7 = 1;
+  }
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
 }
+const ITEM_SLOTS = ['weapon', 'offhand', 'helm', 'armor', 'belt', 'gloves', 'boots', 'amulet', 'ring'];
 function validItem(it, slot) {
-  return it && typeof it === 'object' && it.slot === slot && typeof it.n === 'string' && isNum(it.rar) && isNum(it.plus) && Array.isArray(it.props);
+  return it && typeof it === 'object' && it.slot === slot && ITEM_SLOTS.includes(slot) && typeof it.n === 'string' && isNum(it.rar) && isNum(it.plus) && Array.isArray(it.props);
 }
 function sanitizeItem(it) {
   it.rar = clamp(Math.floor(it.rar), 0, 4); it.plus = clamp(Math.floor(it.plus), 0, 5);
   fixNum(it, 'die', it.slot === 'weapon' ? 4 : 0, 0, 12); fixNum(it, 'ac', 0, 0, 10); fixNum(it, 'v', 5, 0);
+  upgradeItem(it);
+  if (it.slot === 'weapon') { if (!WCAT[it.cat]) it.cat = 'sword'; it.h2 = WCAT[it.cat].h2 ? 1 : 0; } else { delete it.cat; delete it.h2; }
+  if (it.kind && !ARM_KIND[it.kind]) it.kind = 'l';
+  if (it.slot === 'offhand') fixNum(it, 'blk', .08, 0, .3); else delete it.blk;
+  if (it.slot === 'gloves') fixNum(it, 'hit', 0, 0, 4); else delete it.hit;
+  if (!it.req || typeof it.req !== 'object') it.req = { lvl: 1 };
+  fixNum(it.req, 'lvl', 1, 1, MAX_LVL); it.req.lvl = Math.floor(it.req.lvl);
+  if (typeof it.req.s !== 'string' || !it.req.s.split('/').every(k => STATS.includes(k)) || !isNum(it.req.v)) { delete it.req.s; delete it.req.v; } else it.req.v = clamp(Math.round(it.req.v), 0, 20);
+  if (it.set && !SETS[it.set]) delete it.set;
+  for (const k of ['pre', 'suf', 'fl']) if (it[k] !== undefined && typeof it[k] !== 'string') delete it[k];
   it.props = it.props.filter(p => p && PROP_DEF[p.k]).map(p => STATS.includes(p.k) ? { k: p.k, v: clamp(isNum(p.v) ? p.v : 1, 1, 3) } : { k: p.k });
   if (it.curse && !(CURSES[it.curse.k])) it.curse = null;
   if (!it.id) it.id = 'it' + Math.random().toString(36).slice(2, 9);
@@ -177,10 +207,13 @@ function sanitize(o) {
   h.feats = Array.isArray(h.feats) ? [...new Set(h.feats.filter(x => FEATS[x]))] : [];
   fixNum(h, 'lvl', 1, 1, MAX_LVL); h.lvl = Math.floor(h.lvl); fixNum(h, 'xp', 0, 0, Math.max(0, xpNext(h.lvl) - 1)); if (h.lvl >= MAX_LVL) h.xp = 0;
   if (!h.eq || typeof h.eq !== 'object') h.eq = d.hero.eq;
-  for (const sl of ['weapon', 'armor', 'amulet', 'ring']) { if (h.eq[sl] && !validItem(h.eq[sl], sl)) h.eq[sl] = null; if (h.eq[sl]) sanitizeItem(h.eq[sl]); }
+  for (const k of Object.keys(h.eq)) if (!EQ_KEYS.includes(k)) delete h.eq[k];
+  for (const sl of EQ_KEYS) { const it = h.eq[sl]; if (!it || !itemFitsKey(it, sl) || !validItem(it, it.slot)) h.eq[sl] = null; else sanitizeItem(it); }
+  if (h.eq.offhand && h.eq.offhand.slot === 'weapon' && h.cls !== 'rogue') h.eq.offhand = null;
   if (!h.eq.weapon) h.eq.weapon = starterItem('weapon', CLASSES[h.cls].wpn);
   if (!h.eq.armor) h.eq.armor = starterItem('armor', CLASSES[h.cls].arm);
-  h.inv = Array.isArray(h.inv) ? h.inv.filter(i => i && typeof i.n === 'string' && (i.slot ? validItem(i, i.slot) : true)).map(i => i.slot ? sanitizeItem(i) : { n: i.n, v: isNum(i.v) ? Math.max(0, i.v) : 3 }).slice(-12) : [];
+  if (h.eq.weapon.h2 && h.eq.offhand) { if (!Array.isArray(h.inv)) h.inv = []; h.inv.push(h.eq.offhand); h.eq.offhand = null; }
+  h.inv = Array.isArray(h.inv) ? h.inv.filter(i => i && typeof i.n === 'string' && (i.slot ? validItem(i, i.slot) : true)).map(i => i.slot ? sanitizeItem(i) : { n: i.n, v: isNum(i.v) ? Math.max(0, i.v) : 3 }).slice(-16) : [];
   fixNum(h, 'gold', 0, 0); h.gold = Math.floor(h.gold); fixNum(h, 'potions', 0, 0, 20); h.potions = Math.floor(h.potions); fixNum(h, 'trust', 40, 0, 100);
   fixNum(h, 'deadT', 0, 0, PACE.dead); fixNum(h, 'townStep', 0, 0, 5); fixNum(h, 'restT', 0, 0, 10); fixNum(h, 'shortRests', 2, 0, 2); fixNum(h, 'orcCd', 0, 0, 10800);
   if (!h.quest || typeof h.quest.n !== 'string') h.quest = newQuest(); fixNum(h.quest, 'p', 0, 0, 99);

@@ -105,16 +105,16 @@ function armorOf(h, temple) { const a = h.eq.armor; return (a ? a.ac + a.plus : 
 function heroUnit() {
   const h = S.hero, sh = sheet(), st = STYLE[h.cls];
   return { id: 'me', name: h.name, team: 0, kind: 'hero', isMe: true, race: h.race, cls: h.cls, lvl: h.lvl, hp: Math.max(1, h.hp), max: h.maxHp,
-    avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
-    atkN: st.atk, blkN: st.blk, habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
+    avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), za: zoneArmor(h, S.flock.temple), gx: gearFx(h), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
+    atkN: st.atk, blkN: blkFor(h.cls, h), habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
 }
 /* Боевые свойства снаряжения, которые видны в бою по зонам */
-function gearProps(h) { const o = []; for (const sl of ['weapon', 'armor']) { const it = h.eq[sl]; if (it) for (const p of it.props || []) if (PROP_IC[p.k] && !o.includes(p.k)) o.push(p.k); } return o; }
+function gearProps(h) { const o = []; for (const p of allProps(h)) if (PROP_IC[p.k] && !o.includes(p.k)) o.push(p.k); return o; }
 function botUnit(b) {
   const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], gk = clamp(b.gk || 1, .5, 2), max = Math.round(calcMaxHp(vh) * gk);
   return { id: newFid(), name: b.name, team: 1, kind: 'bot', race: b.race, cls: b.cls, lvl: b.lvl, hp: b.hpPct ? Math.max(1, Math.round(max * b.hpPct / 100)) : max, max,
-    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * gk, armor: armorOf(vh, 0), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
-    atkN: st.atk, blkN: st.blk, habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
+    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * (1 + Math.max(0, b.lvl - 9) * .045) * gk, armor: armorOf(vh, 0), za: zoneArmor(vh, 0), gx: gearFx(vh), props: gearProps(vh), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
+    atkN: st.atk, blkN: blkFor(b.cls, vh), habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
 }
 const MON_REF = {};
 function monsterRef(t) {
@@ -230,16 +230,18 @@ function choiceFor(F, f) {
 function hitOne(F, a, d, z, picks, o) {
   o = o || {};
   const P = picks[d.id] || { blk: [] };
-  const aimed = a.cls && STYLE[a.cls].aimed && R() < .15;
+  const ag = a.gx || {}, dg = d.gx || {};
+  const aimed = (a.cls && STYLE[a.cls].aimed && R() < .15) || (ag.aim && R() < ag.aim);
   const blocked = !o.magic && !o.aoe && P.blk.includes(z) && !aimed || (o.aoe && P.blk.includes(z));
-  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
+  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) + (dg.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
   const bard = F.fighters.some(x => x.alive && x.team === a.team && x.cls === 'bard');
   const ap = a.props || [], bw = d.weak || d.boss && d.boss.weak, br = d.res || d.boss && d.boss.res;
-  let critP = clamp(.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (ap.includes('crit') && br !== 'crit' ? .06 : 0), .03, .5);
+  let critP = clamp((.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (br !== 'crit' ? ag.crit || 0 : 0)) * (1 - (dg.acrit || 0)), .02, .5);
   if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
   if (a.debuf > 0) critP = 0;
   const zacc = ZONE_ACC[z];
   if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
+  if (!blocked && !o.magic && !o.aoe && dg.blk && R() < dg.blk) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss' };
   const crit = R() < critP;
   if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
   let dmg = a.avg * DMG_K * (.75 + R() * .5) * ZONE_MUL[z] * (o.mul || 1);
@@ -253,7 +255,8 @@ function hitOne(F, a, d, z, picks, o) {
   if (ap.includes('holy') && br !== 'holy') dmg *= 1.05;
   if (bw && ap.includes(bw)) { dmg *= 1.4; tag += ` ${PROP_IC[bw]} слабость!`; }
   if (br && ap.includes(br)) { dmg *= .8; tag += ` ${PROP_IC[br]} не берёт`; }
-  dmg *= 1 - Math.min(.5, d.armor * ZONE_ARM[z] * .035);
+  dmg *= 1 - Math.min(.5, (d.za ? d.za[z] || 0 : d.armor * ZONE_ARM[z]) * (1 - (ag.pierce || 0)) * .035);
+  if (!o.aoe && !o.magic) { const fx = k => ap.includes(k) && br !== k; if (fx('ice') && R() < .12) { d.debuf = Math.max(d.debuf, 2); tag += ' ❄ заморозка'; } if (fx('poison') && R() < .25) { d.buf.psn = 3; tag += ' ☠ яд'; } if (fx('stun') && R() < .08) { d.buf.stun = 1; tag += ' 💫 оглушение'; } }
   if (d.buf.shield) dmg *= .3;
   dmg = Math.max(1, Math.round(dmg));
   const adv = pick(F_ADV), verb = pick(F_VERB);
@@ -273,12 +276,14 @@ function resolveTurn(F) {
     F.lastTarget[a.id] = d.id;
     let zones = P.atk;
     if (F.tele && F.tele.fid === a.id) zones = [];
+    if (a.buf.stun) { a.buf.stun = 0; if (zones.length) lines.push({ r: { dmg: 0, line: `💫 ${a.name} оглушён и пропускает удар.`, c: 'miss' }, d }); zones = []; }
     for (const z of zones) {
       const r = hitOne(F, a, d, z, picks);
       (F.lastAtk[d.id] = F.lastAtk[d.id] || []).push(z);
       if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; if (r.vamp) { heal[a.id] = (heal[a.id] || 0) + r.vamp; r.line += ` 🩸+${r.vamp}`; } if (r.thorn) { add(a, r.thorn); r.line += ` 🌵−${r.thorn} обидчику`; } }
       lines.push({ r, d });
     }
+    if (zones.length && a.gx && a.gx.xatk && R() < a.gx.xatk) { const r = hitOne(F, a, d, pick(ZONES), picks, { mul: .7 }); if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; } r.line = '🗡 Добавочный удар: ' + r.line; lines.push({ r, d }); }
     if (a.cls === 'mage' && F.turn % 3 === 0) { const r = hitOne(F, a, d, 'chest', picks, { magic: 1, mul: .8 }); if (r.dmg) { add(d, r.dmg); a.dealt += r.dmg; r.line = `🔥 ${a.name} швыряет огненный шар!`; r.c = 'crit'; } lines.push({ r, d }); }
     if (a.bear > 0) { a.bear--; const r = hitOne(F, a, d, pick(ZONES), picks, { mul: .8 }); if (r.dmg) { add(d, r.dmg); r.line = `🐻 Божий медведь ${a.isMe ? 'героя' : ''} кусает противника…`; } lines.push({ r, d }); }
   }
@@ -288,6 +293,7 @@ function resolveTurn(F) {
     if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: F.tele.mul || 1.5 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
   }
   for (const f of alive) { const P = picks[f.id]; F.lastBlk[f.id] = P.blk; }
+  for (const f of alive) if (f.buf.psn > 0) { f.buf.psn--; const v = Math.max(1, Math.round(f.max * .03)); add(f, v); lines.push({ r: { dmg: v, line: `☠ Яд жжёт: ${f.name}`, c: 'foe' }, d: f }); }
   // применяем урон одновременно
   for (const f of alive) if (pend[f.id]) f.hp -= pend[f.id];
   for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);

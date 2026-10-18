@@ -12,6 +12,11 @@ INV='''()=>{const S=GAME.S, e=[]; if(!S) return ['S null']; GAME.render();
  if(h.hp>h.maxHp) e.push('hp>max'); if(h.hp<0) e.push('hp<0 '+h.hp);
  if(h.state==='dead'&&h.hp!==0) e.push('dead but hp '+h.hp); if(h.state!=='dead'&&h.hp<=0) e.push('alive with hp '+h.hp);
  if(h.trust<0||h.trust>100) e.push('trust '+h.trust); if(g.align<-100||g.align>100) e.push('align');
+ for(const k of Object.keys(h.eq)) if(!GAME.EQ_KEYS.includes(k)) e.push('bad eq key '+k);
+ if(h.eq.weapon&&h.eq.weapon.h2&&h.eq.offhand) e.push('2h + offhand');
+ if(h.eq.offhand&&h.eq.offhand.slot==='weapon'&&h.cls!=='rogue') e.push('offhand weapon non-rogue');
+ if(h.inv.length>16) e.push('inv>16');
+ for(const k of GAME.EQ_KEYS){const it=h.eq[k]; if(it&&!['weapon','offhand','helm','armor','belt','gloves','boots','amulet','ring'].includes(it.slot)) e.push('bad item slot '+k);}
  if('duel' in S) e.push('old duel field'); if(S.fork&&S.fight) e.push('fork+fight'); if(S.fork&&h.state==='dead') e.push('fork while dead');
  if((h.state==='fight')!==!!h.monster) e.push('fight/monster mismatch '+h.state);
  const F=S.fight, AK=['duel','group','chaos','godduel'];
@@ -72,7 +77,7 @@ ACT='''(r)=>{const modal=document.getElementById('modal').classList.contains('on
  const root=modal?document.getElementById('modal'):document;
  let bs=[...root.querySelectorAll('[data-act]')].filter(b=>!b.disabled&&b.offsetParent!==null&&!['reset','newGame'].includes(b.dataset.act));
  if(!modal) bs=bs.filter(b=>(!['speed','speedCycle','sheet','help','pause'].includes(b.dataset.act))||Math.random()<.05);
- const pri=bs.filter(b=>['fork','fz','fz','fz','fgo','ftarget','fpow','fauto','fclose','fmanual','dgo','dgo','dgo','dauto','dclose','apost','ajoin','aleave','chatToggle','evGive','evVote','evArmy','power','learn','temple','miracle','recruit','challenge','resurrect','closeEv','feat','asi','asiOpen','lift','liftS','callDun','dunTier','dunTier','smith','sheet','mtab','mtab','dheal','skillInfo','dleave'].includes(b.dataset.act));
+ const pri=bs.filter(b=>['itemD','itemD','equipInv','smith','liftS','sheet','fork','fz','fz','fz','fgo','ftarget','fpow','fauto','fclose','fmanual','dgo','dgo','dgo','dauto','dclose','apost','ajoin','aleave','chatToggle','evGive','evVote','evArmy','power','learn','temple','miracle','recruit','challenge','resurrect','closeEv','feat','asi','asiOpen','lift','liftS','callDun','dunTier','dunTier','smith','sheet','mtab','mtab','dheal','skillInfo','dleave'].includes(b.dataset.act));
  const pool=(pri.length&&r<.8)?pri:bs; if(!pool.length) return 'none';
  const b=pool[Math.floor(Math.random()*pool.length)]; b.click(); return b.dataset.act+':'+(b.dataset.arg||'');}'''
 async def main():

@@ -109,7 +109,7 @@ function dunEnter(U, t) {
       if (R() < .2) { ulog('💎 Сундук открыл пасть — это мимик!', 'foe'); return dunFight(U, t, [monsterUnit('Сундук-мимик', L + 1, { elite: 1, hp: dunMonMul(U), dmg: dunMonMul(U) })], 'Мимик!'); }
       const T = DUN_TIERS[U.diff] || DUN_TIERS.normal;
       t.done = 1; const g = Math.round(rnd(15, 35) * goldScale(L) * T.rew); U.gold += g; let txt = `${pick(D_CHEST)} +${g} 💰`;
-      if (R() < .45 || dunHas(U, 'rogue') && R() < .3) { const it = makeItem(undefined, L, rollRarity(.6 + T.rar)); U.loot.push(it); txt += `, «${it.n}» (${RARITY[it.rar].n})`; }
+      if (R() < .45 || dunHas(U, 'rogue') && R() < .3) { const it = makeItem(undefined, L, rollRarity(.6 + T.rar), dunSetOpt(U, .1)); U.loot.push(it); txt += `, «${it.n}» (${RARITY[it.rar].n})`; }
       ulog('💎 ' + txt, 'me'); break;
     }
     case 'fight': case 'elite': {
@@ -131,6 +131,8 @@ function dunEnter(U, t) {
     }
   }
 }
+/* Комплектные вещи падают в основном в подземельях: чем тяжелее, тем чаще */
+function dunSetOpt(U, p) { const k = { easy: .6, normal: 1, hard: 1.5 }[U.diff] || 1; if (R() >= p * k) return undefined; const id = setFor(U.tier, S.hero); return id ? { set: id } : undefined; }
 function dunFight(U, t, mons, intro) {
   U.phase = 'fight'; U.fightTile = U.tiles.indexOf(t);
   const ga = Math.round(((U.gm || 1) * (DUN_TIERS[U.diff] || DUN_TIERS.normal).m - 1) * 4); /* недобор ГС — по монстрам труднее попасть */
@@ -159,13 +161,13 @@ function dunAfterFight(F, won) {
   const elite = F.fighters.some(f => f.elite), x = Math.round(xpUnit(U.tier) * (boss ? 20 : 2.2 * foes * (elite ? 1.5 : 1)) * T.rew), g = Math.round(rnd(8, 18) * goldScale(U.tier) * (boss ? 7 : foes / 2 * (elite ? 1.6 : 1)) * T.rew);
   U.xp += x; U.gold += g; if (t) t.done = 1;
   let txt = `Победа! +${g} 💰, +${x} опыта в общий котёл.`;
-  if (!boss && (elite || R() < .3)) { const it = makeItem(undefined, U.tier, elite ? Math.max(1, rollRarity(.8 + T.rar)) : rollRarity(.4 + T.rar)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
+  if (!boss && (elite || R() < .3)) { const it = makeItem(undefined, U.tier, elite ? Math.max(1, rollRarity(.8 + T.rar)) : rollRarity(.4 + T.rar), dunSetOpt(U, elite ? .25 : .06)); U.loot.push(it); txt += ` Трофей: «${it.n}».`; }
   if (DUN_K.camp) { healHero(h.maxHp * DUN_K.camp); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.camp * 100); }); }
   if (dunHas(U, 'cleric')) { healHero(h.maxHp * DUN_K.cleric); U.party.forEach(p => { if (!p.isMe && p.hp > 0) p.hp = Math.min(100, p.hp + DUN_K.cleric * 100); }); txt += ' Жрец чуть подлатал отряд.'; }
   ulog('⚔ ' + txt, 'me');
   if (boss) {
     const lb = U.diff === 'hard' ? 1 : 0, lr = U.diff === 'easy' ? 1 : 2;
-    U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(lr + lb, rollRarity(1.4 + T.rar)))); U.loot.push(makeItem(undefined, U.tier + lb, Math.max(1, rollRarity(1 + T.rar)))); if (R() < .35 + lb * .3) U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(2, rollRarity(1.6 + T.rar))));
+    U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(lr + lb, rollRarity(1.4 + T.rar)), dunSetOpt(U, .45))); U.loot.push(makeItem(undefined, U.tier + lb, Math.max(1, rollRarity(1 + T.rar)))); if (R() < .35 + lb * .3) U.loot.push(makeItem(undefined, U.tier + 1 + lb, Math.max(2, rollRarity(1.6 + T.rar))));
     S.stats.bosses++; endDungeon(true, 'boss');
   }
 }
@@ -245,7 +247,7 @@ function validFight(F) {
   if (!Array.isArray(F.fighters) || F.fighters.length < 2 || !Array.isArray(F.log) || !F.my || typeof F.my !== 'object') return false;
   for (const f of F.fighters) if (!(f && typeof f.id === 'string' && typeof f.name === 'string' && (f.team === 0 || f.team === 1) && isNum(f.hp) && isNum(f.max) && f.max > 0 && isNum(f.avg) && isNum(f.armor) && isNum(f.atkN) && isNum(f.blkN) && ZONES.includes(f.habit))) return false;
   if (F.fighters.filter(f => f.isMe).length !== 1) return false;
-  for (const f of F.fighters) { f.hp = clamp(Math.round(f.hp), 0, f.max); f.alive = !!f.alive && f.hp > 0; f.atkN = clamp(Math.round(f.atkN), 1, 2); f.blkN = clamp(Math.round(f.blkN), 1, 3); if (!f.buf || typeof f.buf !== 'object') f.buf = {}; if (!f.used || typeof f.used !== 'object') f.used = {}; f.props = Array.isArray(f.props) ? f.props.filter(k => PROP_IC[k]).slice(0, 5) : []; if (!PROP_IC[f.weak]) f.weak = null; if (!PROP_IC[f.res]) f.res = null; if (f.boss && typeof f.boss === 'object') { if (!PROP_IC[f.boss.weak]) f.boss.weak = null; if (!PROP_IC[f.boss.res]) f.boss.res = null; } fixNum(f, 'debuf', 0, 0, 10); fixNum(f, 'bear', 0, 0, 10); fixNum(f, 'dealt', 0, 0); fixNum(f, 'dex', 0, -5, 10); fixNum(f, 'intu', 0, -5, 10); fixNum(f, 'wis', 0, -5, 10); }
+  for (const f of F.fighters) { f.hp = clamp(Math.round(f.hp), 0, f.max); f.alive = !!f.alive && f.hp > 0; f.atkN = clamp(Math.round(f.atkN), 1, 2); f.blkN = clamp(Math.round(f.blkN), 1, 3); if (!f.buf || typeof f.buf !== 'object') f.buf = {}; if (!f.used || typeof f.used !== 'object') f.used = {}; f.props = Array.isArray(f.props) ? f.props.filter(k => PROP_IC[k]).slice(0, 5) : []; if (f.za && typeof f.za === 'object') { for (const z of ZONES) fixNum(f.za, z, 0, 0, 40); } else delete f.za; if (f.gx && typeof f.gx === 'object') { for (const k of ['blk', 'xatk', 'pierce', 'dodge', 'acrit', 'crit', 'aim', 'sh']) fixNum(f.gx, k, 0, 0, 1); } else delete f.gx; if (f.buf.psn !== undefined) fixNum(f.buf, 'psn', 0, 0, 3); if (!PROP_IC[f.weak]) f.weak = null; if (!PROP_IC[f.res]) f.res = null; if (f.boss && typeof f.boss === 'object') { if (!PROP_IC[f.boss.weak]) f.boss.weak = null; if (!PROP_IC[f.boss.res]) f.boss.res = null; } fixNum(f, 'debuf', 0, 0, 10); fixNum(f, 'bear', 0, 0, 10); fixNum(f, 'dealt', 0, 0); fixNum(f, 'dex', 0, -5, 10); fixNum(f, 'intu', 0, -5, 10); fixNum(f, 'wis', 0, -5, 10); }
   const me = F.fighters.find(f => f.isMe), ids = F.fighters.map(f => f.id);
   F.my.atk = Array.isArray(F.my.atk) ? [...new Set(F.my.atk.filter(z => ZONES.includes(z)))].slice(0, me.atkN) : [];
   F.my.blk = Array.isArray(F.my.blk) ? [...new Set(F.my.blk.filter(z => ZONES.includes(z)))].slice(0, me.blkN) : [];

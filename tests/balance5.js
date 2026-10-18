@@ -9,8 +9,11 @@ window.BAL = (() => {
     const h = s.hero, c = G.CLASSES[cls]; h.lvl = L;
     for (let i = 2; i <= L; i++) { if (i % 2) h.st[c.prim] = Math.min(20, h.st[c.prim] + 1); else { h.st[c.prim] = Math.min(20, h.st[c.prim] + 1); h.st.con = Math.min(20, h.st.con + 1); } }
     const rar = L < 3 ? 0 : L < 7 ? 1 : L < 12 ? 2 : 3;
-    for (const sl of ['weapon', 'armor']) if (L >= 2) { const it = G.makeItem(sl, L, rar); it.curse = null; h.eq[sl] = it; }
-    if (L >= 4) for (const sl of ['amulet', 'ring']) { const it = G.makeItem(sl, L, Math.max(1, rar - 1)); it.curse = null; h.eq[sl] = it; }
+    const put = (sl, r) => { for (let t = 0; t < 4; t++) { const it = G.makeItem(sl, L, r); it.curse = null; it.n = nameOf(it); if (!G.reqOk(h, it) && t < 3) continue; const b = G.bestPlace(h, it, true, true); if (b) { applyPlace(h, it, b); return; } } };
+    if (L >= 2) { put('weapon', rar); put('armor', rar); put('helm', rar); put('boots', rar); }
+    if (L >= 3) { put('belt', rar); put('gloves', rar); if (!(h.eq.weapon && h.eq.weapon.h2)) put(cls === 'rogue' ? 'weapon' : 'offhand', rar); }
+    if (L >= 4) for (const sl of ['amulet', 'ring', 'ring']) put(sl, Math.max(1, rar - 1));
+    h.inv = [];
     h.maxHp = G.calcMaxHp(h); h.hp = h.maxHp; h.potions = 1; s.god.lvl = Math.max(1, Math.ceil(L / 2)); s.god.faith = G.maxFaith();
     return s;
   }
@@ -72,10 +75,10 @@ window.BAL.smartRoute = function (U) {
 };
 // Подогнать снаряжение героя под целевой ГС (±2): +N, затем кольцо/амулет, затем базовая вещь
 window.BAL.fitGS = function (target) {
-  const h = S.hero, sl = ['weapon', 'armor', 'amulet', 'ring']; let k = 0;
-  while (gearScore(h) < target - 2 && k++ < 80) { const c = sl.filter(x => h.eq[x] && (h.eq[x].plus || 0) < smithCap(h.eq[x])); if (!h.eq.amulet) { h.eq.amulet = makeItem('amulet', h.lvl, 1); h.eq.amulet.curse = null; continue; } if (!h.eq.ring) { h.eq.ring = makeItem('ring', h.lvl, 1); h.eq.ring.curse = null; continue; } if (!c.length) { const r = sl.filter(x => h.eq[x].rar < 4); if (!r.length) break; h.eq[r[Math.floor(Math.random() * r.length)]].rar++; continue; } h.eq[c[Math.floor(Math.random() * c.length)]].plus++; }
+  const h = S.hero, sl = EQ_KEYS; let k = 0;
+  while (gearScore(h) < target - 2 && k++ < 80) { const c = sl.filter(x => h.eq[x] && (h.eq[x].plus || 0) < smithCap(h.eq[x])); const em = EQ_KEYS.find(x => !h.eq[x] && !(x === 'offhand' && h.eq.weapon && h.eq.weapon.h2)); if (em) { const it = makeItem(em === 'ring2' ? 'ring' : em === 'offhand' && h.cls === 'rogue' ? 'weapon' : em, h.lvl, 1); if (em === 'offhand' && h.cls === 'rogue') { it.cat = 'dagger'; delete it.h2; } it.curse = null; h.eq[em] = it; continue; } if (!c.length) { const r = sl.filter(x => h.eq[x] && h.eq[x].rar < 4); if (!r.length) break; h.eq[r[Math.floor(Math.random() * r.length)]].rar++; continue; } h.eq[c[Math.floor(Math.random() * c.length)]].plus++; }
   while (gearScore(h) > target + 2 && k++ < 160) { const c = sl.filter(x => h.eq[x] && h.eq[x].plus > 0); if (c.length) { h.eq[c[Math.floor(Math.random() * c.length)]].plus--; continue; }
-    if (h.eq.ring) { h.eq.ring = null; continue; } if (h.eq.amulet) { h.eq.amulet = null; continue; }
+    { const dk = ['ring2', 'ring', 'amulet', 'gloves', 'belt'].find(x => h.eq[x]); if (dk) { h.eq[dk] = null; continue; } }
     const w = h.eq.weapon, ar = h.eq.armor; if (w && w.props.length) { w.props.pop(); continue; } if (ar && ar.props.length) { ar.props.pop(); continue; }
     if (w && w.rar > 0) { w.rar--; continue; } if (ar && ar.rar > 0) { ar.rar--; continue; } if (ar && ar.ac > 1) { ar.ac--; continue; } if (w && w.die > 4) { w.die -= 2; continue; } break; }
   for (const x of sl) { const it = h.eq[x]; if (it && !it.unique) it.n = it.base + (it.plus ? ` +${it.plus}` : '') + (it.props[0] ? ' ' + PROP_DEF[it.props[0].k].n : ''); }

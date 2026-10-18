@@ -10,27 +10,26 @@ const ZONE_MUL = { head: 1.25, chest: 1, belly: 1.05, waist: .95, legs: .85 };
 const ZONE_ARM = { head: .4, chest: 1, belly: .9, waist: .7, legs: .5 };
 /* Стиль боя класса: число атак и блоков (как в «Бойцовском клубе»: щит = 3 блока, два клинка = 2 удара) */
 const STYLE = {
-  warrior: { atk: 1, blk: 3, n: 'меч и щит', h: 'head' }, cleric: { atk: 1, blk: 3, n: 'булава и щит', h: 'chest' },
+  warrior: { atk: 1, blk: 3, n: 'меч и щит', h: 'head', shield: 1 }, cleric: { atk: 1, blk: 3, n: 'булава и щит', h: 'chest', shield: 1 },
   rogue: { atk: 2, blk: 1, n: 'два кинжала', h: 'belly' }, ranger: { atk: 1, blk: 2, n: 'лук и нож', h: 'chest', aimed: 1 },
   mage: { atk: 1, blk: 2, n: 'посох', h: 'head' }, bard: { atk: 1, blk: 2, n: 'лютня-дубинка', h: 'legs' },
   barbarian: { atk: 1, blk: 2, n: 'двуручный топор', h: 'head', heavy: 1 }
 };
 /* Баланс классов (подбирается симуляциями balance5.js): d — множитель урона, h — здоровья (везде);
    z — доп. множитель урона только в бою по зонам */
-const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .78 }, mage: { d: 1, h: 1, r: 0.78, z: 1.07 }, rogue: { d: 1, h: 1, r: 0.85, z: .70 }, cleric: { d: 1, h: 1, r: 0.8, z: .81 }, bard: { d: 1, h: 1, r: 0.76, z: 1.55 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.12 }, barbarian: { d: 1, h: 1, r: 1.6, z: .96 } };
+const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .91 }, mage: { d: 1, h: 1, r: 0.78, z: 1.11 }, rogue: { d: 1, h: 1, r: 0.85, z: .69 }, cleric: { d: 1, h: 1, r: 0.8, z: .84 }, bard: { d: 1, h: 1, r: 0.76, z: 1.30 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.15 }, barbarian: { d: 1, h: 1, r: 1.6, z: .88 } };
 const BOT_K = 1.06;
 /* Монстры: в бою по зонам — доли от «типичного героя» того же уровня; на дороге — множители старой формулы */
-const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.2, vet: .07 };
+const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.55, vet: .07 };
 /* Пещеры v5: меньше бесплатного лечения, злее комнаты и боссы, отступление с частью добычи */
-const DUN_K = { shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: .9, mdmg: .8, bhp: [1.5, .42], bdmg: 1.25, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
+const DUN_K = { shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.5, .42], bdmg: 1.35, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
 /* v6: сила снаряжения (ГС) и уровни сложности пещер. g — доля «типичного» ГС уровня, m — сила монстров, rew — награда, rar — бонус редкости */
 const DUN_TIERS = {
   easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .93, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
   normal: { n: 'Обычная', ic: '🟡', g: 1, m: 1, rew: 1, rar: 0, nm: 'Пещера' },
-  hard: { n: 'Тяжёлая', ic: '🔴', g: 1.2, m: 1.03, rew: 1.6, rar: .7, nm: 'Глубины' }
+  hard: { n: 'Тяжёлая', ic: '🔴', g: 1.2, m: 1.06, rew: 1.6, rar: .7, nm: 'Глубины' }
 };
-const GS_K = { k: 1.1, ku: 1.7, hero: .6, min: .6, max: 1.7 };
-const PROP_IC = { fire: '🔥', vamp: '🩸', crit: '🎯', thorns: '🌵', holy: '✝' }, PROP_RU = { fire: 'огонь', vamp: 'вампиризм', crit: 'точность', thorns: 'шипы', holy: 'серебро' };
+const GS_K = { k: 1.1, ku: 1.45, hero: .6, min: .6, max: 1.7 };
 const MONSTER_STYLE = { atk: 1, blk: 1, n: 'когти и зубы', h: 'chest' };
 const F_ADV = ['неожиданно', 'украдкой', 'с размаху', 'не глядя', 'по-богатырски', 'исподтишка', 'мощно', 'от души', 'лениво', 'вдохновенно', 'случайно', 'со злости', 'хитро', 'с разворота', 'зажмурившись'];
 const F_VERB = ['стукнул', 'врезал', 'треснул', 'приложил', 'ткнул', 'огрел', 'заехал', 'пнул', 'боднул', 'шлёпнул', 'двинул'];

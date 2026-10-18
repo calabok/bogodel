@@ -24,12 +24,13 @@ async def main():
         r=await pg.evaluate("(()=>{const m=document.getElementById('modal');return {on:m.classList.contains('on'),t:/Снаряжение/.test(m.innerText)&&/Рюкзак/.test(m.innerText)&&/Доверие/.test(m.innerText),st:!!m.querySelector('.stgrid')}})()")
         ok('hero sheet: stats, trust, equipment, backpack', r['on'] and r['t'] and r['st'], r)
         await pg.evaluate("(()=>{const h=GAME.S.hero; const it=GAME.makeItem('ring',h.lvl,1); it.curse={k:'chatty',n:'Болтун'}; h.eq.ring=it; GAME.S.god.faith=GAME.maxFaith(); document.getElementById('modal').classList.remove('on'); GAME.render()})()")
-        hint=await pg.evaluate("/проклят/.test(document.getElementById('colHero').innerText)")
+        hint=await pg.evaluate("!!document.querySelector('#colHero [title=\"Надет проклятый предмет\"]')")
         await pg.click('#colHero [data-act=sheet]'); await pg.wait_for_timeout(150)
+        await pg.click('#modal [data-act=itemD][data-arg="eq:ring"]'); await pg.wait_for_timeout(150)
         n=await pg.evaluate("document.querySelectorAll('#modal [data-act=liftS]').length")
         if n: await pg.click('#modal [data-act=liftS]'); await pg.wait_for_timeout(150)
         r=await pg.evaluate("({c:!!(GAME.S.hero.eq.ring&&GAME.S.hero.eq.ring.curse), open:document.getElementById('modal').classList.contains('on')})")
-        ok('curse hint on card + lift from sheet', hint and n==1 and not r['c'] and r['open'], [hint,n,r])
+        ok('curse ☠ on GS chip + lift from item detail', hint and n==1 and not r['c'] and r['open'], [hint,n,r])
         await pg.evaluate("document.getElementById('modal').classList.remove('on')")
         # --- силы: описание по нажатию ---
         await pg.evaluate("GAME.S.tab='powers';GAME.render()")
@@ -44,7 +45,7 @@ async def main():
         # --- баланс: таблицы и эталон ---
         r=await pg.evaluate("(()=>{const ok=Object.keys(GAME.CLASSES).every(c=>GAME.CLASS_BAL[c]&&GAME.CLASS_BAL[c].z>0&&GAME.CLASS_BAL[c].r>0); const a=GAME.monsterRef(5), b=GAME.monsterRef(15); return {ok, grow: b.hp>a.hp*2 && b.avg>a.avg*1.8}})()")
         ok('class balance table + monster ref grows with level', r['ok'] and r['grow'], r)
-        r=await pg.evaluate("(()=>{const e=monsterUnit('Волк',8,{elite:1}), m=monsterUnit('Волк',8); return {e:e.max>m.max*1.1&&e.kind==='elite'&&/элита/.test(e.name), b:e.blkN===2}})()")
+        r=await pg.evaluate("(()=>{let se=0,sm=0,e; for(let i=0;i<30;i++){e=monsterUnit('Волк',8,{elite:1}); se+=e.max; sm+=monsterUnit('Волк',8).max;} return {e:se>sm*1.1&&e.kind==='elite'&&/элита/.test(e.name), b:e.blkN===2}})()")
         ok('elite monsters: tougher, marked', r['e'] and r['b'], r)
         # --- пещера: генерация ---
         r=await pg.evaluate("(()=>{let bad=0,el=0; for(let i=0;i<200;i++){const G=genDungeon(6); const c=t=>G.tiles.filter(x=>x&&x.t===t).length; if(c('shrine')>1||c('boss')!==1||c('key')!==1||c('elite')>2) bad++; el+=c('elite');} return {bad, el:el/200}})()")

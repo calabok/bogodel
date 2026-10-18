@@ -1,5 +1,5 @@
 /* БогоДел — service worker. Версия подставляется deploy.sh; любое изменение файла = обновление у игроков. */
-const VERSION = '20261018-205956';
+const VERSION = '20261018-232515';
 const CACHE = 'bogodel-' + VERSION;
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
 self.addEventListener('install', e => {

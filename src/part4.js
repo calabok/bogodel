@@ -26,7 +26,59 @@ const pct = (a, b) => clamp(b ? a / b * 100 : 0, 0, 100).toFixed(1) + '%';
 const bar = (cls, a, b, id) => `<div class="bar ${cls}"><i ${id ? 'id="' + id + '"' : ''} style="width:${pct(a, b)}"></i></div>`;
 const faithChip = () => `<span class="faithChip" title="Текущая вера">🔥 ${Math.floor(S.god.faith)} / ${maxFaith()}</span>`;
 const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене ⚔', rest: 'отдыхает 💤', dungeon: 'в пещере 🏰' };
-const SLOT_IC = { weapon: '⚔', armor: '🛡', amulet: '📿', ring: '💍' };
+/* ---------- Кукла героя (как в БК) и карточка предмета ---------- */
+const itemIc = it => it.slot === 'weapon' && WCAT[it.cat] ? WCAT[it.cat].ic : SLOT_IC[it.slot];
+function dollCell(h, k) {
+  const it = h.eq[k];
+  if (!it) { const blocked = k === 'offhand' && h.eq.weapon && h.eq.weapon.h2;
+    return `<div class="slotc empty" title="${SLOT_RU[k]}: ${blocked ? 'занято двуручным оружием' : 'пусто'}"><span class="ci">${blocked ? '🚫' : SLOT_IC[k]}</span><span class="cn">${blocked ? 'двуручное' : SLOT_RU[k]}</span></div>`; }
+  return `<button class="slotc r${it.rar}" style="border-color:${RARITY[it.rar].c}" data-act="itemD" data-arg="eq:${k}" title="${esc(it.n)}" aria-label="${esc(SLOT_RU[k] + ': ' + it.n)}"><span class="ci">${itemIc(it)}</span><span class="cn">${esc(it.base)}</span><span class="cb">${it.plus ? `<i>+${it.plus}</i>` : ''}${it.set ? '<i>🧩</i>' : ''}${it.curse ? '<i class="cur">☠</i>' : ''}</span></button>`;
+}
+function setProgress(h) {
+  const c = setCounts(h), ids = new Set(Object.keys(c)); for (const i of h.inv) if (i.set) ids.add(i.set);
+  return [...ids].map(id => { const n = c[id] || 0, S0 = SETS[id], next = Object.keys(S0.b).map(Number).find(x => x > n);
+    return `<span class="setc ${n >= 2 ? 'on' : ''}" title="${esc(Object.keys(S0.b).map(x => `${x}: ${setBonusText(id, x)}`).join(' · '))}">🧩 ${esc(S0.n)} ${n}/${S0.pcs.length}${next ? ` · бонус на ${next}` : ''}</span>`; }).join('');
+}
+function dollHTML(h) {
+  const sh = sheet(), za = zoneArmor(h, S.flock.temple), sp = setProgress(h);
+  return `<h3>Снаряжение</h3><div class="doll">
+    <div class="dcol">${['helm', 'amulet', 'armor', 'belt', 'boots'].map(k => dollCell(h, k)).join('')}</div>
+    <div class="dmid"><div class="dav">${CLS_IC[h.cls] || '🧔'}</div><div class="dgsv" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></div>
+      <div class="dst">урон ≈${Math.round(sh.avg)}<br>КД ${sh.ac} · ❤ ${h.maxHp}</div>
+      <div class="dza" title="Броня по зонам в бою: шлем — голова, броня — грудь и живот, пояс — пояс, сапоги — ноги">${ZONES.map(z => `<span>${ZONE_RU[z]} <b>${Math.round(za[z])}</b></span>`).join('')}</div></div>
+    <div class="dcol">${['weapon', 'offhand', 'gloves', 'ring', 'ring2'].map(k => dollCell(h, k)).join('')}</div>
+  </div>${sp ? `<div class="sets">${sp}</div>` : ''}
+  <div class="muted">Нажмите на вещь — подробности. Подземелья: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} рек. ГС ${recGS(h.lvl, k)}`).join(' · ')}.</div>`;
+}
+function findItemRef(ref) {
+  const h = S.hero, [t, id] = String(ref || '').split(':');
+  if (t === 'eq' && EQ_KEYS.includes(id) && h.eq[id]) return { it: h.eq[id], key: id };
+  if (t === 'inv') { const it = h.inv.find(i => i.id === id && i.slot); if (it) return { it, inv: true }; }
+  return null;
+}
+function itemModal(ref) {
+  const h = S.hero, f = findItemRef(ref); if (!f) return sheetModal();
+  const it = f.it, c = it.slot === 'weapon' ? WCAT[it.cat] : null, rq = reqHtml(h, it);
+  let set = '';
+  if (it.set) { const S0 = SETS[it.set], n = setCounts(h)[it.set] || 0, eqB = equipped(h).map(i => i.set === it.set && i.base), invB = h.inv.filter(i => i.set === it.set).map(i => i.base);
+    set = `<div class="setbox"><b>🧩 Комплект «${esc(S0.n)}» — надето ${n} из ${S0.pcs.length}</b>
+      <div class="setp">${S0.pcs.map(p => `<span class="${eqB.includes(p[1]) ? 'on' : invB.includes(p[1]) ? 'bag' : ''}">${eqB.includes(p[1]) ? '✔' : invB.includes(p[1]) ? '🎒' : '·'} ${SLOT_IC[p[0]]} ${esc(p[1])}</span>`).join('')}</div>
+      ${Object.keys(S0.b).map(x => `<div class="setb ${n >= +x ? 'on' : ''}">${x} ${plural(+x, 'предмет', 'предмета', 'предметов')}: ${esc(setBonusText(it.set, x))}</div>`).join('')}
+      <div class="fl">${esc(S0.fl)}</div></div>`; }
+  let cmp = '';
+  if (f.inv) { const b = bestPlace(h, it, true, true); if (b) { const cur = h.eq[b.k]; const d = gearScore({ eq: b.eq, cls: h.cls }) - gearScore(h);
+    cmp = `<div class="cmp">Вместо: ${cur ? itemSpan(cur) : `<span class="muted">${SLOT_RU[b.k]} пусто</span>`}${b.gone.length > 1 ? ' и щита (двуручное!)' : ''} · ГС <b class="${d >= 0 ? 'up' : 'dn'}">${d >= 0 ? '+' : ''}${d}</b>${b.sc > .01 ? ' · герой считает это улучшением' : ''}</div>`; } }
+  const btns = [];
+  if (f.inv) btns.push(`<button class="btn green" data-act="equipInv" data-arg="${it.id}" ${reqOk(h, it) ? '' : 'disabled'}>Надеть</button>`);
+  if (f.key && smithOk(it)) btns.push(`<button class="btn small" data-act="smith" data-arg="${f.key}" ${h.gold < smithCost(it) || S.fight || S.dun ? 'disabled' : ''}>🔨 +1 · ${smithCost(it)} 💰</button>`);
+  if (f.key && it.curse) btns.push(`<button class="btn small red" data-act="liftS" data-arg="${f.key}" ${S.god.faith < liftCost(it) ? 'disabled' : ''}>Снять ☠ · ${liftCost(it)}</button>`);
+  modal(`<div class="sheet itemd"><h2 style="color:${RARITY[it.rar].c}">${itemIc(it)} ${esc(it.n)}</h2>
+    <div class="muted">${RARITY[it.rar].n} · ${SLOT_RU[f.key || it.slot]} · ГС ${itemGS(it)}${f.key ? ' · надето' : ' · в рюкзаке'}</div>
+    <ul class="ist">${itemStats(it).map(x => `<li>${esc(x)}</li>`).join('')}${c ? `<li>${c.ic} ${esc(c.t)}</li>${c.cls.includes(h.cls) ? `<li class="aff">✦ любимое оружие класса «${CLASSES[h.cls].n}»: +1 к попаданию, +8% урона</li>` : ''}` : ''}
+    ${it.props.map(p => `<li>${PROP_IC[p.k] || '✧'} ${esc(propText(p))}</li>`).join('')}${it.curse ? `<li class="cur">☠ проклятие ${esc(CURSES[it.curse.k].n)}: ${esc(CURSES[it.curse.k].d)}</li>` : ''}</ul>
+    <div class="req">${rq || 'Требований нет'}</div>${it.fl ? `<div class="fl">«${esc(it.fl)}»</div>` : ''}${set}${cmp}
+    <div class="btns">${btns.join('')}<button class="btn small" data-act="sheet">← К герою</button></div></div>`);
+}
 const itemSpan = it => `<span class="r${it.rar}${it.curse ? ' cursed' : ''}" title="${esc(RARITY[it.rar].n + ': ' + itemDesc(it))}">${esc(it.n)}${it.curse ? ' ☠' : ''}</span>`;
 
 function renderHeader() {
@@ -63,8 +115,8 @@ function renderHero() {
     <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span>${Math.min(100, Math.floor(h.quest.p))}%</span></label>${bar('quest', h.quest.p, 100)}</div>
     <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   </div>
-  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
-    ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}${equipped(h).some(it => it.curse) ? '<button class="linkbtn" data-act="sheet" style="color:#8c2e20">☠ проклятый предмет</button>' : ''}</div>`;
+  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
+    ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div>`;
   setHTML($('colHero'), html);
 }
 function sheetModal() {
@@ -74,8 +126,8 @@ function sheetModal() {
   <div class="muted">Бой: атака ${fmtMod(sh.atkB)} · урон d${sh.die}${sh.dmgB ? fmtMod(sh.dmgB) : ''} (≈${Math.round(sh.avg)}) · КД ${sh.ac} · HP ${h.maxHp}. Владение ★: ${c.prof.map(k => STAT_SHORT[k]).join(', ')} (${fmtMod(profB(h.lvl))}).</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}, слушается ~${Math.round(obeyChance() * 100)}%</span></label>${bar('trust', h.trust, 100)}</div>
   ${h.inj.length ? `<h3>🤕 Травмы</h3>${h.inj.map(j => `<div class="injrow">${esc(j.n)}: ${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, пройдёт за ${fmtDur(j.t)}</div>`).join('')}<div class="muted">Лечат время, долгий отдых, храм и «Исцеление».</div>` : ''}
-  <h3>Снаряжение · ⚔ ГС ${gearScore(h)}</h3><div class="muted">Сила снаряжения решает в подземельях: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} ${DUN_TIERS[k].n.toLowerCase()} — рек. ${recGS(h.lvl, k)}`).join(' · ')}. Кузнец: +1 к предмету за золото (предел — от редкости: обычная +1 … легендарная +5).</div><ul class="eq">${['weapon', 'armor', 'amulet', 'ring'].map(sl => { const it = h.eq[sl]; return `<li><span>${SLOT_IC[sl]}</span><span class="nm">${it ? `${itemSpan(it)}<div class="muted">${RARITY[it.rar].n} · ГС ${itemGS(it)} · ${esc(itemDesc(it))}</div>` : `<span class="muted">${SLOT_RU[sl]}: пусто</span>`}</span><span class="eqb">${smithOk(it) ? `<button class="btn small" data-act="smith" data-arg="${sl}" ${h.gold < smithCost(it) || S.fight || S.dun ? 'disabled' : ''} title="Кузнец: +1 (ГС +4)">🔨 +1 · ${smithCost(it)} 💰</button>` : ''}${it && it.curse ? `<button class="btn small red" data-act="liftS" data-arg="${sl}" ${S.god.faith < liftCost(it) ? 'disabled' : ''}>Снять ☠ · ${liftCost(it)}</button>` : ''}</span></li>`; }).join('')}</ul>
-  <h3>🎒 Рюкзак (${h.inv.length}/12)</h3><ul class="inv">${h.inv.length ? h.inv.map(i => `<li>${i.slot ? itemSpan(i) : esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
+  ${dollHTML(h)}
+  <h3>🎒 Рюкзак (${h.inv.length}/${INV_MAX})</h3><ul class="inv">${h.inv.length ? h.inv.map(i => i.slot ? `<li><button class="linkbtn invb" data-act="itemD" data-arg="inv:${i.id}">${itemSpan(i)}</button>${!reqOk(h, i) ? ` <span class="rqb small">${esc(reqHtml(h, i).replace(/<[^>]+>/g, ''))}</span>` : bestPlace(h, i) ? ' <span class="upg" title="Лучше надетого">▲</span>' : ''} <span class="muted">~${i.v}💰</span></li>` : `<li>${esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
   <h3>Раса и класс</h3><div class="muted"><b>${r.tr}.</b> ${r.td}</div><div class="muted"><b>${c.ab}.</b> ${c.ad}</div>
   <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}
   <div class="btns"><button class="btn" data-act="closeModal">Закрыть</button></div></div>`);
@@ -206,7 +258,7 @@ function render() { renderNav(); renderHeader(); renderHero(); renderEvent(); re
 
 /* ---------- Модальные окна ---------- */
 const DUN_TIER_KEYS = ['easy', 'normal', 'hard'];
-function gsTip(h) { return `Сила снаряжения: ${['weapon', 'armor', 'amulet', 'ring'].map(sl => `${SLOT_RU[sl]} ${itemGS(h.eq[sl])}`).join(', ')}. Средний ГС для ур. ${h.lvl}: ${typGS(h.lvl)}. Чем выше — тем легче подземелья.`; }
+function gsTip(h) { return `Сила снаряжения: ${EQ_KEYS.filter(k => h.eq[k]).map(sl => `${SLOT_RU[sl]} ${itemGS(h.eq[sl])}`).join(', ')}${setBonusProps(h).length ? `, комплекты +${3 * setBonusProps(h).length}` : ''}. Средний ГС для ур. ${h.lvl}: ${typGS(h.lvl)}. Чем выше — тем легче подземелья.`; }
 function gsVerdict(q) { return q >= 1.25 ? ['легко', 'g'] : q >= 1.05 ? ['уверенно', 'g'] : q >= .92 ? ['по силам', 'n'] : q >= .78 ? ['трудно', 'w'] : ['опасно!', 'b']; }
 function tierModal() {
   const h = S.hero, gs = gearScore(h), auto = autoTier(h);
@@ -243,7 +295,7 @@ function help() {
   <p><b>Герой живёт сам</b>: бродит, дерётся, торгует, отдыхает и пишет дневник. Ваша валюта — <b>вера</b>: копится от паствы и храма, а ещё герой жертвует золото, если доверяет вам. Это неспешная игра: до 10-го уровня — пара недель.</p>
   <p><b>📋 Характеристики.</b> СИЛ, ЛОВ, ТЕЛ, ИНТ, МДР, ХАР — как в настольных ролевых играх. Они влияют на бой, торговлю (Харизма), проповеди и исходы развилок: в дневнике видно «проверка Харизмы: успех». Раса и класс дают бонусы и особые умения.</p>
   <p><b>🎖 Черты.</b> На каждом чётном уровне герой выбирает черту или +2 к характеристике. Подскажите ему, иначе выберет сам.</p>
-  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру.</p>
+  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение.</p>
   <p><b>🙏 Развилки.</b> Герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
@@ -287,7 +339,9 @@ const ACT = {
   mtab: a => { if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(a)) return; S.ui.mtab = a; if (a === 'powers' || a === 'arena') S.tab = a; else if (a === 'more' && !['flock', 'gods'].includes(S.tab)) S.tab = 'flock'; window.scrollTo(0, 0); },
   speedCycle: () => { const L = [1, 2, 5, 10]; S.speed = L[(L.indexOf(S.speed) + 1) % L.length]; S.paused = false; },
   skillInfo: a => { openSkill = openSkill === a ? null : a; },
-  liftS: a => { liftCurse(a); sheetModal(); },
+  liftS: a => { if (!EQ_KEYS.includes(a)) return; liftCurse(a); itemModal('eq:' + a); },
+  itemD: a => itemModal(a),
+  equipInv: id => { if (equipInv(id)) { render(); sheetModal(); } },
   voice: () => { const i = $('voiceIn'); voice(i.value); i.value = ''; },
   voiceq: a => voice(a),
   fork: a => answerFork(+a),
@@ -303,7 +357,7 @@ const ACT = {
   challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
   callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
   dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
-  smith: sl => { if (!['weapon', 'armor', 'amulet', 'ring'].includes(sl)) return; if (smithUpgrade(sl) === true) { sheetModal(); render(); } },
+  smith: sl => { if (!EQ_KEYS.includes(sl)) return; if (smithUpgrade(sl) === true) { render(); itemModal('eq:' + sl); } },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,
   rename: () => { S.god.name = ($('inGod').value || '').trim() || S.god.name; S.hero.name = ($('inHero').value || '').trim() || S.hero.name; closeModal(); save(); },
