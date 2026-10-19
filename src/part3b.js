@@ -23,12 +23,22 @@ function tx(t, d) {
 }
 function plural(n, a, b, c) { n = Math.abs(n) % 100; const n1 = n % 10; if (n > 10 && n < 20) return c; if (n1 > 1 && n1 < 5) return b; if (n1 === 1) return a; return c; }
 function nowStr() { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+/* v11: у записи есть id (для ленты без полной перерисовки) и флаг u — «вмешательство бога» (запись вызвана действием игрока) */
+let userActing = 0;
 function diary(text, cls, fx) {
   const e = { tm: nowStr(), x: tx(text), c: cls || '', f: fx || '' };
+  if (S) { S.dseq = (S.dseq || 0) + 1; e.i = S.dseq; }
+  if (userActing && !SILENT) e.u = 1;
   if (SILENT) { SILENT.buf.push(e); if (SILENT.buf.length > 400) SILENT.buf.splice(0, 100); return; }
   S.diary.unshift(e);
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
+}
+/* v11: подробности к записи дневника (лог боя/пещеры), разворачиваются по нажатию */
+function diaryDetail(after, log) {
+  if (SILENT || !S || !Array.isArray(log)) return;
+  const e = S.diary.slice(0, 12).filter(x => x.i > after).pop(); if (!e || e.d) return;
+  e.d = log.slice(0, 30).map(l => String(l.t).slice(0, 220)).reverse(); diaryVer++;
 }
 function toast(msg) {
   if (SILENT || typeof document === 'undefined') return;

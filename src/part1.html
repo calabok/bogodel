@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1c1638">
 <meta name="description" content="БогоДел — игра, где вы бог, а ваш герой живёт сам. Развилки, дуэли богов, подземелья с отрядом.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -358,7 +358,7 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
   .vs{grid-template-columns:1fr;}.vsx{text-align:center;font-size:18px}
 }
 /* ===== v5: спокойный интерфейс ===== */
-.spdC,#mnav,#moreLinks,#diaryMini,#mBanner{display:none}
+.spdC,#mBanner{display:none}
 .hcard h2{border:none;margin:0;padding:0;font-size:19px}
 .hc-top{display:flex;align-items:center;gap:12px}
 .hc-av{width:46px;height:46px;flex:none;border-radius:50%;background:#2a1f45;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--gold)}
@@ -387,60 +387,240 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
 .dc.room.elite{box-shadow:inset 0 0 0 2px #b8412f}
 #chatDock .chatPill{padding:6px 10px;font-size:13px;opacity:.85}
 #chatDock .chatPill:hover{opacity:1}
-@media (min-width:761px){#colHero{order:-2}}
+/* ===== v11: «Сцена бога» — темы, нижняя навигация, лента дневника, карточки сил ===== */
+:root,body[data-theme=good]{--gold:#c9962b;--gold2:#f0c75e;--hdr1:#221a3e;--hdr2:#2a1f48;--bgA:#4a3670;--bg2:#2a1f45;--bg1:#14122b;--parch:#fbf1d8;--parch2:#f1e1ba;--cardb:#e0c68e;--btn1:#f0cb6e;--btn2:#cf9a2c;--btnb:#a77b20;--btnInk:#2b1d07;--navbg:#1c1638f5;--navInk:#cdb98b;--h2c:#5a3b12;--glow:#f0c75e}
+body[data-theme=evil]{--gold:#b8412f;--gold2:#ff7a5c;--hdr1:#1e0c10;--hdr2:#2e1117;--bgA:#4f1a22;--bg2:#26100f;--bg1:#0d0708;--parch:#f3e4de;--parch2:#e5cfc6;--cardb:#c99a8c;--btn1:#ec8f72;--btn2:#b8412f;--btnb:#8c2e20;--btnInk:#fff;--navbg:#1a0a0df5;--navInk:#d9a89c;--h2c:#6e1d14;--glow:#ff5a3a}
+body[data-theme=neutral]{--gold:#6f93b8;--gold2:#a9cbec;--hdr1:#121a28;--hdr2:#19263b;--bgA:#2b3f5c;--bg2:#17233a;--bg1:#0b111c;--parch:#eef1f4;--parch2:#dde4ea;--cardb:#b4c3d1;--btn1:#cddcec;--btn2:#93b0cf;--btnb:#6f8fb0;--btnInk:#17263a;--navbg:#101826f5;--navInk:#9fb3c8;--h2c:#2c3e55;--glow:#a9cbec}
+html{background:var(--bg1)}
+body{background:radial-gradient(ellipse at top,var(--bgA) 0%,var(--bg2) 35%,var(--bg1) 100%) fixed;transition:background .6s}
+.card{background:linear-gradient(180deg,var(--parch),var(--parch2));border-color:var(--cardb)}
+.card h2{color:var(--h2c)}
+.btn{background:linear-gradient(180deg,var(--btn1),var(--btn2));color:var(--btnInk);border-color:var(--btnb);box-shadow:0 2px 0 var(--btnb)}
+header{background:linear-gradient(180deg,var(--hdr1),var(--hdr2));border-bottom:2px solid var(--gold);padding:calc(6px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 8px calc(12px + env(safe-area-inset-left))}
+.hrow{flex-wrap:nowrap;gap:8px}
+.godchip{display:flex;align-items:center;gap:9px;background:none;border:none;color:inherit;padding:0;min-width:0;text-align:left;flex:0 1 auto}
+.gav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;background:radial-gradient(circle at 35% 30%,var(--gold2),var(--gold));box-shadow:0 0 14px var(--glow);flex:none;border:2px solid #fff4}
+.godInfo{display:flex;flex-direction:column;min-width:0}
+.godInfo b{font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}
+.godInfo span{font-size:12px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glvl{display:flex;flex-direction:column;gap:3px;min-width:100px;font-size:12.5px;font-weight:700;color:#f3e6c4;flex:none}
+.glvl .bar{height:5px;border:none;background:#0007}.glvl .stars{color:#ffe27a;margin-left:3px}
+.hbtn{min-width:36px;min-height:34px}
+.speed button.on{background:var(--gold);border-color:var(--gold2)}
+.hrow2{grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);gap:8px}
+.hrow2 .faithM{grid-column:auto!important}
+.meter.faithM{height:32px}.meter.faithM>span{font-size:15px}
+.meter>span .rate{font-weight:600;opacity:.85;font-size:.82em;margin-left:7px}
+.meter.hpM{height:24px!important}
+main{max-width:1320px;grid-template-columns:minmax(0,1fr) 400px;padding:16px calc(16px + env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+#colRight{top:calc(var(--hdrH,104px) + 12px);max-height:calc(100vh - var(--hdrH,104px) - 112px)}
+.rph{display:flex;align-items:center;gap:8px}
+/* нижняя навигация — на всех ширинах */
+#mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(640px,calc(100% - 24px));z-index:45;background:var(--navbg);border:2px solid var(--gold);border-radius:18px;padding:4px;box-shadow:var(--shadow)}
+#mnav button{background:none;border:none;color:var(--navInk);font-size:12.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;min-height:52px;position:relative;border-radius:13px;font-weight:600}
+#mnav button b{font-size:23px;font-weight:400;line-height:1.1;transition:transform .15s}
+#mnav button.on{color:var(--gold2);background:#ffffff17}#mnav button.on b{transform:scale(1.12)}
+#mnav i{position:absolute;top:5px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:#e74c3c;display:none}
+#mnav i.on{display:block}
+#mnav button.dot::after{content:'';position:absolute;top:5px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:#f1c40f;box-shadow:0 0 6px #f1c40f}
+#chatDock{bottom:calc(12px + env(safe-area-inset-bottom))}#chatDock.open{bottom:calc(92px + env(safe-area-inset-bottom))}
+@media (max-width:1100px){#chatDock.closed{display:none}}
+#toasts{bottom:calc(92px + env(safe-area-inset-bottom))}
+#updBar{bottom:calc(92px + env(safe-area-inset-bottom))}
+.mobOnly{display:none}
+/* карточка героя */
+.hc-top{gap:10px}.hc-id h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-av{background:radial-gradient(circle at 35% 30%,#4a3a78,#1c1638);border-color:var(--gold)}
+.hc-btns{display:flex;gap:6px;flex:none}.hc-btns .btn{min-width:44px;min-height:40px}
+.hcol{display:none}
+.hc-now{margin:8px 0 2px;align-items:center}
+.hc-bars{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 16px;margin-top:8px}
+.hc-bars .stat{margin:2px 0}.hc-bars .bar{height:9px}
+.stat label b{font-weight:700}
+/* маршрут */
+.route{position:relative;height:50px;margin:8px 2px 2px}
+.route .rl{position:absolute;left:8%;right:8%;top:15px;height:4px;background:#0000001f;border-radius:2px}
+.route .rl i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 1s}
+.route .rn{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--ink2);white-space:nowrap;gap:2px}
+.route .rn b{width:32px;height:32px;border-radius:50%;background:#fffaf0;border:2px solid #00000026;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:400}
+.route .rn.on{color:var(--h2c);font-weight:700}.route .rn.on b{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold2) 45%,transparent)}
+.route .rdot{position:absolute;top:-9px;transform:translateX(-50%);font-size:19px;transition:left 1.2s ease-in-out;filter:drop-shadow(0 2px 2px #0006);z-index:2;line-height:1}
+.route .rdot.walk{animation:rwalk 1.4s ease-in-out infinite}@keyframes rwalk{50%{transform:translateX(-50%) translateY(-3px)}}
+/* дневник */
+.dhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--cardb);margin-bottom:6px}
+.dhead h2{border:none;margin:0;padding-bottom:6px}
+#diary{max-height:max(240px,calc(100vh - var(--hdrH,104px) - 540px));overflow:auto;padding:0 4px 0 0}
+.entry{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;padding:8px 10px 8px 6px;margin:6px 0;border:1px solid #00000010;border-left:4px solid #0000001a;border-radius:12px;background:#ffffff8c;font-size:14.5px;line-height:1.42;animation:fadeIn .4s}
+.entry .tm{font-size:11.5px;color:#9a7f55;padding-top:2px;text-align:right;min-width:0;font-variant-numeric:tabular-nums;opacity:1}
+.entry.med{background:#ffffffb3}
+.entry.big{padding:11px 12px 11px 6px;font-size:15.5px;background:#fff;box-shadow:0 2px 10px #0000001f}.entry.big .tx{font-weight:700}
+.entry.fight{border-left-color:#c0392b}.entry.loot{border-left-color:#c9962b}.entry.rare{border-left-color:#8a3cc4;background:linear-gradient(90deg,#f6ecff,#fff)}
+.entry.level{border-left-color:#3c8a2a;background:linear-gradient(90deg,#eaf8e2,#fff)}.entry.death{border-left-color:#222;background:linear-gradient(90deg,#efe2e2,#fff)}.entry.death .tx{color:#5a1a12}
+.entry.fork{border-left-color:#7b4fa8}.entry.event{border-left-color:#1d8a7e}.entry.duel{border-left-color:#d9731a}.entry.god{border-left-color:#5f8fd0}
+.entry.iv{background:linear-gradient(90deg,#e3edff,#f7faff);border-color:#a9c1ea;border-left-color:#2f63b8;border-left-width:5px}
+.entry.iv .tx{color:#1f3f72}
+.ivb{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:#2f63b8;border-radius:8px;padding:0 7px;margin:0 6px 2px 0;vertical-align:1px;line-height:17px;font-style:normal}
+.eic{margin-right:4px}
+.entry.can{cursor:pointer}.entry.can:hover{border-color:#00000030}
+.emore{display:inline-block;font-size:11.5px;color:#7a4d10;margin-left:4px;font-weight:600;white-space:nowrap}
+.edet{margin-top:6px;padding:6px 8px;background:#00000009;border-radius:8px;font-size:12.5px;line-height:1.35}
+.edet div{padding:2px 0;border-bottom:1px dotted #0000001f}.edet div:last-child{border:none}
+.edet .dice{font-weight:700;color:#2a4f8f}
+.entry.flash{animation:eflash 1s}@keyframes eflash{0%{box-shadow:0 0 0 3px var(--gold2)}100%{box-shadow:none}}
+.dempty{text-align:center;padding:18px 12px;border:2px dashed var(--cardb);border-radius:14px;margin:8px 0;color:var(--ink2);font-size:14px}
+.dempty .ei{font-size:38px;line-height:1.1}.dempty b{display:block;font-size:17px;color:var(--h2c);margin:6px 0 2px;font-family:Georgia,serif}
+#diaryMore:empty{display:none}#diaryMore{text-align:center;margin:6px 0}
+#voiceBar{border-top:1px dashed var(--cardb);padding-top:8px;margin-top:8px}
+#voiceBar .chips{margin-bottom:6px}
+.chip{min-height:34px;padding:5px 11px;font-size:13px;border-radius:16px;font-weight:600}
+.chip:disabled{opacity:.5}
+.voice{margin:0}
+/* силы — карточки */
+.pgrp{margin:6px 0 12px}
+.pgrp h3{display:flex;align-items:center;gap:6px;font-size:15px;margin:4px 0 7px;color:var(--h2c)}
+.pgrp h3 small{font-weight:400;font-size:12px;color:var(--ink2);font-family:inherit}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
+.pcard{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:10px 10px 9px;border-radius:13px;border:2px solid var(--pc);background:linear-gradient(180deg,#fff,var(--pbg));min-height:122px;position:relative;color:var(--ink);font:inherit;box-shadow:0 2px 0 var(--pc);transition:transform .1s}
+.pcard:active{transform:translateY(1px);box-shadow:none}
+.pcard .pic{font-size:29px;line-height:1.05}
+.pcard .pn{font-weight:700;font-size:14px;line-height:1.2;padding-right:2px}
+.pcard .pc{position:absolute;top:8px;right:8px;font-weight:700;font-size:12.5px;background:#1f3a6e;color:#fff;border-radius:10px;padding:1px 8px}
+.pcard .pd{font-size:12px;color:var(--ink2);line-height:1.3}
+.pcard .pw{font-size:11.5px;font-weight:700;color:#8c2e20;margin-top:auto;padding-top:3px}
+.pcard .pw.ok{color:#2f6b20}.pcard .pips{font-size:11px}
+.pcard.dim{opacity:.58;filter:grayscale(.55)}
+.pcard.lock .pc{background:#8a8a8a}
+.pgrp.light{--pc:#e0b64a;--pbg:#fff6da}.pgrp.wrath{--pc:#d0604a;--pbg:#ffe9e2}.pgrp.nature{--pc:#5fa04a;--pbg:#eaf7e2}
+.pprev{text-align:center}
+.pprev .pbig{font-size:56px;line-height:1.1}
+.pprev .pq{font-size:17px;font-weight:700;margin:10px 0 4px;color:var(--h2c)}
+.pprev .pfx{background:#fff;border:1px solid var(--cardb);border-radius:12px;padding:9px 12px;margin:8px 0;font-size:14.5px;text-align:left}
+.pprev .pfx li{margin:3px 0}
+.pprev .btns{justify-content:center}.pprev .btns .btn{min-height:44px;min-width:140px;font-size:15px}
+/* бой */
+.vsbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;margin:6px 0 8px}
+.vsu{background:#ffffffb0;border-radius:12px;padding:7px 9px;min-width:0;position:relative;border:1px solid #0000001a}
+.vsu .vn{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsu .vs2{font-size:11.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsu .bar{height:15px;margin-top:4px;border-radius:8px}
+.vsu .vh{font-size:13px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.vsu.foe{text-align:right}.vsu.me{border-color:#5f8fd0}.vsu.foe{border-color:#d0604a}
+.vsu.low .bar{box-shadow:0 0 0 2px #e74c3c88}
+.vsbar .vsx{font-size:22px;text-align:center}
+.zb .zi{font-size:15px}
+.zb{min-height:44px}.zb.head{min-height:48px}
+.zb.hintz{outline:3px dashed #2f63b8;outline-offset:1px}
+.fhint{background:#e3edff;border:1px solid #a9c1ea;border-radius:8px;padding:6px 9px;font-size:13.5px;color:#1f3f72;margin:6px 0;font-weight:600}
+.btn.hintb{background:linear-gradient(180deg,#a9c8f5,#5f8fd0);color:#fff;border-color:#2f63b8;box-shadow:0 2px 0 #2f63b8}
+/* эффекты */
+#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:48;overflow:hidden}
+.ftx{position:absolute;transform:translate(-50%,-50%);font-weight:800;font-size:21px;text-shadow:0 2px 0 #fff,0 0 7px #fff,0 0 2px #fff;animation:ftxUp 1.35s ease-out forwards;white-space:nowrap;font-family:Georgia,serif}
+.ftx.crit{color:#d0021b;font-size:28px}.ftx.hit{color:#a0281a}.ftx.blk{color:#1f4f9a}.ftx.dodge{color:#2f6b20}.ftx.heal{color:#2f8b3a}.ftx.god{color:#7b4fa8}
+@keyframes ftxUp{0%{opacity:0;transform:translate(-50%,-20%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}30%{transform:translate(-50%,-60%) scale(1)}100%{opacity:0;transform:translate(-50%,-190%)}}
+.fflash{position:absolute;border-radius:14px;animation:fflash .55s ease-out forwards}
+.fflash.hit{background:#ff3b2a59}.fflash.good{background:#ffe27a73}.fflash.light{background:#fff3b0b3}.fflash.wrath{background:#ff5a3a80}.fflash.nature{background:#8fe07a80}
+.fflash.screen{border-radius:0}
+@keyframes fflash{0%{opacity:1}100%{opacity:0}}
+.fly{position:absolute;font-size:34px;transform:translate(-50%,-50%) scale(1.2);transition:left .75s cubic-bezier(.4,-.25,.6,1),top .75s cubic-bezier(.3,.7,.5,1),opacity .75s ease-in,transform .75s;filter:drop-shadow(0 0 8px var(--glow))}
+body.rm .ftx{animation:none!important;opacity:1}
+body.rm .fflash,body.rm .fly{display:none}
+/* сводка «пока вас не было» */
+.away h2{font-size:21px}
+.awsub{color:var(--ink2);font-size:13.5px;margin:2px 0 8px}
+.awgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin:10px 0}
+.awt{background:#fff;border-radius:12px;padding:8px 10px;border:1px solid var(--cardb);font-size:12.5px;color:var(--ink2)}
+.awt b{display:block;font-size:21px;color:var(--ink);font-family:Georgia,serif}
+.awt.good b{color:#2f6b20}.awt.bad b{color:#a0281a}
+.awhl{list-style:none;padding:0;margin:6px 0;font-size:13.5px}
+.awhl li{background:#ffffff99;border-radius:10px;padding:6px 9px;margin:5px 0;border-left:4px solid var(--gold)}
+/* модалки */
+.btn.mcbig{width:100%;min-height:48px;font-size:16px}
+.nobar .mcbar{display:none!important}
+#modal .card{position:relative}
+.mx{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;border:1px solid var(--cardb);background:#fff8;font-size:16px;z-index:2;color:var(--ink)}
+.mcbar{display:none}
+/* момент — в стиле новой сцены */
+.card.fork.mom{border:2px solid var(--gold);background:linear-gradient(180deg,#fffdf3,var(--parch))}
+.card.fork.mom:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;border-radius:14px 14px 0 0;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold))}
+.fork.mom .q{font-size:16px}
+.mopts .btn{min-height:46px;border-radius:12px}
+.settings .snd{display:flex;align-items:center;gap:10px}
+.tgl.on{background:linear-gradient(180deg,#86c46d,#4c8a3c);color:#fff;border-color:#36662a}
+@media (max-width:1050px){main{grid-template-columns:minmax(0,1fr) 350px}}
+@media (min-width:761px){#colHero{order:-2}.hcol{display:none!important}}
 @media (max-width:760px){
-  .speed,.dsk{display:none}.spdC{display:inline-block}
-  #mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:#1c1638f7;border-top:2px solid var(--gold);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}
-  #mnav button{background:none;border:none;color:#cdb98b;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 0;min-height:48px;position:relative}
-  #mnav button b{font-size:19px;font-weight:400}
-  #mnav button.on{color:var(--gold2)}#mnav button.on b{transform:scale(1.1)}
-  #mnav i{position:absolute;top:4px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:#e74c3c;display:none}
-  #mnav i.on{display:block}
-  main{padding-bottom:84px}
-  #toasts{bottom:76px}
-  #chatDock{display:none}
-  body.chatOpen #chatDock{display:block;left:0;right:0;bottom:0;z-index:50}
-  body[data-mtab] #colRight{display:none}
-  body[data-mtab=powers] #colRight,body[data-mtab=arena] #colRight,body[data-mtab=more] #colRight{display:block}
-  body[data-mtab=powers] #colCenter>*,body[data-mtab=arena] #colCenter>*,body[data-mtab=more] #colCenter>*{display:none}
-  body[data-mtab=powers] #colCenter>#mBanner,body[data-mtab=arena] #colCenter>#mBanner,body[data-mtab=more] #colCenter>#mBanner{display:block}
-  body[data-mtab=diary] #colHero{display:none}
-  body[data-mtab=hero] #diaryCard{display:none}
-  body[data-mtab=hero] #diaryMini{display:block}
-  body[data-mtab] #colRight .tabs{display:none}
-  body[data-mtab=more] #colRight .tabs{display:flex}
-  body[data-mtab=more] #colRight .tabs button[data-arg=powers],body[data-mtab=more] #colRight .tabs button[data-arg=arena]{display:none}
-  body[data-mtab=more] #moreLinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-  #colRight{position:static;max-height:none}
+  main{grid-template-columns:minmax(0,1fr);grid-template-areas:"center" "right";gap:10px;padding:8px calc(8px + env(safe-area-inset-right)) calc(170px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left))}
+  header{padding:calc(5px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 7px calc(8px + env(safe-area-inset-left))}
+  .speed{display:none}.spdC{display:inline-block}
+  .gav{width:36px;height:36px;font-size:19px}
+  .godInfo b{font-size:14px}.godInfo span{font-size:11px}
+  .glvl{min-width:62px;font-size:11.5px}
+  .hbtn{min-width:40px;min-height:40px;padding:4px 6px}
+  .hrow2{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:6px;margin-top:6px}
+  .meter.faithM{height:30px}.meter.faithM>span{font-size:14px;padding:0 6px}
+  .meter.hpM>span{font-size:12px;padding:0 4px}
+  #mnav{left:0;right:0;transform:none;width:auto;bottom:0;border-radius:0;border-width:2px 0 0;padding:3px calc(2px + env(safe-area-inset-right)) calc(3px + env(safe-area-inset-bottom)) calc(2px + env(safe-area-inset-left));box-shadow:0 -4px 14px #0006}
+  #mnav button{min-height:54px;font-size:11.5px}
+  #mnav button b{font-size:24px}
+  #colRight{display:none;position:static;max-height:none}
+  body:not([data-mtab=hero]) #colRight{display:block}
+  body:not([data-mtab=hero]) #colCenter>*{display:none}
+  body:not([data-mtab=hero]) #colCenter>#mBanner{display:block}
+  body:not([data-mtab=hero]) main{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   #mBanner:empty{display:none!important}
-  .mban{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#2a1f45;color:#f3e6c4;border:2px solid var(--gold);border-radius:12px;padding:8px 12px;font-size:14px}
-  #diary{max-height:none}
-  .hc-grid{grid-template-columns:1fr}
+  .mban{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--hdr2);color:#f3e6c4;border:2px solid var(--gold);border-radius:12px;padding:8px 12px;font-size:14px}
+  #diary{max-height:none;overflow:visible;padding:0}
+  .entry{grid-template-columns:38px minmax(0,1fr);gap:6px;padding:8px 9px 8px 4px}
+  #voiceBar{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom));z-index:44;margin:0;background:var(--navbg);border-top:1px solid #ffffff26;padding:6px calc(8px + env(safe-area-inset-right)) 6px calc(8px + env(safe-area-inset-left));backdrop-filter:blur(6px)}
+  #voiceBar .chips{margin-bottom:5px;gap:6px}
+  #voiceBar .chip{min-height:40px;font-size:14px;padding:6px 13px;background:#fff6e0}
+  #voiceBar .voice input{min-height:40px;padding:6px 10px}
+  #voiceBar .voice .btn{min-height:40px}
+  #toasts{bottom:calc(172px + env(safe-area-inset-bottom));left:10px;right:10px;max-width:none}
+  body:not([data-mtab=hero]) #toasts{bottom:calc(76px + env(safe-area-inset-bottom))}
+  #updBar{bottom:calc(172px + env(safe-area-inset-bottom))}
+  .hcol{display:inline-flex}
+  body.heroCol .hc-more{display:none}
+  body.heroCol .hc-now{margin-bottom:0}
+  .hc-bars{gap:4px 12px}
+  .vsbar .vsx{font-size:16px}
+  .vsu{padding:6px 7px}.vsu .vn{font-size:13px}
+  button,.btn,.chip{min-height:40px}
+  .btn.small{min-height:40px;padding:6px 10px}
+  .linkbtn{min-height:40px}
+  .mobOnly{display:inline}
+  body.busyF #voiceBar{display:none}
+  body.busyF main{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  #chatDock{display:none}
+  body.chatOpen #chatDock{display:block;inset:0;z-index:58}
+  body.chatOpen .chatPanel{width:100%;height:100%;max-height:none;border-radius:0;border:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  .chatHead{padding:8px 10px}.chatX{min-height:44px;font-size:15px}
+  #modal{padding:0;align-items:stretch}
+  #modal .card{max-width:none;width:100%;max-height:none;height:100%;border-radius:0;border:none;padding:calc(14px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left))}
+  .mx{display:none}
+  .mcbar{display:block;position:sticky;bottom:0;margin:14px -14px 0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,var(--parch2) 22%);z-index:3}
+  .mcbar .btn{width:100%;min-height:50px;font-size:16px}
+  .pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-#chatDot2,#moreDot{display:none}
-#mnav button.dot::after{content:'';position:absolute;top:4px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:#f1c40f}
-#chatDot2.on{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e74c3c;margin-left:4px}
+@media (max-width:420px){.hideXS{display:none}}
+@media (max-width:360px){.glvl{display:none}.godInfo span{display:none}.pgrid{gap:6px}.pcard{padding:8px}.route .rn{font-size:10px}}
+@media (prefers-reduced-motion: reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<header>
+<header id="topbar">
   <div class="hrow">
-    <div class="logo">⚜<span class="logoTxt"> БогоДел</span><small>бог, которому не всё равно</small></div>
-    <div class="godInfo"><b id="hGod">—</b><span id="hTitle">—</span></div>
+    <button class="godchip" data-act="mtab" data-arg="gods" title="Ваш бог: характер и пантеон"><span class="gav" id="hAv">🙂</span><span class="godInfo"><b id="hGod">—</b><span id="hTitle">—</span></span></button>
     <div class="hspacer"></div>
-    <div class="speed"><span class="speedLbl">Скорость:</span>
-      <button data-act="speed" data-arg="1">×1</button><button data-act="speed" data-arg="2">×2</button>
-      <button data-act="speed" data-arg="5">×5</button><button data-act="speed" data-arg="10">×10</button>
-      <button data-act="pause" id="pauseBtn" title="Пауза">⏸</button>
-    </div>
+    <div class="glvl" id="hLvl" title="Уровень бога: за него дают очки сил ★"><span id="hGxp">Ур. 1</span><div class="bar gxp"><i id="hGxpBar"></i></div></div>
+    <div class="speed"><button data-act="speed" data-arg="1">×1</button><button data-act="speed" data-arg="2">×2</button><button data-act="speed" data-arg="5">×5</button><button data-act="speed" data-arg="10">×10</button><button data-act="pause" id="pauseBtn" title="Пауза">⏸</button></div>
     <button class="hbtn spdC" data-act="speedCycle" id="spdC" title="Скорость (нажмите, чтобы сменить)">×1</button><button class="hbtn spdC" data-act="pause" id="pauseBtn2" title="Пауза">⏸</button>
-    <button class="hbtn dsk" data-act="help" title="Как играть">❔<span class="hideS"> Как играть</span></button>
-    <button class="hbtn dsk" data-act="settings" title="Настройки">⚙</button>
+    <button class="hbtn" data-act="help" title="Как играть" aria-label="Как играть">❔</button>
+    <button class="hbtn" data-act="settings" title="Настройки" aria-label="Настройки">⚙</button>
   </div>
   <div class="hrow2">
     <div class="meter faithM" id="faithMeter" title="Вера (прана) — главная валюта бога. Копится от паствы и храма, тратится на силы, чудеса, армию и события."><i id="hFaithBar"></i><span id="hFaith">🔥 Вера: 0/0</span></div>
     <div class="meter hpM" id="hpMeter" title="Здоровье героя"><i id="hHpBar"></i><span id="hHp">HP</span></div>
-    <div class="meter gxpM" title="Уровень бога: за него дают очки сил"><i id="hGxpBar"></i><span id="hGxp">Ур. бога 1</span></div>
   </div>
 </header>
 <main>
@@ -452,32 +632,35 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
     <div id="fightBox"></div>
     <div id="dunBox"></div>
     <div id="eventBox"></div>
-    <div id="diaryMini" class="card"></div>
     <div class="card" id="diaryCard">
-      <h2>📜 Дневник героя</h2>
-      <div class="voice"><input id="voiceIn" maxlength="80" placeholder="Глас божий: «лечись», «копай клад»…"><button class="btn" data-act="voice" id="voiceBtn">📣 Глас · 5</button></div>
-      <div class="chips">
-        <button class="chip" data-act="voiceq" data-arg="Лечись!">лечись</button><button class="chip" data-act="voiceq" data-arg="Бей его!">бей</button>
-        <button class="chip" data-act="voiceq" data-arg="Копай клад!">копай клад</button><button class="chip" data-act="voiceq" data-arg="Проповедуй!">проповедуй</button>
-        <button class="chip" data-act="voiceq" data-arg="Иди в город!">в город</button><button class="chip" data-act="voiceq" data-arg="Беги!">беги</button>
-        <button class="chip" data-act="voiceq" data-arg="Вперёд, к цели!">вперёд</button><button class="chip" data-act="voiceq" data-arg="Отдыхай!">отдыхай</button>
+      <div class="dhead"><h2>📜 Дневник героя</h2><span class="muted" id="dCount"></span></div>
+      <div id="diaryEmpty"></div>
+      <div id="diary" role="feed" aria-label="Дневник героя"></div>
+      <div id="diaryMore"></div>
+      <div id="voiceBar">
+        <div class="chips">
+          <button class="chip" data-act="voiceq" data-arg="Лечись!">❤ лечись</button><button class="chip" data-act="voiceq" data-arg="Бей его!">⚔ бей</button>
+          <button class="chip" data-act="voiceq" data-arg="Копай клад!">💰 копай</button><button class="chip" data-act="voiceq" data-arg="Проповедуй!">📢 проповедуй</button>
+          <button class="chip" data-act="voiceq" data-arg="Иди в город!">🏘 в город</button><button class="chip" data-act="voiceq" data-arg="Беги!">🏃 беги</button>
+          <button class="chip" data-act="voiceq" data-arg="Вперёд, к цели!">➜ вперёд</button><button class="chip" data-act="voiceq" data-arg="Отдыхай!">💤 отдыхай</button>
+        </div>
+        <div class="voice"><input id="voiceIn" maxlength="80" placeholder="Глас божий: «лечись», «копай клад»…" enterkeyhint="send"><button class="btn" data-act="voice" id="voiceBtn">📣 Глас · 5</button></div>
       </div>
-      <div id="diary"></div>
     </div>
   </section>
   <section id="colRight" class="card">
-    <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="arena">🤺 Арена<i id="arenaDot"></i></button><button data-act="tab" data-arg="gods">⚜ Пантеон</button></div>
-    <div id="moreLinks"><button class="btn small" data-act="help">❔ Как играть</button><button class="btn small" data-act="settings">⚙ Настройки</button><button class="btn small" data-act="chatToggle">💬 Чат<i id="chatDot2"></i></button></div>
+    <div id="rightHead"></div>
     <div id="rightBody"></div>
   </section>
 </main>
 <nav id="mnav" aria-label="Разделы">
-  <button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button><button data-act="mtab" data-arg="diary"><b>📜</b>Дневник</button><button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="more"><b>☰</b>Ещё<i id="moreDot"></i></button>
+  <button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="flock"><b>⛪</b>Паства</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="gods"><b>⚜</b>Пантеон<i id="godsDot"></i></button><button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button>
 </nav>
 <div id="modal"></div>
 <div id="toasts"></div>
+<div id="fxLayer" aria-hidden="true"></div>
 <div id="chatDock" class="closed"><button class="chatPill" data-act="chatToggle" id="chatPill">💬 Чат</button>
-  <div class="chatPanel"><div class="chatHead"><b>💬 Общий чат</b><span class="muted" id="chatOnline"></span><button class="btn small" data-act="chatToggle" title="Свернуть">✕</button></div>
+  <div class="chatPanel"><div class="chatHead"><b>💬 Общий чат</b><span class="muted" id="chatOnline"></span><button class="btn small chatX" data-act="chatToggle" title="Свернуть">✕<span class="mobOnly"> Закрыть</span></button></div>
   <div class="chatLog" id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="120" placeholder="Скажите что-нибудь богам…" autocomplete="off"><button class="btn small" data-act="chatSend">➤</button></div></div></div>
 <div id="updBar"><span>✨ Доступно обновление</span><button class="btn small" data-act="applyUpdate">Обновить</button></div>

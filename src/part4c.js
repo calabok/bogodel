@@ -10,14 +10,14 @@ function fighterRow(F, f, me, canTarget) {
   const tele = F.tele && F.tele.fid === f.id ? `<div class="tl">⚠ замах ${ZONE_ACC[F.tele.zone]}</div>` : '';
   const sub = f.kind === 'boss' ? '👑 босс' : f.cls ? `${CLS_IC[f.cls] || ''} ${CLASSES[f.cls].n.toLowerCase()}` : 'чудище';
   const inner = `<span class="nm"><b>${f.isMe ? '⭐ ' : ''}${esc(f.name)}</b><span class="muted">${sub} · ${f.lvl}</span></span>${bar('hp', f.hp, f.max)}<span class="nm"><span class="muted">${Math.max(0, f.hp)}/${f.max}${f.bear > 0 ? ' 🐻' : ''}${f.debuf > 0 ? ' ☠' : ''}${f.buf && f.buf.shield ? ' 🛡' : ''}</span>${sel ? '<span class="tl">🎯 цель</span>' : ''}</span>${tele}`;
-  return tg ? `<button class="fr tg ${sel ? 'sel' : ''}" data-act="ftarget" data-arg="${f.id}">${inner}</button>`
-    : `<div class="fr ${f.isMe ? 'me' : ''} ${f.alive ? '' : 'dead'} ${sel ? 'sel' : ''}">${inner}</div>`;
+  return tg ? `<button class="fr tg ${sel ? 'sel' : ''}" data-act="ftarget" data-arg="${f.id}" data-fid="${esc(f.id)}">${inner}</button>`
+    : `<div class="fr ${f.isMe ? 'me' : ''} ${f.alive ? '' : 'dead'} ${sel ? 'sel' : ''}" data-fid="${esc(f.id)}">${inner}</div>`;
 }
 function zoneBody(F, me, k) {
   const sel = k === 'a' ? F.my.atk : F.my.blk, dis = F.auto || F.phase === 'end' || !me.alive;
-  const n = k === 'a' ? me.atkN : me.blkN;
+  const n = k === 'a' ? me.atkN : me.blkN, hz = F.hint && F.hint.turn === F.turn && F.phase === 'turn' ? F.hint.zones : [];
   const lbl = k === 'a' ? `⚔ Удар${n > 1 ? ` (${n} зоны)` : ''}` : `🛡 Блок (${n} ${plural(n, 'зона', 'зоны', 'зон')})`;
-  return `<div class="body ${k === 'a' ? 'atk' : 'blk'}"><h4>${lbl}</h4>${ZONES.map(z => `<button class="zb ${z} ${sel.includes(z) ? 'on' : ''} ${k === 'b' && F.tele && F.tele.zone === z ? 'tele' : ''}" data-act="fz" data-arg="${k}:${z}" ${dis ? 'disabled' : ''} aria-label="${k === 'a' ? 'Удар' : 'Блок'}: ${ZONE_RU[z]}">${ZONE_RU[z]}</button>`).join('')}</div>`;
+  return `<div class="body ${k === 'a' ? 'atk' : 'blk'}"><h4>${lbl}</h4>${ZONES.map(z => `<button class="zb ${z} ${sel.includes(z) ? 'on' : ''} ${k === 'b' && F.tele && F.tele.zone === z ? 'tele' : ''} ${k === 'b' && hz.includes(z) ? 'hintz' : ''}" data-act="fz" data-arg="${k}:${z}" ${dis ? 'disabled' : ''} aria-pressed="${sel.includes(z) ? 'true' : 'false'}" aria-label="${k === 'a' ? 'Удар' : 'Блок'}: ${ZONE_RU[z]}"><span class="zi">${ZONE_IC[z]}</span>${ZONE_RU[z]}</button>`).join('')}</div>`;
 }
 let fightSeenId = null;
 function renderFight() {
@@ -25,7 +25,11 @@ function renderFight() {
   if (!F) { setHTML(box, ''); return; }
   const me = fMe(F), turn = F.phase === 'turn', mine = me && me.alive;
   const t0 = F.fighters.filter(f => f.team === 0), t1 = F.fighters.filter(f => f.team === 1);
-  const teams = `<div class="teams"><div class="team"><h4>${t0.length > 1 ? 'Наши' : 'Вы'}</h4>${t0.map(f => fighterRow(F, f, me, false)).join('')}</div>
+  const multi = t0.length > 1 || t1.length > 1;
+  const foeT = F.fighters.find(f => f.id === F.my.target && f.alive) || t1.find(f => f.alive) || t1[0], meU = me || t0[0];
+  const vsU = (f, cls) => f ? `<div class="vsu ${cls} ${f.alive && f.hp < f.max * .3 ? 'low' : ''}" data-fid="${esc(f.id)}"><div class="vn">${f.isMe ? '⭐ ' : ''}${esc(f.name)}</div><div class="vs2">${f.kind === 'boss' ? '👑 босс' : f.cls ? `${CLS_IC[f.cls] || ''} ${CLASSES[f.cls].n.toLowerCase()}` : 'чудище'} · ур. ${f.lvl}${f.buf && f.buf.shield ? ' · 🛡' : ''}${f.debuf > 0 ? ' · ☠' : ''}</div>${bar('hp', f.hp, f.max)}<div class="vh">${f.alive ? `❤ ${Math.max(0, f.hp)} / ${f.max}` : '😵 выбыл'}</div></div>` : '<div></div>';
+  const vs = `<div class="vsbar">${vsU(meU, 'me')}<div class="vsx">⚔</div>${vsU(foeT, 'foe')}</div>`;
+  const teams = !multi ? '' : `<div class="teams"><div class="team"><h4>${t0.length > 1 ? 'Наши' : 'Вы'}</h4>${t0.map(f => fighterRow(F, f, me, false)).join('')}</div>
     <div class="team"><h4>${t1.length > 1 ? `Противники${turn && mine ? ' · нажмите — цель' : ''}` : 'Противник'}</h4>${t1.map(f => fighterRow(F, f, me, turn && mine && fAlive(F, 1).length > 1)).join('')}</div></div>`;
   let mid = '';
   const acts = FIGHT_ACT_KINDS.includes(F.kind) && mine && !F.auto ? `<div class="facts"><button class="btn small ${F.my.act === 'potion' ? 'on green' : ''}" data-act="fpot" ${S.hero.potions < 1 ? 'disabled' : ''} title="Вместо удара: +35% HP, блок остаётся">🧪 Зелье вместо удара (${S.hero.potions})</button><button class="btn small ${F.my.act === 'flee' ? 'on red' : ''}" data-act="fflee" title="${F.kind === 'dungeon' ? 'Отряд уходит из пещеры с добычей' : 'Сбежать с поля боя'}">🏃 Сбежать (${Math.round(fleeChance(F, me) * 100)}%)</button></div>${F.my.act ? `<div class="muted">${F.my.act === 'potion' ? '🧪 В этот ход герой пьёт зелье вместо удара.' : '🏃 В этот ход герой попробует сбежать вместо удара.'}</div>` : ''}` : '';
@@ -45,16 +49,18 @@ function renderFight() {
   else if (turn) {
     const tele = F.tele ? `<div class="telewarn">⚠ ${esc(F.fighters.find(f => f.id === F.tele.fid).name)} ударит ${ZONE_ACC[F.tele.zone]} всех! Поставьте блок на «${ZONE_RU[F.tele.zone]}».</div>` : '';
     const ok = mine && (F.my.atk.length >= me.atkN || F.my.act) && F.my.blk.length === me.blkN;
-    const ids = pIds;
+    const ids = pIds, hNow = F.hint && F.hint.turn === F.turn;
+    const hintBtn = F.auto ? '' : `<button class="btn small hintb" data-act="fhint" ${hNow || S.god.faith < HINT_COST ? 'disabled' : ''} title="Бог подсмотрит, куда целит самый опасный противник: в верх или в низ. Раз за ход.">👁 Подсказать · ${HINT_COST}</button>`;
+    const hintLine = hNow ? `<div class="fhint">${esc(F.hint.txt)}${F.hint.zones.length ? ' Синие пунктирные зоны — где ждать удара.' : ''}</div>` : '';
     mid = mine ? `${tele}${low}${F.absent ? '<div class="muted">🙏 Бога нет рядом — герой бьётся сам: осторожно, без сил. Нажмите что-нибудь, чтобы взять бой под контроль.</div>' : ''}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
-      <div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : '⚔ Ход (герой доберёт сам)'}</button>
+      ${hintLine}<div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : `⚔ Ход — выберите ${F.my.atk.length < me.atkN && !F.my.act ? (me.atkN > 1 ? `${me.atkN} зоны удара` : 'удар') : ''}${F.my.atk.length < me.atkN && !F.my.act && F.my.blk.length !== me.blkN ? ' и ' : ''}${F.my.blk.length !== me.blkN ? 'блок' : ''}`}</button>${hintBtn}
       <button class="btn small ${F.auto ? 'on green' : ''}" data-act="fauto">🤖 Автобой: ${F.auto ? 'вкл' : 'выкл'}</button></div>${acts}
       <div class="muted" style="margin-top:6px">Силы бога в бою: ${F.powersLeft}/3 (1 за ход) · ${faithChip()}${F.rivalGod ? ` · у бога ${esc(F.rivalGod.name)} осталось ${F.rivalGod.left}` : ''}</div>
       <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="fpow" data-arg="${id}" ${S.god.faith < powerCost(id) || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет изученных сил.</span>'}</div>`
       : `<div class="q">😵 ${F.kind === 'dungeon' ? 'Герой без сознания — союзники бьются дальше и прикрывают его.' : 'Ваш герой выбыл из боя. Союзники бьются дальше…'}</div>${F.kind === 'dungeon' && S.god.skills.heal ? `<div class="acts"><button class="btn small green" data-act="fpow" data-arg="heal" ${S.god.faith < powerCost('heal') || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>✚ Поднять героя (${powerCost('heal')})</button></div>` : ''}`;
   } else mid = `<div class="fend"><b>${esc(F.result || '')}</b>${F.rew ? `<div class="muted">${esc(F.rew)}</div>` : ''}</div><div class="btns"><button class="btn" data-act="fclose">Закрыть</button></div>`;
   setHTML(box, `<div class="card zf"><h2>⚔ ${esc(F.title)} <span class="muted">${F.phase === 'turn' ? `ход ${F.turn}` : F.phase === 'intro' ? 'подготовка' : 'итог'}</span></h2>
-    ${teams}
+    ${vs}${teams}
     <div class="stat"><label><span>${turn ? (F.auto ? 'Следующий ход через' : 'До конца хода (потом герой решит сам)') : F.phase === 'intro' ? (F.prep ? 'Подготовка — бой начнётся через' : 'Бой начнётся через') : 'Закроется через'}</span><span id="fSec"></span></label><div class="bar time"><i id="fBar"></i></div></div>
     ${mid}
     <div class="flog">${F.log.slice(0, 40).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
@@ -62,6 +68,7 @@ function renderFight() {
     if (fightSeenId !== F.id) { fightSeenId = F.id; if (!fightVis || r.top > innerHeight * .35 || r.top < 0) { const hd = document.querySelector('header'), hh = hd && getComputedStyle(hd).position !== 'static' ? hd.getBoundingClientRect().height : 0; window.scrollTo(0, Math.max(0, r.top + scrollY - hh - 6)); const r2 = box.getBoundingClientRect(); fightVis = !!box.offsetParent && r2.height > 0 && r2.top < innerHeight && r2.bottom > 0; } } }
   $('fSec').textContent = Math.max(0, Math.ceil(F.t)) + ' с';
   $('fBar').style.width = pct(F.t, F.T);
+  fightFx(F);
 }
 /* ---------- Пещера ---------- */
 function dunGsRow(U) {
@@ -148,7 +155,7 @@ function renderChat() {
   const ad2 = $('arenaDot2'); if (ad2) ad2.classList.toggle('on', !!dot && S.ui.mtab !== 'arena');
 }
 Object.assign(ACT, {
-  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a), fpot: () => fightAct('potion'), fflee: () => fightAct('flee'),
+  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => { const f0 = S.god.faith; fightPower(a); if (S.god.faith < f0) powerFx(a, lastBtnRect); }, fpot: () => fightAct('potion'), fflee: () => fightAct('flee'),
   fclose: () => { if (S.fight && S.fight.phase === 'end') closeFight(); },
   fmanual: () => { if (!startMonsterFight()) toast('Сейчас нечего брать под контроль.'); },
   dgo: a => dunMove(a), dheal: () => dunHeal(), dpotion: () => dunPotion(false), dauto: () => dunToggleAuto(), dleave: () => { if (confirm(`Отступить? Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи. Босс останется непобеждённым.`)) dunLeave(); },
@@ -178,4 +185,5 @@ window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldSt
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },
   MOMENTS, MOM_BY, MOM_T, startMoment, answerMoment, timeoutMoment, forkPaused, momentButtons, momCtx, forkOptions, get momClock() { return momClock; },
-  PWA, parseSave, checkUpdate, APP_BUILD };
+  PWA, parseSave, checkUpdate, APP_BUILD,
+  fightHint, HINT_COST, powerModal, powerEffect, powerWhy, routePos, themeOf, awayModal, get lastAway() { return lastAway; }, sfx, get audioCtx() { return audioCtx; }, diaryDetail, diary, NAV_TABS, renderDiary, get diaryLim() { return diaryLim; } };

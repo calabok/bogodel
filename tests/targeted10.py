@@ -2,7 +2,8 @@
 import asyncio, json, sys
 from playwright.async_api import async_playwright
 URL=sys.argv[1] if len(sys.argv)>1 else 'file:///workspace/godgame/index.html'
-SHOTS='/workspace/godgame/shots10_moments/'
+import os
+SHOTS=os.environ.get('SHOTS','/workspace/godgame/shots10_moments/')
 res={}; errs=[]
 def ok(n,c,info=None): res[n]='OK' if c else 'FAIL '+json.dumps(info,ensure_ascii=False,default=str)[:700]
 async def newgame(br, cls='warrior', w=1280, h=900, race='human'):
@@ -110,7 +111,7 @@ async def main():
             r=await pg.evaluate("({fork:!!GAME.S.fork, e:GAME.S.diary[0].x+' | '+GAME.S.diary[0].f, card:!!document.querySelector('#forkBox .fork')})")
             ok(f'{w}px: click → card closes, diary line with numbers', not r['fork'] and not r['card'] and any(c.isdigit() for c in r['e']), r)
             if w in (390,1280):
-                await pg.evaluate("document.getElementById('diaryMini').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(150)
+                await pg.evaluate("document.getElementById('diary').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(150)
                 await pg.screenshot(path=SHOTS+f'result_{w}.png')
                 # молитва (старый формат) для сравнения + момент с проверкой при низком HP
                 await pg.evaluate("(()=>{const S=GAME.S; S.hero.hp=Math.round(S.hero.maxHp*.3); S.god.faith=8; GAME.startMoment('nymph'); GAME.render(); document.getElementById('forkBox').scrollIntoView({block:'center'})})()"); await pg.wait_for_timeout(200)

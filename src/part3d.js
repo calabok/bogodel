@@ -218,7 +218,7 @@ function nextTurn(F) {
   bossPreTurn(F);
   if ((F.auto || F.absent) && me && me.alive) { const c = heroBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target, act: c.act }; F.ready = !!F.auto; }
   const st = S, id = F.id, turn = F.turn;
-  Promise.resolve(fightProv.decideTurn(fightView(F))).then(list => { if (S !== st || !S.fight || S.fight.id !== id || S.fight.turn !== turn) return; for (const c of list || []) S.fight.choices[c.fid] = c; }).catch(() => { });
+  Promise.resolve(fightProv.decideTurn(fightView(F))).then(list => { if (S !== st || !S.fight || S.fight.id !== id || S.fight.turn !== turn) return; for (const c of list || []) if (!S.fight.choices[c.fid]) S.fight.choices[c.fid] = c; }).catch(() => { });
   if (F.rivalGod && F.rivalGod.left > 0) Promise.resolve(fightProv.rivalPower(fightView(F))).then(p => { if (p && S === st && S.fight && S.fight.id === id && S.fight.turn === turn && S.fight.phase === 'turn') rivalGodAct(S.fight, p.act); }).catch(() => { });
 }
 function bossPreTurn(F) {
@@ -273,10 +273,10 @@ function hitOne(F, a, d, z, picks, o) {
   if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
   if (a.debuf > 0) critP = 0;
   const zacc = ZONE_ACC[z];
-  if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
-  if (!blocked && !o.magic && !o.aoe && (dg.blk || dbf.blk) && R() < (dg.blk || 0) + (dbf.blk || 0)) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss' };
+  if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss', k: 'dodge' };
+  if (!blocked && !o.magic && !o.aoe && (dg.blk || dbf.blk) && R() < (dg.blk || 0) + (dbf.blk || 0)) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss', k: 'blk' };
   const crit = R() < critP;
-  if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
+  if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss', k: 'blk' };
   let dmg = a.avg * DMG_K * (.75 + R() * .5) * ZONE_MUL[z] * (o.mul || 1);
   if (crit) dmg *= blocked ? 1 : 2;
   if (a.cls === 'barbarian') dmg *= 1.15 * (a.hp < a.max / 2 ? 1.3 : 1);
@@ -298,7 +298,7 @@ function hitOne(F, a, d, z, picks, o) {
   const adv = pick(F_ADV), verb = pick(F_VERB);
   const line = (crit ? `${a.name} ${pick(F_CRIT)} ${verb} ${zacc}${blocked ? ', пробив блок' : ''}! Критический удар` : `${a.name} ${adv} ${verb} ${zacc}${aimed ? ' (меткий выстрел сквозь блок)' : ''}…`) + (tag ? ` ${tag.trim()}` : '');
   const dp = d.props || [], ar = a.res || a.boss && a.boss.res;
-  return { dmg, line, c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe'), vamp: ap.includes('vamp') && br !== 'vamp' ? Math.round(dmg * .15) : 0, thorn: dp.includes('thorns') && ar !== 'thorns' ? Math.max(1, Math.round(dmg * .15)) : 0 };
+  return { dmg, line, k: crit ? 'crit' : 'hit', c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe'), vamp: ap.includes('vamp') && br !== 'vamp' ? Math.round(dmg * .15) : 0, thorn: dp.includes('thorns') && ar !== 'thorns' ? Math.max(1, Math.round(dmg * .15)) : 0 };
 }
 function resolveTurn(F) {
   const alive = F.fighters.filter(f => f.alive), picks = {}, pend = {};
@@ -352,6 +352,8 @@ function resolveTurn(F) {
   }
   for (const f of alive) if (f.bf && f.bf.heal && f.hp > 0 && f.hp < f.max) heal[f.id] = (heal[f.id] || 0) + Math.max(1, Math.round(f.max * f.bf.heal));
   for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);
+  /* v11: краткая сводка хода для всплывающих надписей («Крит!», «Блок», «Уворот») — только для интерфейса */
+  F.fx = { n: (F.fx && F.fx.n || 0) + 1, turn: F.turn, a: lines.filter(x => x.r.k || x.r.c === 'heal').slice(0, 24).map(({ r, d }) => ({ id: d.id, k: r.k || 'heal', v: r.dmg || 0 })) };
   flog(F, `— Ход ${F.turn} —`, 'turn');
   for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg}` : r.line, r.c);
   for (const f of capped) flog(F, `🛡 ${f.name} уворачивается, как может: часть ударов прошла вскользь.`, 'me');
@@ -423,6 +425,32 @@ function fightZone(arg) {
   const [k, z] = String(arg).split(':'); if (!ZONES.includes(z)) return;
   if (k === 'a') { if (me.atkN === 1) F.my.atk = [z]; else { const i = F.my.atk.indexOf(z); if (i >= 0) F.my.atk.splice(i, 1); else { F.my.atk.push(z); if (F.my.atk.length > me.atkN) F.my.atk.shift(); } } }
   else F.my.blk = blkSet(z, me.blkN);
+}
+/* v11: «Подсказать» — бог подсматривает замах самого опасного противника: верх (голова–живот) или низ (живот–ноги).
+   Стоит веры, раз за ход, не считается силой. Выбор противника фиксируется сразу, так что подсказка честная, но
+   покрывает 3 зоны из 5 — блок на 2 соседние всё равно остаётся угадыванием. */
+const HINT_COST = 6;
+function fightHint() {
+  const F = S.fight; if (!F || F.phase !== 'turn') return toast('Подсказка — только во время хода.');
+  if (F.auto) return toast('В автобое герой не слушает подсказок.');
+  const me = fMe(F); if (!me || !me.alive) return toast('Ваш герой уже не в строю.');
+  if (F.hint && F.hint.turn === F.turn) return toast('Подсказка на этот ход уже есть.');
+  if (S.god.faith < HINT_COST) return toast('Не хватает веры.');
+  S.god.faith -= HINT_COST; addGxp(1);
+  const att = [];
+  for (const e of fEnemies(F, me)) {
+    if (!e.alive) continue;
+    let c = F.choices[e.id]; if (!c || !Array.isArray(c.atk)) { c = botBrain(F, e); F.choices[e.id] = c; }
+    const z = (c.atk || []).find(x => ZONES.includes(x));
+    if (c.target === me.id && z && !(F.tele && F.tele.fid === e.id)) att.push({ e, z });
+  }
+  if (!att.length) { F.hint = { turn: F.turn, zones: [], txt: F.tele ? '👁 Кроме объявленного удара по герою никто не целит.' : '👁 Похоже, в этот ход по герою никто не целит — можно бить без оглядки.' }; flog(F, F.hint.txt, 'god'); return; }
+  att.sort((a, b) => b.e.avg - a.e.avg);
+  const { e, z } = att[0], wide = me.blkN >= 3;   // кто закрывает 3 зоны, получает подсказку шире (4 зоны), иначе она решала бы всё
+  const up = wide ? z === 'head' || (z !== 'legs' && R() < .5) : z === 'head' || z === 'chest' || (z === 'belly' && R() < .5);
+  const zones = wide ? (up ? ['head', 'chest', 'belly', 'waist'] : ['chest', 'belly', 'waist', 'legs']) : up ? ['head', 'chest', 'belly'] : ['belly', 'waist', 'legs'];
+  F.hint = { turn: F.turn, zones, fid: e.id, txt: `👁 ${e.name} целит ${up ? 'в верх' : 'в низ'}: ${zones.map(x => ZONE_RU[x]).join(', ')}.${att.length > 1 ? ` Остальные — как получится.` : ''}` };
+  flog(F, F.hint.txt, 'god');
 }
 function fightTarget(id) { const F = S.fight; if (!F || (F.phase !== 'turn' && F.phase !== 'intro')) return; const me = fMe(F); if (me && fightTargetOk(F, me, id)) F.my.target = id; }
 function fightGo() {
@@ -497,6 +525,10 @@ function healInjuries(kind) {
 }
 function endBattle(F, winTeam) {
   if (F.phase === 'end') return;
+  const dv0 = S.dseq || 0;
+  try { endBattle0(F, winTeam); } finally { diaryDetail(dv0, F.log); }
+}
+function endBattle0(F, winTeam) {
   F.phase = 'end'; F.t = 12; F.T = F.t; F.win = winTeam; F.tele = null;
   const h = S.hero, me = fMe(F), won = winTeam === 0, L = h.lvl;
   const foes = F.fighters.filter(f => f.team === 1), fx = [];

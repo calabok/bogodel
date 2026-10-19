@@ -186,7 +186,12 @@ function dunAfterFight(F, won) {
   }
 }
 function endDungeon(ok, why) {
-  const U = S.dun, h = S.hero; if (!U || U.phase === 'end') return;
+  const U = S.dun; if (!U || U.phase === 'end') return;
+  const dv0 = S.dseq || 0;
+  try { endDungeon0(ok, why); } finally { diaryDetail(dv0, U.log); }
+}
+function endDungeon0(ok, why) {
+  const U = S.dun, h = S.hero;
   const mult = why === 'carried' ? DUN_K.carried : why === 'boss' ? 1 : DUN_K.left;
   const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 15 * (DUN_TIERS[U.diff] || DUN_TIERS.normal).rew * (U.out ? DUN_K.outShare : 1) : 0)) * mult);
   if (U.out) { U.out = 0; h.hp = Math.max(h.hp, Math.round(h.maxHp * .1)); ulog(`😵 ${h.name} очнулся уже снаружи, на травке. Голова гудит.`, 'foe'); }

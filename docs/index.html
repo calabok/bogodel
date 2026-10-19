@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1c1638">
 <meta name="description" content="БогоДел — игра, где вы бог, а ваш герой живёт сам. Развилки, дуэли богов, подземелья с отрядом.">
 <link rel="manifest" href="manifest.webmanifest">
@@ -358,7 +358,7 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
   .vs{grid-template-columns:1fr;}.vsx{text-align:center;font-size:18px}
 }
 /* ===== v5: спокойный интерфейс ===== */
-.spdC,#mnav,#moreLinks,#diaryMini,#mBanner{display:none}
+.spdC,#mBanner{display:none}
 .hcard h2{border:none;margin:0;padding:0;font-size:19px}
 .hc-top{display:flex;align-items:center;gap:12px}
 .hc-av{width:46px;height:46px;flex:none;border-radius:50%;background:#2a1f45;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--gold)}
@@ -387,60 +387,240 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
 .dc.room.elite{box-shadow:inset 0 0 0 2px #b8412f}
 #chatDock .chatPill{padding:6px 10px;font-size:13px;opacity:.85}
 #chatDock .chatPill:hover{opacity:1}
-@media (min-width:761px){#colHero{order:-2}}
+/* ===== v11: «Сцена бога» — темы, нижняя навигация, лента дневника, карточки сил ===== */
+:root,body[data-theme=good]{--gold:#c9962b;--gold2:#f0c75e;--hdr1:#221a3e;--hdr2:#2a1f48;--bgA:#4a3670;--bg2:#2a1f45;--bg1:#14122b;--parch:#fbf1d8;--parch2:#f1e1ba;--cardb:#e0c68e;--btn1:#f0cb6e;--btn2:#cf9a2c;--btnb:#a77b20;--btnInk:#2b1d07;--navbg:#1c1638f5;--navInk:#cdb98b;--h2c:#5a3b12;--glow:#f0c75e}
+body[data-theme=evil]{--gold:#b8412f;--gold2:#ff7a5c;--hdr1:#1e0c10;--hdr2:#2e1117;--bgA:#4f1a22;--bg2:#26100f;--bg1:#0d0708;--parch:#f3e4de;--parch2:#e5cfc6;--cardb:#c99a8c;--btn1:#ec8f72;--btn2:#b8412f;--btnb:#8c2e20;--btnInk:#fff;--navbg:#1a0a0df5;--navInk:#d9a89c;--h2c:#6e1d14;--glow:#ff5a3a}
+body[data-theme=neutral]{--gold:#6f93b8;--gold2:#a9cbec;--hdr1:#121a28;--hdr2:#19263b;--bgA:#2b3f5c;--bg2:#17233a;--bg1:#0b111c;--parch:#eef1f4;--parch2:#dde4ea;--cardb:#b4c3d1;--btn1:#cddcec;--btn2:#93b0cf;--btnb:#6f8fb0;--btnInk:#17263a;--navbg:#101826f5;--navInk:#9fb3c8;--h2c:#2c3e55;--glow:#a9cbec}
+html{background:var(--bg1)}
+body{background:radial-gradient(ellipse at top,var(--bgA) 0%,var(--bg2) 35%,var(--bg1) 100%) fixed;transition:background .6s}
+.card{background:linear-gradient(180deg,var(--parch),var(--parch2));border-color:var(--cardb)}
+.card h2{color:var(--h2c)}
+.btn{background:linear-gradient(180deg,var(--btn1),var(--btn2));color:var(--btnInk);border-color:var(--btnb);box-shadow:0 2px 0 var(--btnb)}
+header{background:linear-gradient(180deg,var(--hdr1),var(--hdr2));border-bottom:2px solid var(--gold);padding:calc(6px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) 8px calc(12px + env(safe-area-inset-left))}
+.hrow{flex-wrap:nowrap;gap:8px}
+.godchip{display:flex;align-items:center;gap:9px;background:none;border:none;color:inherit;padding:0;min-width:0;text-align:left;flex:0 1 auto}
+.gav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;background:radial-gradient(circle at 35% 30%,var(--gold2),var(--gold));box-shadow:0 0 14px var(--glow);flex:none;border:2px solid #fff4}
+.godInfo{display:flex;flex-direction:column;min-width:0}
+.godInfo b{font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}
+.godInfo span{font-size:12px;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.glvl{display:flex;flex-direction:column;gap:3px;min-width:100px;font-size:12.5px;font-weight:700;color:#f3e6c4;flex:none}
+.glvl .bar{height:5px;border:none;background:#0007}.glvl .stars{color:#ffe27a;margin-left:3px}
+.hbtn{min-width:36px;min-height:34px}
+.speed button.on{background:var(--gold);border-color:var(--gold2)}
+.hrow2{grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);gap:8px}
+.hrow2 .faithM{grid-column:auto!important}
+.meter.faithM{height:32px}.meter.faithM>span{font-size:15px}
+.meter>span .rate{font-weight:600;opacity:.85;font-size:.82em;margin-left:7px}
+.meter.hpM{height:24px!important}
+main{max-width:1320px;grid-template-columns:minmax(0,1fr) 400px;padding:16px calc(16px + env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+#colRight{top:calc(var(--hdrH,104px) + 12px);max-height:calc(100vh - var(--hdrH,104px) - 112px)}
+.rph{display:flex;align-items:center;gap:8px}
+/* нижняя навигация — на всех ширинах */
+#mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(640px,calc(100% - 24px));z-index:45;background:var(--navbg);border:2px solid var(--gold);border-radius:18px;padding:4px;box-shadow:var(--shadow)}
+#mnav button{background:none;border:none;color:var(--navInk);font-size:12.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 0;min-height:52px;position:relative;border-radius:13px;font-weight:600}
+#mnav button b{font-size:23px;font-weight:400;line-height:1.1;transition:transform .15s}
+#mnav button.on{color:var(--gold2);background:#ffffff17}#mnav button.on b{transform:scale(1.12)}
+#mnav i{position:absolute;top:5px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:#e74c3c;display:none}
+#mnav i.on{display:block}
+#mnav button.dot::after{content:'';position:absolute;top:5px;right:calc(50% - 20px);width:10px;height:10px;border-radius:50%;background:#f1c40f;box-shadow:0 0 6px #f1c40f}
+#chatDock{bottom:calc(12px + env(safe-area-inset-bottom))}#chatDock.open{bottom:calc(92px + env(safe-area-inset-bottom))}
+@media (max-width:1100px){#chatDock.closed{display:none}}
+#toasts{bottom:calc(92px + env(safe-area-inset-bottom))}
+#updBar{bottom:calc(92px + env(safe-area-inset-bottom))}
+.mobOnly{display:none}
+/* карточка героя */
+.hc-top{gap:10px}.hc-id h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hc-av{background:radial-gradient(circle at 35% 30%,#4a3a78,#1c1638);border-color:var(--gold)}
+.hc-btns{display:flex;gap:6px;flex:none}.hc-btns .btn{min-width:44px;min-height:40px}
+.hcol{display:none}
+.hc-now{margin:8px 0 2px;align-items:center}
+.hc-bars{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 16px;margin-top:8px}
+.hc-bars .stat{margin:2px 0}.hc-bars .bar{height:9px}
+.stat label b{font-weight:700}
+/* маршрут */
+.route{position:relative;height:50px;margin:8px 2px 2px}
+.route .rl{position:absolute;left:8%;right:8%;top:15px;height:4px;background:#0000001f;border-radius:2px}
+.route .rl i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width 1s}
+.route .rn{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--ink2);white-space:nowrap;gap:2px}
+.route .rn b{width:32px;height:32px;border-radius:50%;background:#fffaf0;border:2px solid #00000026;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:400}
+.route .rn.on{color:var(--h2c);font-weight:700}.route .rn.on b{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold2) 45%,transparent)}
+.route .rdot{position:absolute;top:-9px;transform:translateX(-50%);font-size:19px;transition:left 1.2s ease-in-out;filter:drop-shadow(0 2px 2px #0006);z-index:2;line-height:1}
+.route .rdot.walk{animation:rwalk 1.4s ease-in-out infinite}@keyframes rwalk{50%{transform:translateX(-50%) translateY(-3px)}}
+/* дневник */
+.dhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--cardb);margin-bottom:6px}
+.dhead h2{border:none;margin:0;padding-bottom:6px}
+#diary{max-height:max(240px,calc(100vh - var(--hdrH,104px) - 540px));overflow:auto;padding:0 4px 0 0}
+.entry{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;padding:8px 10px 8px 6px;margin:6px 0;border:1px solid #00000010;border-left:4px solid #0000001a;border-radius:12px;background:#ffffff8c;font-size:14.5px;line-height:1.42;animation:fadeIn .4s}
+.entry .tm{font-size:11.5px;color:#9a7f55;padding-top:2px;text-align:right;min-width:0;font-variant-numeric:tabular-nums;opacity:1}
+.entry.med{background:#ffffffb3}
+.entry.big{padding:11px 12px 11px 6px;font-size:15.5px;background:#fff;box-shadow:0 2px 10px #0000001f}.entry.big .tx{font-weight:700}
+.entry.fight{border-left-color:#c0392b}.entry.loot{border-left-color:#c9962b}.entry.rare{border-left-color:#8a3cc4;background:linear-gradient(90deg,#f6ecff,#fff)}
+.entry.level{border-left-color:#3c8a2a;background:linear-gradient(90deg,#eaf8e2,#fff)}.entry.death{border-left-color:#222;background:linear-gradient(90deg,#efe2e2,#fff)}.entry.death .tx{color:#5a1a12}
+.entry.fork{border-left-color:#7b4fa8}.entry.event{border-left-color:#1d8a7e}.entry.duel{border-left-color:#d9731a}.entry.god{border-left-color:#5f8fd0}
+.entry.iv{background:linear-gradient(90deg,#e3edff,#f7faff);border-color:#a9c1ea;border-left-color:#2f63b8;border-left-width:5px}
+.entry.iv .tx{color:#1f3f72}
+.ivb{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:#2f63b8;border-radius:8px;padding:0 7px;margin:0 6px 2px 0;vertical-align:1px;line-height:17px;font-style:normal}
+.eic{margin-right:4px}
+.entry.can{cursor:pointer}.entry.can:hover{border-color:#00000030}
+.emore{display:inline-block;font-size:11.5px;color:#7a4d10;margin-left:4px;font-weight:600;white-space:nowrap}
+.edet{margin-top:6px;padding:6px 8px;background:#00000009;border-radius:8px;font-size:12.5px;line-height:1.35}
+.edet div{padding:2px 0;border-bottom:1px dotted #0000001f}.edet div:last-child{border:none}
+.edet .dice{font-weight:700;color:#2a4f8f}
+.entry.flash{animation:eflash 1s}@keyframes eflash{0%{box-shadow:0 0 0 3px var(--gold2)}100%{box-shadow:none}}
+.dempty{text-align:center;padding:18px 12px;border:2px dashed var(--cardb);border-radius:14px;margin:8px 0;color:var(--ink2);font-size:14px}
+.dempty .ei{font-size:38px;line-height:1.1}.dempty b{display:block;font-size:17px;color:var(--h2c);margin:6px 0 2px;font-family:Georgia,serif}
+#diaryMore:empty{display:none}#diaryMore{text-align:center;margin:6px 0}
+#voiceBar{border-top:1px dashed var(--cardb);padding-top:8px;margin-top:8px}
+#voiceBar .chips{margin-bottom:6px}
+.chip{min-height:34px;padding:5px 11px;font-size:13px;border-radius:16px;font-weight:600}
+.chip:disabled{opacity:.5}
+.voice{margin:0}
+/* силы — карточки */
+.pgrp{margin:6px 0 12px}
+.pgrp h3{display:flex;align-items:center;gap:6px;font-size:15px;margin:4px 0 7px;color:var(--h2c)}
+.pgrp h3 small{font-weight:400;font-size:12px;color:var(--ink2);font-family:inherit}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
+.pcard{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:10px 10px 9px;border-radius:13px;border:2px solid var(--pc);background:linear-gradient(180deg,#fff,var(--pbg));min-height:122px;position:relative;color:var(--ink);font:inherit;box-shadow:0 2px 0 var(--pc);transition:transform .1s}
+.pcard:active{transform:translateY(1px);box-shadow:none}
+.pcard .pic{font-size:29px;line-height:1.05}
+.pcard .pn{font-weight:700;font-size:14px;line-height:1.2;padding-right:2px}
+.pcard .pc{position:absolute;top:8px;right:8px;font-weight:700;font-size:12.5px;background:#1f3a6e;color:#fff;border-radius:10px;padding:1px 8px}
+.pcard .pd{font-size:12px;color:var(--ink2);line-height:1.3}
+.pcard .pw{font-size:11.5px;font-weight:700;color:#8c2e20;margin-top:auto;padding-top:3px}
+.pcard .pw.ok{color:#2f6b20}.pcard .pips{font-size:11px}
+.pcard.dim{opacity:.58;filter:grayscale(.55)}
+.pcard.lock .pc{background:#8a8a8a}
+.pgrp.light{--pc:#e0b64a;--pbg:#fff6da}.pgrp.wrath{--pc:#d0604a;--pbg:#ffe9e2}.pgrp.nature{--pc:#5fa04a;--pbg:#eaf7e2}
+.pprev{text-align:center}
+.pprev .pbig{font-size:56px;line-height:1.1}
+.pprev .pq{font-size:17px;font-weight:700;margin:10px 0 4px;color:var(--h2c)}
+.pprev .pfx{background:#fff;border:1px solid var(--cardb);border-radius:12px;padding:9px 12px;margin:8px 0;font-size:14.5px;text-align:left}
+.pprev .pfx li{margin:3px 0}
+.pprev .btns{justify-content:center}.pprev .btns .btn{min-height:44px;min-width:140px;font-size:15px}
+/* бой */
+.vsbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center;margin:6px 0 8px}
+.vsu{background:#ffffffb0;border-radius:12px;padding:7px 9px;min-width:0;position:relative;border:1px solid #0000001a}
+.vsu .vn{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsu .vs2{font-size:11.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vsu .bar{height:15px;margin-top:4px;border-radius:8px}
+.vsu .vh{font-size:13px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.vsu.foe{text-align:right}.vsu.me{border-color:#5f8fd0}.vsu.foe{border-color:#d0604a}
+.vsu.low .bar{box-shadow:0 0 0 2px #e74c3c88}
+.vsbar .vsx{font-size:22px;text-align:center}
+.zb .zi{font-size:15px}
+.zb{min-height:44px}.zb.head{min-height:48px}
+.zb.hintz{outline:3px dashed #2f63b8;outline-offset:1px}
+.fhint{background:#e3edff;border:1px solid #a9c1ea;border-radius:8px;padding:6px 9px;font-size:13.5px;color:#1f3f72;margin:6px 0;font-weight:600}
+.btn.hintb{background:linear-gradient(180deg,#a9c8f5,#5f8fd0);color:#fff;border-color:#2f63b8;box-shadow:0 2px 0 #2f63b8}
+/* эффекты */
+#fxLayer{position:fixed;inset:0;pointer-events:none;z-index:48;overflow:hidden}
+.ftx{position:absolute;transform:translate(-50%,-50%);font-weight:800;font-size:21px;text-shadow:0 2px 0 #fff,0 0 7px #fff,0 0 2px #fff;animation:ftxUp 1.35s ease-out forwards;white-space:nowrap;font-family:Georgia,serif}
+.ftx.crit{color:#d0021b;font-size:28px}.ftx.hit{color:#a0281a}.ftx.blk{color:#1f4f9a}.ftx.dodge{color:#2f6b20}.ftx.heal{color:#2f8b3a}.ftx.god{color:#7b4fa8}
+@keyframes ftxUp{0%{opacity:0;transform:translate(-50%,-20%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.18)}30%{transform:translate(-50%,-60%) scale(1)}100%{opacity:0;transform:translate(-50%,-190%)}}
+.fflash{position:absolute;border-radius:14px;animation:fflash .55s ease-out forwards}
+.fflash.hit{background:#ff3b2a59}.fflash.good{background:#ffe27a73}.fflash.light{background:#fff3b0b3}.fflash.wrath{background:#ff5a3a80}.fflash.nature{background:#8fe07a80}
+.fflash.screen{border-radius:0}
+@keyframes fflash{0%{opacity:1}100%{opacity:0}}
+.fly{position:absolute;font-size:34px;transform:translate(-50%,-50%) scale(1.2);transition:left .75s cubic-bezier(.4,-.25,.6,1),top .75s cubic-bezier(.3,.7,.5,1),opacity .75s ease-in,transform .75s;filter:drop-shadow(0 0 8px var(--glow))}
+body.rm .ftx{animation:none!important;opacity:1}
+body.rm .fflash,body.rm .fly{display:none}
+/* сводка «пока вас не было» */
+.away h2{font-size:21px}
+.awsub{color:var(--ink2);font-size:13.5px;margin:2px 0 8px}
+.awgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin:10px 0}
+.awt{background:#fff;border-radius:12px;padding:8px 10px;border:1px solid var(--cardb);font-size:12.5px;color:var(--ink2)}
+.awt b{display:block;font-size:21px;color:var(--ink);font-family:Georgia,serif}
+.awt.good b{color:#2f6b20}.awt.bad b{color:#a0281a}
+.awhl{list-style:none;padding:0;margin:6px 0;font-size:13.5px}
+.awhl li{background:#ffffff99;border-radius:10px;padding:6px 9px;margin:5px 0;border-left:4px solid var(--gold)}
+/* модалки */
+.btn.mcbig{width:100%;min-height:48px;font-size:16px}
+.nobar .mcbar{display:none!important}
+#modal .card{position:relative}
+.mx{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;border:1px solid var(--cardb);background:#fff8;font-size:16px;z-index:2;color:var(--ink)}
+.mcbar{display:none}
+/* момент — в стиле новой сцены */
+.card.fork.mom{border:2px solid var(--gold);background:linear-gradient(180deg,#fffdf3,var(--parch))}
+.card.fork.mom:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;border-radius:14px 14px 0 0;background:linear-gradient(90deg,var(--gold),var(--gold2),var(--gold))}
+.fork.mom .q{font-size:16px}
+.mopts .btn{min-height:46px;border-radius:12px}
+.settings .snd{display:flex;align-items:center;gap:10px}
+.tgl.on{background:linear-gradient(180deg,#86c46d,#4c8a3c);color:#fff;border-color:#36662a}
+@media (max-width:1050px){main{grid-template-columns:minmax(0,1fr) 350px}}
+@media (min-width:761px){#colHero{order:-2}.hcol{display:none!important}}
 @media (max-width:760px){
-  .speed,.dsk{display:none}.spdC{display:inline-block}
-  #mnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:#1c1638f7;border-top:2px solid var(--gold);padding:4px 2px calc(4px + env(safe-area-inset-bottom))}
-  #mnav button{background:none;border:none;color:#cdb98b;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 0;min-height:48px;position:relative}
-  #mnav button b{font-size:19px;font-weight:400}
-  #mnav button.on{color:var(--gold2)}#mnav button.on b{transform:scale(1.1)}
-  #mnav i{position:absolute;top:4px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:#e74c3c;display:none}
-  #mnav i.on{display:block}
-  main{padding-bottom:84px}
-  #toasts{bottom:76px}
-  #chatDock{display:none}
-  body.chatOpen #chatDock{display:block;left:0;right:0;bottom:0;z-index:50}
-  body[data-mtab] #colRight{display:none}
-  body[data-mtab=powers] #colRight,body[data-mtab=arena] #colRight,body[data-mtab=more] #colRight{display:block}
-  body[data-mtab=powers] #colCenter>*,body[data-mtab=arena] #colCenter>*,body[data-mtab=more] #colCenter>*{display:none}
-  body[data-mtab=powers] #colCenter>#mBanner,body[data-mtab=arena] #colCenter>#mBanner,body[data-mtab=more] #colCenter>#mBanner{display:block}
-  body[data-mtab=diary] #colHero{display:none}
-  body[data-mtab=hero] #diaryCard{display:none}
-  body[data-mtab=hero] #diaryMini{display:block}
-  body[data-mtab] #colRight .tabs{display:none}
-  body[data-mtab=more] #colRight .tabs{display:flex}
-  body[data-mtab=more] #colRight .tabs button[data-arg=powers],body[data-mtab=more] #colRight .tabs button[data-arg=arena]{display:none}
-  body[data-mtab=more] #moreLinks{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-  #colRight{position:static;max-height:none}
+  main{grid-template-columns:minmax(0,1fr);grid-template-areas:"center" "right";gap:10px;padding:8px calc(8px + env(safe-area-inset-right)) calc(170px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left))}
+  header{padding:calc(5px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 7px calc(8px + env(safe-area-inset-left))}
+  .speed{display:none}.spdC{display:inline-block}
+  .gav{width:36px;height:36px;font-size:19px}
+  .godInfo b{font-size:14px}.godInfo span{font-size:11px}
+  .glvl{min-width:62px;font-size:11.5px}
+  .hbtn{min-width:40px;min-height:40px;padding:4px 6px}
+  .hrow2{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:6px;margin-top:6px}
+  .meter.faithM{height:30px}.meter.faithM>span{font-size:14px;padding:0 6px}
+  .meter.hpM>span{font-size:12px;padding:0 4px}
+  #mnav{left:0;right:0;transform:none;width:auto;bottom:0;border-radius:0;border-width:2px 0 0;padding:3px calc(2px + env(safe-area-inset-right)) calc(3px + env(safe-area-inset-bottom)) calc(2px + env(safe-area-inset-left));box-shadow:0 -4px 14px #0006}
+  #mnav button{min-height:54px;font-size:11.5px}
+  #mnav button b{font-size:24px}
+  #colRight{display:none;position:static;max-height:none}
+  body:not([data-mtab=hero]) #colRight{display:block}
+  body:not([data-mtab=hero]) #colCenter>*{display:none}
+  body:not([data-mtab=hero]) #colCenter>#mBanner{display:block}
+  body:not([data-mtab=hero]) main{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
   #mBanner:empty{display:none!important}
-  .mban{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#2a1f45;color:#f3e6c4;border:2px solid var(--gold);border-radius:12px;padding:8px 12px;font-size:14px}
-  #diary{max-height:none}
-  .hc-grid{grid-template-columns:1fr}
+  .mban{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--hdr2);color:#f3e6c4;border:2px solid var(--gold);border-radius:12px;padding:8px 12px;font-size:14px}
+  #diary{max-height:none;overflow:visible;padding:0}
+  .entry{grid-template-columns:38px minmax(0,1fr);gap:6px;padding:8px 9px 8px 4px}
+  #voiceBar{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom));z-index:44;margin:0;background:var(--navbg);border-top:1px solid #ffffff26;padding:6px calc(8px + env(safe-area-inset-right)) 6px calc(8px + env(safe-area-inset-left));backdrop-filter:blur(6px)}
+  #voiceBar .chips{margin-bottom:5px;gap:6px}
+  #voiceBar .chip{min-height:40px;font-size:14px;padding:6px 13px;background:#fff6e0}
+  #voiceBar .voice input{min-height:40px;padding:6px 10px}
+  #voiceBar .voice .btn{min-height:40px}
+  #toasts{bottom:calc(172px + env(safe-area-inset-bottom));left:10px;right:10px;max-width:none}
+  body:not([data-mtab=hero]) #toasts{bottom:calc(76px + env(safe-area-inset-bottom))}
+  #updBar{bottom:calc(172px + env(safe-area-inset-bottom))}
+  .hcol{display:inline-flex}
+  body.heroCol .hc-more{display:none}
+  body.heroCol .hc-now{margin-bottom:0}
+  .hc-bars{gap:4px 12px}
+  .vsbar .vsx{font-size:16px}
+  .vsu{padding:6px 7px}.vsu .vn{font-size:13px}
+  button,.btn,.chip{min-height:40px}
+  .btn.small{min-height:40px;padding:6px 10px}
+  .linkbtn{min-height:40px}
+  .mobOnly{display:inline}
+  body.busyF #voiceBar{display:none}
+  body.busyF main{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  #chatDock{display:none}
+  body.chatOpen #chatDock{display:block;inset:0;z-index:58}
+  body.chatOpen .chatPanel{width:100%;height:100%;max-height:none;border-radius:0;border:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  .chatHead{padding:8px 10px}.chatX{min-height:44px;font-size:15px}
+  #modal{padding:0;align-items:stretch}
+  #modal .card{max-width:none;width:100%;max-height:none;height:100%;border-radius:0;border:none;padding:calc(14px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) 0 calc(14px + env(safe-area-inset-left))}
+  .mx{display:none}
+  .mcbar{display:block;position:sticky;bottom:0;margin:14px -14px 0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,var(--parch2) 22%);z-index:3}
+  .mcbar .btn{width:100%;min-height:50px;font-size:16px}
+  .pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-#chatDot2,#moreDot{display:none}
-#mnav button.dot::after{content:'';position:absolute;top:4px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:#f1c40f}
-#chatDot2.on{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e74c3c;margin-left:4px}
+@media (max-width:420px){.hideXS{display:none}}
+@media (max-width:360px){.glvl{display:none}.godInfo span{display:none}.pgrid{gap:6px}.pcard{padding:8px}.route .rn{font-size:10px}}
+@media (prefers-reduced-motion: reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<header>
+<header id="topbar">
   <div class="hrow">
-    <div class="logo">⚜<span class="logoTxt"> БогоДел</span><small>бог, которому не всё равно</small></div>
-    <div class="godInfo"><b id="hGod">—</b><span id="hTitle">—</span></div>
+    <button class="godchip" data-act="mtab" data-arg="gods" title="Ваш бог: характер и пантеон"><span class="gav" id="hAv">🙂</span><span class="godInfo"><b id="hGod">—</b><span id="hTitle">—</span></span></button>
     <div class="hspacer"></div>
-    <div class="speed"><span class="speedLbl">Скорость:</span>
-      <button data-act="speed" data-arg="1">×1</button><button data-act="speed" data-arg="2">×2</button>
-      <button data-act="speed" data-arg="5">×5</button><button data-act="speed" data-arg="10">×10</button>
-      <button data-act="pause" id="pauseBtn" title="Пауза">⏸</button>
-    </div>
+    <div class="glvl" id="hLvl" title="Уровень бога: за него дают очки сил ★"><span id="hGxp">Ур. 1</span><div class="bar gxp"><i id="hGxpBar"></i></div></div>
+    <div class="speed"><button data-act="speed" data-arg="1">×1</button><button data-act="speed" data-arg="2">×2</button><button data-act="speed" data-arg="5">×5</button><button data-act="speed" data-arg="10">×10</button><button data-act="pause" id="pauseBtn" title="Пауза">⏸</button></div>
     <button class="hbtn spdC" data-act="speedCycle" id="spdC" title="Скорость (нажмите, чтобы сменить)">×1</button><button class="hbtn spdC" data-act="pause" id="pauseBtn2" title="Пауза">⏸</button>
-    <button class="hbtn dsk" data-act="help" title="Как играть">❔<span class="hideS"> Как играть</span></button>
-    <button class="hbtn dsk" data-act="settings" title="Настройки">⚙</button>
+    <button class="hbtn" data-act="help" title="Как играть" aria-label="Как играть">❔</button>
+    <button class="hbtn" data-act="settings" title="Настройки" aria-label="Настройки">⚙</button>
   </div>
   <div class="hrow2">
     <div class="meter faithM" id="faithMeter" title="Вера (прана) — главная валюта бога. Копится от паствы и храма, тратится на силы, чудеса, армию и события."><i id="hFaithBar"></i><span id="hFaith">🔥 Вера: 0/0</span></div>
     <div class="meter hpM" id="hpMeter" title="Здоровье героя"><i id="hHpBar"></i><span id="hHp">HP</span></div>
-    <div class="meter gxpM" title="Уровень бога: за него дают очки сил"><i id="hGxpBar"></i><span id="hGxp">Ур. бога 1</span></div>
   </div>
 </header>
 <main>
@@ -452,32 +632,35 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
     <div id="fightBox"></div>
     <div id="dunBox"></div>
     <div id="eventBox"></div>
-    <div id="diaryMini" class="card"></div>
     <div class="card" id="diaryCard">
-      <h2>📜 Дневник героя</h2>
-      <div class="voice"><input id="voiceIn" maxlength="80" placeholder="Глас божий: «лечись», «копай клад»…"><button class="btn" data-act="voice" id="voiceBtn">📣 Глас · 5</button></div>
-      <div class="chips">
-        <button class="chip" data-act="voiceq" data-arg="Лечись!">лечись</button><button class="chip" data-act="voiceq" data-arg="Бей его!">бей</button>
-        <button class="chip" data-act="voiceq" data-arg="Копай клад!">копай клад</button><button class="chip" data-act="voiceq" data-arg="Проповедуй!">проповедуй</button>
-        <button class="chip" data-act="voiceq" data-arg="Иди в город!">в город</button><button class="chip" data-act="voiceq" data-arg="Беги!">беги</button>
-        <button class="chip" data-act="voiceq" data-arg="Вперёд, к цели!">вперёд</button><button class="chip" data-act="voiceq" data-arg="Отдыхай!">отдыхай</button>
+      <div class="dhead"><h2>📜 Дневник героя</h2><span class="muted" id="dCount"></span></div>
+      <div id="diaryEmpty"></div>
+      <div id="diary" role="feed" aria-label="Дневник героя"></div>
+      <div id="diaryMore"></div>
+      <div id="voiceBar">
+        <div class="chips">
+          <button class="chip" data-act="voiceq" data-arg="Лечись!">❤ лечись</button><button class="chip" data-act="voiceq" data-arg="Бей его!">⚔ бей</button>
+          <button class="chip" data-act="voiceq" data-arg="Копай клад!">💰 копай</button><button class="chip" data-act="voiceq" data-arg="Проповедуй!">📢 проповедуй</button>
+          <button class="chip" data-act="voiceq" data-arg="Иди в город!">🏘 в город</button><button class="chip" data-act="voiceq" data-arg="Беги!">🏃 беги</button>
+          <button class="chip" data-act="voiceq" data-arg="Вперёд, к цели!">➜ вперёд</button><button class="chip" data-act="voiceq" data-arg="Отдыхай!">💤 отдыхай</button>
+        </div>
+        <div class="voice"><input id="voiceIn" maxlength="80" placeholder="Глас божий: «лечись», «копай клад»…" enterkeyhint="send"><button class="btn" data-act="voice" id="voiceBtn">📣 Глас · 5</button></div>
       </div>
-      <div id="diary"></div>
     </div>
   </section>
   <section id="colRight" class="card">
-    <div class="tabs"><button data-act="tab" data-arg="powers">✨ Силы</button><button data-act="tab" data-arg="flock">⛪ Паства</button><button data-act="tab" data-arg="arena">🤺 Арена<i id="arenaDot"></i></button><button data-act="tab" data-arg="gods">⚜ Пантеон</button></div>
-    <div id="moreLinks"><button class="btn small" data-act="help">❔ Как играть</button><button class="btn small" data-act="settings">⚙ Настройки</button><button class="btn small" data-act="chatToggle">💬 Чат<i id="chatDot2"></i></button></div>
+    <div id="rightHead"></div>
     <div id="rightBody"></div>
   </section>
 </main>
 <nav id="mnav" aria-label="Разделы">
-  <button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button><button data-act="mtab" data-arg="diary"><b>📜</b>Дневник</button><button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="more"><b>☰</b>Ещё<i id="moreDot"></i></button>
+  <button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="flock"><b>⛪</b>Паства</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="gods"><b>⚜</b>Пантеон<i id="godsDot"></i></button><button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button>
 </nav>
 <div id="modal"></div>
 <div id="toasts"></div>
+<div id="fxLayer" aria-hidden="true"></div>
 <div id="chatDock" class="closed"><button class="chatPill" data-act="chatToggle" id="chatPill">💬 Чат</button>
-  <div class="chatPanel"><div class="chatHead"><b>💬 Общий чат</b><span class="muted" id="chatOnline"></span><button class="btn small" data-act="chatToggle" title="Свернуть">✕</button></div>
+  <div class="chatPanel"><div class="chatHead"><b>💬 Общий чат</b><span class="muted" id="chatOnline"></span><button class="btn small chatX" data-act="chatToggle" title="Свернуть">✕<span class="mobOnly"> Закрыть</span></button></div>
   <div class="chatLog" id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="120" placeholder="Скажите что-нибудь богам…" autocomplete="off"><button class="btn small" data-act="chatSend">➤</button></div></div></div>
 <div id="updBar"><span>✨ Доступно обновление</span><button class="btn small" data-act="applyUpdate">Обновить</button></div>
@@ -1082,12 +1265,13 @@ function defaultState(god, hero, race, cls) {
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], momHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
-    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
+    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero', heroCol: false, snd: false }, dseq: 0, lastSeen: Date.now()
   };
   return S0;
 }
 let S = null;
 let diaryVer = 0;
+const NAV_TABS = ['powers', 'flock', 'arena', 'gods', 'hero'];
 let SILENT = null; // во время офлайн-симуляции записи дневника копятся здесь
 function save() { if (!S) return; S.lastSeen = Date.now(); try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
 function deepMerge(def, obj) {
@@ -1248,9 +1432,13 @@ function sanitize(o) {
   fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20);
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
-  if (!['powers', 'flock', 'arena', 'gods'].includes(o.tab)) o.tab = 'powers';
+  if (!NAV_TABS.includes(o.tab)) o.tab = 'powers';
   if (!o.ui || typeof o.ui !== 'object' || Array.isArray(o.ui)) o.ui = { mtab: 'hero' };
-  if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(o.ui.mtab)) o.ui.mtab = 'hero';
+  /* v11: нижняя навигация «Силы | Паства | Арена | Пантеон | Герой»; старые вкладки «Дневник» и «Ещё» переехали */
+  if (o.ui.mtab === 'diary') o.ui.mtab = 'hero'; else if (o.ui.mtab === 'more') o.ui.mtab = ['flock', 'gods'].includes(o.tab) ? o.tab : 'flock';
+  if (!NAV_TABS.includes(o.ui.mtab)) o.ui.mtab = 'hero';
+  o.ui.heroCol = !!o.ui.heroCol; o.ui.snd = !!o.ui.snd;
+  for (const k of Object.keys(o.ui)) if (!['mtab', 'heroCol', 'snd'].includes(k)) delete o.ui[k];
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
   o.momHist = Array.isArray(o.momHist) ? o.momHist.filter(i => typeof i === 'string' && MOM_BY[i]).slice(-MOM_HIST) : [];
@@ -1291,6 +1479,12 @@ function sanitize(o) {
   for (const b of RIVALS_BASE) if (!o.rivals.find(r => r.id === b.id)) o.rivals.push(Object.assign({ w: 0, l: 0, army: 0, hlvl: 1 }, b));
   for (const r of o.rivals) { const b = RIVALS_BASE.find(x => x.id === r.id); Object.assign(r, { name: b.name, hero: b.hero, pers: b.pers, race: b.race, cls: b.cls }); fixNum(r, 'lvl', b.lvl, 1, 99); fixNum(r, 'hlvl', 1, 1, MAX_LVL); fixNum(r, 'w', 0, 0); fixNum(r, 'l', 0, 0); fixNum(r, 'army', 0, 0); }
   o.diary = Array.isArray(o.diary) ? o.diary.filter(e => e && typeof e.x === 'string').slice(0, 150) : [];
+  { let mx = 0; for (const e of o.diary) if (isNum(e.i) && e.i > 0) mx = Math.max(mx, Math.floor(e.i));
+    let n = Math.max(mx, isNum(o.dseq) ? Math.floor(o.dseq) : 0) + o.diary.length; o.dseq = n + 1; const seen = new Set();
+    for (const e of o.diary) { if (!(isNum(e.i) && e.i > 0) || seen.has(e.i)) e.i = n--; else e.i = Math.floor(e.i); seen.add(e.i);
+      e.tm = typeof e.tm === 'string' ? e.tm.slice(0, 8) : ''; e.c = typeof e.c === 'string' ? e.c.slice(0, 12) : ''; e.f = typeof e.f === 'string' ? e.f.slice(0, 400) : '';
+      if (e.u) e.u = 1; else delete e.u;
+      if (Array.isArray(e.d)) e.d = e.d.filter(x => typeof x === 'string').slice(0, 40).map(x => x.slice(0, 220)); else delete e.d; } }
   if (!o.stats || typeof o.stats !== 'object') o.stats = {};
   for (const k in d.stats) fixNum(o.stats, k, 0, 0);
   return o;
@@ -1461,12 +1655,22 @@ function tx(t, d) {
 }
 function plural(n, a, b, c) { n = Math.abs(n) % 100; const n1 = n % 10; if (n > 10 && n < 20) return c; if (n1 > 1 && n1 < 5) return b; if (n1 === 1) return a; return c; }
 function nowStr() { const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+/* v11: у записи есть id (для ленты без полной перерисовки) и флаг u — «вмешательство бога» (запись вызвана действием игрока) */
+let userActing = 0;
 function diary(text, cls, fx) {
   const e = { tm: nowStr(), x: tx(text), c: cls || '', f: fx || '' };
+  if (S) { S.dseq = (S.dseq || 0) + 1; e.i = S.dseq; }
+  if (userActing && !SILENT) e.u = 1;
   if (SILENT) { SILENT.buf.push(e); if (SILENT.buf.length > 400) SILENT.buf.splice(0, 100); return; }
   S.diary.unshift(e);
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
+}
+/* v11: подробности к записи дневника (лог боя/пещеры), разворачиваются по нажатию */
+function diaryDetail(after, log) {
+  if (SILENT || !S || !Array.isArray(log)) return;
+  const e = S.diary.slice(0, 12).filter(x => x.i > after).pop(); if (!e || e.d) return;
+  e.d = log.slice(0, 30).map(l => String(l.t).slice(0, 220)).reverse(); diaryVer++;
 }
 function toast(msg) {
   if (SILENT || typeof document === 'undefined') return;
@@ -3071,11 +3275,14 @@ function simulateAway(sec, why) {
   diary(`📖 Пока вас не было (${fmtDur(cap)}${sec > cap ? ', дальше герой спал' : ''})${why ? ' — ' + why : ''}: побед в боях ${c.wins}, смертей ${c.deaths}, заданий ${c.quests}, развилок решил сам ${c.forks}. Золото ${gd >= 0 ? '+' : ''}${gd}, паства ${fd >= 0 ? '+' : ''}${fd}, вера ${Math.floor(fa0)} → ${Math.floor(S.god.faith)}.${h.lvl > l0 ? ` Уровень ${l0} → ${h.lvl}!` : ''}${c.items.length ? ' Ценные находки: ' + c.items.slice(0, 4).join(', ') + '.' : ''}`, 'event');
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
+  /* v11: сводка для отдельной карточки «Пока вас не было» */
+  lastAway = { sec: cap, slept: sec > cap, why: why || '', wins: c.wins, deaths: c.deaths, quests: c.quests, forks: c.forks, gold: gd, fol: fd, fa0: Math.floor(fa0), fa1: Math.floor(S.god.faith), l0, l1: h.lvl, items: c.items.slice(0, 6), hl: hl.slice(0, 6).map(e => ({ x: e.x.replace(/^⏳ /, ''), c: e.c })) };
   return c;
 }
+let lastAway = null;
 function offlineCatchUp() {
   const sec = (Date.now() - (S.lastSeen || Date.now())) / 1000;
-  if (sec >= 60) simulateAway(sec);
+  if (sec >= 60 && simulateAway(sec) && typeof awayModal === 'function' && typeof document !== 'undefined') awayModal();
   if (S._migratedV3) {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
@@ -3306,7 +3513,7 @@ function nextTurn(F) {
   bossPreTurn(F);
   if ((F.auto || F.absent) && me && me.alive) { const c = heroBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target, act: c.act }; F.ready = !!F.auto; }
   const st = S, id = F.id, turn = F.turn;
-  Promise.resolve(fightProv.decideTurn(fightView(F))).then(list => { if (S !== st || !S.fight || S.fight.id !== id || S.fight.turn !== turn) return; for (const c of list || []) S.fight.choices[c.fid] = c; }).catch(() => { });
+  Promise.resolve(fightProv.decideTurn(fightView(F))).then(list => { if (S !== st || !S.fight || S.fight.id !== id || S.fight.turn !== turn) return; for (const c of list || []) if (!S.fight.choices[c.fid]) S.fight.choices[c.fid] = c; }).catch(() => { });
   if (F.rivalGod && F.rivalGod.left > 0) Promise.resolve(fightProv.rivalPower(fightView(F))).then(p => { if (p && S === st && S.fight && S.fight.id === id && S.fight.turn === turn && S.fight.phase === 'turn') rivalGodAct(S.fight, p.act); }).catch(() => { });
 }
 function bossPreTurn(F) {
@@ -3361,10 +3568,10 @@ function hitOne(F, a, d, z, picks, o) {
   if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
   if (a.debuf > 0) critP = 0;
   const zacc = ZONE_ACC[z];
-  if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
-  if (!blocked && !o.magic && !o.aoe && (dg.blk || dbf.blk) && R() < (dg.blk || 0) + (dbf.blk || 0)) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss' };
+  if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss', k: 'dodge' };
+  if (!blocked && !o.magic && !o.aoe && (dg.blk || dbf.blk) && R() < (dg.blk || 0) + (dbf.blk || 0)) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss', k: 'blk' };
   const crit = R() < critP;
-  if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
+  if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss', k: 'blk' };
   let dmg = a.avg * DMG_K * (.75 + R() * .5) * ZONE_MUL[z] * (o.mul || 1);
   if (crit) dmg *= blocked ? 1 : 2;
   if (a.cls === 'barbarian') dmg *= 1.15 * (a.hp < a.max / 2 ? 1.3 : 1);
@@ -3386,7 +3593,7 @@ function hitOne(F, a, d, z, picks, o) {
   const adv = pick(F_ADV), verb = pick(F_VERB);
   const line = (crit ? `${a.name} ${pick(F_CRIT)} ${verb} ${zacc}${blocked ? ', пробив блок' : ''}! Критический удар` : `${a.name} ${adv} ${verb} ${zacc}${aimed ? ' (меткий выстрел сквозь блок)' : ''}…`) + (tag ? ` ${tag.trim()}` : '');
   const dp = d.props || [], ar = a.res || a.boss && a.boss.res;
-  return { dmg, line, c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe'), vamp: ap.includes('vamp') && br !== 'vamp' ? Math.round(dmg * .15) : 0, thorn: dp.includes('thorns') && ar !== 'thorns' ? Math.max(1, Math.round(dmg * .15)) : 0 };
+  return { dmg, line, k: crit ? 'crit' : 'hit', c: crit ? 'crit' : (a.team === 0 ? 'me' : 'foe'), vamp: ap.includes('vamp') && br !== 'vamp' ? Math.round(dmg * .15) : 0, thorn: dp.includes('thorns') && ar !== 'thorns' ? Math.max(1, Math.round(dmg * .15)) : 0 };
 }
 function resolveTurn(F) {
   const alive = F.fighters.filter(f => f.alive), picks = {}, pend = {};
@@ -3440,6 +3647,8 @@ function resolveTurn(F) {
   }
   for (const f of alive) if (f.bf && f.bf.heal && f.hp > 0 && f.hp < f.max) heal[f.id] = (heal[f.id] || 0) + Math.max(1, Math.round(f.max * f.bf.heal));
   for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);
+  /* v11: краткая сводка хода для всплывающих надписей («Крит!», «Блок», «Уворот») — только для интерфейса */
+  F.fx = { n: (F.fx && F.fx.n || 0) + 1, turn: F.turn, a: lines.filter(x => x.r.k || x.r.c === 'heal').slice(0, 24).map(({ r, d }) => ({ id: d.id, k: r.k || 'heal', v: r.dmg || 0 })) };
   flog(F, `— Ход ${F.turn} —`, 'turn');
   for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg}` : r.line, r.c);
   for (const f of capped) flog(F, `🛡 ${f.name} уворачивается, как может: часть ударов прошла вскользь.`, 'me');
@@ -3511,6 +3720,32 @@ function fightZone(arg) {
   const [k, z] = String(arg).split(':'); if (!ZONES.includes(z)) return;
   if (k === 'a') { if (me.atkN === 1) F.my.atk = [z]; else { const i = F.my.atk.indexOf(z); if (i >= 0) F.my.atk.splice(i, 1); else { F.my.atk.push(z); if (F.my.atk.length > me.atkN) F.my.atk.shift(); } } }
   else F.my.blk = blkSet(z, me.blkN);
+}
+/* v11: «Подсказать» — бог подсматривает замах самого опасного противника: верх (голова–живот) или низ (живот–ноги).
+   Стоит веры, раз за ход, не считается силой. Выбор противника фиксируется сразу, так что подсказка честная, но
+   покрывает 3 зоны из 5 — блок на 2 соседние всё равно остаётся угадыванием. */
+const HINT_COST = 6;
+function fightHint() {
+  const F = S.fight; if (!F || F.phase !== 'turn') return toast('Подсказка — только во время хода.');
+  if (F.auto) return toast('В автобое герой не слушает подсказок.');
+  const me = fMe(F); if (!me || !me.alive) return toast('Ваш герой уже не в строю.');
+  if (F.hint && F.hint.turn === F.turn) return toast('Подсказка на этот ход уже есть.');
+  if (S.god.faith < HINT_COST) return toast('Не хватает веры.');
+  S.god.faith -= HINT_COST; addGxp(1);
+  const att = [];
+  for (const e of fEnemies(F, me)) {
+    if (!e.alive) continue;
+    let c = F.choices[e.id]; if (!c || !Array.isArray(c.atk)) { c = botBrain(F, e); F.choices[e.id] = c; }
+    const z = (c.atk || []).find(x => ZONES.includes(x));
+    if (c.target === me.id && z && !(F.tele && F.tele.fid === e.id)) att.push({ e, z });
+  }
+  if (!att.length) { F.hint = { turn: F.turn, zones: [], txt: F.tele ? '👁 Кроме объявленного удара по герою никто не целит.' : '👁 Похоже, в этот ход по герою никто не целит — можно бить без оглядки.' }; flog(F, F.hint.txt, 'god'); return; }
+  att.sort((a, b) => b.e.avg - a.e.avg);
+  const { e, z } = att[0], wide = me.blkN >= 3;   // кто закрывает 3 зоны, получает подсказку шире (4 зоны), иначе она решала бы всё
+  const up = wide ? z === 'head' || (z !== 'legs' && R() < .5) : z === 'head' || z === 'chest' || (z === 'belly' && R() < .5);
+  const zones = wide ? (up ? ['head', 'chest', 'belly', 'waist'] : ['chest', 'belly', 'waist', 'legs']) : up ? ['head', 'chest', 'belly'] : ['belly', 'waist', 'legs'];
+  F.hint = { turn: F.turn, zones, fid: e.id, txt: `👁 ${e.name} целит ${up ? 'в верх' : 'в низ'}: ${zones.map(x => ZONE_RU[x]).join(', ')}.${att.length > 1 ? ` Остальные — как получится.` : ''}` };
+  flog(F, F.hint.txt, 'god');
 }
 function fightTarget(id) { const F = S.fight; if (!F || (F.phase !== 'turn' && F.phase !== 'intro')) return; const me = fMe(F); if (me && fightTargetOk(F, me, id)) F.my.target = id; }
 function fightGo() {
@@ -3585,6 +3820,10 @@ function healInjuries(kind) {
 }
 function endBattle(F, winTeam) {
   if (F.phase === 'end') return;
+  const dv0 = S.dseq || 0;
+  try { endBattle0(F, winTeam); } finally { diaryDetail(dv0, F.log); }
+}
+function endBattle0(F, winTeam) {
   F.phase = 'end'; F.t = 12; F.T = F.t; F.win = winTeam; F.tele = null;
   const h = S.hero, me = fMe(F), won = winTeam === 0, L = h.lvl;
   const foes = F.fighters.filter(f => f.team === 1), fx = [];
@@ -3916,7 +4155,12 @@ function dunAfterFight(F, won) {
   }
 }
 function endDungeon(ok, why) {
-  const U = S.dun, h = S.hero; if (!U || U.phase === 'end') return;
+  const U = S.dun; if (!U || U.phase === 'end') return;
+  const dv0 = S.dseq || 0;
+  try { endDungeon0(ok, why); } finally { diaryDetail(dv0, U.log); }
+}
+function endDungeon0(ok, why) {
+  const U = S.dun, h = S.hero;
   const mult = why === 'carried' ? DUN_K.carried : why === 'boss' ? 1 : DUN_K.left;
   const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 15 * (DUN_TIERS[U.diff] || DUN_TIERS.normal).rew * (U.out ? DUN_K.outShare : 1) : 0)) * mult);
   if (U.out) { U.out = 0; h.hp = Math.max(h.hp, Math.round(h.maxHp * .1)); ulog(`😵 ${h.name} очнулся уже снаружи, на травке. Голова гудит.`, 'foe'); }
@@ -4144,43 +4388,76 @@ function itemModal(ref) {
 }
 const itemSpan = it => `<span class="r${it.rar}${it.curse ? ' cursed' : ''}" title="${esc(RARITY[it.rar].n + ': ' + itemDesc(it))}">${esc(it.n)}${it.curse ? ' ☠' : ''}</span>`;
 
+/* ---------- v11: верхняя панель, тема по характеру бога ---------- */
+const GOD_AV = { 'Всеблагой': '😇', 'Добрый': '☀️', 'Себе на уме': '🌀', 'Суровый': '😠', 'Гневный': '👿' };
+const themeOf = a => a >= 25 ? 'good' : a <= -25 ? 'evil' : 'neutral';
 function renderHeader() {
-  const g = S.god;
+  const g = S.god, B = document.body, at = alignTitle(g.align), th = themeOf(g.align);
+  if (B.dataset.theme !== th) { B.dataset.theme = th; const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = th === 'evil' ? '#1e0c10' : th === 'neutral' ? '#121a28' : '#221a3e'; }
+  $('hAv').textContent = GOD_AV[at] || '🙂';
   $('hGod').textContent = g.name;
-  $('hTitle').textContent = `Характер: ${alignTitle(g.align).toLowerCase()} · паства ${Math.floor(S.flock.fol)}`;
-  $('hFaith').textContent = `🔥 Вера: ${Math.floor(g.faith)} / ${maxFaith()}  (+${faithRegen().toFixed(2)}/с)`;
+  $('hTitle').textContent = `${at} · паства ${Math.floor(S.flock.fol)}`;
+  const rate = faithRegen() * 60;
+  setHTML($('hFaith'), `🔥 ${Math.floor(g.faith)} / ${maxFaith()}<span class="rate">+${rate >= 10 ? Math.round(rate) : rate.toFixed(1)}/мин</span>`);
   $('hFaithBar').style.width = pct(g.faith, maxFaith());
-  $('hGxp').textContent = `${innerWidth <= 360 ? 'Бог' : 'Ур. бога'} ${g.lvl} · ${g.xp}/${gxpNext(g.lvl)}` + (g.sp ? ` · ★${g.sp}` : '');
-  const vb = $('voiceBtn'); vb.disabled = g.faith < 5 || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon' || !!S.fight;
+  $('faithMeter').title = `Вера: ${Math.floor(g.faith)} из ${maxFaith()}, растёт на ${faithRegen().toFixed(2)} в секунду (${Math.round(faithRegen() * 3600)} в час). Тратится на силы, глас, чудеса и храм.`;
+  setHTML($('hGxp'), `Ур. ${g.lvl}${g.sp ? `<span class="stars" title="Неизрасходованные очки сил">${'★'.repeat(Math.min(3, g.sp))}${g.sp > 3 ? '+' + (g.sp - 3) : ''}</span>` : ''}`);
+  $('hLvl').title = `Уровень бога ${g.lvl}: ${g.xp}/${gxpNext(g.lvl)} опыта. ${g.sp ? `★ ${g.sp} — очки сил, потратьте во вкладке «Силы».` : 'Очки сил ★ дают за новые уровни.'}`;
   $('hGxpBar').style.width = pct(g.xp, gxpNext(g.lvl));
+  const vb = $('voiceBtn'), vdis = g.faith < 5 || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon' || !!S.fight;
+  vb.disabled = vdis; document.querySelectorAll('#voiceBar .chip').forEach(c => { if (c.disabled !== vdis) c.disabled = vdis; });
   const h = S.hero, hm = $('hpMeter'), dead = h.state === 'dead', narrow = innerWidth <= 430;
-  $('hHp').innerHTML = dead ? `💀 мёртв${narrow ? '' : ` · встанет через ${fmtDur(Math.max(60, h.deadT))}`}` : `❤ HP: ${Math.max(0, h.hp)} / ${h.maxHp}<small>КД ${sheet().ac}</small>`;
+  $('hHp').innerHTML = dead ? `💀 ${narrow ? 'мёртв' : `мёртв · встанет через ${fmtDur(Math.max(60, h.deadT))}`}` : `❤ ${narrow ? '' : 'HP: '}${Math.max(0, h.hp)} / ${h.maxHp}${narrow ? '' : `<small>КД ${sheet().ac}</small>`}`;
   $('hHpBar').style.width = dead ? '100%' : pct(h.hp, h.maxHp);
   hm.classList.toggle('dead', dead); hm.classList.toggle('low', !dead && h.hp < h.maxHp * .25);
-  hm.title = dead ? 'Герой мёртв. Воскресить можно на панели героя (30 веры).' : `Здоровье героя: ${h.hp} из ${h.maxHp}, класс доспеха ${sheet().ac}`;
+  hm.title = dead ? 'Герой мёртв. Воскресить можно в карточке героя (30 веры).' : `Здоровье героя: ${h.hp} из ${h.maxHp}, класс доспеха ${sheet().ac}`;
   if (hm._hp !== undefined && hm._max === h.maxHp && !dead && hm._hp - h.hp >= h.maxHp * .15) { hm.classList.remove('hit'); void hm.offsetWidth; hm.classList.add('hit'); }
   if (hm._hp !== undefined && !hm._dead && dead) { hm.classList.remove('hit'); void hm.offsetWidth; hm.classList.add('hit'); }
   hm._hp = h.hp; hm._max = h.maxHp; hm._dead = dead;
   document.querySelectorAll('.speed [data-act=speed]').forEach(b => b.classList.toggle('on', +b.dataset.arg === S.speed));
   $('pauseBtn').textContent = S.paused ? '▶' : '⏸'; $('pauseBtn').classList.toggle('on', S.paused);
+  const hh = document.querySelector('header').offsetHeight; if (hh && hh !== renderHeader._h) { renderHeader._h = hh; document.documentElement.style.setProperty('--hdrH', hh + 'px'); }
+}
+/* ---------- v11: маршрут Город → Лес → Подземелье → Город (точка — из настоящего состояния героя) ---------- */
+const ROUTE = [['🏘', 'Город'], ['🌲', 'Лес'], ['🏰', 'Подземелье'], ['🏘', 'Город']];
+function routePos(h) {
+  const back = momClock - momDunAt, st = h.state;
+  if (S.dun || st === 'dungeon') return { f: 2 / 3, node: 2 };
+  if (st === 'town' || (st === 'rest' && h.restKind !== 'camp')) return back < 1800 ? { f: 1, node: 3 } : { f: 0, node: 0 };
+  if (back < 900) { const k = clamp(back / 900, 0, 1); return { f: 2 / 3 + k / 3 * .85, node: k < .5 ? 2 : 3 }; }
+  const q = clamp((h.quest && h.quest.p || 0) / 100, 0, 1);
+  return { f: .12 + .3 * q, node: 1 };
+}
+function routeHTML(h) {
+  const p = routePos(h), L = x => (8 + 84 * x).toFixed(1) + '%';
+  const ic = h.state === 'dead' ? '💀' : S.fight || h.state === 'fight' ? '⚔' : h.state === 'duel' ? '🤺' : h.state === 'rest' ? '💤' : (CLS_IC[h.cls] || '🧔');
+  return `<div class="route" role="img" aria-label="Маршрут: ${ROUTE.map(r => r[1]).join(' → ')}; герой сейчас у точки «${ROUTE[p.node][1]}»">
+    <div class="rl"><i style="width:${(p.f * 100).toFixed(1)}%"></i></div>
+    ${ROUTE.map((r, i) => `<span class="rn ${i === p.node ? 'on' : ''}" style="left:${L(i / 3)}"><b>${r[0]}</b>${r[1]}</span>`).join('')}
+    <span class="rdot ${h.state === 'road' ? 'walk' : ''}" id="routeDot" data-node="${p.node}" style="left:${L(p.f)}">${ic}</span></div>`;
 }
 function renderHero() {
   const h = S.hero, m = h.monster, b = S.buffs;
   const buffs = [];
   if (b.luck > 0) buffs.push(`🍀 ${Math.ceil(b.luck)}с`); if (b.shield > 0) buffs.push(`🛡 ${Math.ceil(b.shield)}с`); if (b.trade > 0) buffs.push('☠ торговцы');
   const act = h.state === 'rest' ? `💤 ${h.restKind === 'camp' ? 'спит в лагере' : h.restKind === 'temple' ? 'ночует в храме' : 'отдыхает в трактире'}` : (STATE_RU[h.state] || h.state) + (m ? ': ' + esc(m.n) : '');
+  const col = !!S.ui.heroCol;
   let html = `<div class="hc-top"><div class="hc-av">${CLS_IC[h.cls] || '🧔'}</div><div class="hc-id"><h2>${esc(h.name)}</h2><div class="hc-sub">${RACES[h.race].n} · ${CLASSES[h.cls].n} · ур. ${h.lvl}</div></div>
-    <button class="btn small ghost" data-act="sheet" title="Характеристики, снаряжение, рюкзак">📋 Герой</button></div>
+    <div class="hc-btns"><button class="btn small ghost" data-act="sheet" title="Характеристики, снаряжение, рюкзак">📋<span class="hideXS"> Герой</span></button><button class="btn small ghost hcol" data-act="heroCol" aria-expanded="${!col}" title="${col ? 'Развернуть карточку' : 'Свернуть карточку'}">${col ? '▾' : '▴'}</button></div></div>
   <div class="hc-now"><span>📍 ${esc(h.loc)}</span><span class="st">${act}</span>${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
+  ${routeHTML(h)}
   ${m && !S.fight ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div><div class="btns" style="margin-top:4px"><button class="btn small red" data-act="fmanual">🎯 Взять бой под контроль</button></div>` : ''}
   ${h.state === 'dead' ? `<div class="deadbox">💀 Герой мёртв. Встанет сам через ${fmtDur(Math.max(60, h.deadT))} (и обидится).<div class="btns"><button class="btn" data-act="resurrect" ${S.god.faith < 30 ? 'disabled' : ''}>✨ Воскресить · 30</button></div></div>` : ''}
-  <div class="hc-grid">
-    <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span>${Math.min(100, Math.floor(h.quest.p))}%</span></label>${bar('quest', h.quest.p, 100)}</div>
-    <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
+  <div class="hc-more"><div class="hc-bars">
+    <div class="stat"><label><span>❤ Здоровье</span><span><b>${Math.max(0, h.hp)}</b>/${h.maxHp}</span></label>${bar('hp', h.hp, h.maxHp)}</div>
+    <div class="stat" title="Доверие: ${esc(trustLabel(h.trust))}. Чем выше, тем чаще слушается."><label><span>🤝 Доверие</span><span><b>${Math.round(h.trust)}</b>/100</span></label>${bar('trust', h.trust, 100)}</div>
+    <div class="stat"><label><span>⭐ Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : `<b>${h.xp}</b>/${xpNext(h.lvl)}`}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
+    <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span><b>${Math.min(100, Math.floor(h.quest.p))}</b>%</span></label>${bar('quest', h.quest.p, 100)}</div>
   </div>
-  <div class="hc-mini">${bldChip(h)}<button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
-    ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div>`;
+  <div class="hc-mini">${bldChip(h)}<button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span>
+    ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div></div>`;
   setHTML($('colHero'), html);
+  document.body.classList.toggle('heroCol', col);
 }
 /* ---------- v8: путь героя в интерфейсе ---------- */
 const bldPri = (h, id) => { const w = bldStatW(h, id); return STATS.slice().sort((a, b) => w[b] - w[a]).slice(0, 3); };
@@ -4209,9 +4486,10 @@ function bldModal() {
   <div class="opts">${Object.keys(BUILDS).map(id => { const B = BUILDS[id]; return `<button class="btn bldopt ${id === cur ? 'on' : ''}" data-act="bldPick" data-arg="${id}" ${id === cur ? 'disabled' : ''}><b>${B.ic} ${B.n}</b>${B.cls.includes(h.cls) ? ' <span class="tag cls">к лицу</span>' : ''}<br><span class="small">${esc(B.d)} Качает ${bldPri(h, id).map(k => STAT_SHORT[k]).join(' › ')}.</span></button>`; }).join('')}</div>
   <div class="btns"><button class="btn" data-act="sheet">← К герою</button></div></div>`);
 }
-function sheetModal() {
+function sheetModal() { modal(`<div class="sheet">${sheetHTML()}<div class="btns"><button class="btn" data-act="closeModal">Закрыть</button></div></div>`); }
+function sheetHTML(inline) {
   const h = S.hero, sh = sheet(), c = CLASSES[h.cls], r = RACES[h.race];
-  modal(`<div class="sheet"><h2>📋 ${esc(h.name)} — ${r.n.toLowerCase()}-${c.n.toLowerCase()}, ур. ${h.lvl}</h2>
+  return (`<${inline ? 'h3' : 'h2'}>📋 ${esc(h.name)} — ${r.n.toLowerCase()}-${c.n.toLowerCase()}, ур. ${h.lvl}</${inline ? 'h3' : 'h2'}>
   <div class="stgrid">${STATS.map(k => `<div class="${c.prim === k ? 'pr' : ''}">${STAT_SHORT[k]}<b>${statVal(k)}</b>${fmtMod(mod(statVal(k)))}</div>`).join('')}</div>
   <div class="muted">Бой: атака ${fmtMod(sh.atkB)} · урон d${sh.die}${sh.dmgB ? fmtMod(sh.dmgB) : ''} (≈${Math.round(sh.avg)}) · КД ${sh.ac} · HP ${h.maxHp}. Владение ★: ${c.prof.map(k => STAT_SHORT[k]).join(', ')} (${fmtMod(profB(h.lvl))}).</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}, слушается ~${Math.round(obeyChance() * 100)}%</span></label>${bar('trust', h.trust, 100)}</div>
@@ -4219,8 +4497,7 @@ function sheetModal() {
   ${bldHTML(h)}${dollHTML(h)}
   <h3>🎒 Рюкзак (${h.inv.length}/${INV_MAX})</h3><ul class="inv">${h.inv.length ? h.inv.map(i => i.slot ? `<li><button class="linkbtn invb" data-act="itemD" data-arg="inv:${i.id}">${itemSpan(i)}</button>${!reqOk(h, i) ? ` <span class="rqb small">${esc(reqHtml(h, i).replace(/<[^>]+>/g, ''))}</span>` : bestPlace(h, i) ? ' <span class="upg" title="Лучше надетого">▲</span>' : ''} <span class="muted">~${i.v}💰</span></li>` : `<li>${esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
   <h3>Раса и класс</h3><div class="muted"><b>${r.tr}.</b> ${r.td}</div><div class="muted"><b>${c.ab}.</b> ${c.ad}</div>
-  <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}
-  <div class="btns"><button class="btn" data-act="closeModal">Закрыть</button></div></div>`);
+  <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}`);
 }
 function renderFeat() {
   const box = $('featBox'), F = S.featOffer;
@@ -4233,12 +4510,62 @@ function renderFeat() {
   setHTML(box, `<div class="card feat"><h2>🎖 Герой вырос: выберите черту</h2>
   <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам.${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${pf}${body}</div>`);
 }
-function renderDiary() {
+/* ---------- v11: дневник — живая лента. Ключ записи — e.i; DOM ограничен, новые записи добавляются без перерисовки всей ленты ---------- */
+const D_BIG = ['level', 'death', 'rare', 'fork', 'event', 'duel'], D_MED = ['fight', 'loot'];
+const D_IC = { fight: '⚔', loot: '💰', rare: '💎', level: '⭐', death: '💀', fork: '✨', event: '🌍', duel: '🤺', god: '🙏' };
+const D_PAGE = 40;
+let diaryLim = D_PAGE, diaryOpen = new Set(), diaryTopSeen = 0, diaryMoreV = -1;
+function fxSplit(f) { return String(f || '').split(/,\s+(?![^()]*\))/).filter(Boolean); }
+function diaryNode(e) {
+  const chips = fxSplit(e.f), dice = chips.filter(x => x.startsWith('🎲')), nums = chips.filter(x => !x.startsWith('🎲'));
+  const can = !!(dice.length || (e.d && e.d.length) || nums.length > 3), open = can && diaryOpen.has(e.i);
+  const imp = D_BIG.includes(e.c) ? 'big' : D_MED.includes(e.c) ? 'med' : '';
+  const ic = D_IC[e.c] && !/^\p{Extended_Pictographic}/u.test(e.x) ? `<span class="eic">${D_IC[e.c]}</span>` : '';
+  const shown = open ? nums : nums.slice(0, 3);
+  const more = can ? `<span class="emore">${open ? '▴ свернуть' : `▾ ${dice.length ? '🎲 бросок' : e.d && e.d.length ? `ход боя (${e.d.length})` : 'подробнее'}`}</span>` : '';
+  const det = open ? `<div class="edet">${dice.map(x => `<div class="dice">${esc(x)}</div>`).join('')}${(e.d || []).map(x => `<div>${esc(x)}</div>`).join('')}</div>` : '';
+  const el = document.createElement('div');
+  el.className = `entry ${e.c || ''} ${imp} ${e.u ? 'iv' : ''} ${can ? 'can' : ''}`.replace(/\s+/g, ' ').trim();
+  el.dataset.id = e.i; el.dataset.k = (open ? 'o' : 'c') + (e.d ? e.d.length : 0);
+  if (can) { el.dataset.act = 'dexp'; el.dataset.arg = e.i; el.setAttribute('role', 'button'); el.setAttribute('aria-expanded', open ? 'true' : 'false'); el.tabIndex = 0; }
+  el.innerHTML = `<div class="tm">${esc(e.tm || '')}</div><div>${e.u ? '<span class="ivb" title="Это ваше вмешательство">🙏 вмешательство</span>' : ''}${ic}<span class="tx">${esc(e.x)}</span>${more}${shown.length ? `<div class="fx">${shown.map(x => `<span class="fxc">${esc(x)}</span>`).join('')}${!open && nums.length > 3 ? `<span class="fxc">+${nums.length - 3}</span>` : ''}</div>` : ''}${det}</div>`;
+  return el;
+}
+function renderDiary(force) {
   const el = $('diary');
-  if (el._v === diaryVer) return; el._v = diaryVer;
-  const row = e => `<div class="entry ${e.c}"><div class="tm">${e.tm}</div><div><span class="tx">${esc(e.x)}</span>${e.f ? `<div class="fx">${fxChips(e.f)}</div>` : ''}</div></div>`;
-  el.innerHTML = S.diary.map(row).join('');
-  const mini = $('diaryMini'); if (mini) mini.innerHTML = `<h2>📜 Последнее</h2>${S.diary.slice(0, 4).map(row).join('')}<div class="btns"><button class="btn small ghost" data-act="mtab" data-arg="diary">Весь дневник и глас →</button></div>`;
+  if (el._s !== S) { el._s = S; el.innerHTML = ''; el._v = null; diaryTopSeen = 0; diaryOpen.clear(); diaryLim = D_PAGE; }
+  const key = diaryVer + ':' + diaryLim + ':' + diaryMoreV;
+  if (el._v === key && !force) return; el._v = key;
+  const list = S.diary.slice(0, diaryLim), have = new Map();
+  for (const n of Array.from(el.children)) { const id = +n.dataset.id; if (have.has(id)) n.remove(); else have.set(id, n); }
+  let prev = null;
+  for (const e of list) {
+    if (!e.i) { S.dseq = (S.dseq || 0) + 1; e.i = S.dseq; }
+    let n = have.get(e.i);
+    const k = (diaryOpen.has(e.i) ? 'o' : 'c') + (e.d ? e.d.length : 0);
+    if (n && n.dataset.k !== k) { const nn = diaryNode(e); n.replaceWith(nn); n = nn; }
+    if (!n) n = diaryNode(e);
+    have.delete(e.i);
+    const want = prev ? prev.nextSibling : el.firstChild;
+    if (n !== want) el.insertBefore(n, want);
+    prev = n;
+  }
+  for (const n of have.values()) n.remove();
+  setHTML($('diaryEmpty'), S.diary.length < 4 ? `<div class="dempty"><div class="ei">🚶</div><b>Герой пока бродит. Дай ему команду</b>Нажмите кнопку гласа внизу — «бей», «копай клад», «проповедуй»… Это стоит 5 веры. Или загляните во вкладку «✨ Силы».</div>` : '');
+  setHTML($('diaryMore'), S.diary.length > diaryLim ? `<button class="btn small ghost" data-act="dmore">Показать ещё (${S.diary.length - diaryLim})</button>` : '');
+  setHTML($('dCount'), S.diary.length ? `${S.diary.length} ${plural(S.diary.length, 'запись', 'записи', 'записей')}` : '');
+  const top = S.diary[0];
+  if (top && top.i !== diaryTopSeen) {
+    if (diaryTopSeen) { const fresh = S.diary.slice(0, 6).filter(e => e.i > diaryTopSeen); diaryCue(fresh); }
+    diaryTopSeen = top.i;
+  }
+}
+/* звук на важные новые записи */
+function diaryCue(fresh) {
+  if (!fresh.length) return;
+  const c = fresh.map(e => e.c);
+  if (c.includes('level')) sfx('level'); else if (c.includes('death')) sfx('death'); else if (c.includes('rare')) sfx('rare');
+  else if (fresh.some(e => e.c === 'fork' && /^✨/.test(e.x))) sfx('bell');
 }
 function fxChips(f) { return String(f).split(/,\s+(?![^()]*\))/).filter(Boolean).map(x => `<span class="fxc">${esc(x)}</span>`).join(''); }
 function alignTag(a) { return a >= 2 ? '<span class="tag kind">добро</span>' : a <= -2 ? '<span class="tag wrath">гнев</span>' : ''; }
@@ -4295,32 +4622,75 @@ function powerDisabled(id, c) {
   else if (S.dun || S.hero.state === 'duel' || S.hero.state === 'dungeon') return true;
   return false;
 }
-let openSkill = null;
-function skillHTML(id) {
-  const p = POWERS[id], g = S.god, L = g.skills[id] || 0, c = powerCost(id);
-  const preOk = !p.pre || g.skills[p.pre] >= 1, lvlOk = g.lvl >= p.req;
-  const canLearn = g.sp > 0 && L < 3 && preOk && lvlOk;
-  let why = '';
-  if (!L && !lvlOk) why = `Нужен ур. бога ${p.req}`; else if (!L && !preOk) why = `Сначала: ${POWERS[p.pre].n}`;
-  return `<div class="skill ${L ? '' : 'locked'} ${openSkill === id ? 'open' : ''}"><div class="ic">${p.ic}</div>
-    <div><div class="nm" data-act="skillInfo" data-arg="${id}" role="button" tabindex="0">${p.n} <span class="pips">${'●'.repeat(L)}${'○'.repeat(3 - L)}</span><span class="i">${openSkill === id ? '▴' : 'ⓘ'}</span></div>${why ? `<div class="hint">${why}</div>` : ''}<div class="ds">${p.d}</div></div>
-    <div class="sb">${L ? `<button class="btn small" data-act="power" data-arg="${id}" ${powerDisabled(id, c) ? 'disabled' : ''}>${S.fight && S.fight.phase === 'turn' ? 'В бой' : 'Применить'} (${c})</button>` : ''}
-    ${canLearn ? `<button class="btn small green" data-act="learn" data-arg="${id}">${L ? 'Улучшить ★' : 'Изучить ★'}</button>` : ''}</div></div>`;
+/* v11: почему силу сейчас нельзя применить — короткая подсказка на карточке */
+function powerWhy(id) {
+  const p = POWERS[id], g = S.god, L = g.skills[id] || 0, c = powerCost(id), F = S.fight;
+  if (!L) { if (g.lvl < p.req) return `🔒 нужен ур. ${p.req}`; if (p.pre && !(g.skills[p.pre] >= 1)) return `🔒 сначала «${POWERS[p.pre].n}»`; return g.sp > 0 ? '★ можно изучить' : '🔒 нужно очко ★'; }
+  if (S.hero.state === 'dead') return '💀 герой мёртв';
+  if (F) { if (F.phase !== 'turn') return '⏳ дождитесь хода'; if (F.powersLeft < 1) return 'лимит 3 за бой'; if (F.usedTurn >= 1) return 'одна сила за ход'; const me = fMe(F); if (!me || !me.alive) return 'герой выбыл'; }
+  else if (S.dun || S.hero.state === 'duel' || S.hero.state === 'dungeon') return '⏳ герой занят';
+  if (g.faith < c) return `не хватает веры (${Math.floor(g.faith)}/${c})`;
+  return '';
 }
+/* Что сделает сила прямо сейчас — для предпросмотра перед тратой веры */
+function powerEffect(id) {
+  const h = S.hero, mu = pmult(id), m = h.monster, F = S.fight, lv = h.lvl, pc = x => Math.round(x * 100) + '%';
+  if (F && F.phase === 'turn') {
+    const me = fMe(F), en = me ? fEnemies(F, me) : [], tg = en.find(e => e.id === F.my.target) || en[0], tn = tg ? `«${tg.name}»` : 'врага';
+    return ({ heal: [`Боец ${me ? '«' + me.name + '»' : ''} получит лечение: +${pc(DUN_K.godHeal * mu)} HP${F.kind === 'dungeon' ? ' (павшего — поднимет)' : ''}`], rain: ['Вся ваша команда подлечится: +' + pc(.12 * mu) + ' HP'], bless: ['Следующий удар героя — критический'],
+      shield: ['Урон по герою в этом ходу −70%'], luck: ['Герой скользкий, как угорь: +30% к увороту на ход'], curse: [`${tn} ослаблен на 2 хода: бьёт слабее и без критов`], beast: ['Медведь кусает противника 2 хода подряд'],
+      bolt: [`Молния по ${tn}: −${pc(.12 * mu)} его HP`], quake: [`Все противники теряют ${pc(.07 * mu)} HP`] })[id].concat(['Сила в бою: ' + F.powersLeft + '/3 осталось, 1 за ход']);
+  }
+  const hp = x => Math.max(1, Math.round(h.maxHp * x));
+  switch (id) {
+    case 'heal': return [`Герой получит лечение: +${hp(.3 * mu)} HP`, '+2 доверия', h.inj.length ? 'Исцелит одну травму' : 'Травм нет — просто приятно'];
+    case 'bless': return [`🍀 Удача на ${Math.round(5 * mu)} мин: больше золота, удачнее развилки`, '+1 доверия'];
+    case 'shield': return [`🛡 Божий щит на ${Math.round(5 * mu)} мин: урон по герою вдвое меньше`];
+    case 'bolt': return m ? [`Молния ударит «${m.n}»: −${Math.round((10 + 6 * lv) * mu * (S.god.align <= -30 ? 1.3 : 1))} HP`, '+1 доверия'] : ['⚠ Врага рядом нет — молния попадёт в героя!', `−${hp(.12)} HP герою, −4 доверия`];
+    case 'curse': return m ? [`«${m.n}» покроется прыщами и будет биться вдвое слабее`] : ['Торговцы начнут переплачивать: торговля ×1.5 на ' + Math.round(30 * mu) + ' мин'];
+    case 'quake': return m ? [`Земля разверзнется под «${m.n}»: −${Math.round((20 + 12 * lv) * mu)} HP`, `Героя тоже тряхнёт: −${hp(.05)} HP`] : ['Из трещины вылезет сундук с золотом'];
+    case 'rain': return [`Освежит героя: +${hp(.12 * mu)} HP`, '+1–3 паствы'];
+    case 'luck': return ['Герой найдёт клад: золото и вещь (иногда ценную)'];
+    case 'beast': return m ? [m.tier <= lv + 1 ? `Медведь разорвёт «${m.n}»` : `Медведь вцепится в «${m.n}»: −${Math.round((15 + 10 * lv) * mu)} HP`] : ['Медведь принесёт герою вещь'];
+  }
+  return [];
+}
+const PV_SHORT = { heal: 'лечение', bless: 'удача', shield: 'защита', bolt: 'удар по врагу', curse: 'ослабит врага', quake: 'огромный урон', rain: 'лечение и паства', luck: 'клад', beast: 'медведь в помощь' };
+function powerCard(id) {
+  const p = POWERS[id], g = S.god, L = g.skills[id] || 0, c = powerCost(id), why = powerWhy(id), dim = !!why && why !== '★ можно изучить';
+  return `<button class="pcard ${L ? '' : 'lock'} ${dim ? 'dim' : ''}" data-act="pprev" data-arg="${id}" aria-label="${esc(p.n)}: ${c} веры${why ? ', ' + esc(why) : ''}">
+    <span class="pic">${p.ic}</span><span class="pc">🔥${c}</span><span class="pn">${p.n} <span class="pips">${'●'.repeat(L)}${'○'.repeat(3 - L)}</span></span>
+    <span class="pd">${esc(p.d.split(/[.!]\s/)[0].replace(/\.$/, ''))}.</span>${why ? `<span class="pw ${why.startsWith('★') ? 'ok' : ''}">${esc(why)}</span>` : `<span class="pw ok">▶ ${PV_SHORT[id]}</span>`}</button>`;
+}
+const BR_UI = { light: ['☀️', 'Свет'], wrath: ['⚡', 'Гнев'], nature: ['🌿', 'Стихии'] };
+function powersHTML() {
+  const g = S.god;
+  let html = `<div class="row" style="margin-bottom:4px"><span>${faithChip()}</span><span>${g.sp ? `<b>★ ${g.sp}</b> ${plural(g.sp, 'очко', 'очка', 'очков')} сил` : '<span class="muted">★ 0 — новые с уровнем бога</span>'}</span></div>
+    <div class="alignLine" title="Добрые дела сдвигают вправо, кары — влево. Свет дешевле у доброго бога, гнев — у гневного."><span>😠</span><div class="align"><i style="left:${(g.align + 100) / 2}%"></i></div><span>😇</span><b>${alignTitle(g.align)}</b></div>`;
+  for (const br in BRANCHES) html += `<div class="pgrp ${br}"><h3>${BR_UI[br][0]} ${BR_UI[br][1]} <small>${BRANCHES[br]}</small></h3><div class="pgrid">${Object.keys(POWERS).filter(id => POWERS[id].br === br).map(powerCard).join('')}</div></div>`;
+  return html + '<div class="hint">Нажмите на карточку — покажу, что случится, и попрошу подтвердить.</div>';
+}
+function powerModal(id) {
+  const p = POWERS[id]; if (!p) return;
+  const g = S.god, L = g.skills[id] || 0, c = powerCost(id), why = powerWhy(id), canLearn = g.sp > 0 && L < 3 && (!p.pre || g.skills[p.pre] >= 1) && g.lvl >= p.req;
+  const fx = powerEffect(id), dis = !L || powerDisabled(id, c);
+  modal(`<div class="pprev"><div class="pbig">${p.ic}</div><h2 style="border:none">${p.n} <span class="pips">${'●'.repeat(L)}${'○'.repeat(3 - L)}</span></h2>
+    <div class="muted">${BR_UI[p.br][0]} ${BRANCHES[p.br]} · ${p.al > 0 ? 'добрая сила' : p.al < 0 ? 'карающая сила' : 'нейтральная сила'}</div>
+    ${L ? `<div class="pq">Потратить ${c} веры? ${esc(fx[0] || '')}</div>` : `<div class="pq">Сила не изучена</div>`}
+    <ul class="pfx">${fx.slice(L ? 1 : 0).map(x => `<li>${esc(x)}</li>`).join('')}<li class="muted">${esc(p.d)}</li></ul>
+    <div class="muted">У вас ${faithChip()}${why && L ? ` · <b style="color:#8c2e20">${esc(why)}</b>` : ''}</div>
+    <div class="btns">${L ? `<button class="btn green" data-act="powerGo" data-arg="${id}" ${dis ? 'disabled' : ''}>✔ Применить · ${c}</button>` : ''}${canLearn ? `<button class="btn" data-act="learnGo" data-arg="${id}">${L ? 'Улучшить ★' : 'Изучить ★'}</button>` : !L ? `<span class="muted">${esc(why)}</span>` : ''}<button class="btn ghost" data-act="closeModal">Отмена</button></div></div>`);
+}
+const TAB_H = { powers: '✨ Силы', flock: '⛪ Паства', arena: '🤺 Арена', gods: '⚜ Пантеон', hero: '🧔 Герой' };
 function renderRight() {
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.arg === S.tab));
-  const g = S.god, fl = S.flock;
+  const g = S.god, fl = S.flock, mob = innerWidth <= 760, tab = mob ? S.ui.mtab : S.tab;
   let html = '';
-  if (S.tab === 'powers') {
-    html = `<div class="row" style="margin-bottom:4px"><span>${faithChip()}</span><span>${g.sp ? `<b>★ ${g.sp}</b> ${plural(g.sp, 'очко', 'очка', 'очков')} сил` : '<span class="muted">★ 0 — новые с уровнем бога</span>'}</span></div>
-      <div class="alignLine" title="Добрые дела сдвигают вправо, кары — влево. Подробнее — в «Как играть»."><span>😠</span><div class="align"><i style="left:${(g.align + 100) / 2}%"></i></div><span>😇</span><b>${alignTitle(g.align)}</b></div>
-      <div class="hint" style="margin-bottom:6px">Нажмите на название силы — покажу описание.</div>`;
-    for (const br in BRANCHES) html += `<div class="branch ${br}"><h3>${BRANCHES[br]}</h3>${Object.keys(POWERS).filter(id => POWERS[id].br === br).map(skillHTML).join('')}</div>`;
-  } else if (S.tab === 'flock') {
-    const tc = templeCost();
+  if (tab === 'powers') html = powersHTML();
+  else if (tab === 'flock') {
+    const tc = templeCost(), mf = maxFaith();
     html = `<div class="row" style="margin-bottom:6px"><span>Доступно для вложений</span>${faithChip()}</div>
-      <div class="box"><h3>Паства</h3><div class="big">${Math.floor(fl.fol)} 👥</div>
-      <div class="muted">≈ ${Math.round(faithRegen() * 3600)} веры в час</div></div>
+      <div class="box"><h3>👥 Паства</h3><div class="big">${Math.floor(fl.fol)} 👥</div>
+      <div class="muted">≈ ${Math.round(faithRegen() * 3600)} веры в час · запас веры ${Math.floor(g.faith)}/${mf}</div>${bar('faith', g.faith, mf)}</div>
       <div class="box"><h3>⛪ Храм — ур. ${fl.temple}${fl.temple ? ' (' + TEMPLE_NAMES[fl.temple - 1] + ')' : ''}</h3>
       <div class="muted">Каждый уровень: больше веры и её запас, ночлег героя, +КД.</div>
       ${fl.temple < 10 ? `<div class="stat"><label><span>Стройка до ур. ${fl.temple + 1}</span><span>${Math.floor(fl.templeProg)} / ${tc}</span></label>${bar('faith', fl.templeProg, tc)}</div>
@@ -4329,30 +4699,37 @@ function renderRight() {
       <div class="btns">${MIRACLES.map(m => `<button class="btn small" data-act="miracle" data-arg="${m.id}" ${g.faith < m.cost ? 'disabled' : ''}>${m.n} (${m.cost})</button>`).join('')}</div></div>
       <div class="box"><h3>⚔ Божья армия — ${fl.army} солдат</h3>
       <div class="muted">Солдат: ${soldierCost()} веры и 2 последователя. Помогает в дуэлях и событиях.</div>
-      <div class="btns"><button class="btn small red" data-act="recruit" data-arg="1" ${g.faith < soldierCost() || fl.fol < 2 ? 'disabled' : ''}>Набрать 1 (${soldierCost()})</button><button class="btn small red" data-act="recruit" data-arg="5" ${g.faith < soldierCost() * 5 || fl.fol < 10 ? 'disabled' : ''}>Набрать 5 (${soldierCost() * 5})</button></div></div>
-`;
-  } else if (S.tab === 'arena') html = arenaTabHTML();
+      <div class="btns"><button class="btn small red" data-act="recruit" data-arg="1" ${g.faith < soldierCost() || fl.fol < 2 ? 'disabled' : ''}>Набрать 1 (${soldierCost()})</button><button class="btn small red" data-act="recruit" data-arg="5" ${g.faith < soldierCost() * 5 || fl.fol < 10 ? 'disabled' : ''}>Набрать 5 (${soldierCost() * 5})</button></div></div>`;
+  } else if (tab === 'arena') html = arenaTabHTML();
+  else if (tab === 'hero') html = `<div class="sheet inl">${sheetHTML(true)}</div>`;
   else {
-    const st = S.stats;
-    html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
+    const st = S.stats, C = S.chat, last = C.msgs.slice(-3);
+    html = `<div class="box"><h3>${GOD_AV[alignTitle(g.align)] || ''} ${esc(g.name)} — ${alignTitle(g.align).toLowerCase()}</h3><div class="stat"><label><span>Уровень бога ${g.lvl}</span><span>${g.xp}/${gxpNext(g.lvl)}</span></label>${bar('gxp', g.xp, gxpNext(g.lvl))}</div>
+      <div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div>
+      <div class="btns"><button class="btn small ghost" data-act="help">❔ Как играть</button><button class="btn small ghost" data-act="settings">⚙ Настройки и сохранение</button></div></div>
+      <div class="box"><h3>💬 Чат богов${C.unread ? ` <span class="faithChip" style="background:#b8412f">${C.unread} новых</span>` : ''}</h3>${last.map(m => `<div class="cm ${m.c}"><span class="tm">${esc(m.tm)}</span>${m.c === 'sys' ? esc(m.x) : `<b>${esc(m.from)}:</b> ${esc(m.x)}`}</div>`).join('') || '<div class="muted">Тихо.</div>'}
+      <div class="btns"><button class="btn small" data-act="chatToggle">${C.open ? '✕ Закрыть чат' : '💬 Открыть чат'}</button></div></div>
       ${godsDunHTML()}
-      ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
+      <div class="box"><h3>⚜ Соперники</h3>${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
+        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}</div>`;
   }
+  setHTML($('rightHead'), mob ? '' : `<h2 class="rph">${TAB_H[tab] || ''}</h2>`);
+  if (mob && tab === 'hero') return;
   setHTML($('rightBody'), html);
 }
 function renderNav() {
-  const mt = S.ui.mtab, B = document.body; if (B.dataset.mtab !== mt) B.dataset.mtab = mt;
+  const mt = S.ui.mtab, B = document.body, mob = innerWidth <= 760, cur = mob ? mt : S.tab;
+  if (B.dataset.mtab !== mt) B.dataset.mtab = mt;
   B.classList.toggle('chatOpen', !!S.chat.open);
-  document.querySelectorAll('#mnav button').forEach(b => b.classList.toggle('on', b.dataset.arg === mt));
+  document.querySelectorAll('#mnav button').forEach(b => { const on = b.dataset.arg === cur; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const busy = S.fight ? '⚔ Идёт бой' : S.dun ? '🏰 Отряд в пещере' : S.fork && !forkPaused() ? (S.fork.m ? '✨ Божественный момент' : '🙏 Герой молится вам') : S.featOffer ? '🎖 Выберите черту' : S.ev ? '🌍 Мировое событие' : '';
-  setHTML($('mBanner'), busy && ['powers', 'arena', 'more'].includes(mt) ? `<div class="mban"><span>${busy}</span><button class="btn small" data-act="mtab" data-arg="hero">Открыть</button></div>` : '');
-  const heroDot = !!((S.fork && !forkPaused()) || S.featOffer || (S.fight && S.fight.phase === 'turn' && !S.fight.auto) || (S.dun && S.dun.phase === 'explore'));
-  const md = $('moreDot'); if (md) md.classList.toggle('on', !!S.chat.unread);
-  const cd = $('chatDot2'); if (cd) cd.classList.toggle('on', !!S.chat.unread);
-  const hb = document.querySelector('#mnav button[data-arg=hero]'); if (hb) hb.classList.toggle('dot', heroDot && mt !== 'hero');
+  setHTML($('mBanner'), busy && mt !== 'hero' ? `<div class="mban"><span>${busy}</span><button class="btn small" data-act="mtab" data-arg="hero">Открыть</button></div>` : '');
+  const heroDot = !!((S.fork && !forkPaused()) || S.featOffer || (S.fight && S.fight.phase !== 'end' && !S.fight.auto) || (S.dun && S.dun.phase === 'explore'));
+  const gd = $('godsDot'); if (gd) gd.classList.toggle('on', !!S.chat.unread && !S.chat.open);
+  const hb = document.querySelector('#mnav button[data-arg=hero]'); if (hb) hb.classList.toggle('dot', heroDot && mob && mt !== 'hero');
   const sc = $('spdC'); if (sc) { sc.textContent = '×' + S.speed; sc.classList.toggle('on', S.speed > 1); }
   const p2 = $('pauseBtn2'); if (p2) { p2.textContent = S.paused ? '▶' : '⏸'; p2.classList.toggle('on', S.paused); }
+  B.classList.toggle('rm', reducedMotion()); B.classList.toggle('busyF', !!(S.fight || S.dun));
 }
 function render() { renderNav(); renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
 
@@ -4368,7 +4745,8 @@ function tierModal() {
   <div class="muted">Цена: 40 веры. Тяжёлая даёт больше золота и опыта, вещи лучше и выше уровнем.</div>
   <div class="btns"><button class="btn small" data-act="closeModal">Отмена</button></div></div>`);
 }
-function modal(html) { const m = $('modal'); m.innerHTML = `<div class="card">${html}</div>`; m.classList.add('on'); }
+/* v11: на телефоне модалки во весь экран с большой кнопкой «Закрыть» внизу; на компьютере — крестик в углу */
+function modal(html, o) { const m = $('modal'), cl = S && !(o && o.noClose); m.innerHTML = `<div class="card${o && o.noBar ? ' nobar' : ''}" role="dialog" aria-modal="true">${cl ? '<button class="mx" data-act="closeModal" aria-label="Закрыть">✕</button>' : ''}${html}${cl ? '<div class="mcbar"><button class="btn" data-act="closeModal">✕ Закрыть</button></div>' : ''}</div>`; m.classList.add('on'); m.scrollTop = 0; const c = m.firstChild; if (c) c.scrollTop = 0; }
 function closeModal() { $('modal').classList.remove('on'); $('modal').innerHTML = ''; }
 function onboarding() {
   const ro = Object.keys(RACES).map(k => `<option value="${k}">${RACES[k].n}</option>`).join(''), co = Object.keys(CLASSES).map(k => `<option value="${k}">${CLASSES[k].n}</option>`).join('');
@@ -4379,7 +4757,7 @@ function onboarding() {
   <label>Раса героя</label><select id="inRace" data-keep>${ro}</select><div class="desc" id="raceDesc"></div>
   <label>Класс героя</label><select id="inCls" data-keep>${co}</select><div class="desc" id="clsDesc"></div>
   <div class="btns"><button class="btn blue" data-act="rndHero">🎲 Случайно</button><button class="btn" data-act="newGame">Сотворить мир</button></div>
-  <div class="btns"><button class="btn small" data-act="importSave">📥 У меня есть сохранение (импорт)</button></div>`);
+  <div class="btns"><button class="btn small" data-act="importSave">📥 У меня есть сохранение (импорт)</button></div>`, { noClose: 1 });
   const r = $('inRace'), c = $('inCls');
   r.value = pick(Object.keys(RACES)); c.value = pick(Object.keys(CLASSES));
   r.onchange = c.onchange = obDesc; obDesc();
@@ -4401,8 +4779,8 @@ function help() {
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
   <p><b>😇 Характер бога.</b> Добрые поступки и силы света сдвигают его к «доброму» (силы света на 20% дешевле, паства растёт сама), кары — к «гневному» (кары дешевле, молния сильнее, солдаты дешевле).</p>
-  <p><b>📋 Герой.</b> На главном экране — только главное. Характеристики, снаряжение, рюкзак, травмы и черты — по кнопке «📋 Герой». На телефоне разделы — во вкладках внизу.</p>
-  <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
+  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Пантеон | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Чат, пещеры и соперники — в «Пантеоне», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
+  <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Кнопка «👁 Подсказать» (6 веры, раз за ход) подсмотрит, бьёт ли самый опасный враг в верх или в низ. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
   <p><b>🤺 Арена</b> — вкладка с заявками: дуэли 1нс1, группы 3нс3 и 5нс5, хаотичные бои. Принимайте чужие или подавайте свои. За бои — опыт, золото и рейтинг; после поражения — травмы (штраф к характеристике, лечатся временем, отдыхом и храмом). <b>⚜ Дуэль богов</b> — тот же бой, но соперничающий бог тоже колдует.</p>
   <p><b>🏰 Пещеры</b> — карта 5×5: ведите отряд по комнатам, ищите 🗝 ключ и бейте 👑 босса. Это испытание: бесплатного лечения почти нет (один ⛲ источник и жрец), чем глубже — тем злее, 💀 элита на половине здоровья звереет. Боссы <b>объявляют</b> страшный удар по зоне — поставьте туда блок, иначе удар в 2,5 раза сильнее. Можно лечить отряд силой «Исцеление» между комнатами (раз за пещеру) и <b>отступить с добычей</b> (60% золота и опыта, все вещи). Если отряд разбит — героя вынесут, оставив 30%. Награда за босса — гарантированная редкая вещь и много опыта. Пещера не чаще раза в 4 часа. <b>💬 Чат</b> — пока с ботами, но они стараются. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
   <p>Обычные стычки с монстрами герой решает сам, но кнопкой «🎯 Бой под контроль» можно взять любой бой в свои руки.</p>
@@ -4410,10 +4788,12 @@ function help() {
   <div class="btns"><button class="btn" data-act="closeModal">Понятно!</button></div>`);
 }
 function settings() {
-  modal(`<h2>⚙ Настройки</h2>
+  modal(`<div class="settings"><h2>⚙ Настройки</h2>
   <label>Имя бога</label><input id="inGod" maxlength="30" value="${esc(S.god.name)}">
   <label>Имя героя</label><input id="inHero" maxlength="30" value="${esc(S.hero.name)}">
   <div class="btns"><button class="btn" data-act="rename">Сохранить</button><button class="btn" data-act="closeModal">Закрыть</button></div>
+  <h3 style="margin-top:14px">🔊 Звук</h3>
+  <div class="snd"><button class="btn tgl ${S.ui.snd ? 'on' : ''}" data-act="sndToggle" id="sndBtn" aria-pressed="${S.ui.snd ? 'true' : 'false'}">${S.ui.snd ? '🔊 Звуки: вкл' : '🔇 Звуки: выкл'}</button><span class="muted">Короткие сигналы без файлов: силы, удары, уровни, моменты. По умолчанию выключены; включаются только после вашего нажатия.</span></div>
   ${pwaSettingsHTML()}
   <h3 style="margin-top:14px">Для тестирования</h3>
   <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">✨ Момент сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
@@ -4421,7 +4801,7 @@ function settings() {
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
   <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
   <h3 style="margin-top:14px">Опасная зона</h3>
-  <div class="btns"><button class="btn small red" data-act="reset">Начать заново (стереть сохранение)</button></div>`);
+  <div class="btns"><button class="btn small red" data-act="reset">Начать заново (стереть сохранение)</button></div></div>`);
 }
 function newGame() {
   const g = ($('inGod').value || '').trim() || 'Великий Пельмень', hn = ($('inHero').value || '').trim() || 'Геннадий Отважный';
@@ -4436,17 +4816,25 @@ const ACT = {
   speed: a => { S.speed = +a; S.paused = false; },
   pause: () => { S.paused = !S.paused; },
   help, settings, closeModal, sheet: () => sheetModal(),
-  tab: a => { S.tab = a; },
-  mtab: a => { if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(a)) return; S.ui.mtab = a; if (a === 'powers' || a === 'arena') S.tab = a; else if (a === 'more' && !['flock', 'gods'].includes(S.tab)) S.tab = 'flock'; window.scrollTo(0, 0); },
+  tab: a => ACT.mtab(a),
+  mtab: a => { a = a === 'diary' ? 'hero' : a === 'more' ? 'flock' : a; if (!NAV_TABS.includes(a)) return; const was = innerWidth <= 760 ? S.ui.mtab : S.tab; S.ui.mtab = a; S.tab = a;
+    if (innerWidth <= 760) { if (was !== a || a !== 'hero') window.scrollTo(0, 0); } else { const r = $('rightBody'); if (r) r.parentNode.scrollTop = 0; } },
+  heroCol: () => { S.ui.heroCol = !S.ui.heroCol; },
+  dexp: a => { const id = +a; if (diaryOpen.has(id)) diaryOpen.delete(id); else diaryOpen.add(id); diaryMoreV++; },
+  dmore: () => { diaryLim = Math.min(150, diaryLim + D_PAGE); diaryMoreV++; },
+  pprev: a => powerModal(a),
+  powerGo: a => { if (!POWERS[a]) return; const f0 = S.god.faith; closeModal(); usePower(a); if (S.god.faith < f0) powerFx(a, lastBtnRect); },
+  learnGo: a => { learn(a); powerModal(a); },
+  fhint: () => { const f0 = S.god.faith; fightHint(); if (S.god.faith < f0) sfx('hint'); },
+  sndToggle: () => { S.ui.snd = !S.ui.snd; save(); if (S.ui.snd) { sndUnlock(); sfx('power'); } const b = $('sndBtn'); if (b) { b.classList.toggle('on', S.ui.snd); b.textContent = S.ui.snd ? '🔊 Звуки: вкл' : '🔇 Звуки: выкл'; b.setAttribute('aria-pressed', S.ui.snd ? 'true' : 'false'); } },
   speedCycle: () => { const L = [1, 2, 5, 10]; S.speed = L[(L.indexOf(S.speed) + 1) % L.length]; S.paused = false; },
-  skillInfo: a => { openSkill = openSkill === a ? null : a; },
   liftS: a => { if (!EQ_KEYS.includes(a)) return; liftCurse(a); itemModal('eq:' + a); },
   itemD: a => itemModal(a),
   equipInv: id => { if (equipInv(id)) { render(); sheetModal(); } },
   voice: () => { const i = $('voiceIn'); voice(i.value); i.value = ''; },
   voiceq: a => voice(a),
   fork: a => answerFork(+a),
-  power: a => usePower(a),
+  power: a => { const f0 = S.god.faith; usePower(a); if (S.god.faith < f0) powerFx(a, lastBtnRect); },
   learn: a => learn(a),
   closeEv: () => { if (S.ev && S.ev.phase === 'done') S.ev = null; },
   evVote: a => evVote(a), evGive: a => evGive(a), evArmy: () => evArmy(),
@@ -4473,24 +4861,133 @@ const ACT = {
     else if (a === 'monster') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startFight(); startMonsterFight(); }
     else if (a === 'dun') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
     else if (a === 'feat') { S.featQueue++; offerFeat(); }
-    else if (a === 'h1' || a === 'h8') simulateAway(a === 'h1' ? 3600 : 8 * 3600, 'перемотка времени');
+    else if (a === 'h1' || a === 'h8') { if (simulateAway(a === 'h1' ? 3600 : 8 * 3600, 'перемотка времени')) awayModal(); }
     else if (a === 'event') startEvent(); else if (a === 'faith') addFaith(100); }
 };
+/* v11: какие действия игрока считаются «вмешательством бога» — их записи в дневнике подсвечиваются */
+const USER_ACTS = new Set(['voice', 'voiceq', 'fork', 'power', 'powerGo', 'resurrect', 'miracle', 'temple', 'recruit', 'challenge', 'dunTier', 'dheal', 'lift', 'liftS', 'bldPick', 'feat', 'asi', 'evGive', 'evArmy', 'fmanual', 'smith']);
+let lastBtnRect = null;
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
   const f = ACT[b.dataset.act]; if (!f) return;
   if (!S && !['newGame', 'rndHero', 'importSave', 'doImport', 'backOnb'].includes(b.dataset.act)) return;
-  f(b.dataset.arg); if (S) render();
+  lastBtnRect = b.getBoundingClientRect(); sndUnlock();
+  userActing = USER_ACTS.has(b.dataset.act) ? 1 : 0;
+  try { f(b.dataset.arg); } finally { userActing = 0; }
+  if (S) render();
 });
-$('voiceIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { ACT.voice(); render(); } });
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.classList && e.target.classList.contains('entry') && e.target.dataset.act === 'dexp') { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && $('modal').classList.contains('on') && S) closeModal(); });
+$('voiceIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { userActing = 1; try { ACT.voice(); } finally { userActing = 0; } render(); } });
 window.addEventListener('beforeunload', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
 
 
 /* =====================================================================
+   v11: звуки (WebAudio, без файлов), анимации сил и боя, сводка «Пока вас не было»
+   ===================================================================== */
+const reducedMotion = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* Звук выключен по умолчанию; AudioContext создаётся только после жеста пользователя и только если звук включён */
+let audioCtx = null, userGestured = false;
+function sndUnlock() {
+  userGestured = true;
+  if (!S || !S.ui || !S.ui.snd) return;
+  try { if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); } if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch (e) { audioCtx = null; }
+}
+for (const ev of ['pointerdown', 'keydown']) addEventListener(ev, () => { userGestured = true; }, { capture: true, passive: true });
+const SFX = {
+  power: [[660, .07, 'triangle'], [880, .09, 'triangle'], [1320, .14, 'sine']],
+  hint: [[520, .06, 'sine'], [780, .1, 'sine']],
+  hit: [[140, .09, 'square', .05]], crit: [[220, .05, 'sawtooth', .06], [110, .14, 'square', .06]],
+  blk: [[900, .04, 'square', .03]], level: [[523, .1, 'triangle'], [659, .1, 'triangle'], [784, .1, 'triangle'], [1047, .22, 'triangle']],
+  death: [[220, .2, 'sine'], [165, .3, 'sine']], rare: [[988, .08, 'sine'], [1319, .16, 'sine']], bell: [[784, .12, 'sine'], [1175, .28, 'sine']]
+};
+let sfxLast = 0;
+function sfx(name) {
+  if (!S || !S.ui || !S.ui.snd || !userGestured || SILENT) return;
+  const seq = SFX[name]; if (!seq) return;
+  const now0 = performance.now(); if (now0 - sfxLast < 60) return; sfxLast = now0;
+  try {
+    sndUnlock(); const A = audioCtx; if (!A || A.state !== 'running') return;
+    let t = A.currentTime + .01;
+    for (const [f, d, type, vol] of seq) {
+      const o = A.createOscillator(), g = A.createGain();
+      o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol || .08, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+      o.connect(g); g.connect(A.destination); o.start(t); o.stop(t + d + .02); t += d * .8;
+    }
+  } catch (e) { }
+}
+/* ---------- слой эффектов поверх страницы ---------- */
+function fxEl(cls, html, x, y) {
+  const L = $('fxLayer'); if (!L) return null;
+  const e = document.createElement('div'); e.className = cls; if (html) e.innerHTML = html;
+  if (x !== undefined) { e.style.left = x + 'px'; e.style.top = y + 'px'; }
+  L.appendChild(e); while (L.children.length > 30) L.firstChild.remove();
+  setTimeout(() => e.remove(), 1500); return e;
+}
+function flashRect(r, cls) {
+  if (reducedMotion() || !r) return;
+  const e = fxEl('fflash ' + cls); if (!e) return;
+  Object.assign(e.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+}
+function floatText(x, y, txt, cls) { fxEl('ftx ' + cls, esc(txt), x, y); }
+/* Сила: вспышка + иконка летит в дневник (или на «Герой» в нижнем меню, если дневник скрыт) */
+function powerFx(id, from) {
+  sfx('power');
+  const p = POWERS[id]; if (!p) return;
+  const vw = innerWidth, vh = innerHeight;
+  flashRect({ left: 0, top: 0, width: vw, height: vh }, p.br + ' screen');
+  if (reducedMotion()) return;
+  const d = $('diary'), dr = d && d.offsetParent ? d.getBoundingClientRect() : null;
+  const tgt = dr && dr.top < vh && dr.bottom > 0 ? { x: dr.left + 40, y: Math.max(dr.top + 20, 80) } : (() => { const hb = document.querySelector('#mnav button[data-arg=hero]'); const r = hb ? hb.getBoundingClientRect() : { left: vw / 2, top: vh - 40, width: 0, height: 0 }; return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
+  const sx = from ? from.left + from.width / 2 : vw / 2, sy = from ? from.top + from.height / 2 : vh / 2;
+  const e = fxEl('fly', p.ic, sx, sy); if (!e) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => { e.style.left = tgt.x + 'px'; e.style.top = tgt.y + 'px'; e.style.opacity = '.2'; e.style.transform = 'translate(-50%,-50%) scale(.5)'; }));
+  setTimeout(() => { const n = d && d.firstChild; if (n) { n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); } }, 760);
+}
+/* Бой: после каждого хода — вспышка и всплывающие «Крит!», «Блок», «Уворот», «−12» над полосками здоровья */
+let fxSeenFight = null, fxSeenN = 0;
+function fightFx(F) {
+  if (!F) return;
+  if (fxSeenFight !== F.id) { fxSeenFight = F.id; fxSeenN = F.fx ? F.fx.n : 0; return; }
+  if (!F.fx) return;   // старые ходы (после загрузки) не показываем
+  if (F.fx.n === fxSeenN) return; fxSeenN = F.fx.n;
+  const me = fMe(F), by = {};
+  for (const a of F.fx.a) (by[a.id] = by[a.id] || []).push(a);
+  let meHit = 0, crit = 0, blk = 0;
+  for (const id in by) {
+    const el = document.querySelector(`#fightBox [data-fid="${CSS.escape(id)}"]`); if (!el) continue;
+    const r = el.getBoundingClientRect(); if (!r.width) continue;
+    by[id].slice(0, 4).forEach((a, k) => {
+      const t = a.k === 'crit' ? `Крит! −${a.v}` : a.k === 'blk' ? 'Блок' : a.k === 'dodge' ? 'Уворот' : a.k === 'heal' ? 'Лечение' : `−${a.v}`;
+      const cls = a.k === 'crit' ? 'crit' : a.k === 'blk' ? 'blk' : a.k === 'dodge' ? 'dodge' : a.k === 'heal' ? 'heal' : 'hit';
+      setTimeout(() => floatText(r.left + r.width / 2 + (k % 2 ? 26 : -26) * (k > 0), r.top + r.height / 2 - k * 6, t, cls), k * 220);
+      if (me && id === me.id && a.v > 0) meHit += a.v; if (a.k === 'crit') crit++; if (a.k === 'blk' || a.k === 'dodge') blk++;
+    });
+  }
+  const card = document.querySelector('#fightBox .card');
+  if (card) flashRect(card.getBoundingClientRect(), meHit ? 'hit' : 'good');
+  sfx(crit ? 'crit' : meHit ? 'hit' : blk ? 'blk' : 'hit');
+}
+/* ---------- Сводка «Пока вас не было» — отдельная карточка при входе ---------- */
+function awayModal() {
+  const a = lastAway; if (!a || !S) return;
+  const sg = v => (v >= 0 ? '+' : '') + v, mf = maxFaith();
+  const tiles = [['⚔', 'побед в боях', a.wins, a.wins ? 'good' : ''], ['💀', 'смертей', a.deaths, a.deaths ? 'bad' : ''], ['📌', 'заданий', a.quests, a.quests ? 'good' : ''], ['🙏', 'развилок решил сам', a.forks, ''],
+    ['💰', 'золото', sg(a.gold), a.gold >= 0 ? 'good' : 'bad'], ['👥', 'паства', sg(a.fol), a.fol >= 0 ? 'good' : 'bad']];
+  modal(`<div class="away"><h2>🌙 Пока вас не было</h2><div class="awsub">${fmtDur(a.sec)}${a.slept ? ', дальше герой спал' : ''}${a.why ? ' — ' + esc(a.why) : ''}. ${esc(S.hero.name)} жил сам и вёл дневник.</div>
+    ${a.l1 > a.l0 ? `<div class="fhint" style="background:#eaf8e2;border-color:#9fd08a;color:#2f6b20">⭐ Уровень героя: ${a.l0} → ${a.l1}!</div>` : ''}
+    <div class="awgrid">${tiles.map(t => `<div class="awt ${t[3]}"><b>${t[0]} ${t[2]}</b>${t[1]}</div>`).join('')}</div>
+    <div class="stat"><label><span>🔥 Вера: ${a.fa0} → ${a.fa1}</span><span>${a.fa1}/${mf}</span></label>${bar('faith', a.fa1, mf)}</div>
+    ${a.items.length ? `<div class="muted" style="margin-top:6px">💎 Ценные находки: ${a.items.map(esc).join(', ')}</div>` : ''}
+    ${a.hl.length ? `<h3 style="margin-top:10px">Главное из дневника</h3><ul class="awhl">${a.hl.map(e => `<li>${D_IC[e.c] ? D_IC[e.c] + ' ' : ''}${esc(e.x)}</li>`).join('')}</ul>` : ''}
+    <div class="btns"><button class="btn green mcbig" data-act="closeModal">Продолжить ▶</button></div></div>`, { noBar: 1 });
+}
+
+/* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261019-154142';
+const APP_BUILD = '20261019-164352';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -4606,14 +5103,14 @@ function fighterRow(F, f, me, canTarget) {
   const tele = F.tele && F.tele.fid === f.id ? `<div class="tl">⚠ замах ${ZONE_ACC[F.tele.zone]}</div>` : '';
   const sub = f.kind === 'boss' ? '👑 босс' : f.cls ? `${CLS_IC[f.cls] || ''} ${CLASSES[f.cls].n.toLowerCase()}` : 'чудище';
   const inner = `<span class="nm"><b>${f.isMe ? '⭐ ' : ''}${esc(f.name)}</b><span class="muted">${sub} · ${f.lvl}</span></span>${bar('hp', f.hp, f.max)}<span class="nm"><span class="muted">${Math.max(0, f.hp)}/${f.max}${f.bear > 0 ? ' 🐻' : ''}${f.debuf > 0 ? ' ☠' : ''}${f.buf && f.buf.shield ? ' 🛡' : ''}</span>${sel ? '<span class="tl">🎯 цель</span>' : ''}</span>${tele}`;
-  return tg ? `<button class="fr tg ${sel ? 'sel' : ''}" data-act="ftarget" data-arg="${f.id}">${inner}</button>`
-    : `<div class="fr ${f.isMe ? 'me' : ''} ${f.alive ? '' : 'dead'} ${sel ? 'sel' : ''}">${inner}</div>`;
+  return tg ? `<button class="fr tg ${sel ? 'sel' : ''}" data-act="ftarget" data-arg="${f.id}" data-fid="${esc(f.id)}">${inner}</button>`
+    : `<div class="fr ${f.isMe ? 'me' : ''} ${f.alive ? '' : 'dead'} ${sel ? 'sel' : ''}" data-fid="${esc(f.id)}">${inner}</div>`;
 }
 function zoneBody(F, me, k) {
   const sel = k === 'a' ? F.my.atk : F.my.blk, dis = F.auto || F.phase === 'end' || !me.alive;
-  const n = k === 'a' ? me.atkN : me.blkN;
+  const n = k === 'a' ? me.atkN : me.blkN, hz = F.hint && F.hint.turn === F.turn && F.phase === 'turn' ? F.hint.zones : [];
   const lbl = k === 'a' ? `⚔ Удар${n > 1 ? ` (${n} зоны)` : ''}` : `🛡 Блок (${n} ${plural(n, 'зона', 'зоны', 'зон')})`;
-  return `<div class="body ${k === 'a' ? 'atk' : 'blk'}"><h4>${lbl}</h4>${ZONES.map(z => `<button class="zb ${z} ${sel.includes(z) ? 'on' : ''} ${k === 'b' && F.tele && F.tele.zone === z ? 'tele' : ''}" data-act="fz" data-arg="${k}:${z}" ${dis ? 'disabled' : ''} aria-label="${k === 'a' ? 'Удар' : 'Блок'}: ${ZONE_RU[z]}">${ZONE_RU[z]}</button>`).join('')}</div>`;
+  return `<div class="body ${k === 'a' ? 'atk' : 'blk'}"><h4>${lbl}</h4>${ZONES.map(z => `<button class="zb ${z} ${sel.includes(z) ? 'on' : ''} ${k === 'b' && F.tele && F.tele.zone === z ? 'tele' : ''} ${k === 'b' && hz.includes(z) ? 'hintz' : ''}" data-act="fz" data-arg="${k}:${z}" ${dis ? 'disabled' : ''} aria-pressed="${sel.includes(z) ? 'true' : 'false'}" aria-label="${k === 'a' ? 'Удар' : 'Блок'}: ${ZONE_RU[z]}"><span class="zi">${ZONE_IC[z]}</span>${ZONE_RU[z]}</button>`).join('')}</div>`;
 }
 let fightSeenId = null;
 function renderFight() {
@@ -4621,7 +5118,11 @@ function renderFight() {
   if (!F) { setHTML(box, ''); return; }
   const me = fMe(F), turn = F.phase === 'turn', mine = me && me.alive;
   const t0 = F.fighters.filter(f => f.team === 0), t1 = F.fighters.filter(f => f.team === 1);
-  const teams = `<div class="teams"><div class="team"><h4>${t0.length > 1 ? 'Наши' : 'Вы'}</h4>${t0.map(f => fighterRow(F, f, me, false)).join('')}</div>
+  const multi = t0.length > 1 || t1.length > 1;
+  const foeT = F.fighters.find(f => f.id === F.my.target && f.alive) || t1.find(f => f.alive) || t1[0], meU = me || t0[0];
+  const vsU = (f, cls) => f ? `<div class="vsu ${cls} ${f.alive && f.hp < f.max * .3 ? 'low' : ''}" data-fid="${esc(f.id)}"><div class="vn">${f.isMe ? '⭐ ' : ''}${esc(f.name)}</div><div class="vs2">${f.kind === 'boss' ? '👑 босс' : f.cls ? `${CLS_IC[f.cls] || ''} ${CLASSES[f.cls].n.toLowerCase()}` : 'чудище'} · ур. ${f.lvl}${f.buf && f.buf.shield ? ' · 🛡' : ''}${f.debuf > 0 ? ' · ☠' : ''}</div>${bar('hp', f.hp, f.max)}<div class="vh">${f.alive ? `❤ ${Math.max(0, f.hp)} / ${f.max}` : '😵 выбыл'}</div></div>` : '<div></div>';
+  const vs = `<div class="vsbar">${vsU(meU, 'me')}<div class="vsx">⚔</div>${vsU(foeT, 'foe')}</div>`;
+  const teams = !multi ? '' : `<div class="teams"><div class="team"><h4>${t0.length > 1 ? 'Наши' : 'Вы'}</h4>${t0.map(f => fighterRow(F, f, me, false)).join('')}</div>
     <div class="team"><h4>${t1.length > 1 ? `Противники${turn && mine ? ' · нажмите — цель' : ''}` : 'Противник'}</h4>${t1.map(f => fighterRow(F, f, me, turn && mine && fAlive(F, 1).length > 1)).join('')}</div></div>`;
   let mid = '';
   const acts = FIGHT_ACT_KINDS.includes(F.kind) && mine && !F.auto ? `<div class="facts"><button class="btn small ${F.my.act === 'potion' ? 'on green' : ''}" data-act="fpot" ${S.hero.potions < 1 ? 'disabled' : ''} title="Вместо удара: +35% HP, блок остаётся">🧪 Зелье вместо удара (${S.hero.potions})</button><button class="btn small ${F.my.act === 'flee' ? 'on red' : ''}" data-act="fflee" title="${F.kind === 'dungeon' ? 'Отряд уходит из пещеры с добычей' : 'Сбежать с поля боя'}">🏃 Сбежать (${Math.round(fleeChance(F, me) * 100)}%)</button></div>${F.my.act ? `<div class="muted">${F.my.act === 'potion' ? '🧪 В этот ход герой пьёт зелье вместо удара.' : '🏃 В этот ход герой попробует сбежать вместо удара.'}</div>` : ''}` : '';
@@ -4641,16 +5142,18 @@ function renderFight() {
   else if (turn) {
     const tele = F.tele ? `<div class="telewarn">⚠ ${esc(F.fighters.find(f => f.id === F.tele.fid).name)} ударит ${ZONE_ACC[F.tele.zone]} всех! Поставьте блок на «${ZONE_RU[F.tele.zone]}».</div>` : '';
     const ok = mine && (F.my.atk.length >= me.atkN || F.my.act) && F.my.blk.length === me.blkN;
-    const ids = pIds;
+    const ids = pIds, hNow = F.hint && F.hint.turn === F.turn;
+    const hintBtn = F.auto ? '' : `<button class="btn small hintb" data-act="fhint" ${hNow || S.god.faith < HINT_COST ? 'disabled' : ''} title="Бог подсмотрит, куда целит самый опасный противник: в верх или в низ. Раз за ход.">👁 Подсказать · ${HINT_COST}</button>`;
+    const hintLine = hNow ? `<div class="fhint">${esc(F.hint.txt)}${F.hint.zones.length ? ' Синие пунктирные зоны — где ждать удара.' : ''}</div>` : '';
     mid = mine ? `${tele}${low}${F.absent ? '<div class="muted">🙏 Бога нет рядом — герой бьётся сам: осторожно, без сил. Нажмите что-нибудь, чтобы взять бой под контроль.</div>' : ''}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
-      <div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : '⚔ Ход (герой доберёт сам)'}</button>
+      ${hintLine}<div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : `⚔ Ход — выберите ${F.my.atk.length < me.atkN && !F.my.act ? (me.atkN > 1 ? `${me.atkN} зоны удара` : 'удар') : ''}${F.my.atk.length < me.atkN && !F.my.act && F.my.blk.length !== me.blkN ? ' и ' : ''}${F.my.blk.length !== me.blkN ? 'блок' : ''}`}</button>${hintBtn}
       <button class="btn small ${F.auto ? 'on green' : ''}" data-act="fauto">🤖 Автобой: ${F.auto ? 'вкл' : 'выкл'}</button></div>${acts}
       <div class="muted" style="margin-top:6px">Силы бога в бою: ${F.powersLeft}/3 (1 за ход) · ${faithChip()}${F.rivalGod ? ` · у бога ${esc(F.rivalGod.name)} осталось ${F.rivalGod.left}` : ''}</div>
       <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="fpow" data-arg="${id}" ${S.god.faith < powerCost(id) || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет изученных сил.</span>'}</div>`
       : `<div class="q">😵 ${F.kind === 'dungeon' ? 'Герой без сознания — союзники бьются дальше и прикрывают его.' : 'Ваш герой выбыл из боя. Союзники бьются дальше…'}</div>${F.kind === 'dungeon' && S.god.skills.heal ? `<div class="acts"><button class="btn small green" data-act="fpow" data-arg="heal" ${S.god.faith < powerCost('heal') || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>✚ Поднять героя (${powerCost('heal')})</button></div>` : ''}`;
   } else mid = `<div class="fend"><b>${esc(F.result || '')}</b>${F.rew ? `<div class="muted">${esc(F.rew)}</div>` : ''}</div><div class="btns"><button class="btn" data-act="fclose">Закрыть</button></div>`;
   setHTML(box, `<div class="card zf"><h2>⚔ ${esc(F.title)} <span class="muted">${F.phase === 'turn' ? `ход ${F.turn}` : F.phase === 'intro' ? 'подготовка' : 'итог'}</span></h2>
-    ${teams}
+    ${vs}${teams}
     <div class="stat"><label><span>${turn ? (F.auto ? 'Следующий ход через' : 'До конца хода (потом герой решит сам)') : F.phase === 'intro' ? (F.prep ? 'Подготовка — бой начнётся через' : 'Бой начнётся через') : 'Закроется через'}</span><span id="fSec"></span></label><div class="bar time"><i id="fBar"></i></div></div>
     ${mid}
     <div class="flog">${F.log.slice(0, 40).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
@@ -4658,6 +5161,7 @@ function renderFight() {
     if (fightSeenId !== F.id) { fightSeenId = F.id; if (!fightVis || r.top > innerHeight * .35 || r.top < 0) { const hd = document.querySelector('header'), hh = hd && getComputedStyle(hd).position !== 'static' ? hd.getBoundingClientRect().height : 0; window.scrollTo(0, Math.max(0, r.top + scrollY - hh - 6)); const r2 = box.getBoundingClientRect(); fightVis = !!box.offsetParent && r2.height > 0 && r2.top < innerHeight && r2.bottom > 0; } } }
   $('fSec').textContent = Math.max(0, Math.ceil(F.t)) + ' с';
   $('fBar').style.width = pct(F.t, F.T);
+  fightFx(F);
 }
 /* ---------- Пещера ---------- */
 function dunGsRow(U) {
@@ -4744,7 +5248,7 @@ function renderChat() {
   const ad2 = $('arenaDot2'); if (ad2) ad2.classList.toggle('on', !!dot && S.ui.mtab !== 'arena');
 }
 Object.assign(ACT, {
-  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a), fpot: () => fightAct('potion'), fflee: () => fightAct('flee'),
+  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => { const f0 = S.god.faith; fightPower(a); if (S.god.faith < f0) powerFx(a, lastBtnRect); }, fpot: () => fightAct('potion'), fflee: () => fightAct('flee'),
   fclose: () => { if (S.fight && S.fight.phase === 'end') closeFight(); },
   fmanual: () => { if (!startMonsterFight()) toast('Сейчас нечего брать под контроль.'); },
   dgo: a => dunMove(a), dheal: () => dunHeal(), dpotion: () => dunPotion(false), dauto: () => dunToggleAuto(), dleave: () => { if (confirm(`Отступить? Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи. Босс останется непобеждённым.`)) dunLeave(); },
@@ -4774,7 +5278,8 @@ window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldSt
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },
   MOMENTS, MOM_BY, MOM_T, startMoment, answerMoment, timeoutMoment, forkPaused, momentButtons, momCtx, forkOptions, get momClock() { return momClock; },
-  PWA, parseSave, checkUpdate, APP_BUILD };
+  PWA, parseSave, checkUpdate, APP_BUILD,
+  fightHint, HINT_COST, powerModal, powerEffect, powerWhy, routePos, themeOf, awayModal, get lastAway() { return lastAway; }, sfx, get audioCtx() { return audioCtx; }, diaryDetail, diary, NAV_TABS, renderDiary, get diaryLim() { return diaryLim; } };
 </script>
 </body>
 </html>

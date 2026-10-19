@@ -175,11 +175,14 @@ function simulateAway(sec, why) {
   diary(`📖 Пока вас не было (${fmtDur(cap)}${sec > cap ? ', дальше герой спал' : ''})${why ? ' — ' + why : ''}: побед в боях ${c.wins}, смертей ${c.deaths}, заданий ${c.quests}, развилок решил сам ${c.forks}. Золото ${gd >= 0 ? '+' : ''}${gd}, паства ${fd >= 0 ? '+' : ''}${fd}, вера ${Math.floor(fa0)} → ${Math.floor(S.god.faith)}.${h.lvl > l0 ? ` Уровень ${l0} → ${h.lvl}!` : ''}${c.items.length ? ' Ценные находки: ' + c.items.slice(0, 4).join(', ') + '.' : ''}`, 'event');
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
+  /* v11: сводка для отдельной карточки «Пока вас не было» */
+  lastAway = { sec: cap, slept: sec > cap, why: why || '', wins: c.wins, deaths: c.deaths, quests: c.quests, forks: c.forks, gold: gd, fol: fd, fa0: Math.floor(fa0), fa1: Math.floor(S.god.faith), l0, l1: h.lvl, items: c.items.slice(0, 6), hl: hl.slice(0, 6).map(e => ({ x: e.x.replace(/^⏳ /, ''), c: e.c })) };
   return c;
 }
+let lastAway = null;
 function offlineCatchUp() {
   const sec = (Date.now() - (S.lastSeen || Date.now())) / 1000;
-  if (sec >= 60) simulateAway(sec);
+  if (sec >= 60 && simulateAway(sec) && typeof awayModal === 'function' && typeof document !== 'undefined') awayModal();
   if (S._migratedV3) {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');

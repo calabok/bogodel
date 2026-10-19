@@ -87,12 +87,13 @@ function defaultState(god, hero, race, cls) {
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], momHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
-    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
+    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero', heroCol: false, snd: false }, dseq: 0, lastSeen: Date.now()
   };
   return S0;
 }
 let S = null;
 let diaryVer = 0;
+const NAV_TABS = ['powers', 'flock', 'arena', 'gods', 'hero'];
 let SILENT = null; // во время офлайн-симуляции записи дневника копятся здесь
 function save() { if (!S) return; S.lastSeen = Date.now(); try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { } }
 function deepMerge(def, obj) {
@@ -253,9 +254,13 @@ function sanitize(o) {
   fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20);
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
-  if (!['powers', 'flock', 'arena', 'gods'].includes(o.tab)) o.tab = 'powers';
+  if (!NAV_TABS.includes(o.tab)) o.tab = 'powers';
   if (!o.ui || typeof o.ui !== 'object' || Array.isArray(o.ui)) o.ui = { mtab: 'hero' };
-  if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(o.ui.mtab)) o.ui.mtab = 'hero';
+  /* v11: нижняя навигация «Силы | Паства | Арена | Пантеон | Герой»; старые вкладки «Дневник» и «Ещё» переехали */
+  if (o.ui.mtab === 'diary') o.ui.mtab = 'hero'; else if (o.ui.mtab === 'more') o.ui.mtab = ['flock', 'gods'].includes(o.tab) ? o.tab : 'flock';
+  if (!NAV_TABS.includes(o.ui.mtab)) o.ui.mtab = 'hero';
+  o.ui.heroCol = !!o.ui.heroCol; o.ui.snd = !!o.ui.snd;
+  for (const k of Object.keys(o.ui)) if (!['mtab', 'heroCol', 'snd'].includes(k)) delete o.ui[k];
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
   o.momHist = Array.isArray(o.momHist) ? o.momHist.filter(i => typeof i === 'string' && MOM_BY[i]).slice(-MOM_HIST) : [];
@@ -296,6 +301,12 @@ function sanitize(o) {
   for (const b of RIVALS_BASE) if (!o.rivals.find(r => r.id === b.id)) o.rivals.push(Object.assign({ w: 0, l: 0, army: 0, hlvl: 1 }, b));
   for (const r of o.rivals) { const b = RIVALS_BASE.find(x => x.id === r.id); Object.assign(r, { name: b.name, hero: b.hero, pers: b.pers, race: b.race, cls: b.cls }); fixNum(r, 'lvl', b.lvl, 1, 99); fixNum(r, 'hlvl', 1, 1, MAX_LVL); fixNum(r, 'w', 0, 0); fixNum(r, 'l', 0, 0); fixNum(r, 'army', 0, 0); }
   o.diary = Array.isArray(o.diary) ? o.diary.filter(e => e && typeof e.x === 'string').slice(0, 150) : [];
+  { let mx = 0; for (const e of o.diary) if (isNum(e.i) && e.i > 0) mx = Math.max(mx, Math.floor(e.i));
+    let n = Math.max(mx, isNum(o.dseq) ? Math.floor(o.dseq) : 0) + o.diary.length; o.dseq = n + 1; const seen = new Set();
+    for (const e of o.diary) { if (!(isNum(e.i) && e.i > 0) || seen.has(e.i)) e.i = n--; else e.i = Math.floor(e.i); seen.add(e.i);
+      e.tm = typeof e.tm === 'string' ? e.tm.slice(0, 8) : ''; e.c = typeof e.c === 'string' ? e.c.slice(0, 12) : ''; e.f = typeof e.f === 'string' ? e.f.slice(0, 400) : '';
+      if (e.u) e.u = 1; else delete e.u;
+      if (Array.isArray(e.d)) e.d = e.d.filter(x => typeof x === 'string').slice(0, 40).map(x => x.slice(0, 220)); else delete e.d; } }
   if (!o.stats || typeof o.stats !== 'object') o.stats = {};
   for (const k in d.stats) fixNum(o.stats, k, 0, 0);
   return o;

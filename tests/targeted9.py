@@ -1,5 +1,5 @@
 # v9: реалистичные бои — без мгновенных смертей, без магического воскрешения, подготовка к бою, присутствие бога
-import asyncio, json, sys
+import asyncio, json, sys, os
 from playwright.async_api import async_playwright
 URL=sys.argv[1] if len(sys.argv)>1 else 'file:///workspace/godgame/index.html'
 res={}; errs=[]
@@ -42,7 +42,7 @@ async def main():
         await pg.evaluate("GAME.S.speed=10; GAME.S.paused=false"); await pg.wait_for_timeout(2300); await pg.evaluate("GAME.S.paused=true")
         r=await pg.evaluate("({ph:GAME.S.fight.phase, t:GAME.S.fight.t, turn:GAME.S.fight.turn})")
         ok('at ×10 speed the prep timer runs in real time (≈2s gone, not 20s)', r['ph']=='intro' and r['t']>=26 and r['turn']==0, r)
-        await pg.screenshot(path='/workspace/godgame/shots9_prep_desktop.png')
+        await pg.screenshot(path=''+os.environ.get('SHOTS9','/workspace/godgame/')+'shots9_prep_desktop.png')
         await pg.click('#fightBox [data-act=fz][data-arg="a:legs"]'); await pg.click('#fightBox [data-act=fz][data-arg="b:head"]'); await pg.wait_for_timeout(100)
         await pg.click('#fightBox [data-act=fgo]'); await pg.wait_for_timeout(150)
         r=await pg.evaluate("({ph:GAME.S.fight.phase, turn:GAME.S.fight.turn, atk:GAME.S.fight.my.atk, blk:GAME.S.fight.my.blk, T:GAME.S.fight.T})")
@@ -52,7 +52,7 @@ async def main():
         await pg.wait_for_timeout(100)
         r=await pg.evaluate("""(()=>{const b=document.getElementById('fightBox'); return {low:!!b.querySelector('.lowhp'), pot:!!b.querySelector('[data-act=fpot]:not([disabled])'), flee:!!b.querySelector('[data-act=fflee]'), pow:b.querySelectorAll('[data-act=fpow]').length, blk:!!b.querySelector('[data-act=fz][data-arg^="b:"]:not([disabled])')}})()""")
         ok('low HP in fight: clear warning + block, potion, god power and flee options', r['low'] and r['pot'] and r['flee'] and r['blk'] and r['pow']>=1, r)
-        await pg.evaluate("document.getElementById('fightBox').scrollIntoView()"); await pg.screenshot(path='/workspace/godgame/shots9_lowhp_desktop.png')
+        await pg.evaluate("document.getElementById('fightBox').scrollIntoView()"); await pg.screenshot(path=''+os.environ.get('SHOTS9','/workspace/godgame/')+'shots9_lowhp_desktop.png')
         # зелье как действие хода
         r=await pg.evaluate("""(()=>{const G=GAME,F=G.S.fight,me=F.fighters.find(f=>f.isMe); for(const e of F.fighters) if(e.team===1){e.avg=.01;} const p0=G.S.hero.potions, hp0=me.hp, eh=F.fighters.filter(f=>f.team===1).map(f=>f.hp).join(); G.fightAct('potion'); F.my.blk=blkSet('head',me.blkN); G.fightGo(); const tl=[]; for(const l of F.log){ if(l.c==='turn') break; tl.push(l); } return {p0,p1:G.S.hero.potions,hp0,hp1:me.hp, heroHit: tl.some(l=>l.c==='me' && l.t.startsWith(me.name+' ') && /−\d+$/.test(l.t)), log:tl.map(l=>l.t).join(' | ')}})()""")
         ok('potion as a turn action: +HP, −1 potion, hero does not attack that turn', r['p1']==r['p0']-1 and r['hp1']>r['hp0'] and not r['heroHit'] and 'вместо удара пьёт зелье' in r['log'], r)
@@ -71,7 +71,7 @@ async def main():
         ok('next fight: unconscious hero does not fight (party carries him); god «Исцеление» in fight raises him', r['fight'] and r['meAlive']==False and r['intro'] and r['revived'] and r['out']==0 and r['hp']>0, r)
         r=await pg.evaluate("""(()=>{const G=GAME,U=G.S.dun; if(!U||U.phase!=='explore') return {skip:1}; U.out=1; G.S.hero.hp=1; G.S.hero.potions=1; const a=G.dunPotion(false); const r={a, out:U.out, hp:G.S.hero.hp}; U.out=1; G.S.hero.hp=1; U.heals=0; G.S.god.faith=G.maxFaith(); G.dunHeal(); r.out2=U.out; r.hp2=G.S.hero.hp; return r})()""")
         ok('between rooms: party pours a potion / god heals → hero wakes up', r.get('skip') or (r['a'] and r['out']==0 and r['hp']>1 and r['out2']==0 and r['hp2']>1), r)
-        await pg.evaluate("GAME.render()"); await pg.screenshot(path='/workspace/godgame/shots9_dungeon_desktop.png')
+        await pg.evaluate("GAME.render()"); await pg.screenshot(path=''+os.environ.get('SHOTS9','/workspace/godgame/')+'shots9_dungeon_desktop.png')
         await ctx.close()
         # 6) бога нет: герой осторожен — без подготовки, блок объявленного удара, зелье на краю, без сил; отряд уходит, если слаб
         ctx,pg=await newgame(br,'cleric')
@@ -92,7 +92,7 @@ async def main():
             await pg.evaluate(DUN_JS, {'go':1}); await pg.wait_for_timeout(250)
             r=await pg.evaluate("(()=>{const b=document.getElementById('fightBox').getBoundingClientRect(); return {mtab:GAME.S.ui.mtab, vis:b.top<innerHeight&&b.bottom>0&&b.height>0, w:document.documentElement.scrollWidth}})()")
             ok(f'{W}px: fight start switches bottom-nav to hero and scrolls fight card into view, no overflow', r['mtab']=='hero' and r['vis'] and r['w']<=W, r)
-            await pg.screenshot(path=f'/workspace/godgame/shots9_prep_{W}.png')
+            await pg.screenshot(path=os.environ.get('SHOTS9','/workspace/godgame/')+f'shots9_prep_{W}.png')
             await pg.evaluate("GAME.S.ui.mtab='powers'; GAME.render()"); await pg.wait_for_timeout(100)
             t0=await pg.evaluate("GAME.S.fight.t"); await pg.evaluate("GAME.S.paused=false"); await pg.wait_for_timeout(1300); await pg.evaluate("GAME.S.paused=true")
             t1=await pg.evaluate("GAME.S.fight.t")
@@ -102,7 +102,7 @@ async def main():
             await pg.evaluate("(()=>{const F=GAME.S.fight, me=F.fighters.find(f=>f.isMe); me.hp=Math.round(me.max*.2); GAME.S.hero.hp=me.hp; GAME.render()})()"); await pg.wait_for_timeout(100)
             r=await pg.evaluate("(()=>({low:!!document.querySelector('#fightBox .lowhp'), w:document.documentElement.scrollWidth}))()")
             ok(f'{W}px: low-HP warning with options fits', r['low'] and r['w']<=W, r)
-            await pg.evaluate("(()=>{const e=document.querySelector('#fightBox .lowhp'); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-130)})()"); await pg.screenshot(path=f'/workspace/godgame/shots9_lowhp_{W}.png')
+            await pg.evaluate("(()=>{const e=document.querySelector('#fightBox .lowhp'); window.scrollTo(0, e.getBoundingClientRect().top+scrollY-130)})()"); await pg.screenshot(path=os.environ.get('SHOTS9','/workspace/godgame/')+f'shots9_lowhp_{W}.png')
             await ctx.close()
         ctx,pg=await newgame(br,'warrior')
         r=await pg.evaluate("""(()=>{const G=GAME; const me=heroUnit(); const b=botUnit({name:'Бот',race:'elf',cls:'rogue',lvl:3}); const F=beginBattle('duel',[me],[b],{}); nextTurn(F); G.fightAct('flee'); G.fightAct('potion'); G.render(); const x={act:F.my.act||null, btn:!!document.querySelector('#fightBox [data-act=fflee]')}; G.S.fight=null; return x})()""")
