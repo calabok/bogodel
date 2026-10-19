@@ -115,9 +115,36 @@ function renderHero() {
     <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span>${Math.min(100, Math.floor(h.quest.p))}%</span></label>${bar('quest', h.quest.p, 100)}</div>
     <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   </div>
-  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
+  <div class="hc-mini">${bldChip(h)}<button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
     ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div>`;
   setHTML($('colHero'), html);
+}
+/* ---------- v8: путь героя в интерфейсе ---------- */
+const bldPri = (h, id) => { const w = bldStatW(h, id); return STATS.slice().sort((a, b) => w[b] - w[a]).slice(0, 3); };
+function bldTip(h) {
+  const id = bldId(h), B = BUILDS[id]; if (!B) return '';
+  return `${B.n}: ${B.d} Качает ${bldPri(h).map(k => STAT_SHORT[k]).join(' › ')}.${h.bld.re ? ` Переучивается (${h.bld.re.n - h.bld.re.pts}/${h.bld.re.n}).` : ''}`;
+}
+function bldChip(h) { const B = BLD(h); return B ? `<button class="linkbtn bldc" data-act="sheet" title="${esc(bldTip(h))}" aria-label="Путь: ${esc(B.n)}">${B.ic} ${esc(B.n)}${h.bld.re ? ' <span class="re">⟳</span>' : ''}</button>` : ''; }
+function bldLikes(B) {
+  const o = []; if (B.sh) o.push('щит'); if (B.h2) o.push('двуручное'); o.push(B.cats.map(c => WCAT[c].n.toLowerCase()).join('/'));
+  if (B.kind) o.push({ c: 'тканевую броню', l: 'лёгкую броню', h: 'тяжёлую броню' }[B.kind]); o.push(B.props.filter(k => PROP_DEF[k] && !STATS.includes(k)).slice(0, 3).map(k => PROP_RU[k] || PROP_DEF[k].n.toLowerCase()).join(', '));
+  return o.filter(Boolean).join(' · ');
+}
+function bldHTML(h) {
+  const id = bldId(h), B = BUILDS[id]; if (!B) return '';
+  const re = h.bld.re, hist = h.bld.hist.slice(-4);
+  return `<h3>🧭 Путь: ${B.ic} ${esc(B.n)}</h3><div class="bldbox"><div class="muted">${esc(B.d)}</div>
+    <div class="bldp">Качает: <b>${bldPri(h).map(k => STAT_SHORT[k]).join(' › ')}</b> · любит: ${esc(bldLikes(B))}</div>
+    ${re ? `<div class="bldre">⟳ Переучивается с пути ${bldName(re.from)}: ${re.n - re.pts}/${re.n} очк. — по очку за отдых у тренера.</div>${bar('xp', re.n - re.pts, re.n)}` : ''}
+    ${hist.length > 1 ? `<div class="bldh">История: ${hist.map(x => `<span title="${esc(BLD_WHY[x.why] || '')}">${BUILDS[x.id].ic} ур.${x.lvl}</span>`).join(' → ')} <span class="muted">(${esc(BLD_WHY[hist[hist.length - 1].why] || '')})</span></div>` : ''}
+    <div class="btns"><button class="btn small" data-act="bldOpen" ${S.god.faith < BLD_K.suggest ? 'disabled' : ''}>🙏 Посоветовать путь · ${BLD_K.suggest} веры</button>${h.bld.cd > 0 ? `<span class="muted small">ещё не остыл после выбора: послушается реже</span>` : ''}</div></div>`;
+}
+function bldModal() {
+  const h = S.hero, cur = bldId(h), p = Math.round(obeyChance() * (h.bld && h.bld.cd > 0 ? .7 : 1) * 100);
+  modal(`<div class="sheet"><h2>🙏 Какой путь посоветовать?</h2><div class="muted">Совет стоит ${BLD_K.suggest} веры. Герой послушается с шансом ~${p}% (доверие${h.bld && h.bld.cd > 0 ? ', и он недавно уже менял путь' : ''}). Переучивание идёт постепенно: по очку характеристики за отдых.</div>
+  <div class="opts">${Object.keys(BUILDS).map(id => { const B = BUILDS[id]; return `<button class="btn bldopt ${id === cur ? 'on' : ''}" data-act="bldPick" data-arg="${id}" ${id === cur ? 'disabled' : ''}><b>${B.ic} ${B.n}</b>${B.cls.includes(h.cls) ? ' <span class="tag cls">к лицу</span>' : ''}<br><span class="small">${esc(B.d)} Качает ${bldPri(h, id).map(k => STAT_SHORT[k]).join(' › ')}.</span></button>`; }).join('')}</div>
+  <div class="btns"><button class="btn" data-act="sheet">← К герою</button></div></div>`);
 }
 function sheetModal() {
   const h = S.hero, sh = sheet(), c = CLASSES[h.cls], r = RACES[h.race];
@@ -126,7 +153,7 @@ function sheetModal() {
   <div class="muted">Бой: атака ${fmtMod(sh.atkB)} · урон d${sh.die}${sh.dmgB ? fmtMod(sh.dmgB) : ''} (≈${Math.round(sh.avg)}) · КД ${sh.ac} · HP ${h.maxHp}. Владение ★: ${c.prof.map(k => STAT_SHORT[k]).join(', ')} (${fmtMod(profB(h.lvl))}).</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}, слушается ~${Math.round(obeyChance() * 100)}%</span></label>${bar('trust', h.trust, 100)}</div>
   ${h.inj.length ? `<h3>🤕 Травмы</h3>${h.inj.map(j => `<div class="injrow">${esc(j.n)}: ${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, пройдёт за ${fmtDur(j.t)}</div>`).join('')}<div class="muted">Лечат время, долгий отдых, храм и «Исцеление».</div>` : ''}
-  ${dollHTML(h)}
+  ${bldHTML(h)}${dollHTML(h)}
   <h3>🎒 Рюкзак (${h.inv.length}/${INV_MAX})</h3><ul class="inv">${h.inv.length ? h.inv.map(i => i.slot ? `<li><button class="linkbtn invb" data-act="itemD" data-arg="inv:${i.id}">${itemSpan(i)}</button>${!reqOk(h, i) ? ` <span class="rqb small">${esc(reqHtml(h, i).replace(/<[^>]+>/g, ''))}</span>` : bestPlace(h, i) ? ' <span class="upg" title="Лучше надетого">▲</span>' : ''} <span class="muted">~${i.v}💰</span></li>` : `<li>${esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
   <h3>Раса и класс</h3><div class="muted"><b>${r.tr}.</b> ${r.td}</div><div class="muted"><b>${c.ab}.</b> ${c.ad}</div>
   <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}
@@ -139,8 +166,9 @@ function renderFeat() {
   let body;
   if (F.asi) body = `<div class="muted">Какую характеристику прокачать на +2?</div><div class="opts">${STATS.map(k => `<button class="btn" data-act="asi" data-arg="${k}" ${S.hero.st[k] >= 20 ? 'disabled' : ''}>${STAT_RU[k]}: ${S.hero.st[k]} → ${Math.min(20, S.hero.st[k] + 2)}${CLASSES[S.hero.cls].prim === k ? '<span class="tag cls">основная</span>' : ''}</button>`).join('')}<button class="btn small" data-act="asiBack">← Назад к чертам</button></div>`;
   else body = `<div class="opts">${F.opts.map(id => `<button class="btn" data-act="feat" data-arg="${id}">🎖 <b>${FEATS[id].n}</b> — ${FEATS[id].d}</button>`).join('')}<button class="btn" data-act="asiOpen">💪 +2 к характеристике</button></div>`;
+  const pf = F.pref ? `<div class="pref">💭 Сам хочет: <b>${prefText(F.pref)}</b>${BLD(S.hero) ? ` (он же ${bldName(S.hero.bld.id)})` : ''}. Посоветуете другое — послушается с шансом ~${Math.round(prefObeyP() * 100)}%.</div>` : '';
   setHTML(box, `<div class="card feat"><h2>🎖 Герой вырос: выберите черту</h2>
-  <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам (и вам не понравится его логика).${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${body}</div>`);
+  <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам.${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${pf}${body}</div>`);
 }
 function renderDiary() {
   const el = $('diary');
@@ -236,7 +264,7 @@ function renderRight() {
     const st = S.stats;
     html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
       ${godsDunHTML()}
-      ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
+      ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
         <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
   }
   setHTML($('rightBody'), html);
@@ -327,7 +355,7 @@ function newGame() {
   const race = RACES[$('inRace').value] ? $('inRace').value : 'human', cls = CLASSES[$('inCls').value] ? $('inCls').value : 'warrior';
   S = defaultState(g, hn, race, cls); S.hero.maxHp = calcMaxHp(S.hero); S.hero.hp = S.hero.maxHp;
   diary(`Очнулся в канаве у Годграда. Помню только своё имя, что я ${RACES[race].n.toLowerCase()}-${CLASSES[cls].n.toLowerCase()} и что у меня есть бог — {god}. Пора совершать подвиги!`, 'god');
-  diary(`Взял первое задание: «${S.hero.quest.n}».`); closeModal(); save();
+  diary(`Взял первое задание: «${S.hero.quest.n}».`); initBuild(S.hero); closeModal(); save();
 }
 
 /* ---------- Действия ---------- */
@@ -353,6 +381,7 @@ const ACT = {
   temple: a => templeGive(a === 'all' ? 'all' : +a), miracle: a => miracle(a), recruit: a => recruit(+a),
   lift: a => liftCurse(a),
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
+  bldOpen: () => bldModal(), bldPick: a => { if (!BUILDS[a]) return; const ok = suggestBuild(a); sheetModal(); if (!ok && S.hero.bld.id !== a) toast('Герой не послушался — см. дневник.'); },
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
   challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
   callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },

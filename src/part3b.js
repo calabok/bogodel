@@ -84,7 +84,7 @@ function gainXp(v) {
   h.xp += Math.round(v);
   while (h.lvl < MAX_LVL && h.xp >= xpNext(h.lvl)) {
     h.xp -= xpNext(h.lvl); h.lvl++;
-    const s = R() < .5 ? CLASSES[h.cls].prim : pick(STATS); h.st[s] = Math.min(20, h.st[s] + 1);
+    const s = buildStat(h); h.st[s] = Math.min(20, h.st[s] + 1); if (h.bld) h.bld.nolvl = 0;
     recalcHp(); h.hp = h.maxHp; tryEquipInv();
     diary(`🎉 Достиг ${h.lvl}-го уровня! ${STAT_RU[s]} +1, здоровья теперь ${h.maxHp}.`, 'level');
     if (SILENT) SILENT.c.lvls++;
@@ -96,13 +96,14 @@ function gainXp(v) {
 function offerFeat() {
   if (S.featOffer || S.featQueue < 1) return;
   const free = Object.keys(FEATS).filter(f => !S.hero.feats.includes(f)).sort(() => R() - .5).slice(0, 3);
-  S.featOffer = { opts: free, t: PACE.feat, asi: false };
+  S.featOffer = { opts: free, t: PACE.feat, asi: false, pref: heroFeatPref(S.hero, free) };
   diary('🎖 Чувствую, что вырос над собой. Боже, подскажи, чему научиться?', 'level');
   toast('🎖 Герой выбирает черту — подскажите ему!');
 }
 function finishFeat() { S.featOffer = null; S.featQueue = Math.max(0, S.featQueue - 1); if (S.featQueue > 0) offerFeat(); }
 function chooseFeat(id, byHero) {
   if (!S.featOffer || !FEATS[id] || S.hero.feats.includes(id)) return;
+  if (!byHero && featDisobey({ feat: id })) return;
   S.hero.feats.push(id); if (id === 'tough') recalcHp();
   diary(byHero ? `Не дождался совета и выбрал черту «${FEATS[id].n}». ${pick(['Название красивое.', 'Так сказала ромашка.', 'Звучит солидно.'])}` : `По совету бога освоил черту «${FEATS[id].n}»: ${FEATS[id].d}`, 'level');
   if (!byHero) { addTrust(2); addGxp(10); }
@@ -110,16 +111,26 @@ function chooseFeat(id, byHero) {
 }
 function chooseAsi(s, byHero) {
   if (!S.featOffer || !STATS.includes(s)) return;
+  if (!byHero && featDisobey({ asi: s })) return;
   const h = S.hero, before = h.st[s]; h.st[s] = Math.min(20, h.st[s] + 2);
   if (s === 'con') recalcHp();
   diary(byHero ? `Сам решил прокачать ${STAT_RU[s].toLowerCase()}. Зачем — не знаю, но звучит умно. (${before} → ${h.st[s]})` : `По воле бога тренировался до седьмого пота: ${STAT_RU[s]} ${before} → ${h.st[s]}.`, 'level');
   if (!byHero) { addTrust(2); addGxp(10); }
   finishFeat();
 }
+/* Бог советует не то, что хочет герой: послушается по доверию (но не реже 55%) */
+function featDisobey(god) {
+  const F = S.featOffer, p = F && F.pref, h = S.hero; if (!p) return false;
+  const same = (p.feat && p.feat === god.feat) || (p.asi && p.asi === god.asi); if (same || R() < prefObeyP()) return false;
+  F.pref = null; const B = BLD(h);
+  diary(`🙃 Бог советовал ${prefText(god)}, но я же ${B ? bldName(h.bld.id) : 'сам с усами'}! Беру ${prefText(p)}.`, 'level');
+  if (p.feat && F.opts.includes(p.feat)) chooseFeat(p.feat, true); else chooseAsi(p.asi, true);
+  return true;
+}
 function heroPicksFeat() {
   if (!S.featOffer) return;
-  if (S.featOffer.opts.length && R() < .6) chooseFeat(pick(S.featOffer.opts), true);
-  else { const h = S.hero; const low = STATS.slice().sort((a, b) => h.st[a] - h.st[b]); chooseAsi(R() < .5 ? low[0] : CLASSES[h.cls].prim, true); }
+  const p = S.featOffer.pref || heroFeatPref(S.hero, S.featOffer.opts);
+  if (p.feat && S.featOffer.opts.includes(p.feat)) chooseFeat(p.feat, true); else chooseAsi(p.asi || buildStat(S.hero), true);
 }
 
 /* ---------- Эффекты (развилки и пр.) ---------- */
@@ -179,6 +190,7 @@ function questProgress(v) {
 function killHero(reason) {
   const h = S.hero;
   if (h.race === 'orc' && h.orcCd <= 0) { h.hp = 1; h.orcCd = 10800; diary('Должен был умереть, но я ОРК. Орки так просто не умирают. (Неукротимость)', 'level'); return; }
+  bldResult(false, 'death');
   h.hp = 0; h.state = 'dead'; h.deadT = PACE.dead; h.monster = null; h.restT = 0;
   if (S.fork) S.fork = null;
   const lost = Math.floor(h.gold * .1); h.gold -= lost;
@@ -222,7 +234,7 @@ function heroAttack(sh, m, notes) {
     const roll = rnd(1, 20);
     if (roll === 20 || (roll !== 1 && roll + sh.atkB >= m.ac)) {
       d = Math.round((rnd(1, sh.die) + sh.dmgB) * sh.scale);
-      if (roll === 20 || (eqHas('crit') && R() < .15) || (sh.cat === 'axe' && R() < .05)) { d *= 2; notes.add('крит'); }
+      if (roll === 20 || (eqHas('crit') && R() < .15) || (sh.bcrit && R() < sh.bcrit) || (sh.cat === 'axe' && R() < .05)) { d *= 2; notes.add('крит'); }
     }
   }
   if (d > 0 && !m.hit) {
@@ -281,7 +293,7 @@ function winFight() {
   const h = S.hero, m = h.monster; if (!m) return;
   const rel = clamp(1 + .25 * (m.tier - h.lvl), .4, 2);
   const xp = Math.round(xpUnit(h.lvl) * 3.2 * rel * (m.vet ? 1.6 : 1));
-  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1));
+  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1) * (bldId(h) === 'trick' ? 1 + BUILDS.trick.fx.gold : 1));
   h.gold += gold; let fx = `+${gold} 💰, +${xp} опыта`;
   if (SILENT) SILENT.c.wins++;
   diary(pick(['Противник «{m}» побеждён! Забрал трофеи и чувство собственной важности.', 'Победа над противником «{m}»! Победный танец исполнен (зрителей не было).',

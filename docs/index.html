@@ -193,6 +193,9 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
 .slotc .cn{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:break-word;hyphens:auto}
 @media (max-width:400px){.doll{gap:4px;grid-template-columns:minmax(0,1fr) minmax(76px,.9fr) minmax(0,1fr)}.slotc{grid-template-columns:auto minmax(0,1fr);padding:3px 4px;min-height:48px;font-size:10.5px}.slotc .ci{grid-row:1;grid-column:1;font-size:16px;text-align:left}.slotc .cb{grid-row:1;grid-column:2;justify-content:flex-end}.slotc .cn{grid-row:2;grid-column:1/3}.dav{font-size:32px}}
 .slotc .cb{display:flex;gap:3px;font-style:normal}.slotc .cb i{font-style:normal;font-size:10px;font-weight:700;color:#5a3b12}.slotc .cb i.cur{color:#8c2e20}
+.bldc{font-weight:600;color:#5a3b12}.bldc .re{color:#2a64c4}.bldbox{border:1px solid #d6bf8e;border-radius:8px;padding:6px 8px;background:#fbf4e3;font-size:13px}.bldp,.bldre,.bldh{margin:3px 0}.bldre{color:#2a64c4}.bldopt{text-align:left;display:block;width:100%}.bldopt .small{font-weight:400}.feat .pref{background:#eef3e0;border-radius:6px;padding:4px 8px;margin:4px 0;font-size:13px}
+.dwarn{background:#fbe1d8;border:1px solid #d98c6c;color:#7a2a12;border-radius:8px;padding:5px 8px;font-size:13px;font-weight:600;margin:4px 0}
+.dlast{font-size:12px;margin:4px 0;background:#fbf4e3;border-radius:6px;padding:3px 6px}.dlast summary{cursor:pointer;font-weight:600}.dlast div{padding:1px 0;border-bottom:1px dotted #e0cfa8}
 .slotc.empty{border-style:dashed;border-color:#cdb88d;background:transparent;color:#9c8762;cursor:default}.slotc.empty .ci{opacity:.5}
 .slotc.r2,.slotc.r3,.slotc.r4{box-shadow:0 0 0 1px rgba(0,0,0,.05),0 0 6px -1px currentColor}
 .slotc:not(.empty):hover{background:#fff3d6}
@@ -351,6 +354,7 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
 .btn.ghost{background:#fff6e0;border-color:#c8ad74;box-shadow:none;color:#5a3b12}
 .entry .fx{white-space:normal}
 .fxc{display:inline-block;font-size:11.5px;line-height:1.5;color:#6b5233;background:#0000000d;border-radius:8px;padding:0 6px;margin:2px 4px 0 0;white-space:nowrap}
+.entry>div{min-width:0}.entry .fxc{white-space:normal;max-width:100%;overflow-wrap:anywhere}
 .entry{padding:9px 4px;font-size:14.5px}
 .entry .tm{opacity:.75}
 .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.chips::-webkit-scrollbar{display:none}.chip{flex:none}
@@ -785,15 +789,15 @@ const STYLE = {
 };
 /* Баланс классов (подбирается симуляциями balance5.js): d — множитель урона, h — здоровья (везде);
    z — доп. множитель урона только в бою по зонам */
-const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .91 }, mage: { d: 1, h: 1, r: 0.78, z: 1.11 }, rogue: { d: 1, h: 1, r: 0.85, z: .69 }, cleric: { d: 1, h: 1, r: 0.8, z: .84 }, bard: { d: 1, h: 1, r: 0.76, z: 1.30 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.15 }, barbarian: { d: 1, h: 1, r: 1.6, z: .88 } };
-const BOT_K = 1.06;
+const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .91 }, mage: { d: 1, h: 1, r: 0.78, z: 1.11 }, rogue: { d: 1, h: 1, r: 0.85, z: .73 }, cleric: { d: 1, h: 1, r: 0.8, z: .91 }, bard: { d: 1, h: 1, r: 0.76, z: 1.24 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.15 }, barbarian: { d: 1, h: 1, r: 1.6, z: .88 } };
+const BOT_K = 1.1;
 /* Монстры: в бою по зонам — доли от «типичного героя» того же уровня; на дороге — множители старой формулы */
 const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.55, vet: .07 };
 /* Пещеры v5: меньше бесплатного лечения, злее комнаты и боссы, отступление с частью добычи */
-const DUN_K = { shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.5, .42], bdmg: 1.35, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
+const DUN_K = { fallHp: .35, lowHp: .35, lowLvl: [.72, .07], shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.6, .45], bdmg: 1.5, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
 /* v6: сила снаряжения (ГС) и уровни сложности пещер. g — доля «типичного» ГС уровня, m — сила монстров, rew — награда, rar — бонус редкости */
 const DUN_TIERS = {
-  easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .93, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
+  easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .86, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
   normal: { n: 'Обычная', ic: '🟡', g: 1, m: 1, rew: 1, rar: 0, nm: 'Пещера' },
   hard: { n: 'Тяжёлая', ic: '🔴', g: 1.2, m: 1.06, rew: 1.6, rar: .7, nm: 'Глубины' }
 };
@@ -943,6 +947,34 @@ const SETS = {
   intel: { n: 'Варвар-интеллигент', lv: [10, 15], pcs: [['helm', 'Рогатый шлем с очками', 'h'], ['armor', 'Шкура с галстуком', 'h'], ['weapon', 'Двуручный топор «Логика»', 'two'], ['belt', 'Пояс чемпиона шахматного кружка', 'h'], ['boots', 'Ботинки на шнурках (завязаны!)', 'h']],
     b: { 2: [{ k: 'str', v: 1 }], 4: [{ k: 'fire' }, { k: 'hp' }], 5: [{ k: 'str', v: 2 }, { k: 'int', v: 2 }, { k: 'pierce' }] }, fl: 'Сначала цитирует Канта. Потом бьёт. Иногда Кантом.' }
 };
+/* ---------- v8: Пути (билды) героя. Герой сам выбирает, кем стать, как в старом добром БК ----------
+   st — веса характеристик (prim — основная характеристика класса), cats — любимое оружие, kind — тип брони,
+   sh — любит щит, h2 — любит двуручное, props — ценные свойства, feats — любимые черты, z — любимая зона удара,
+   bz — что прикрывает, cls — классы, которым путь «к лицу», fx — небольшой боевой бонус пути */
+const BUILDS = {
+  tank:    { t: 'Танком', n: 'Танк', ic: '🛡', d: 'Стоит стеной: щит, тяжёлая броня, много здоровья. Бьёт не больно, зато долго.', st: { con: 3, str: 1.5, wis: 1 }, cats: ['sword', 'mace'], kind: 'h', sh: 1, props: ['hp', 'acrit', 'blockp', 'thorns', 'regen', 'con'], feats: ['ironskin', 'tough', 'sentinel', 'gourmet'], z: 'chest', bz: 'head', cls: ['warrior', 'cleric', 'barbarian'], race: ['dwarf', 'orc'], al: 0, fx: { blk: .06, red: .08 } },
+  crit:    { t: 'Критовиком', n: 'Критовик', ic: '🎯', d: 'Бьёт редко, но метко — и очень больно. Живёт ради жёлтых цифр.', st: { prim: 3, wis: 1.5, int: 1 }, cats: ['axe', 'dagger', 'bow'], props: ['crit', 'acc', 'pierce', 'stun'], feats: ['wmaster', 'lucky', 'brawler'], z: 'head', bz: 'chest', cls: ['warrior', 'ranger', 'rogue', 'mage', 'barbarian'], race: ['elf', 'human'], al: 0, fx: { crit: .07 } },
+  dodge:   { t: 'Уворотчиком', n: 'Уворотчик', ic: '💨', d: 'Его не поймать: лёгкая броня, высокая Ловкость и вечное «мимо!».', st: { dex: 3, con: 1.2, wis: .8 }, cats: ['dagger', 'sword', 'bow'], kind: 'l', props: ['dodge', 'acrit', 'poison', 'dex'], feats: ['swift', 'sentinel', 'lucky'], z: 'legs', bz: 'chest', cls: ['rogue', 'ranger', 'bard'], race: ['halfling', 'elf'], al: 0, fx: { dodge: .06 } },
+  berserk: { t: 'Берсерком', n: 'Берсерк', ic: '🪓', d: 'Силач с двуручником: щит — для трусов, броня — для слабаков.', st: { str: 3, con: 2 }, cats: ['two', 'axe'], h2: 1, props: ['fire', 'vamp', 'crit', 'stun', 'str'], feats: ['brawler', 'wmaster', 'tough'], z: 'head', bz: 'belly', cls: ['barbarian', 'warrior'], race: ['orc', 'dwarf'], al: -1, fx: { dmg: .1, red: -.05 } },
+  mage:    { t: 'Чародеем', n: 'Чародей', ic: '🔮', d: 'Посох, мантия и умное лицо. Лёд, огонь и вера — его конёк.', st: { int: 3, wis: 2 }, cats: ['staff'], kind: 'c', h2: 1, props: ['ice', 'fire', 'faith', 'int', 'wis'], feats: ['devout', 'sentinel', 'lucky'], z: 'chest', bz: 'head', cls: ['mage', 'cleric', 'bard'], race: ['gnome', 'tiefling', 'elf'], al: 0, fx: { spell: .1 } },
+  healer:  { t: 'Целителем', n: 'Целитель', ic: '✚', d: 'Лечит себя и других прямо в бою. Не умирает из принципа.', st: { wis: 3, con: 1.5, cha: 1 }, cats: ['mace', 'staff'], sh: 1, props: ['regen', 'vamp', 'holy', 'faith', 'wis'], feats: ['devout', 'preacher', 'gourmet'], z: 'belly', bz: 'chest', cls: ['cleric', 'bard'], race: ['dwarf', 'human'], al: 1, fx: { heal: .015 } },
+  trick:   { t: 'Хитрецом-торгашом', n: 'Хитрец-торгаш', ic: '🎭', d: 'Ядовитый кинжал, язык без костей и кошелёк без дна.', st: { cha: 3, dex: 1.5, int: 1 }, cats: ['dagger', 'music'], kind: 'l', props: ['gold', 'luck', 'poison', 'preach', 'cha'], feats: ['trader', 'silver', 'treasure', 'lucky'], z: 'waist', bz: 'head', cls: ['bard', 'rogue'], race: ['halfling', 'tiefling', 'gnome'], al: 0, fx: { first: .3, gold: .15 } }
+};
+/* Подстройка путей под равный винрейт (симуляции bal8): d — урон, r — входящий урон в бою по зонам */
+const BUILD_BAL = { tank: { d: .93, r: 1 }, crit: { d: .96, r: 1 }, dodge: { d: .94, r: 1 }, berserk: { d: 1.05, r: 1 }, mage: { d: 1.1, r: 1 }, healer: { d: .85, r: 1 }, trick: { d: 1.04, r: 1 } };
+const BLD_K = { cd: 48 * 3600, respec: 3 * 3600, loss: 5, stuck: 45 * 3600, suggest: 30, fee: [15, 6] };
+const BLD_WHY = {
+  start: 'с детства мечтал', loss: 'надоело проигрывать', item: 'нашёл вещь мечты', stuck: 'застрял в развитии', god: 'по совету бога', dun: 'пещеры не прощают', migr: 'так сложилось'
+};
+const BLD_SAY = {
+  start: ['Решил: буду {t}! Мама говорила, что у меня талант.', 'Посмотрел на себя в лужу и понял: я — {b}. Без вариантов.', 'Гадалка сказала, что мой путь — {b}. Гадалке я заплатил, значит, правда.'],
+  loss: ['Хватит! Решил, что я вообще-то {b}. Прошлое — ошибка молодости.', 'Меня бьют, значит, путь неверный. Становлюсь {t}!'],
+  item: ['Нашёл «{i}» — это знак! Теперь я {b}.', '«{i}» так ладно сидит в руке… Похоже, я всю жизнь был {t}.'],
+  stuck: ['Что-то я застоялся. Попробую себя в роли: {b}.', 'Скучно быть тем, кем был. Буду {t}!'],
+  god: ['Бог шепнул: «будь {t}». Ну раз бог…', 'Послушал бога: отныне я {b}. Начинаю переучиваться.'],
+  dun: ['Пещера показала: старый путь не работает. Пробую стать {t}.'],
+  no: ['Бог советует стать {t}? Не-а. Я сам знаю, кем мне быть.', 'Подумал над советом стать {t}… Подумал ещё… Нет.', 'Стать {t}? Звучит как работа. Отказываюсь.']
+};
 
 /* =====================================================================
    2) ТЕМП ИГРЫ (все времена — в игровых секундах при скорости ×1)
@@ -1029,7 +1061,7 @@ function defaultState(god, hero, race, cls) {
     timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
     fork: null, fight: null, ev: null, dun: null, fightAuto: false,
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
-    diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2) }, r)),
+    diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
     speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
   };
@@ -1046,7 +1078,17 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 7;
+const SAVE_VERSION = 8;
+/* v8: путь героя */
+function sanitizeBld(h) {
+  const B = h.bld;
+  if (!B || typeof B !== 'object' || !BUILDS[B.id]) { h.bld = mkBld(inferBuild(h), 'migr', h.lvl); return; }
+  for (const [k, mx] of [['age', 1e9], ['cd', BLD_K.cd], ['loss', 20], ['nolvl', 1e8]]) { if (typeof B[k] !== 'number' || !isFinite(B[k])) B[k] = 0; B[k] = Math.max(0, Math.min(mx, B[k])); }
+  B.hist = Array.isArray(B.hist) ? B.hist.filter(x => x && BUILDS[x.id]).map(x => ({ id: x.id, why: BLD_WHY[x.why] ? x.why : 'start', lvl: typeof x.lvl === 'number' && isFinite(x.lvl) ? Math.max(1, Math.min(MAX_LVL, Math.round(x.lvl))) : 1 })).slice(-8) : [];
+  if (!B.hist.length) B.hist = [{ id: B.id, why: 'start', lvl: 1 }];
+  const r = B.re; B.re = r && typeof r === 'object' && BUILDS[r.from] && r.from !== B.id && typeof r.pts === 'number' && r.pts >= 1 ? { from: r.from, pts: Math.min(6, Math.round(r.pts)), n: Math.min(6, Math.max(Math.round(r.pts), typeof r.n === 'number' && isFinite(r.n) ? Math.round(r.n) : 1)), t: typeof r.t === 'number' && isFinite(r.t) ? Math.max(0, Math.min(BLD_K.respec, r.t)) : BLD_K.respec } : null;
+  for (const k of Object.keys(B)) if (!['id', 'age', 'cd', 'loss', 'nolvl', 'hist', 're'].includes(k)) delete B[k];
+}
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -1111,6 +1153,7 @@ function migrate(o) {
     if (h && h.eq && typeof h.eq === 'object') for (const k of ['offhand', 'helm', 'belt', 'gloves', 'boots', 'ring2']) if (!(k in h.eq)) h.eq[k] = null;
     o._migratedV7 = 1;
   }
+  if (v < 8) o._migratedV8 = 1;
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
@@ -1150,6 +1193,7 @@ function sanitize(o) {
   if (!h.st || typeof h.st !== 'object') h.st = genStats(h.cls, h.race);
   for (const s of STATS) { fixNum(h.st, s, 10, 3, 20); h.st[s] = Math.round(h.st[s]); }
   h.feats = Array.isArray(h.feats) ? [...new Set(h.feats.filter(x => FEATS[x]))] : [];
+  sanitizeBld(h);
   fixNum(h, 'lvl', 1, 1, MAX_LVL); h.lvl = Math.floor(h.lvl); fixNum(h, 'xp', 0, 0, Math.max(0, xpNext(h.lvl) - 1)); if (h.lvl >= MAX_LVL) h.xp = 0;
   if (!h.eq || typeof h.eq !== 'object') h.eq = d.hero.eq;
   for (const k of Object.keys(h.eq)) if (!EQ_KEYS.includes(k)) delete h.eq[k];
@@ -1213,10 +1257,11 @@ function sanitize(o) {
   }
   if (o.ev) { fixNum(o.ev, 't', 1, 0, 60); fixNum(o.ev, 'thr', 100, 1); fixNum(o.ev.my, 'power', 0, 0); fixNum(o.ev.my, 'army', 0, 0); if (!o.ev.ai) o.ev.ai = {}; if (o.ev.phase === 'done' && !o.ev.result) o.ev = null; }
   if (o.featOffer && !(Array.isArray(o.featOffer.opts) && o.featOffer.opts.every(x => FEATS[x]) && isNum(o.featOffer.t))) o.featOffer = null;
-  if (o.featOffer) { o.featOffer.opts = o.featOffer.opts.filter(x => !h.feats.includes(x)); o.featOffer.asi = !!o.featOffer.asi; }
+  if (o.featOffer) { o.featOffer.opts = o.featOffer.opts.filter(x => !h.feats.includes(x)); o.featOffer.asi = !!o.featOffer.asi; const P = o.featOffer.pref; o.featOffer.pref = P && ((P.feat && FEATS[P.feat] && !h.feats.includes(P.feat)) || (P.asi && STATS.includes(P.asi))) ? (P.feat ? { feat: P.feat } : { asi: P.asi }) : null; }
   fixNum(o, 'featQueue', 0, 0, 10); o.featQueue = Math.floor(o.featQueue);
   if (!Array.isArray(o.rivals)) o.rivals = d.rivals;
   o.rivals = o.rivals.filter(r => r && RIVALS_BASE.find(b => b.id === r.id));
+  for (const r of o.rivals) if (!BUILDS[r.bld]) r.bld = bldForBot(r.cls, r.race);
   for (const b of RIVALS_BASE) if (!o.rivals.find(r => r.id === b.id)) o.rivals.push(Object.assign({ w: 0, l: 0, army: 0, hlvl: 1 }, b));
   for (const r of o.rivals) { const b = RIVALS_BASE.find(x => x.id === r.id); Object.assign(r, { name: b.name, hero: b.hero, pers: b.pers, race: b.race, cls: b.cls }); fixNum(r, 'lvl', b.lvl, 1, 99); fixNum(r, 'hlvl', 1, 1, MAX_LVL); fixNum(r, 'w', 0, 0); fixNum(r, 'l', 0, 0); fixNum(r, 'army', 0, 0); }
   o.diary = Array.isArray(o.diary) ? o.diary.filter(e => e && typeof e.x === 'string').slice(0, 150) : [];
@@ -1272,7 +1317,7 @@ const AI_W = {
 class LocalAIProvider extends RivalProvider {
   constructor(getState) { super(); this.st = getState; }
   listGods() { return this.st().rivals; }
-  _hero(g, heroLvl) { return { godId: g.id, god: g.name, hero: g.hero, pers: g.pers, lvl: g.lvl, race: g.race, cls: g.cls, heroLvl: clamp(heroLvl + rnd(-1, 1), 1, MAX_LVL), army: g.army }; }
+  _hero(g, heroLvl) { return { godId: g.id, god: g.name, hero: g.hero, pers: g.pers, lvl: g.lvl, race: g.race, cls: g.cls, bld: g.bld, heroLvl: clamp(heroLvl + rnd(-1, 1), 1, MAX_LVL), army: g.army }; }
   findOpponent(player) {
     const gods = this.st().rivals.slice().sort((a, b) => Math.abs(a.lvl - player.godLvl) - Math.abs(b.lvl - player.godLvl));
     const g = player.godId ? this.st().rivals.find(x => x.id === player.godId) || pick(gods.slice(0, 4)) : pick(gods.slice(0, 4));
@@ -1451,7 +1496,7 @@ function gainXp(v) {
   h.xp += Math.round(v);
   while (h.lvl < MAX_LVL && h.xp >= xpNext(h.lvl)) {
     h.xp -= xpNext(h.lvl); h.lvl++;
-    const s = R() < .5 ? CLASSES[h.cls].prim : pick(STATS); h.st[s] = Math.min(20, h.st[s] + 1);
+    const s = buildStat(h); h.st[s] = Math.min(20, h.st[s] + 1); if (h.bld) h.bld.nolvl = 0;
     recalcHp(); h.hp = h.maxHp; tryEquipInv();
     diary(`🎉 Достиг ${h.lvl}-го уровня! ${STAT_RU[s]} +1, здоровья теперь ${h.maxHp}.`, 'level');
     if (SILENT) SILENT.c.lvls++;
@@ -1463,13 +1508,14 @@ function gainXp(v) {
 function offerFeat() {
   if (S.featOffer || S.featQueue < 1) return;
   const free = Object.keys(FEATS).filter(f => !S.hero.feats.includes(f)).sort(() => R() - .5).slice(0, 3);
-  S.featOffer = { opts: free, t: PACE.feat, asi: false };
+  S.featOffer = { opts: free, t: PACE.feat, asi: false, pref: heroFeatPref(S.hero, free) };
   diary('🎖 Чувствую, что вырос над собой. Боже, подскажи, чему научиться?', 'level');
   toast('🎖 Герой выбирает черту — подскажите ему!');
 }
 function finishFeat() { S.featOffer = null; S.featQueue = Math.max(0, S.featQueue - 1); if (S.featQueue > 0) offerFeat(); }
 function chooseFeat(id, byHero) {
   if (!S.featOffer || !FEATS[id] || S.hero.feats.includes(id)) return;
+  if (!byHero && featDisobey({ feat: id })) return;
   S.hero.feats.push(id); if (id === 'tough') recalcHp();
   diary(byHero ? `Не дождался совета и выбрал черту «${FEATS[id].n}». ${pick(['Название красивое.', 'Так сказала ромашка.', 'Звучит солидно.'])}` : `По совету бога освоил черту «${FEATS[id].n}»: ${FEATS[id].d}`, 'level');
   if (!byHero) { addTrust(2); addGxp(10); }
@@ -1477,16 +1523,26 @@ function chooseFeat(id, byHero) {
 }
 function chooseAsi(s, byHero) {
   if (!S.featOffer || !STATS.includes(s)) return;
+  if (!byHero && featDisobey({ asi: s })) return;
   const h = S.hero, before = h.st[s]; h.st[s] = Math.min(20, h.st[s] + 2);
   if (s === 'con') recalcHp();
   diary(byHero ? `Сам решил прокачать ${STAT_RU[s].toLowerCase()}. Зачем — не знаю, но звучит умно. (${before} → ${h.st[s]})` : `По воле бога тренировался до седьмого пота: ${STAT_RU[s]} ${before} → ${h.st[s]}.`, 'level');
   if (!byHero) { addTrust(2); addGxp(10); }
   finishFeat();
 }
+/* Бог советует не то, что хочет герой: послушается по доверию (но не реже 55%) */
+function featDisobey(god) {
+  const F = S.featOffer, p = F && F.pref, h = S.hero; if (!p) return false;
+  const same = (p.feat && p.feat === god.feat) || (p.asi && p.asi === god.asi); if (same || R() < prefObeyP()) return false;
+  F.pref = null; const B = BLD(h);
+  diary(`🙃 Бог советовал ${prefText(god)}, но я же ${B ? bldName(h.bld.id) : 'сам с усами'}! Беру ${prefText(p)}.`, 'level');
+  if (p.feat && F.opts.includes(p.feat)) chooseFeat(p.feat, true); else chooseAsi(p.asi, true);
+  return true;
+}
 function heroPicksFeat() {
   if (!S.featOffer) return;
-  if (S.featOffer.opts.length && R() < .6) chooseFeat(pick(S.featOffer.opts), true);
-  else { const h = S.hero; const low = STATS.slice().sort((a, b) => h.st[a] - h.st[b]); chooseAsi(R() < .5 ? low[0] : CLASSES[h.cls].prim, true); }
+  const p = S.featOffer.pref || heroFeatPref(S.hero, S.featOffer.opts);
+  if (p.feat && S.featOffer.opts.includes(p.feat)) chooseFeat(p.feat, true); else chooseAsi(p.asi || buildStat(S.hero), true);
 }
 
 /* ---------- Эффекты (развилки и пр.) ---------- */
@@ -1546,6 +1602,7 @@ function questProgress(v) {
 function killHero(reason) {
   const h = S.hero;
   if (h.race === 'orc' && h.orcCd <= 0) { h.hp = 1; h.orcCd = 10800; diary('Должен был умереть, но я ОРК. Орки так просто не умирают. (Неукротимость)', 'level'); return; }
+  bldResult(false, 'death');
   h.hp = 0; h.state = 'dead'; h.deadT = PACE.dead; h.monster = null; h.restT = 0;
   if (S.fork) S.fork = null;
   const lost = Math.floor(h.gold * .1); h.gold -= lost;
@@ -1589,7 +1646,7 @@ function heroAttack(sh, m, notes) {
     const roll = rnd(1, 20);
     if (roll === 20 || (roll !== 1 && roll + sh.atkB >= m.ac)) {
       d = Math.round((rnd(1, sh.die) + sh.dmgB) * sh.scale);
-      if (roll === 20 || (eqHas('crit') && R() < .15) || (sh.cat === 'axe' && R() < .05)) { d *= 2; notes.add('крит'); }
+      if (roll === 20 || (eqHas('crit') && R() < .15) || (sh.bcrit && R() < sh.bcrit) || (sh.cat === 'axe' && R() < .05)) { d *= 2; notes.add('крит'); }
     }
   }
   if (d > 0 && !m.hit) {
@@ -1648,7 +1705,7 @@ function winFight() {
   const h = S.hero, m = h.monster; if (!m) return;
   const rel = clamp(1 + .25 * (m.tier - h.lvl), .4, 2);
   const xp = Math.round(xpUnit(h.lvl) * 3.2 * rel * (m.vet ? 1.6 : 1));
-  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1));
+  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1) * (bldId(h) === 'trick' ? 1 + BUILDS.trick.fx.gold : 1));
   h.gold += gold; let fx = `+${gold} 💰, +${xp} опыта`;
   if (SILENT) SILENT.c.wins++;
   diary(pick(['Противник «{m}» побеждён! Забрал трофеи и чувство собственной важности.', 'Победа над противником «{m}»! Победный танец исполнен (зрителей не было).',
@@ -2088,13 +2145,16 @@ function makeSetItem(id, lvl, rar) {
 }
 /* ---------- Оценка вещей для авто-экипировки ---------- */
 function itemScore(it, h) {
-  if (!it) return 0; h = h || S.hero; const c = CLASSES[h.cls];
+  if (!it) return 0; h = h || S.hero; const c = CLASSES[h.cls], B = BUILDS[h.bld && h.bld.id];
   let s = 0;
-  for (const p of it.props) s += STATS.includes(p.k) ? (p.v || 1) * (p.k === c.prim ? 1.6 : p.k === 'con' ? 1.1 : .5) * 1.2 : 1.8;
+  const W = B ? bldStatW(h) : null, wm = W ? Math.max(...Object.values(W)) : 1;
+  for (const p of it.props) s += STATS.includes(p.k) ? (p.v || 1) * (W ? Math.max(.35, W[p.k] / wm * 1.6) : (p.k === c.prim ? 1.6 : p.k === 'con' ? 1.1 : .5)) * 1.2 : (B ? (B.props.includes(p.k) ? 2.8 : 1.4) : 1.8);
   const sl = it.slot, pl = it.plus || 0;
-  if (sl === 'weapon') { const off = h.eq.offhand === it; s += off ? ((it.die || 4) + 1) / 2 * .4 + pl * .5 : ((it.die || 4) + 1) / 2 + pl * 1.5 + (WCAT[it.cat] && WCAT[it.cat].cls.includes(h.cls) ? 1.5 : 0) + (it.cat === 'two' ? .6 : 0); }
+  if (B && it.kind && B.kind) s += it.kind === B.kind ? .8 : -.3;
+  if (sl === 'weapon') { const off = h.eq.offhand === it; s += off ? ((it.die || 4) + 1) / 2 * .4 + pl * .5 : ((it.die || 4) + 1) / 2 + pl * 1.5 + (WCAT[it.cat] && WCAT[it.cat].cls.includes(h.cls) ? 1.5 : 0) + (it.cat === 'two' ? .6 : 0)
+      + (B && !off ? (B.cats.includes(it.cat) ? 1.6 : 0) + (it.h2 ? (B.h2 ? 1.2 : B.sh ? -1.8 : 0) : 0) : 0); }
   else if (sl === 'armor') s += effAc(it);
-  else if (sl === 'offhand') s += effAc(it) * .5 + (it.blk || 0) * 22;
+  else if (sl === 'offhand') s += (effAc(it) * .5 + (it.blk || 0) * 22) * (B ? (B.sh ? 1.4 : B.h2 ? .6 : 1) : 1);
   else if (sl === 'gloves') s += (it.hit || 0) + pl * .5;
   else if (sl === 'helm' || sl === 'belt' || sl === 'boots') s += effAc(it) * .7;
   else s += pl * .5;
@@ -2102,7 +2162,7 @@ function itemScore(it, h) {
   return s;
 }
 function loadoutScore(h, eq) {
-  const hh = { cls: h.cls, eq }, c = CLASSES[h.cls]; let s = 0;
+  const hh = { cls: h.cls, eq, bld: h.bld, st: h.st }, c = CLASSES[h.cls]; let s = 0;
   for (const k of EQ_KEYS) if (eq[k]) s += itemScore(eq[k], hh);
   for (const p of setBonusProps(hh)) s += STATS.includes(p.k) ? (p.v || 1) * (p.k === c.prim ? 1.6 : .6) * 1.2 : 1.8;
   return s;
@@ -2251,6 +2311,7 @@ function lootDrop(boost, source, o) {
   diary(`${source || 'Нашёл'}: «${it.n}» — ${RARITY[it.rar].n}${it.set ? ' (комплект!)' : ''}${worn ? '. Сразу надел!' : !reqOk(h, it) ? '. Пока не по силам — в рюкзак.' : '. Положил в рюкзак.'}`, rareCls, itemDesc(it));
   if (worn && it.curse) diary(`Надел и пожалел: проклятие ${CURSES[it.curse.k].n}! ${CURSES[it.curse.k].d}.`, 'fight');
   if (SILENT && (it.rar >= 2 || it.set)) SILENT.c.items.push(it.n);
+  bldItem(it);
   return it;
 }
 /* Предметы из сохранений v6 и старше → структура v7 */
@@ -2263,7 +2324,7 @@ function upgradeItem(it) {
   return it;
 }
 /* Эффекты снаряжения в бою на дороге */
-function roadFx(h) { const g = gearFx(h); return { cat: wTraits(h).cat, xatk: g.xatk, blk: g.blk * .8, dodgeN: propCnt(h, 'dodge'), acrit: g.acrit }; }
+function roadFx(h) { const g = gearFx(h), B = BUILDS[h.bld && h.bld.id], f = B ? B.fx : {}; return { cat: wTraits(h).cat, xatk: g.xatk, blk: g.blk * .8 + (f.blk || 0) * .6, dodgeN: propCnt(h, 'dodge') + (f.dodge ? 1 : 0), acrit: g.acrit, bcrit: (f.crit || 0) * .8 }; }
 /* Лавка в городе: вещи по уровню героя, сначала в пустые слоты */
 function shopPick(h, L) {
   if (R() > .6) return null;
@@ -2275,6 +2336,136 @@ function shopPick(h, L) {
   }
   return null;
 }
+/* ---------- v8: путь (билд) героя — выбор, характеристики, передумывание, переучивание ---------- */
+const bldId = h => h && h.bld && BUILDS[h.bld.id] ? h.bld.id : null;
+const BLD = h => BUILDS[bldId(h)] || null;
+const bldName = (id, form) => BUILDS[id] ? `${BUILDS[id].ic} ${(form === 't' ? BUILDS[id].t : BUILDS[id].n).toLowerCase()}` : '';
+/* Веса характеристик пути (+ атакующая характеристика класса: бить всё равно надо) */
+function bldStatW(h, id) {
+  const B = BUILDS[id || bldId(h)], c = CLASSES[h.cls] || CLASSES.warrior, w = {};
+  for (const k of STATS) w[k] = .1;
+  if (B) for (const k in B.st) w[k === 'prim' ? c.prim : k] += B.st[k]; else { w[c.prim] += 3; w.con += 1.5; }
+  w[c.atk] += 1; w.con += .4;
+  return w;
+}
+/* Насколько путь подходит герою: класс, раса, характеристики, характер бога, снаряжение */
+function bldFit(h, id) {
+  const B = BUILDS[id], w = bldStatW(h, id), st = h.st || {};
+  let sw = 0, sf = 0; for (const k of STATS) { sw += w[k]; sf += w[k] * ((st[k] || 10) - 10); }
+  let s = (B.cls.includes(h.cls) ? 4 : .4) + (B.race.includes(h.race) ? 1 : 0) + sf / sw * .5;
+  const al = typeof S !== 'undefined' && S && S.god ? S.god.align : 0; s += B.al * al / 60;
+  if (h.eq) for (const it of Object.values(h.eq)) if (it) { if (it.slot === 'weapon' && B.cats.includes(it.cat)) s += .8; if (it.kind && it.kind === B.kind) s += .3; if (B.sh && isShield(it)) s += .6; for (const p of it.props || []) if (B.props.includes(p.k)) s += .3; }
+  return s;
+}
+function pickBuild(h, excl, rnd0) {
+  let best = null, bs = -1e9;
+  for (const id in BUILDS) { if (id === excl) continue; const s = bldFit(h, id) + R() * (rnd0 == null ? 2.5 : rnd0); if (s > bs) { bs = s; best = id; } }
+  return best;
+}
+/* Ботам и соперникам — путь по классу (с долей случайности) */
+function bldForBot(cls, race) {
+  const ids = Object.keys(BUILDS), w = ids.map(id => (BUILDS[id].cls.includes(cls) ? 4 : .35) + (BUILDS[id].race.includes(race) ? .8 : 0));
+  let r = R() * w.reduce((a, b) => a + b, 0); for (let i = 0; i < ids.length; i++) { r -= w[i]; if (r <= 0) return ids[i]; } return ids[0];
+}
+const mkBld = (id, why, lvl) => ({ id, age: 0, cd: BLD_K.cd, loss: 0, nolvl: 0, hist: [{ id, why, lvl: lvl || 1 }], re: null });
+const bldSay = (why, id, it) => pick(BLD_SAY[why] || BLD_SAY.start).replace('{b}', bldName(id)).replace('{t}', bldName(id, 't')).replace('{i}', it ? it.n : '');
+function initBuild(h, why) {
+  const id = pickBuild(h, null); h.bld = mkBld(id, why || 'start', h.lvl); h.bld.cd = BLD_K.cd / 2;
+  if (why !== 'migr') diary(`🧭 ${bldSay('start', id)}`, 'level', `путь: ${bldName(id)}`);
+  return id;
+}
+/* Какую характеристику качать: по пути + та, что нужна для желанной вещи из рюкзака */
+function buildStat(h, n) {
+  const w = bldStatW(h);
+  for (const it of h.inv || []) if (it.slot && it.req && it.req.s && it.req.v && !reqOk(h, it) && (h.lvl >= (it.req.lvl || 1) - 1)) {
+    const ks = it.req.s.split('/'), k = ks.sort((a, b) => h.st[b] - h.st[a])[0]; if (STATS.includes(k) && h.st[k] < it.req.v && h.st[k] < 20) { const top = Math.max(...STATS.map(q => w[q])); w[k] = Math.max(w[k] + 2.5, top * 1.25); }
+  }
+  let best = null, bs = -1;
+  for (const k of STATS) { if (h.st[k] >= 20) continue; const s = w[k] / (1 + Math.max(0, h.st[k] - 15) * .25) * (.85 + R() * .3); if (s > bs) { bs = s; best = k; } }
+  return best || CLASSES[h.cls].prim;
+}
+/* Что сам герой хочет взять на чётном уровне */
+function heroFeatPref(h, opts) {
+  const B = BLD(h); opts = opts || [];
+  if (B) { const f = B.feats.find(x => opts.includes(x) && !h.feats.includes(x)); if (f) return { feat: f }; }
+  if (!B && opts.length && R() < .5) return { feat: opts[0] };
+  return { asi: buildStat(h) };
+}
+const STAT_DAT = { str: 'Силе', dex: 'Ловкости', con: 'Телосложению', int: 'Интеллекту', wis: 'Мудрости', cha: 'Харизме' };
+const prefText = p => p.feat ? `черту «${FEATS[p.feat].n}»` : `+2 к ${STAT_DAT[p.asi]}`;
+/* Послушается ли герой бога, когда тот советует не то, что хочет он сам (мягче, чем в развилках) */
+const prefObeyP = () => Math.max(.55, obeyChance());
+/* ---------- Передумывание ---------- */
+function startRespec(id, why, it) {
+  const h = S.hero; if (!BUILDS[id]) return false;
+  if (!h.bld) h.bld = mkBld(id, why, h.lvl);
+  const from = h.bld.id; if (from === id) return false;
+  h.bld.id = id; h.bld.age = 0; h.bld.cd = BLD_K.cd; h.bld.loss = 0; h.bld.nolvl = 0;
+  h.bld.hist.push({ id, why, lvl: h.lvl }); if (h.bld.hist.length > 8) h.bld.hist.splice(0, h.bld.hist.length - 8);
+  const pts = Math.min(6, Math.max(1, Math.floor(h.lvl / 2)));
+  h.bld.re = { from, pts, n: pts, t: BLD_K.respec };
+  diary(`🧭 ${bldSay(why, id, it)}`, 'level', `путь: ${bldName(from)} → ${bldName(id)} · переучивание ${pts} очк.`);
+  if (!SILENT) toast(`🧭 Герой выбрал путь: ${bldName(id)}`);
+  return true;
+}
+function reconsider(why, id, it) {
+  const h = S.hero; if (!h.bld || h.bld.cd > 0) return false;
+  return startRespec(id || pickBuild(h, h.bld.id), why, it);
+}
+/* Итоги боёв: серия поражений заставляет задуматься */
+function bldResult(won, kind) {
+  const B = S.hero.bld; if (!B) return;
+  if (won) { B.loss = Math.max(0, B.loss - .5); return; }
+  B.loss += kind === 'dun' ? 2 : 1;
+  if (B.loss >= BLD_K.loss && B.cd <= 0) { B.loss = 0; if (R() < .6) reconsider(kind === 'dun' ? 'dun' : 'loss'); }
+}
+/* Нашёл отличную вещь, которая подходит другому пути */
+function bldItem(it) {
+  const h = S.hero, B = h.bld; if (!B || B.cd > 0 || !it || !it.slot || (it.rar || 0) < 3) return;
+  const fits = id => { const X = BUILDS[id]; return (it.slot === 'weapon' && X.cats.includes(it.cat) ? 2 : 0) + (it.props || []).filter(p => X.props.includes(p.k)).length + (X.sh && isShield(it) ? 1 : 0) + (it.kind && it.kind === X.kind ? .5 : 0); };
+  const cur = fits(B.id); let best = null, bs = cur + 1.5;
+  for (const id in BUILDS) if (id !== B.id && fits(id) >= bs) { bs = fits(id); best = id; }
+  if (best && (BUILDS[best].cls.includes(h.cls) || R() < .2) && R() < .15) reconsider('item', best, it);
+}
+/* Время: перезарядка, застой, переучивание (по очку за отдых в городе/трактире) */
+function bldTick(gdt) {
+  const h = S.hero, B = h.bld; if (!B) return;
+  B.age += gdt; if (B.cd > 0) B.cd = Math.max(0, B.cd - gdt);
+  if (h.lvl < MAX_LVL) B.nolvl += gdt;
+  if (B.nolvl > BLD_K.stuck) { B.nolvl = 0; if (B.cd <= 0 && R() < .25) reconsider('stuck'); }
+  const re = B.re; if (!re) return;
+  if (['dead', 'fight', 'dungeon', 'duel'].includes(h.state)) return;
+  re.t -= gdt * (h.state === 'rest' || h.state === 'town' ? 1 : .35);
+  if (re.t > 0) return;
+  re.t = BLD_K.respec;
+  const wo = bldStatW(h, re.from), wn = bldStatW(h);
+  let fk = null, fs = 0, tk = null, ts = 0;
+  for (const k of STATS) { const d = wo[k] - wn[k]; if (h.st[k] > 9 && d > fs) { fs = d; fk = k; } const e = wn[k] - wo[k]; if (h.st[k] < 20 && e > ts) { ts = e; tk = k; } }
+  if (!fk || !tk || fk === tk) { B.re = null; diary('🧭 Переучиваться больше нечему — характеристики и так подходят новому пути.', 'level'); return; }
+  const fee = Math.min(h.gold, BLD_K.fee[0] + BLD_K.fee[1] * h.lvl); h.gold -= fee;
+  h.st[fk]--; h.st[tk]++; re.pts--; if (fk === 'con' || tk === 'con') recalcHp();
+  diary(`🏋 Переучиваюсь у тренера${fee ? ` (за ${fee} 💰)` : ' (в долг, тренер добрый)'}: ${STAT_SHORT[tk]} +1, ${STAT_SHORT[fk]} −1.${re.pts > 0 ? ` Осталось ${re.pts}.` : ' Переучивание закончено!'}`, 'level');
+  if (re.pts <= 0) { B.re = null; tryEquipInv(); }
+}
+/* Бог советует путь (за веру; герой слушается по доверию) */
+function suggestBuild(id) {
+  const h = S.hero; if (!BUILDS[id] || !h.bld) return false;
+  if (id === h.bld.id) { toast('Герой и так идёт этим путём.'); return false; }
+  if (S.god.faith < BLD_K.suggest) { toast('Не хватает веры.'); return false; }
+  S.god.faith -= BLD_K.suggest; addGxp(5);
+  const p = obeyChance() * (h.bld.cd > 0 ? .7 : 1);
+  if (R() < p) { h.bld.cd = 0; startRespec(id, 'god'); addTrust(1); return true; }
+  diary(`🙄 ${bldSay('no', id)}`, 'god'); return false;
+}
+/* Боевой бонус пути для бойца в бою по зонам */
+function bldFx(id, cls) {
+  const B = BUILDS[id]; if (!B) return null;
+  const f = Object.assign({}, B.fx), K = BUILD_BAL[id] || { d: 1, r: 1 };
+  if (f.spell) { const c = CLASSES[cls]; if (c && (c.atk === 'int' || c.atk === 'wis' || c.atk === 'cha')) f.dmg = (f.dmg || 0) + f.spell; else f.crit = (f.crit || 0) + .04; delete f.spell; }
+  f.d = K.d; f.r = K.r; f.id = id; return f;
+}
+/* Миграция v8: путь угадываем по характеристикам и снаряжению */
+function inferBuild(h) { return pickBuild(h, null, .2); }
 
 /* =====================================================================
    6) ОБЩЕЕ ДЛЯ БОЁВ (старая дуэль заменена боем по зонам — см. раздел 12)
@@ -2385,6 +2576,7 @@ function passiveTick(gdt) {
   if (S.featOffer) { if (!SILENT) { S.featOffer.t -= gdt; if (S.featOffer.t <= 0) heroPicksFeat(); } } // офлайн черты ждут бога
   else if (S.featQueue > 0) offerFeat();
   if (S.timers.dunCd > 0) S.timers.dunCd = Math.max(0, S.timers.dunCd - gdt);
+  bldTick(gdt);
   if (h.inj.length) { for (const j of h.inj) j.t -= gdt; const n = h.inj.length; h.inj = h.inj.filter(j => j.t > 0); if (h.inj.length !== n) { recalcHp(); diary('🩹 Травма зажила. Снова как новенький (почти).', 'level'); } }
   S.timers.rivals -= gdt;
   if (S.timers.rivals <= 0) { S.timers.rivals = PACE.rivals; const r = pick(S.rivals); if (r.lvl < S.god.lvl + 2 && R() < .5) r.lvl++; r.hlvl = clamp(h.lvl + rnd(-1, 1), 1, MAX_LVL); if (R() < .5) r.army += rnd(0, 2); }
@@ -2455,6 +2647,7 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV8) { delete S._migratedV8; const id = bldId(S.hero); diary(`🧭 Обновление мира: герои теперь сами выбирают путь. Посмотрев на свои мускулы и рюкзак, ${S.hero.name} решил, что он — ${bldName(id)}. Посоветовать другой путь можно в «📋 Герой».`, 'rare'); }
   if (S._migratedV7) { delete S._migratedV7; diary(`🧥 Обновление мира: у героя теперь 10 слотов — шлем, перчатки, сапоги, пояс, щит и второе кольцо. Новые слоты пока пусты; у вещей появились требования, 9 комплектов и 15 легендарок. Старое снаряжение на месте.`, 'rare'); }
   if (S._migratedV6) { delete S._migratedV6; diary(`⚒ Обновление мира: у снаряжения появилась сила — ⚔ ГС (сейчас ${gearScore(S.hero)}). Подземелья теперь трёх сложностей с рекомендуемым ГС: недобор — монстры злее, перебор — легче. Огонь, вампиризм, шипы и серебро работают в бою, у боссов есть слабости. Кузнец в городе точит вещи за золото.`, 'level'); }
   if (S._migratedV5) { delete S._migratedV5; diary('✨ Обновление мира: пещеры стали опаснее (элитные логова, один источник, боссы бьют по объявленной зоне — блокируйте её!), зато добыча богаче. Интерфейс стал спокойнее: подробности героя — по кнопке «📋 Герой».', 'level'); }
@@ -2506,7 +2699,8 @@ class LocalBotFightProvider extends FightProvider {
     const used = new Set((this.st().arena.apps || []).flatMap(a => appBots(a).map(b => b.name)));
     let name = pick(BOT_NAMES), k = 0; while (used.has(name) && k++ < 20) name = pick(BOT_NAMES);
     const L = clamp(lvl + rnd(-1, 1), 1, MAX_LVL);
-    return { name, race: pick(Object.keys(RACES)), cls: pick(Object.keys(CLASSES)), lvl: L, rating: Math.round(1000 + (L - 1) * 25 + rnd(-120, 120)) };
+    const race = pick(Object.keys(RACES)), cls = pick(Object.keys(CLASSES));
+    return { name, race, cls, bld: bldForBot(cls, race), lvl: L, rating: Math.round(1000 + (L - 1) * 25 + rnd(-120, 120)) };
   }
   arenaTick(A, dt, ctx) {
     const start = [];
@@ -2568,15 +2762,16 @@ function heroUnit() {
   const h = S.hero, sh = sheet(), st = STYLE[h.cls];
   return { id: 'me', name: h.name, team: 0, kind: 'hero', isMe: true, race: h.race, cls: h.cls, lvl: h.lvl, hp: Math.max(1, h.hp), max: h.maxHp,
     avg: sh.avg * CLASS_BAL[h.cls].z, armor: armorOf(h, S.flock.temple), za: zoneArmor(h, S.flock.temple), gx: gearFx(h), dex: mod(statVal('dex')), intu: Math.max(mod(statVal('wis')), mod(statVal('int'))), wis: mod(statVal('wis')),
-    atkN: st.atk, blkN: blkFor(h.cls, h), habit: st.h, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
+    atkN: st.atk, blkN: blkFor(h.cls, h), habit: BLD(h) && R() < .75 ? BLD(h).z : st.h, bz: BLD(h) ? BLD(h).bz : null, bf: bldFx(bldId(h), h.cls), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: S.arena.rating, dealt: 0, props: gearProps(h) };
 }
 /* Боевые свойства снаряжения, которые видны в бою по зонам */
 function gearProps(h) { const o = []; for (const p of allProps(h)) if (PROP_IC[p.k] && !o.includes(p.k)) o.push(p.k); return o; }
 function botUnit(b) {
+  const bb = BUILDS[b.bld] ? b.bld : bldForBot(b.cls, b.race);
   const vh = virtualHero(b.race, b.cls, b.lvl), sh = sheetOf(vh, 0), st = STYLE[b.cls], gk = clamp(b.gk || 1, .5, 2), max = Math.round(calcMaxHp(vh) * gk);
   return { id: newFid(), name: b.name, team: 1, kind: 'bot', race: b.race, cls: b.cls, lvl: b.lvl, hp: b.hpPct ? Math.max(1, Math.round(max * b.hpPct / 100)) : max, max,
-    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * (1 + Math.max(0, b.lvl - 9) * .045) * gk, armor: armorOf(vh, 0), za: zoneArmor(vh, 0), gx: gearFx(vh), props: gearProps(vh), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
-    atkN: st.atk, blkN: blkFor(b.cls, vh), habit: R() < .6 ? st.h : pick(ZONES), alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
+    avg: sh.avg * CLASS_BAL[b.cls].z * BOT_K * (1 + Math.max(0, b.lvl - 9) * .065) * gk, armor: armorOf(vh, 0), za: zoneArmor(vh, 0), gx: gearFx(vh), props: gearProps(vh), dex: mod(statValOf(vh, 'dex')), intu: Math.max(mod(statValOf(vh, 'wis')), mod(statValOf(vh, 'int'))), wis: mod(statValOf(vh, 'wis')),
+    atkN: st.atk, blkN: blkFor(b.cls, vh), habit: BUILDS[bb] && R() < .6 ? BUILDS[bb].z : R() < .6 ? st.h : pick(ZONES), bz: BUILDS[bb] ? BUILDS[bb].bz : null, bf: bldFx(bb, b.cls), bld: bb, alive: true, buf: {}, debuf: 0, bear: 0, used: {}, rating: b.rating || 1000, ref: b.ref || null, dealt: 0 };
 }
 const MON_REF = {};
 function monsterRef(t) {
@@ -2609,7 +2804,7 @@ function botBrain(F, f) {
   let target;
   if (f.isMe && F.my.target && en.find(e => e.id === F.my.target)) target = F.my.target;
   else {
-    const w = {}; for (const e of en) w[e.id] = 1 + (e.hp / e.max < .35 ? 2 : 0) + ((e.cls === 'warrior' || e.cls === 'barbarian') ? .8 : 0) + (e.kind === 'boss' ? 1 : 0) + (e.isMe && f.kind !== 'bot' ? .5 : 0);
+    const w = {}; for (const e of en) w[e.id] = 1 + (e.hp / e.max < .35 ? 2 : 0) + ((e.cls === 'warrior' || e.cls === 'barbarian') ? .8 : 0) + (e.kind === 'boss' ? 1 : 0) + (e.isMe && f.kind !== 'bot' && F.kind !== 'dungeon' ? .5 : 0);
     target = R() < .55 && F.lastTarget && F.lastTarget[f.id] && en.find(e => e.id === F.lastTarget[f.id]) ? F.lastTarget[f.id] : wpick(w);
   }
   const tb = (F.lastBlk || {})[target] || [];
@@ -2620,7 +2815,7 @@ function botBrain(F, f) {
   }
   let bz;
   if (F.tele && f.team !== F.fighters.find(x => x.id === F.tele.fid).team && R() < (f.isMe ? DUN_K.ablk : .6)) bz = F.tele.zone;
-  else { const la = (F.lastAtk || {})[f.id] || []; bz = la.length && R() < .5 ? pick(la) : (R() < .4 ? 'head' : pick(ZONES)); }
+  else { const la = (F.lastAtk || {})[f.id] || []; bz = la.length && R() < .5 ? pick(la) : f.bz && R() < .35 ? f.bz : (R() < .4 ? 'head' : pick(ZONES)); }
   const blk = f.blkN === 2 && R() < .5 ? blkSet(ZONES[(ZONES.indexOf(bz) + 4) % 5], 2) : blkSet(bz, f.blkN);
   return { target, atk, blk };
 }
@@ -2695,15 +2890,16 @@ function hitOne(F, a, d, z, picks, o) {
   const ag = a.gx || {}, dg = d.gx || {};
   const aimed = (a.cls && STYLE[a.cls].aimed && R() < .15) || (ag.aim && R() < ag.aim);
   const blocked = !o.magic && !o.aoe && P.blk.includes(z) && !aimed || (o.aoe && P.blk.includes(z));
-  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) + (dg.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
+  const abf = a.bf || {}, dbf = d.bf || {};
+  const dodgeP = clamp(.07 + .03 * (d.dex - a.dex) + (d.buf.dodge || 0) + (dg.dodge || 0) + (dbf.dodge || 0) - (d.kind === 'boss' ? .03 : 0), .03, .55);
   const bard = F.fighters.some(x => x.alive && x.team === a.team && x.cls === 'bard');
   const ap = a.props || [], bw = d.weak || d.boss && d.boss.weak, br = d.res || d.boss && d.boss.res;
-  let critP = clamp((.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (br !== 'crit' ? ag.crit || 0 : 0)) * (1 - (dg.acrit || 0)), .02, .5);
+  let critP = clamp((.06 + .03 * (a.intu - d.wis) + (a.cls === 'rogue' ? .05 : 0) + (bard ? .05 : 0) + (br !== 'crit' ? ag.crit || 0 : 0) + (abf.crit || 0)) * (1 - (dg.acrit || 0)), .02, .5);
   if (a.buf.crit) { critP = 1; a.buf.crit = 0; }
   if (a.debuf > 0) critP = 0;
   const zacc = ZONE_ACC[z];
   if (!blocked && R() < dodgeP) return { dmg: 0, line: pick(F_DODGE).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
-  if (!blocked && !o.magic && !o.aoe && dg.blk && R() < dg.blk) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss' };
+  if (!blocked && !o.magic && !o.aoe && (dg.blk || dbf.blk) && R() < (dg.blk || 0) + (dbf.blk || 0)) return { dmg: 0, line: `🛡 ${d.name} ${dg.sh ? 'принимает удар на щит' : 'в последний миг закрывается'} — ${a.name} бьёт ${zacc} впустую.`, c: 'miss' };
   const crit = R() < critP;
   if (blocked && !(crit && !o.aoe)) return { dmg: 0, line: pick(F_BLOCK).replace('{d}', d.name).replace('{a}', a.name).replace('{z}', zacc), c: 'miss' };
   let dmg = a.avg * DMG_K * (.75 + R() * .5) * ZONE_MUL[z] * (o.mul || 1);
@@ -2711,6 +2907,8 @@ function hitOne(F, a, d, z, picks, o) {
   if (a.cls === 'barbarian') dmg *= 1.15 * (a.hp < a.max / 2 ? 1.3 : 1);
   if (a.cls === 'rogue' && F.turn === 1) dmg *= 1.5;
   if (a.debuf > 0) dmg *= .6;
+  if (a.bf) { dmg *= (1 + (abf.dmg || 0)) * (abf.d || 1); if (abf.first && F.turn === 1) dmg *= 1 + abf.first; }
+  if (d.bf) dmg *= (1 - (dbf.red || 0)) * (dbf.r || 1);
   if (a.boss && a.buf.adds) dmg *= 1 + .15 * a.buf.adds;
   let tag = '';
   if (ap.includes('fire') && br !== 'fire') { dmg *= 1.12; tag += '🔥'; }
@@ -2758,6 +2956,7 @@ function resolveTurn(F) {
   for (const f of alive) if (f.buf.psn > 0) { f.buf.psn--; const v = Math.max(1, Math.round(f.max * .03)); add(f, v); lines.push({ r: { dmg: v, line: `☠ Яд жжёт: ${f.name}`, c: 'foe' }, d: f }); }
   // применяем урон одновременно
   for (const f of alive) if (pend[f.id]) f.hp -= pend[f.id];
+  for (const f of alive) if (f.bf && f.bf.heal && f.hp > 0 && f.hp < f.max) heal[f.id] = (heal[f.id] || 0) + Math.max(1, Math.round(f.max * f.bf.heal));
   for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);
   flog(F, `— Ход ${F.turn} —`, 'turn');
   for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg} ${hpTag(d)}` : r.line, r.c);
@@ -2873,7 +3072,7 @@ function healInjuries(kind) {
 }
 function endBattle(F, winTeam) {
   if (F.phase === 'end') return;
-  F.phase = 'end'; F.t = F.kind === 'dungeon' ? 6 : 12; F.T = F.t; F.win = winTeam; F.tele = null;
+  F.phase = 'end'; F.t = 12; F.T = F.t; F.win = winTeam; F.tele = null;
   const h = S.hero, me = fMe(F), won = winTeam === 0, L = h.lvl;
   const foes = F.fighters.filter(f => f.team === 1), fx = [];
   if (F.kind === 'monster') {
@@ -2892,12 +3091,12 @@ function endBattle(F, winTeam) {
     S.arena.rating = Math.max(100, S.arena.rating + dr); S.arena.fat = (S.arena.fat || 0) + 1;
     h.hp = clamp(me ? me.hp : 1, 1, h.maxHp); h.state = 'road';
     if (won) {
-      S.arena.w++; S.stats.arenaW++;
+      S.arena.w++; S.stats.arenaW++; bldResult(true, 'arena');
       const x = Math.round(xpUnit(L) * (3 + 1.5 * foes.length) * fat), g = Math.round(12 * goldScale(L) * foes.length * fat);
       gainXp(x); h.gold += g; fx.push(`+${x} опыта`, `+${g} 💰`, `рейтинг ${dr >= 0 ? '+' : ''}${dr}`);
       if (h.hp < h.maxHp * .2 && R() < .3) injure('light', 'Победа далась тяжело');
     } else {
-      S.arena.l++; S.stats.arenaL++;
+      S.arena.l++; S.stats.arenaL++; bldResult(false, 'arena');
       const x = Math.round(xpUnit(L) * 1 * fat); gainXp(x); fx.push(`+${x} опыта за опыт`, `рейтинг ${dr}`);
       const r = R(); injure(r < .1 ? 'heavy' : r < .35 ? 'mid' : 'light', 'Поражение на арене');
     }
@@ -2932,7 +3131,7 @@ async function startGodDuel(godId) {
   let opp;
   try { opp = await rivals.findOpponent({ godLvl: S.god.lvl, heroLvl: h.lvl, godId }); } finally { duelPending = false; }
   if (S !== st || h.state !== 'duel' || S.fight || S.dun) { if (S === st && h.state === 'duel' && !S.fight) h.state = 'road'; return false; }
-  const me = heroUnit(), foe = botUnit({ name: opp.hero, race: opp.race, cls: opp.cls, lvl: opp.heroLvl, rating: 1000 + opp.lvl * 30 });
+  const me = heroUnit(), foe = botUnit({ bld: opp.bld, name: opp.hero, race: opp.race, cls: opp.cls, lvl: opp.heroLvl, rating: 1000 + opp.lvl * 30 });
   me.avg *= 1 + Math.min(S.flock.army, 10) * .02; foe.avg *= 1 + Math.min(opp.army || 0, 10) * .02;
   beginBattle('godduel', [me], [foe], { title: `Дуэль богов: ${S.god.name} против ${opp.god}`, rivalGod: { godId: opp.godId, name: opp.god, pers: opp.pers, lvl: opp.lvl, faith: 50 + opp.lvl * 12, left: 3 },
     intro: `${opp.hero} (${RACES[opp.race].n.toLowerCase()}-${CLASSES[opp.cls].n.toLowerCase()}) говорит, что ваш бог — «так себе».` });
@@ -3077,14 +3276,16 @@ async function startDungeon(byCall, tier) {
   if (S !== st || h.state !== 'dungeon' || S.fight || S.dun) { if (S === st && h.state === 'dungeon' && !S.dun) h.state = 'road'; return false; }
   if (!DUN_TIERS[tier]) tier = autoTier(h);
   const rec = recGS(h.lvl, tier);
+  const hp0 = h.hp; if (h.hp < h.maxHp * .7) h.hp = Math.round(h.maxHp * .7); /* у входа отряд ждёт, пока герой отдышится */
   const party = [{ godId: 'me', god: S.god.name, hero: h.name, race: h.race, cls: h.cls, lvl: h.lvl, isMe: true, hp: 100, gs: gearScore(h) }]
-    .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, hp: 100, gs: Math.round(rec * (.9 + R() * .15)) })));
+    .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, bld: BUILDS[m.bld] ? m.bld : bldForBot(m.cls, m.race), hp: 100, gs: Math.round(rec * (.9 + R() * .15)) })));
   const G = genDungeon(h.lvl);
   S.dun = { diff: tier, rec, id: 'd' + Date.now().toString(36), name: (tier === 'normal' ? '' : DUN_TIERS[tier].nm + ': ') + pick(DUN_NAMES), tier: h.lvl, tiles: G.tiles, pos: G.pos, boss: G.boss, party, keys: 0, log: [], phase: 'explore', gold: 0, xp: 0, loot: [], fights: 0, heals: 0, idle: 0, auto: false, t: 0, result: null, byCall: !!byCall, picked: false };
   S.dun.gm = +dunGearMul(S.dun).m.toFixed(3);
   dunReveal(S.dun);
   S.stats.duns++; S.timers.dunCd = PACE.dunCd;
   ulog(`${DUN_TIERS[tier].ic} Сложность: ${DUN_TIERS[tier].n} · ГС отряда ${Math.round(dunGearMul(S.dun).q * rec)} / рек. ${rec}.`);
+  if (h.hp > hp0) ulog(`🍞 Перед спуском отряд подождал, пока ${h.name} отдышится и перекусит: ${hp0} → ${h.hp} HP.`, 'me');
   ulog(`Отряд у входа в «${S.dun.name}»: ${party.map(p => `${p.hero} (${CLASSES[p.cls].n.toLowerCase()})`).join(', ')}. Где-то в глубине ждёт ${G.boss.n}. Ищите ключ 🗝!`);
   diary(`🏰 Спустился в «${S.dun.name}» с отрядом: ${mates.map(m => m.hero).join(', ')}. Факел взял. Совесть — тоже.`, 'event');
   if (!SILENT) { chatSys(`🏰 Отряд ${h.name} спустился в «${S.dun.name}».`); toast('🏰 Пещера! Ведите отряд по карте: нажимайте на соседние комнаты.'); }
@@ -3092,7 +3293,7 @@ async function startDungeon(byCall, tier) {
 }
 function partyUnits(U) {
   const out = [heroUnit()];
-  for (const p of U.party) if (!p.isMe && p.hp > 0) out.push(botUnit({ name: p.hero, race: p.race, cls: p.cls, lvl: p.lvl, hpPct: p.hp, ref: p.godId, gk: Math.sqrt((p.gs || typGS(p.lvl)) / typGS(p.lvl)) }));
+  for (const p of U.party) if (!p.isMe && p.hp > 0) out.push(botUnit({ bld: p.bld, name: p.hero, race: p.race, cls: p.cls, lvl: p.lvl, hpPct: p.hp, ref: p.godId, gk: Math.sqrt((p.gs || typGS(p.lvl)) / typGS(p.lvl)) }));
   return out;
 }
 function dunMove(arg) {
@@ -3103,7 +3304,11 @@ function dunMove(arg) {
     if (dunHas(U, 'rogue') && !U.picked) { U.picked = true; if (R() < .5) { ulog('🔓 Плут поковырялся в замке шпилькой — дверь открылась!', 'me'); U.keys++; } else { ulog('Плут сломал шпильку. Нужен ключ 🗝.', 'foe'); return; } }
     else { ulog('🔒 Дверь в логово босса заперта. Нужен ключ 🗝.', 'foe'); return; }
   }
-  U.pos = { x, y }; U.idle = 0; dunReveal(U); dunEnter(U, t);
+  if (!U.auto && !SILENT && dunLowHp(U) && dunRisky(U, { x, y }) && U.warnAt !== y * DW + x) {
+    U.warnAt = y * DW + x; ulog(`⚠ Отряд еле жив: у ${S.hero.name} ${S.hero.hp}/${S.hero.maxHp} HP. Лучше выпить зелье, подлечиться или отступить. Нажмите комнату ещё раз, чтобы всё равно идти.`, 'warn');
+    toast('⚠ Герой еле жив — нажмите ещё раз, если всё равно идти'); return;
+  }
+  U.warnAt = -1; U.pos = { x, y }; U.idle = 0; dunReveal(U); dunEnter(U, t);
 }
 function dunEnter(U, t) {
   const h = S.hero, L = U.tier;
@@ -3155,6 +3360,8 @@ function dunFight(U, t, mons, intro) {
   U.phase = 'fight'; U.fightTile = U.tiles.indexOf(t);
   const ga = Math.round(((U.gm || 1) * (DUN_TIERS[U.diff] || DUN_TIERS.normal).m - 1) * 4); /* недобор ГС — по монстрам труднее попасть */
   for (const m of mons) m.armor = Math.max(0, m.armor + ga);
+  const lk = Math.min(1, DUN_K.lowLvl[0] + DUN_K.lowLvl[1] * U.tier); /* низкие уровни: монстры чуть мягче (герой ещё хрупкий) */
+  if (lk < 1) for (const m of mons) { m.avg *= lk; m.max = Math.max(1, Math.round(m.max * lk)); m.hp = Math.min(m.hp, m.max); }
   const allies = partyUnits(U);
   const F = beginBattle('dungeon', allies, mons, { title: `${U.name}: ${t.t === 'boss' ? 'босс' : 'бой'}`, intro, ctx: { tile: U.fightTile, boss: t.t === 'boss' } });
   const wk = mons.filter(m => m.weak || m.boss && m.boss.weak);
@@ -3166,12 +3373,13 @@ function dunAfterFight(F, won) {
   const U = S.dun, h = S.hero; if (!U) return;
   for (const f of F.fighters) if (f.team === 0 && f.ref) { const p = U.party.find(x => x.godId === f.ref); if (p) p.hp = f.alive ? Math.max(1, Math.round(f.hp / f.max * 100)) : 0; }
   const me = fMe(F), t = U.tiles[F.ctx.tile];
+  U.lastFight = { title: F.title, won: !!won, turns: F.turn, log: F.log.slice(0, 14).map(l => ({ t: String(l.t).slice(0, 200), c: l.c })) };
   if (!won) {
     h.hp = Math.max(1, Math.min(h.maxHp, me.hp)); injure('mid', 'Вынесли из пещеры');
     ulog(`🩹 Отряд разбит. ${h.name} без сознания — его вынесли на руках.`, 'foe');
     return endDungeon(false, 'carried');
   }
-  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * .1)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли и отряхнули.`, 'foe'); }
+  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * DUN_K.fallHp)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли, перевязали и дали отдышаться (${h.hp}/${h.maxHp} HP).`, 'foe'); }
   else h.hp = clamp(me.hp, 1, h.maxHp);
   U.fights++;
   const foes = F.fighters.filter(f => f.team === 1).length, boss = F.ctx.boss;
@@ -3195,8 +3403,9 @@ function endDungeon(ok, why) {
   const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 15 * (DUN_TIERS[U.diff] || DUN_TIERS.normal).rew : 0)) * mult);
   h.gold += gold; gainXp(xp); addGxp(20 + U.fights * 8 + (ok ? 25 : 0));
   if (ok) { addTrust(3); S.stats.dwinsD++; }
+  bldResult(ok || why === 'left', 'dun');
   const items = why === 'carried' ? U.loot.slice(0, 1) : U.loot, names = [];
-  for (const it of items) { const worn = equip(it, true); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
+  for (const it of items) { const worn = equip(it, true); bldItem(it); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
   rivals.reportDungeon({ ok, godIds: U.party.filter(p => !p.isMe).map(p => p.godId) });
   U.result = `${ok ? '🏆 Босс повержен, пещера пройдена!' : why === 'carried' ? '🩹 Героя вынесли на руках.' : why === 'left' ? '🚪 Отряд ушёл из пещеры.' : why === 'nokey' ? '🔒 Ключ так и не нашли — отряд ушёл.' : '😵 Отряд отступил.'} Добыча: ${gold} 💰, ${xp} опыта${names.length ? ', ' + names.join(', ') : ''}.`;
   ulog(U.result, 'sys');
@@ -3231,11 +3440,23 @@ function dunNextStep(U) {
   let j = goal; while (prev[j] !== start && prev[j] >= 0) j = prev[j];
   return { x: j % DW, y: Math.floor(j / DW) };
 }
-function dunAutoStep() {
+function dunAutoStep(idle) {
   const U = S.dun; if (!U || U.phase !== 'explore') return;
   const nx = dunNextStep(U);
+  if (nx && dunLowHp(U) && dunRisky(U, nx) && S.hero.potions > 0) dunPotion(true);
+  /* бог молчит, а отряд еле жив: не лезем в бой вслепую — второй раз просто уходим с добычей */
+  if (idle && !U.auto && nx && dunLowHp(U) && dunRisky(U, nx) && U.warnAt === nx.y * DW + nx.x) { ulog('🚪 Отряд еле жив, а бог молчит — герои благоразумно отступили с добычей.', 'warn'); return dunLeave(); }
   if (!nx) { const boss = U.tiles.find(t => t && t.t === 'boss'); return endDungeon(false, boss && !boss.done && U.keys < 1 ? 'nokey' : 'left'); }
   dunMove(nx.x + ',' + nx.y);
+}
+/* Низкое здоровье перед боем: предупреждение, зелье, двойной клик для входа в бой */
+const dunLowHp = U => S.hero.hp < S.hero.maxHp * DUN_K.lowHp;
+function dunRisky(U, q) { const t = tileAt(U, q.x, q.y); return !!t && !t.done && (!(t.seen) || ['fight', 'elite', 'boss', 'chest', 'trap'].includes(t.t)); }
+function dunPotion(auto) {
+  const U = S.dun, h = S.hero; if (!U || U.phase !== 'explore') return false;
+  if (h.potions < 1) { if (!auto) toast('Зелий нет.'); return false; }
+  h.potions--; const a = healHero(Math.round(h.maxHp * .35 * (hasFeat('gourmet') ? 1.5 : 1)));
+  ulog(`🧪 ${h.name} ${auto ? 'перед дверью ' : ''}выпил зелье: +${a} HP (${h.hp}/${h.maxHp}).`, 'me'); return true;
 }
 function dunToggleAuto() { if (S.dun) { S.dun.auto = !S.dun.auto; S.dun.idle = 0; } }
 function dunTick(idt) {
@@ -3243,7 +3464,7 @@ function dunTick(idt) {
   if (U.phase === 'end') { U.t -= idt; if (U.t <= 0) S.dun = null; return; }
   if (U.phase !== 'explore') return;
   U.idle += idt;
-  if ((U.auto && U.idle >= 2.5) || U.idle >= 25) { if (!U.auto) ulog('Бог задумался — отряд пошёл сам.'); U.idle = 0; dunAutoStep(); }
+  if ((U.auto && U.idle >= 2.5) || U.idle >= 25) { if (!U.auto) ulog('Бог задумался — отряд пошёл сам.'); U.idle = 0; dunAutoStep(!U.auto); }
 }
 function dunAutoFinish() {
   let k = 0;
@@ -3289,13 +3510,15 @@ function validDun(U) {
   if (!tileAt(U, U.pos.x, U.pos.y)) return false;
   if (!U.tiles.some(t => t && t.t === 'boss')) return false;
   U.party = U.party.filter(p => p && typeof p.hero === 'string' && CLASSES[p.cls] && RACES[p.race]).slice(0, 5);
-  for (const p of U.party) { fixNum(p, 'hp', 100, 0, 100); fixNum(p, 'lvl', 1, 1, MAX_LVL); fixNum(p, 'gs', 0, 0, 999); }
+  for (const p of U.party) { if (!p.isMe && !BUILDS[p.bld]) p.bld = bldForBot(p.cls, p.race); fixNum(p, 'hp', 100, 0, 100); fixNum(p, 'lvl', 1, 1, MAX_LVL); fixNum(p, 'gs', 0, 0, 999); }
   if (!DUN_TIERS[U.diff]) U.diff = 'normal'; fixNum(U, 'rec', 0, 0, 999); fixNum(U, 'gm', 1, .3, 3);
   if (!U.rec) U.rec = typGS(U.tier); for (const p of U.party) if (!p.gs) p.gs = U.rec;
   U.loot = Array.isArray(U.loot) ? U.loot.filter(i => i && i.slot && validItem(i, i.slot)).map(sanitizeItem).slice(0, 10) : [];
   fixNum(U, 'keys', 0, 0, 3); fixNum(U, 'gold', 0, 0); fixNum(U, 'xp', 0, 0); fixNum(U, 'fights', 0, 0); fixNum(U, 'heals', 0, 0, 9); fixNum(U, 'idle', 0, 0, 60); fixNum(U, 't', 1, 0, 20); fixNum(U, 'tier', 1, 1, 30);
   U.auto = !!U.auto; if (typeof U.name !== 'string') U.name = 'Пещера';
   if (U.log.length > 40) U.log.length = 40;
+  fixNum(U, 'warnAt', -1, -1, DW * DH);
+  const LF = U.lastFight; U.lastFight = LF && typeof LF === 'object' && Array.isArray(LF.log) ? { title: String(LF.title || '').slice(0, 80), won: !!LF.won, turns: isNum(LF.turns) ? Math.max(0, Math.min(99, Math.round(LF.turns))) : 0, log: LF.log.filter(l => l && typeof l.t === 'string').slice(0, 14).map(l => ({ t: l.t.slice(0, 200), c: typeof l.c === 'string' ? l.c.replace(/[^a-z]/g, '').slice(0, 10) : 'sys' })) } : null;
   return true;
 }
 function sanitizeArena(o, h) {
@@ -3428,9 +3651,36 @@ function renderHero() {
     <div class="stat"><label><span>📌 ${esc(h.quest.n)}</span><span>${Math.min(100, Math.floor(h.quest.p))}%</span></label>${bar('quest', h.quest.p, 100)}</div>
     <div class="stat"><label><span>Опыт</span><span>${h.lvl >= MAX_LVL ? 'максимум' : h.xp + '/' + xpNext(h.lvl)}</span></label>${bar('xp', h.xp, h.lvl >= MAX_LVL ? 1 : xpNext(h.lvl))}</div>
   </div>
-  <div class="hc-mini"><button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
+  <div class="hc-mini">${bldChip(h)}<button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span><span title="Доверие к вам: ${trustLabel(h.trust)}">🤝 <b>${Math.round(h.trust)}</b></span>
     ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div>`;
   setHTML($('colHero'), html);
+}
+/* ---------- v8: путь героя в интерфейсе ---------- */
+const bldPri = (h, id) => { const w = bldStatW(h, id); return STATS.slice().sort((a, b) => w[b] - w[a]).slice(0, 3); };
+function bldTip(h) {
+  const id = bldId(h), B = BUILDS[id]; if (!B) return '';
+  return `${B.n}: ${B.d} Качает ${bldPri(h).map(k => STAT_SHORT[k]).join(' › ')}.${h.bld.re ? ` Переучивается (${h.bld.re.n - h.bld.re.pts}/${h.bld.re.n}).` : ''}`;
+}
+function bldChip(h) { const B = BLD(h); return B ? `<button class="linkbtn bldc" data-act="sheet" title="${esc(bldTip(h))}" aria-label="Путь: ${esc(B.n)}">${B.ic} ${esc(B.n)}${h.bld.re ? ' <span class="re">⟳</span>' : ''}</button>` : ''; }
+function bldLikes(B) {
+  const o = []; if (B.sh) o.push('щит'); if (B.h2) o.push('двуручное'); o.push(B.cats.map(c => WCAT[c].n.toLowerCase()).join('/'));
+  if (B.kind) o.push({ c: 'тканевую броню', l: 'лёгкую броню', h: 'тяжёлую броню' }[B.kind]); o.push(B.props.filter(k => PROP_DEF[k] && !STATS.includes(k)).slice(0, 3).map(k => PROP_RU[k] || PROP_DEF[k].n.toLowerCase()).join(', '));
+  return o.filter(Boolean).join(' · ');
+}
+function bldHTML(h) {
+  const id = bldId(h), B = BUILDS[id]; if (!B) return '';
+  const re = h.bld.re, hist = h.bld.hist.slice(-4);
+  return `<h3>🧭 Путь: ${B.ic} ${esc(B.n)}</h3><div class="bldbox"><div class="muted">${esc(B.d)}</div>
+    <div class="bldp">Качает: <b>${bldPri(h).map(k => STAT_SHORT[k]).join(' › ')}</b> · любит: ${esc(bldLikes(B))}</div>
+    ${re ? `<div class="bldre">⟳ Переучивается с пути ${bldName(re.from)}: ${re.n - re.pts}/${re.n} очк. — по очку за отдых у тренера.</div>${bar('xp', re.n - re.pts, re.n)}` : ''}
+    ${hist.length > 1 ? `<div class="bldh">История: ${hist.map(x => `<span title="${esc(BLD_WHY[x.why] || '')}">${BUILDS[x.id].ic} ур.${x.lvl}</span>`).join(' → ')} <span class="muted">(${esc(BLD_WHY[hist[hist.length - 1].why] || '')})</span></div>` : ''}
+    <div class="btns"><button class="btn small" data-act="bldOpen" ${S.god.faith < BLD_K.suggest ? 'disabled' : ''}>🙏 Посоветовать путь · ${BLD_K.suggest} веры</button>${h.bld.cd > 0 ? `<span class="muted small">ещё не остыл после выбора: послушается реже</span>` : ''}</div></div>`;
+}
+function bldModal() {
+  const h = S.hero, cur = bldId(h), p = Math.round(obeyChance() * (h.bld && h.bld.cd > 0 ? .7 : 1) * 100);
+  modal(`<div class="sheet"><h2>🙏 Какой путь посоветовать?</h2><div class="muted">Совет стоит ${BLD_K.suggest} веры. Герой послушается с шансом ~${p}% (доверие${h.bld && h.bld.cd > 0 ? ', и он недавно уже менял путь' : ''}). Переучивание идёт постепенно: по очку характеристики за отдых.</div>
+  <div class="opts">${Object.keys(BUILDS).map(id => { const B = BUILDS[id]; return `<button class="btn bldopt ${id === cur ? 'on' : ''}" data-act="bldPick" data-arg="${id}" ${id === cur ? 'disabled' : ''}><b>${B.ic} ${B.n}</b>${B.cls.includes(h.cls) ? ' <span class="tag cls">к лицу</span>' : ''}<br><span class="small">${esc(B.d)} Качает ${bldPri(h, id).map(k => STAT_SHORT[k]).join(' › ')}.</span></button>`; }).join('')}</div>
+  <div class="btns"><button class="btn" data-act="sheet">← К герою</button></div></div>`);
 }
 function sheetModal() {
   const h = S.hero, sh = sheet(), c = CLASSES[h.cls], r = RACES[h.race];
@@ -3439,7 +3689,7 @@ function sheetModal() {
   <div class="muted">Бой: атака ${fmtMod(sh.atkB)} · урон d${sh.die}${sh.dmgB ? fmtMod(sh.dmgB) : ''} (≈${Math.round(sh.avg)}) · КД ${sh.ac} · HP ${h.maxHp}. Владение ★: ${c.prof.map(k => STAT_SHORT[k]).join(', ')} (${fmtMod(profB(h.lvl))}).</div>
   <div class="stat"><label><span>Доверие к богу</span><span>${Math.round(h.trust)} — ${trustLabel(h.trust)}, слушается ~${Math.round(obeyChance() * 100)}%</span></label>${bar('trust', h.trust, 100)}</div>
   ${h.inj.length ? `<h3>🤕 Травмы</h3>${h.inj.map(j => `<div class="injrow">${esc(j.n)}: ${STAT_SHORT[j.s]} −${INJURIES[j.k].pen}, пройдёт за ${fmtDur(j.t)}</div>`).join('')}<div class="muted">Лечат время, долгий отдых, храм и «Исцеление».</div>` : ''}
-  ${dollHTML(h)}
+  ${bldHTML(h)}${dollHTML(h)}
   <h3>🎒 Рюкзак (${h.inv.length}/${INV_MAX})</h3><ul class="inv">${h.inv.length ? h.inv.map(i => i.slot ? `<li><button class="linkbtn invb" data-act="itemD" data-arg="inv:${i.id}">${itemSpan(i)}</button>${!reqOk(h, i) ? ` <span class="rqb small">${esc(reqHtml(h, i).replace(/<[^>]+>/g, ''))}</span>` : bestPlace(h, i) ? ' <span class="upg" title="Лучше надетого">▲</span>' : ''} <span class="muted">~${i.v}💰</span></li>` : `<li>${esc(i.n)} <span class="muted">~${i.v}💰</span></li>`).join('') : '<li class="muted">пусто, как в голове после боя</li>'}</ul>
   <h3>Раса и класс</h3><div class="muted"><b>${r.tr}.</b> ${r.td}</div><div class="muted"><b>${c.ab}.</b> ${c.ad}</div>
   <h3>Черты (${h.feats.length})</h3>${h.feats.length ? h.feats.map(f => `<div class="muted">🎖 <b>${FEATS[f].n}</b> — ${FEATS[f].d}</div>`).join('') : '<div class="muted">Пока никаких. Новые — на каждом чётном уровне.</div>'}
@@ -3452,8 +3702,9 @@ function renderFeat() {
   let body;
   if (F.asi) body = `<div class="muted">Какую характеристику прокачать на +2?</div><div class="opts">${STATS.map(k => `<button class="btn" data-act="asi" data-arg="${k}" ${S.hero.st[k] >= 20 ? 'disabled' : ''}>${STAT_RU[k]}: ${S.hero.st[k]} → ${Math.min(20, S.hero.st[k] + 2)}${CLASSES[S.hero.cls].prim === k ? '<span class="tag cls">основная</span>' : ''}</button>`).join('')}<button class="btn small" data-act="asiBack">← Назад к чертам</button></div>`;
   else body = `<div class="opts">${F.opts.map(id => `<button class="btn" data-act="feat" data-arg="${id}">🎖 <b>${FEATS[id].n}</b> — ${FEATS[id].d}</button>`).join('')}<button class="btn" data-act="asiOpen">💪 +2 к характеристике</button></div>`;
+  const pf = F.pref ? `<div class="pref">💭 Сам хочет: <b>${prefText(F.pref)}</b>${BLD(S.hero) ? ` (он же ${bldName(S.hero.bld.id)})` : ''}. Посоветуете другое — послушается с шансом ~${Math.round(prefObeyP() * 100)}%.</div>` : '';
   setHTML(box, `<div class="card feat"><h2>🎖 Герой вырос: выберите черту</h2>
-  <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам (и вам не понравится его логика).${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${body}</div>`);
+  <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам.${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${pf}${body}</div>`);
 }
 function renderDiary() {
   const el = $('diary');
@@ -3549,7 +3800,7 @@ function renderRight() {
     const st = S.stats;
     html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
       ${godsDunHTML()}
-      ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
+      ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
         <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
   }
   setHTML($('rightBody'), html);
@@ -3640,7 +3891,7 @@ function newGame() {
   const race = RACES[$('inRace').value] ? $('inRace').value : 'human', cls = CLASSES[$('inCls').value] ? $('inCls').value : 'warrior';
   S = defaultState(g, hn, race, cls); S.hero.maxHp = calcMaxHp(S.hero); S.hero.hp = S.hero.maxHp;
   diary(`Очнулся в канаве у Годграда. Помню только своё имя, что я ${RACES[race].n.toLowerCase()}-${CLASSES[cls].n.toLowerCase()} и что у меня есть бог — {god}. Пора совершать подвиги!`, 'god');
-  diary(`Взял первое задание: «${S.hero.quest.n}».`); closeModal(); save();
+  diary(`Взял первое задание: «${S.hero.quest.n}».`); initBuild(S.hero); closeModal(); save();
 }
 
 /* ---------- Действия ---------- */
@@ -3666,6 +3917,7 @@ const ACT = {
   temple: a => templeGive(a === 'all' ? 'all' : +a), miracle: a => miracle(a), recruit: a => recruit(+a),
   lift: a => liftCurse(a),
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
+  bldOpen: () => bldModal(), bldPick: a => { if (!BUILDS[a]) return; const ok = suggestBuild(a); sheetModal(); if (!ok && S.hero.bld.id !== a) toast('Герой не послушался — см. дневник.'); },
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
   challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
   callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
@@ -3701,7 +3953,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) save(
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261018-232515';
+const APP_BUILD = '20261019-051735';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -3880,16 +4132,16 @@ function renderDunMap() {
   const hc = dunHealCost(), hl = DUN_K.heals - (U.heals || 0);
   const mid = U.phase === 'end' ? `<div class="q"><b>${esc(U.result || '')}</b></div><div class="btns"><button class="btn" data-act="dclose">Закрыть</button></div>`
     : U.phase === 'fight' ? '<div class="q">⚔ Отряд сражается!</div>'
-    : `<div class="hint">Ходите по соседним комнатам (жёлтая рамка). Лечения почти нет — берегите отряд.</div>
-      <div class="btns">${S.god.skills.heal ? `<button class="btn small green" data-act="dheal" ${hl < 1 || S.god.faith < hc ? 'disabled' : ''} title="Герой +30% HP, отряд +20%">✚ Лечить отряд · ${hc} (${hl})</button>` : ''}<button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Авто: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave" title="Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи">🚪 Отступить с добычей</button></div>`;
+    : `${dunLowHp(U) ? `<div class="dwarn">⚠ Отряд еле жив — лучше отступить или подлечиться (у героя ${S.hero.hp}/${S.hero.maxHp} HP).</div>` : `<div class="hint">Ходите по соседним комнатам (жёлтая рамка). Лечения почти нет — берегите отряд.</div>`}
+      <div class="btns">${S.hero.potions > 0 && S.hero.hp < S.hero.maxHp ? `<button class="btn small" data-act="dpotion" title="+35% HP">🧪 Зелье (${S.hero.potions})</button>` : ''}${S.god.skills.heal ? `<button class="btn small green" data-act="dheal" ${hl < 1 || S.god.faith < hc ? 'disabled' : ''} title="Герой +30% HP, отряд +20%">✚ Лечить отряд · ${hc} (${hl})</button>` : ''}<button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Авто: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave" title="Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи">🚪 Отступить с добычей</button></div>`;
   setHTML(box, `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2>
     <div class="row"><span>🗝 <b>${U.keys}</b> · ${U.gold} 💰 · ${U.loot.length} 🎁</span>${roles.length ? `<span class="hint">${roles.join(' · ')}</span>` : ''}</div>
     ${dunGsRow(U)}${party}<div class="dgrid">${cells}</div><div class="dleg">⚔ логово · 💀 элита · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс</div>
     <div class="bossInfo">👑 <b>${esc(U.boss.n)}</b>: ${esc((BOSSES.find(b => b.n === U.boss.n) || U.boss).d)}</div>
-    ${mid}<div class="dlog">${U.log.slice(0, 12).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
+    ${mid}${U.lastFight && U.phase !== 'fight' ? `<details class="dlast"><summary>📜 Последний бой: ${U.lastFight.won ? 'победа' : 'поражение'}, ходов ${U.lastFight.turns}</summary>${U.lastFight.log.map(l => `<div class="${esc(l.c)}">${esc(l.t)}</div>`).join('')}</details>` : ''}<div class="dlog">${U.log.slice(0, 12).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
 }
 /* ---------- Арена ---------- */
-function appSide(list, cap) { return list.map(m => m.me ? `<b>⭐ ${esc(m.name)}</b>` : `${CLS_IC[m.cls] || ''} ${esc(m.name)} <span class="muted">${m.lvl || ''}</span>`).join('<br>') + (list.length < cap ? `<br><span class="muted">${'· '.repeat(cap - list.length)}свободно ${cap - list.length}</span>` : ''); }
+function appSide(list, cap) { return list.map(m => m.me ? `<b>⭐ ${esc(m.name)}</b>` : `${CLS_IC[m.cls] || ''}${BUILDS[m.bld] ? `<span title="${esc(BUILDS[m.bld].n)}">${BUILDS[m.bld].ic}</span>` : ''} ${esc(m.name)} <span class="muted">${m.lvl || ''}</span>`).join('<br>') + (list.length < cap ? `<br><span class="muted">${'· '.repeat(cap - list.length)}свободно ${cap - list.length}</span>` : ''); }
 function arenaTabHTML() {
   const A = S.arena, h = S.hero, inApp = A.apps.find(a => a.joined !== null), can = arenaCanJoin(true);
   const busy = !can ? (h.state === 'dead' ? 'Герой мёртв.' : S.fight ? 'Герой уже в бою.' : inApp ? 'Вы уже в заявке — ждём бойцов.' : h.hp < h.maxHp * .3 ? 'Герою нужно хотя бы 30% HP.' : 'Герой занят (развилка, пещера или дуэль).') : '';
@@ -3942,7 +4194,7 @@ Object.assign(ACT, {
   fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a),
   fclose: () => { if (S.fight && S.fight.phase === 'end') closeFight(); },
   fmanual: () => { if (!startMonsterFight()) toast('Сейчас нечего брать под контроль.'); },
-  dgo: a => dunMove(a), dheal: () => dunHeal(), dauto: () => dunToggleAuto(), dleave: () => { if (confirm(`Отступить? Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи. Босс останется непобеждённым.`)) dunLeave(); },
+  dgo: a => dunMove(a), dheal: () => dunHeal(), dpotion: () => dunPotion(false), dauto: () => dunToggleAuto(), dleave: () => { if (confirm(`Отступить? Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи. Босс останется непобеждённым.`)) dunLeave(); },
   dclose: () => { if (S.dun && S.dun.phase === 'end') S.dun = null; },
   apost: a => arenaPost(a), ajoin: a => arenaJoin(a), aleave: a => arenaLeave(a),
   chatToggle: () => { S.chat.open = !S.chat.open; chatSeen = -1; if (S.chat.open) { S.chat.unread = 0; setTimeout(() => { const i = $('chatIn'); if (i && innerWidth > 760) i.focus(); const l = $('chatLog'); if (l) l.scrollTop = l.scrollHeight; }, 0); } },
@@ -3962,7 +4214,7 @@ S = load();
 if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
 setInterval(loop, 250);
 /* Отладочный доступ из консоли / тестов */
-window.GAME = { EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldStatW, bldFit, pickBuild, bldForBot, mkBld, initBuild, buildStat, heroFeatPref, startRespec, reconsider, bldResult, bldItem, bldTick, suggestBuild, bldFx, inferBuild, bldModal, itemScore, offerFeat, EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },

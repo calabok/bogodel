@@ -17,15 +17,15 @@ const STYLE = {
 };
 /* Баланс классов (подбирается симуляциями balance5.js): d — множитель урона, h — здоровья (везде);
    z — доп. множитель урона только в бою по зонам */
-const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .91 }, mage: { d: 1, h: 1, r: 0.78, z: 1.11 }, rogue: { d: 1, h: 1, r: 0.85, z: .69 }, cleric: { d: 1, h: 1, r: 0.8, z: .84 }, bard: { d: 1, h: 1, r: 0.76, z: 1.30 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.15 }, barbarian: { d: 1, h: 1, r: 1.6, z: .88 } };
-const BOT_K = 1.06;
+const CLASS_BAL = { warrior: { d: 1, h: 1, r: 1.2, z: .91 }, mage: { d: 1, h: 1, r: 0.78, z: 1.11 }, rogue: { d: 1, h: 1, r: 0.85, z: .73 }, cleric: { d: 1, h: 1, r: 0.8, z: .91 }, bard: { d: 1, h: 1, r: 0.76, z: 1.24 }, ranger: { d: 1, h: 1, r: 1.1, z: 1.15 }, barbarian: { d: 1, h: 1, r: 1.6, z: .88 } };
+const BOT_K = 1.1;
 /* Монстры: в бою по зонам — доли от «типичного героя» того же уровня; на дороге — множители старой формулы */
 const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.55, vet: .07 };
 /* Пещеры v5: меньше бесплатного лечения, злее комнаты и боссы, отступление с частью добычи */
-const DUN_K = { shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.5, .42], bdmg: 1.35, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
+const DUN_K = { fallHp: .35, lowHp: .35, lowLvl: [.72, .07], shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.6, .45], bdmg: 1.5, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
 /* v6: сила снаряжения (ГС) и уровни сложности пещер. g — доля «типичного» ГС уровня, m — сила монстров, rew — награда, rar — бонус редкости */
 const DUN_TIERS = {
-  easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .93, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
+  easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .86, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
   normal: { n: 'Обычная', ic: '🟡', g: 1, m: 1, rew: 1, rar: 0, nm: 'Пещера' },
   hard: { n: 'Тяжёлая', ic: '🔴', g: 1.2, m: 1.06, rew: 1.6, rar: .7, nm: 'Глубины' }
 };

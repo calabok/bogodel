@@ -15,16 +15,17 @@ async def main():
         await pg.goto('file:///workspace/godgame/index.html'); await pg.wait_for_timeout(300); await pg.click('[data-act=newGame]')
         await pg.evaluate('GAME.S.paused=true'); await pg.add_script_tag(path='/workspace/godgame/balance5.js')
         await pg.evaluate('window.toast=()=>{}; window.render=()=>{};'); await pg.evaluate('o=>{Object.assign(GS_K,o.GS_K||{});Object.assign(DUN_K,o.DUN_K||{});for(const k in (o.TT||{})) Object.assign(DUN_TIERS[k],o.TT[k])}', OV)
+        if OV.get('BLD'): await pg.evaluate("b=>{BAL.forceBld=b}", OV['BLD'])
         res={}
         for t in TI:
           for q in QS:
             for pol in POL:
-                vals=[]; gold=0; xp=0
+                vals=[]; gold=0; xp=0; nf=0; fell=0; n1=0; f1=0
                 for L in LV:
                     for c in CL:
-                        r=await pg.evaluate(f'BAL.dun({L},"{c}",{N},"{pol}","{t}",{q})'); vals.append(r['boss']); gold+=r['gold']; xp+=r['xp']
+                        r=await pg.evaluate(f'BAL.dun({L},"{c}",{N},"{pol}","{t}",{q})'); vals.append(r['boss']); gold+=r['gold']; xp+=r['xp']; nf+=r.get('nf',0); fell+=r.get('fell',0); n1+=r.get('n1',0); f1+=r.get('fell1',0)
                 k=f'{t} q{q} {pol}'; res[k]=round(sum(vals)/len(vals),3)
-                print(k, 'boss', res[k], 'min', min(vals), 'max', max(vals), 'gold', round(gold/len(vals)), 'xp', round(xp/len(vals)), flush=True)
+                print(k, 'boss', res[k], 'min', min(vals), 'max', max(vals), 'gold', round(gold/len(vals)), 'xp', round(xp/len(vals)), 'fell/fight', round(fell/max(nf,1e-9),3), 'fell 1st', round(f1/max(n1,1e-9),3), flush=True)
         print('ERR', errs[:3]); print(json.dumps(res))
         await br.close()
 asyncio.run(main())

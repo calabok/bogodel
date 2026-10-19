@@ -108,6 +108,7 @@ function passiveTick(gdt) {
   if (S.featOffer) { if (!SILENT) { S.featOffer.t -= gdt; if (S.featOffer.t <= 0) heroPicksFeat(); } } // офлайн черты ждут бога
   else if (S.featQueue > 0) offerFeat();
   if (S.timers.dunCd > 0) S.timers.dunCd = Math.max(0, S.timers.dunCd - gdt);
+  bldTick(gdt);
   if (h.inj.length) { for (const j of h.inj) j.t -= gdt; const n = h.inj.length; h.inj = h.inj.filter(j => j.t > 0); if (h.inj.length !== n) { recalcHp(); diary('🩹 Травма зажила. Снова как новенький (почти).', 'level'); } }
   S.timers.rivals -= gdt;
   if (S.timers.rivals <= 0) { S.timers.rivals = PACE.rivals; const r = pick(S.rivals); if (r.lvl < S.god.lvl + 2 && R() < .5) r.lvl++; r.hlvl = clamp(h.lvl + rnd(-1, 1), 1, MAX_LVL); if (R() < .5) r.army += rnd(0, 2); }
@@ -178,6 +179,7 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV8) { delete S._migratedV8; const id = bldId(S.hero); diary(`🧭 Обновление мира: герои теперь сами выбирают путь. Посмотрев на свои мускулы и рюкзак, ${S.hero.name} решил, что он — ${bldName(id)}. Посоветовать другой путь можно в «📋 Герой».`, 'rare'); }
   if (S._migratedV7) { delete S._migratedV7; diary(`🧥 Обновление мира: у героя теперь 10 слотов — шлем, перчатки, сапоги, пояс, щит и второе кольцо. Новые слоты пока пусты; у вещей появились требования, 9 комплектов и 15 легендарок. Старое снаряжение на месте.`, 'rare'); }
   if (S._migratedV6) { delete S._migratedV6; diary(`⚒ Обновление мира: у снаряжения появилась сила — ⚔ ГС (сейчас ${gearScore(S.hero)}). Подземелья теперь трёх сложностей с рекомендуемым ГС: недобор — монстры злее, перебор — легче. Огонь, вампиризм, шипы и серебро работают в бою, у боссов есть слабости. Кузнец в городе точит вещи за золото.`, 'level'); }
   if (S._migratedV5) { delete S._migratedV5; diary('✨ Обновление мира: пещеры стали опаснее (элитные логова, один источник, боссы бьют по объявленной зоне — блокируйте её!), зато добыча богаче. Интерфейс стал спокойнее: подробности героя — по кнопке «📋 Герой».', 'level'); }

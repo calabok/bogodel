@@ -39,7 +39,7 @@ async def main():
         await pg.click(f'#modal [data-act=itemD][data-arg="inv:{iid}"]'); await pg.wait_for_timeout(150)
         r=await pg.evaluate("(()=>{const m=document.getElementById('modal');return {t:m.innerText, red:m.querySelectorAll('.rqb').length, eqb:!!m.querySelector('[data-act=equipInv]:not([disabled])'), cmp:!!m.querySelector('.cmp')}})()")
         ok('item detail: requirement red, "Требуется", comparison, no equip button', r['red']>=1 and 'Требуется' in r['t'] and r['cmp'] and not r['eqb'], {k:v for k,v in r.items() if k!='t'})
-        r=await pg.evaluate(f"""(()=>{{const h=GAME.S.hero; h.lvl+=5; h.st.str=19; const it=h.inv.find(i=>i.id==='{iid}'); GAME.tryEquipInv(); return {{eq:h.eq.weapon===it, inv:h.inv.includes(it), d:GAME.S.diary.slice(0,4).map(x=>x.x).join(' | ')}}}})()""")
+        r=await pg.evaluate(f"""(()=>{{const h=GAME.S.hero; if(GAME.mkBld) h.bld=GAME.mkBld('berserk','start',1); h.lvl+=5; h.st.str=19; const it=h.inv.find(i=>i.id==='{iid}'); GAME.tryEquipInv(); return {{eq:h.eq.weapon===it, inv:h.inv.includes(it), d:GAME.S.diary.slice(0,4).map(x=>x.x).join(' | ')}}}})()""")
         ok('after level/stat met: auto-equips from backpack', r['eq'] and not r['inv'], r)
         await pg.evaluate("GAME.closeModal()")
         # 2h blocks shield
@@ -122,7 +122,7 @@ async def main():
         await pg.goto(URL); await pg.evaluate("s=>localStorage.setItem('bogodel_save_v1',s)", v6); await pg.reload(); await pg.wait_for_timeout(500)
         r=await pg.evaluate("""(()=>{const h=GAME.S.hero; return {v:GAME.S.v, w:h.eq.weapon&&h.eq.weapon.n, wp:h.eq.weapon&&h.eq.weapon.plus, cat:h.eq.weapon&&h.eq.weapon.cat, a:h.eq.armor&&h.eq.armor.n, am:h.eq.amulet&&h.eq.amulet.n,
           nulls:['helm','belt','gloves','boots','offhand','ring2'].every(k=>h.eq[k]===null), keys:Object.keys(h.eq).length, inv:h.inv.length, note:GAME.S.diary.slice(0,8).some(d=>/10 слотов/.test(d.x))}})()""")
-        ok('v6→v7 migration: old items kept (with +N), new slots empty, note', r['v']==7 and r['w']=='Старый меч +2' and r['wp']==2 and r['cat'] and r['a']=='Кольчуга' and r['am']=='Амулет' and r['nulls'] and r['keys']==10 and r['inv']==2 and r['note'], r)
+        ok('v6→v8 migration: old items kept (with +N), new slots empty, note', r['v']==8 and r['w']=='Старый меч +2' and r['wp']==2 and r['cat'] and r['a']=='Кольчуга' and r['am']=='Амулет' and r['nulls'] and r['keys']==10 and r['inv']==2 and r['note'], r)
         await pg.click('#colHero [data-act=sheet]'); await pg.wait_for_timeout(150)
         ok('migrated save renders doll', await pg.evaluate("document.querySelectorAll('#modal .doll .slotc').length==10"))
         bad=await pg.evaluate("""(()=>{const s=JSON.parse(JSON.stringify(GAME.S)); const h=s.hero; h.eq.bogus={slot:'weapon',n:'x'}; h.eq.helm={slot:'weapon',n:'Меч в шлеме',die:6,props:[]};

@@ -84,7 +84,7 @@ function defaultState(god, hero, race, cls) {
     timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
     fork: null, fight: null, ev: null, dun: null, fightAuto: false,
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
-    diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2) }, r)),
+    diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
     speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
   };
@@ -101,7 +101,17 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 7;
+const SAVE_VERSION = 8;
+/* v8: путь героя */
+function sanitizeBld(h) {
+  const B = h.bld;
+  if (!B || typeof B !== 'object' || !BUILDS[B.id]) { h.bld = mkBld(inferBuild(h), 'migr', h.lvl); return; }
+  for (const [k, mx] of [['age', 1e9], ['cd', BLD_K.cd], ['loss', 20], ['nolvl', 1e8]]) { if (typeof B[k] !== 'number' || !isFinite(B[k])) B[k] = 0; B[k] = Math.max(0, Math.min(mx, B[k])); }
+  B.hist = Array.isArray(B.hist) ? B.hist.filter(x => x && BUILDS[x.id]).map(x => ({ id: x.id, why: BLD_WHY[x.why] ? x.why : 'start', lvl: typeof x.lvl === 'number' && isFinite(x.lvl) ? Math.max(1, Math.min(MAX_LVL, Math.round(x.lvl))) : 1 })).slice(-8) : [];
+  if (!B.hist.length) B.hist = [{ id: B.id, why: 'start', lvl: 1 }];
+  const r = B.re; B.re = r && typeof r === 'object' && BUILDS[r.from] && r.from !== B.id && typeof r.pts === 'number' && r.pts >= 1 ? { from: r.from, pts: Math.min(6, Math.round(r.pts)), n: Math.min(6, Math.max(Math.round(r.pts), typeof r.n === 'number' && isFinite(r.n) ? Math.round(r.n) : 1)), t: typeof r.t === 'number' && isFinite(r.t) ? Math.max(0, Math.min(BLD_K.respec, r.t)) : BLD_K.respec } : null;
+  for (const k of Object.keys(B)) if (!['id', 'age', 'cd', 'loss', 'nolvl', 'hist', 're'].includes(k)) delete B[k];
+}
 const isNum = v => typeof v === 'number' && isFinite(v);
 function fixNum(o, k, def, min, max) { let v = o[k]; if (!isNum(v)) v = def; if (min !== undefined) v = Math.max(min, v); if (max !== undefined) v = Math.min(max, v); o[k] = v; }
 /* Миграция старых сохранений */
@@ -166,6 +176,7 @@ function migrate(o) {
     if (h && h.eq && typeof h.eq === 'object') for (const k of ['offhand', 'helm', 'belt', 'gloves', 'boots', 'ring2']) if (!(k in h.eq)) h.eq[k] = null;
     o._migratedV7 = 1;
   }
+  if (v < 8) o._migratedV8 = 1;
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
@@ -205,6 +216,7 @@ function sanitize(o) {
   if (!h.st || typeof h.st !== 'object') h.st = genStats(h.cls, h.race);
   for (const s of STATS) { fixNum(h.st, s, 10, 3, 20); h.st[s] = Math.round(h.st[s]); }
   h.feats = Array.isArray(h.feats) ? [...new Set(h.feats.filter(x => FEATS[x]))] : [];
+  sanitizeBld(h);
   fixNum(h, 'lvl', 1, 1, MAX_LVL); h.lvl = Math.floor(h.lvl); fixNum(h, 'xp', 0, 0, Math.max(0, xpNext(h.lvl) - 1)); if (h.lvl >= MAX_LVL) h.xp = 0;
   if (!h.eq || typeof h.eq !== 'object') h.eq = d.hero.eq;
   for (const k of Object.keys(h.eq)) if (!EQ_KEYS.includes(k)) delete h.eq[k];
@@ -268,10 +280,11 @@ function sanitize(o) {
   }
   if (o.ev) { fixNum(o.ev, 't', 1, 0, 60); fixNum(o.ev, 'thr', 100, 1); fixNum(o.ev.my, 'power', 0, 0); fixNum(o.ev.my, 'army', 0, 0); if (!o.ev.ai) o.ev.ai = {}; if (o.ev.phase === 'done' && !o.ev.result) o.ev = null; }
   if (o.featOffer && !(Array.isArray(o.featOffer.opts) && o.featOffer.opts.every(x => FEATS[x]) && isNum(o.featOffer.t))) o.featOffer = null;
-  if (o.featOffer) { o.featOffer.opts = o.featOffer.opts.filter(x => !h.feats.includes(x)); o.featOffer.asi = !!o.featOffer.asi; }
+  if (o.featOffer) { o.featOffer.opts = o.featOffer.opts.filter(x => !h.feats.includes(x)); o.featOffer.asi = !!o.featOffer.asi; const P = o.featOffer.pref; o.featOffer.pref = P && ((P.feat && FEATS[P.feat] && !h.feats.includes(P.feat)) || (P.asi && STATS.includes(P.asi))) ? (P.feat ? { feat: P.feat } : { asi: P.asi }) : null; }
   fixNum(o, 'featQueue', 0, 0, 10); o.featQueue = Math.floor(o.featQueue);
   if (!Array.isArray(o.rivals)) o.rivals = d.rivals;
   o.rivals = o.rivals.filter(r => r && RIVALS_BASE.find(b => b.id === r.id));
+  for (const r of o.rivals) if (!BUILDS[r.bld]) r.bld = bldForBot(r.cls, r.race);
   for (const b of RIVALS_BASE) if (!o.rivals.find(r => r.id === b.id)) o.rivals.push(Object.assign({ w: 0, l: 0, army: 0, hlvl: 1 }, b));
   for (const r of o.rivals) { const b = RIVALS_BASE.find(x => x.id === r.id); Object.assign(r, { name: b.name, hero: b.hero, pers: b.pers, race: b.race, cls: b.cls }); fixNum(r, 'lvl', b.lvl, 1, 99); fixNum(r, 'hlvl', 1, 1, MAX_LVL); fixNum(r, 'w', 0, 0); fixNum(r, 'l', 0, 0); fixNum(r, 'army', 0, 0); }
   o.diary = Array.isArray(o.diary) ? o.diary.filter(e => e && typeof e.x === 'string').slice(0, 150) : [];
@@ -327,7 +340,7 @@ const AI_W = {
 class LocalAIProvider extends RivalProvider {
   constructor(getState) { super(); this.st = getState; }
   listGods() { return this.st().rivals; }
-  _hero(g, heroLvl) { return { godId: g.id, god: g.name, hero: g.hero, pers: g.pers, lvl: g.lvl, race: g.race, cls: g.cls, heroLvl: clamp(heroLvl + rnd(-1, 1), 1, MAX_LVL), army: g.army }; }
+  _hero(g, heroLvl) { return { godId: g.id, god: g.name, hero: g.hero, pers: g.pers, lvl: g.lvl, race: g.race, cls: g.cls, bld: g.bld, heroLvl: clamp(heroLvl + rnd(-1, 1), 1, MAX_LVL), army: g.army }; }
   findOpponent(player) {
     const gods = this.st().rivals.slice().sort((a, b) => Math.abs(a.lvl - player.godLvl) - Math.abs(b.lvl - player.godLvl));
     const g = player.godId ? this.st().rivals.find(x => x.id === player.godId) || pick(gods.slice(0, 4)) : pick(gods.slice(0, 4));

@@ -7,7 +7,8 @@ window.BAL = (() => {
     race = race || RACE_FOR[cls];
     const s = G.defaultState('Бог', 'Гена', race, cls); G.S = s; s.paused = true; s.timers.fork = s.timers.duel = s.timers.dun = s.timers.event = 1e9;
     const h = s.hero, c = G.CLASSES[cls]; h.lvl = L;
-    for (let i = 2; i <= L; i++) { if (i % 2) h.st[c.prim] = Math.min(20, h.st[c.prim] + 1); else { h.st[c.prim] = Math.min(20, h.st[c.prim] + 1); h.st.con = Math.min(20, h.st.con + 1); } }
+    h.bld = G.mkBld(window.BAL && BAL.forceBld || G.bldForBot(cls, race), 'start', 1);
+    for (let i = 2; i <= L; i++) { let k = G.buildStat(h); h.st[k] = Math.min(20, h.st[k] + 1); if (i % 2 === 0) { k = G.buildStat(h); h.st[k] = Math.min(20, h.st[k] + 1); } }
     const rar = L < 3 ? 0 : L < 7 ? 1 : L < 12 ? 2 : 3;
     const put = (sl, r) => { for (let t = 0; t < 4; t++) { const it = G.makeItem(sl, L, r); it.curse = null; it.n = nameOf(it); if (!G.reqOk(h, it) && t < 3) continue; const b = G.bestPlace(h, it, true, true); if (b) { applyPlace(h, it, b); return; } } };
     if (L >= 2) { put('weapon', rar); put('armor', rar); put('helm', rar); put('boots', rar); }
@@ -85,7 +86,7 @@ window.BAL.fitGS = function (target) {
   h.maxHp = calcMaxHp(h); h.hp = h.maxHp; return gearScore(h);
 };
 window.BAL.dun = async function (L, cls, N, policy, tier, q) {
-  const out = { bossFight: 0, boss: 0, carried: 0, left: 0, nokey: 0, fights: 0, heroHp: 0, gold: 0, xp: 0, gs: 0 };
+  const out = { nf: 0, fell: 0, fell1: 0, n1: 0, _k: -1, bossFight: 0, boss: 0, carried: 0, left: 0, nokey: 0, fights: 0, heroHp: 0, gold: 0, xp: 0, gs: 0 };
   for (let i = 0; i < N; i++) {
     const s = BAL.hero(L, cls); s.god.skills.bless = s.god.lvl >= 2 ? 1 : 0; s.god.skills.shield = s.god.lvl >= 4 ? 1 : 0;
     s.god.faith = Math.round(maxFaith() * .7); s.timers.dunCd = 0; S.hero.inj = [];
@@ -96,7 +97,7 @@ window.BAL.dun = async function (L, cls, N, policy, tier, q) {
     while (S.dun && k++ < 400) {
       if (S.fight) { const F = S.fight; if (F.ctx.boss && !F._c) { F._c = 1; out.bossFight++; }
         if (policy !== 'auto') { F.auto = false; let q = 0; while (S.fight === F && F.phase !== 'end' && q++ < 200) { if (F.phase === 'intro') nextTurn(F); else { BAL.smartChoice(F, policy === 'good'); if (F.phase === 'turn') resolveTurn(F); } } if (S.fight === F) closeFight(); }
-        else autoResolveBattle(F); continue; }
+        else autoResolveBattle(F); out.nf++; const mm = F.fighters.find(f => f.isMe), dead = !!(mm && !mm.alive); if (dead) out.fell++; if (out._k !== i) { out._k = i; out.n1++; if (dead) out.fell1++; } continue; }
       if (S.dun.phase === 'end') { res = S.dun.result; break; }
       if (policy === 'good' && Math.random() < .2) { dunAutoStep(); continue; }
       if (policy !== 'auto') { const h = S.hero; const bossNext = (() => { const n = BAL.smartRoute(S.dun); return n && S.dun.tiles[n.y * DW + n.x].t === 'boss'; })();

@@ -78,7 +78,7 @@ async def main():
         await pg.evaluate("(()=>{const s=JSON.parse(JSON.stringify(GAME.S)); s.v=5; delete s.dun.diff; delete s.dun.rec; delete s.dun.gm; s.dun.party.forEach(p=>delete p.gs); const j=JSON.stringify(s); localStorage.setItem(GAME.SAVE_KEY, j); const w=()=>localStorage.setItem(GAME.SAVE_KEY, j); window.addEventListener('beforeunload',w); document.addEventListener('visibilitychange',w); window.addEventListener('pagehide',w);})()")
         await pg.reload(); await pg.wait_for_timeout(400)
         r=await pg.evaluate("({v:GAME.S.v, diff:GAME.S.dun&&GAME.S.dun.diff, rec:GAME.S.dun&&GAME.S.dun.rec, gs:GAME.S.dun&&GAME.S.dun.party.every(p=>p.gs>0), note:GAME.S.diary.slice(0,6).some(d=>/ГС/.test(d.x)&&/Обновление мира/.test(d.x)), card:/ГС отряда/.test(document.getElementById('dunBox').innerText)})")
-        ok('v5->v7 migration: dungeon kept as normal tier, rec/GS filled, note', r['v']==7 and r['diff']=='normal' and r['rec']>0 and r['gs'] and r['note'] and r['card'], r)
+        ok('v5->v8 migration: dungeon kept as normal tier, rec/GS filled, note', r['v']==8 and r['diff']=='normal' and r['rec']>0 and r['gs'] and r['note'] and r['card'], r)
         await pg.evaluate("GAME.S.paused=true")
         r=await pg.evaluate("(()=>{let k=0; while(GAME.S.dun&&k++<400){ if(GAME.S.fight) autoResolveBattle(GAME.S.fight); else if(GAME.S.dun.phase==='explore') dunAutoStep(); else if(GAME.S.dun.phase==='end') GAME.S.dun=null; else GAME.S.dun.phase='explore'; } return {done:!GAME.S.dun}})()")
         ok('migrated dungeon playable to the end', r['done'], r)

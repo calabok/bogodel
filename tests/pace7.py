@@ -18,7 +18,7 @@ async def main():
             res=await pg.evaluate('''(H)=>{const G=GAME;const lv=[];const reach={};const gsl={};let deaths=0,wins=0,items=0;
               for(let h=1;h<=H;h++){const c=G.simulateAway(3600);deaths+=c.deaths;wins+=c.wins;items+=c.items.length;
                 const S=G.S; if(S.featOffer) G.chooseFeat(S.featOffer.opts[0]); const L=S.hero.lvl; if(!reach[L]) reach[L]=h; gsl[L]=G.gearScore(S.hero);}
-              const S=G.S;return {gsl,reach,deaths,wins,items,lvl:S.hero.lvl,glvl:S.god.lvl,gold:S.hero.gold,fol:Math.floor(S.flock.fol),faith:Math.floor(S.god.faith),maxHp:S.hero.maxHp,st:S.hero.st,feats:S.hero.feats,eq:Object.values(S.hero.eq).filter(Boolean).map(i=>i.n+'/'+i.rar)}}''', HOURS)
+              const S=G.S;return {gsl,reach,deaths,wins,items,lvl:S.hero.lvl,glvl:S.god.lvl,gold:S.hero.gold,fol:Math.floor(S.flock.fol),faith:Math.floor(S.god.faith),maxHp:S.hero.maxHp,bld:S.hero.bld&&S.hero.bld.hist.map(x=>x.id+':'+x.why+'@'+x.lvl).join(' > '),st:S.hero.st,feats:S.hero.feats,eq:Object.values(S.hero.eq).filter(Boolean).map(i=>i.n+'/'+i.rar)}}''', HOURS)
             res['combo']=race+'/'+cls; res['errs']=errs[:3]; out.append(res); print(json.dumps(res,ensure_ascii=False)); sys.stdout.flush()
             await ctx.close()
         await b.close()

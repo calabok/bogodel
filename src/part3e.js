@@ -59,14 +59,16 @@ async function startDungeon(byCall, tier) {
   if (S !== st || h.state !== 'dungeon' || S.fight || S.dun) { if (S === st && h.state === 'dungeon' && !S.dun) h.state = 'road'; return false; }
   if (!DUN_TIERS[tier]) tier = autoTier(h);
   const rec = recGS(h.lvl, tier);
+  const hp0 = h.hp; if (h.hp < h.maxHp * .7) h.hp = Math.round(h.maxHp * .7); /* у входа отряд ждёт, пока герой отдышится */
   const party = [{ godId: 'me', god: S.god.name, hero: h.name, race: h.race, cls: h.cls, lvl: h.lvl, isMe: true, hp: 100, gs: gearScore(h) }]
-    .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, hp: 100, gs: Math.round(rec * (.9 + R() * .15)) })));
+    .concat(mates.map(m => ({ godId: m.godId, god: m.god, hero: m.hero, race: m.race, cls: m.cls, lvl: m.heroLvl, pers: m.pers, bld: BUILDS[m.bld] ? m.bld : bldForBot(m.cls, m.race), hp: 100, gs: Math.round(rec * (.9 + R() * .15)) })));
   const G = genDungeon(h.lvl);
   S.dun = { diff: tier, rec, id: 'd' + Date.now().toString(36), name: (tier === 'normal' ? '' : DUN_TIERS[tier].nm + ': ') + pick(DUN_NAMES), tier: h.lvl, tiles: G.tiles, pos: G.pos, boss: G.boss, party, keys: 0, log: [], phase: 'explore', gold: 0, xp: 0, loot: [], fights: 0, heals: 0, idle: 0, auto: false, t: 0, result: null, byCall: !!byCall, picked: false };
   S.dun.gm = +dunGearMul(S.dun).m.toFixed(3);
   dunReveal(S.dun);
   S.stats.duns++; S.timers.dunCd = PACE.dunCd;
   ulog(`${DUN_TIERS[tier].ic} Сложность: ${DUN_TIERS[tier].n} · ГС отряда ${Math.round(dunGearMul(S.dun).q * rec)} / рек. ${rec}.`);
+  if (h.hp > hp0) ulog(`🍞 Перед спуском отряд подождал, пока ${h.name} отдышится и перекусит: ${hp0} → ${h.hp} HP.`, 'me');
   ulog(`Отряд у входа в «${S.dun.name}»: ${party.map(p => `${p.hero} (${CLASSES[p.cls].n.toLowerCase()})`).join(', ')}. Где-то в глубине ждёт ${G.boss.n}. Ищите ключ 🗝!`);
   diary(`🏰 Спустился в «${S.dun.name}» с отрядом: ${mates.map(m => m.hero).join(', ')}. Факел взял. Совесть — тоже.`, 'event');
   if (!SILENT) { chatSys(`🏰 Отряд ${h.name} спустился в «${S.dun.name}».`); toast('🏰 Пещера! Ведите отряд по карте: нажимайте на соседние комнаты.'); }
@@ -74,7 +76,7 @@ async function startDungeon(byCall, tier) {
 }
 function partyUnits(U) {
   const out = [heroUnit()];
-  for (const p of U.party) if (!p.isMe && p.hp > 0) out.push(botUnit({ name: p.hero, race: p.race, cls: p.cls, lvl: p.lvl, hpPct: p.hp, ref: p.godId, gk: Math.sqrt((p.gs || typGS(p.lvl)) / typGS(p.lvl)) }));
+  for (const p of U.party) if (!p.isMe && p.hp > 0) out.push(botUnit({ bld: p.bld, name: p.hero, race: p.race, cls: p.cls, lvl: p.lvl, hpPct: p.hp, ref: p.godId, gk: Math.sqrt((p.gs || typGS(p.lvl)) / typGS(p.lvl)) }));
   return out;
 }
 function dunMove(arg) {
@@ -85,7 +87,11 @@ function dunMove(arg) {
     if (dunHas(U, 'rogue') && !U.picked) { U.picked = true; if (R() < .5) { ulog('🔓 Плут поковырялся в замке шпилькой — дверь открылась!', 'me'); U.keys++; } else { ulog('Плут сломал шпильку. Нужен ключ 🗝.', 'foe'); return; } }
     else { ulog('🔒 Дверь в логово босса заперта. Нужен ключ 🗝.', 'foe'); return; }
   }
-  U.pos = { x, y }; U.idle = 0; dunReveal(U); dunEnter(U, t);
+  if (!U.auto && !SILENT && dunLowHp(U) && dunRisky(U, { x, y }) && U.warnAt !== y * DW + x) {
+    U.warnAt = y * DW + x; ulog(`⚠ Отряд еле жив: у ${S.hero.name} ${S.hero.hp}/${S.hero.maxHp} HP. Лучше выпить зелье, подлечиться или отступить. Нажмите комнату ещё раз, чтобы всё равно идти.`, 'warn');
+    toast('⚠ Герой еле жив — нажмите ещё раз, если всё равно идти'); return;
+  }
+  U.warnAt = -1; U.pos = { x, y }; U.idle = 0; dunReveal(U); dunEnter(U, t);
 }
 function dunEnter(U, t) {
   const h = S.hero, L = U.tier;
@@ -137,6 +143,8 @@ function dunFight(U, t, mons, intro) {
   U.phase = 'fight'; U.fightTile = U.tiles.indexOf(t);
   const ga = Math.round(((U.gm || 1) * (DUN_TIERS[U.diff] || DUN_TIERS.normal).m - 1) * 4); /* недобор ГС — по монстрам труднее попасть */
   for (const m of mons) m.armor = Math.max(0, m.armor + ga);
+  const lk = Math.min(1, DUN_K.lowLvl[0] + DUN_K.lowLvl[1] * U.tier); /* низкие уровни: монстры чуть мягче (герой ещё хрупкий) */
+  if (lk < 1) for (const m of mons) { m.avg *= lk; m.max = Math.max(1, Math.round(m.max * lk)); m.hp = Math.min(m.hp, m.max); }
   const allies = partyUnits(U);
   const F = beginBattle('dungeon', allies, mons, { title: `${U.name}: ${t.t === 'boss' ? 'босс' : 'бой'}`, intro, ctx: { tile: U.fightTile, boss: t.t === 'boss' } });
   const wk = mons.filter(m => m.weak || m.boss && m.boss.weak);
@@ -148,12 +156,13 @@ function dunAfterFight(F, won) {
   const U = S.dun, h = S.hero; if (!U) return;
   for (const f of F.fighters) if (f.team === 0 && f.ref) { const p = U.party.find(x => x.godId === f.ref); if (p) p.hp = f.alive ? Math.max(1, Math.round(f.hp / f.max * 100)) : 0; }
   const me = fMe(F), t = U.tiles[F.ctx.tile];
+  U.lastFight = { title: F.title, won: !!won, turns: F.turn, log: F.log.slice(0, 14).map(l => ({ t: String(l.t).slice(0, 200), c: l.c })) };
   if (!won) {
     h.hp = Math.max(1, Math.min(h.maxHp, me.hp)); injure('mid', 'Вынесли из пещеры');
     ulog(`🩹 Отряд разбит. ${h.name} без сознания — его вынесли на руках.`, 'foe');
     return endDungeon(false, 'carried');
   }
-  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * .1)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли и отряхнули.`, 'foe'); }
+  if (!me.alive || me.hp <= 0) { h.hp = Math.max(1, Math.round(h.maxHp * DUN_K.fallHp)); injure('light', 'Упал в бою, но отряд победил'); ulog(`🩹 ${h.name} упал, но друзья его подняли, перевязали и дали отдышаться (${h.hp}/${h.maxHp} HP).`, 'foe'); }
   else h.hp = clamp(me.hp, 1, h.maxHp);
   U.fights++;
   const foes = F.fighters.filter(f => f.team === 1).length, boss = F.ctx.boss;
@@ -177,8 +186,9 @@ function endDungeon(ok, why) {
   const gold = Math.round(U.gold * mult), xp = Math.round((U.xp + (ok ? xpUnit(U.tier) * 15 * (DUN_TIERS[U.diff] || DUN_TIERS.normal).rew : 0)) * mult);
   h.gold += gold; gainXp(xp); addGxp(20 + U.fights * 8 + (ok ? 25 : 0));
   if (ok) { addTrust(3); S.stats.dwinsD++; }
+  bldResult(ok || why === 'left', 'dun');
   const items = why === 'carried' ? U.loot.slice(0, 1) : U.loot, names = [];
-  for (const it of items) { const worn = equip(it, true); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
+  for (const it of items) { const worn = equip(it, true); bldItem(it); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
   rivals.reportDungeon({ ok, godIds: U.party.filter(p => !p.isMe).map(p => p.godId) });
   U.result = `${ok ? '🏆 Босс повержен, пещера пройдена!' : why === 'carried' ? '🩹 Героя вынесли на руках.' : why === 'left' ? '🚪 Отряд ушёл из пещеры.' : why === 'nokey' ? '🔒 Ключ так и не нашли — отряд ушёл.' : '😵 Отряд отступил.'} Добыча: ${gold} 💰, ${xp} опыта${names.length ? ', ' + names.join(', ') : ''}.`;
   ulog(U.result, 'sys');
@@ -213,11 +223,23 @@ function dunNextStep(U) {
   let j = goal; while (prev[j] !== start && prev[j] >= 0) j = prev[j];
   return { x: j % DW, y: Math.floor(j / DW) };
 }
-function dunAutoStep() {
+function dunAutoStep(idle) {
   const U = S.dun; if (!U || U.phase !== 'explore') return;
   const nx = dunNextStep(U);
+  if (nx && dunLowHp(U) && dunRisky(U, nx) && S.hero.potions > 0) dunPotion(true);
+  /* бог молчит, а отряд еле жив: не лезем в бой вслепую — второй раз просто уходим с добычей */
+  if (idle && !U.auto && nx && dunLowHp(U) && dunRisky(U, nx) && U.warnAt === nx.y * DW + nx.x) { ulog('🚪 Отряд еле жив, а бог молчит — герои благоразумно отступили с добычей.', 'warn'); return dunLeave(); }
   if (!nx) { const boss = U.tiles.find(t => t && t.t === 'boss'); return endDungeon(false, boss && !boss.done && U.keys < 1 ? 'nokey' : 'left'); }
   dunMove(nx.x + ',' + nx.y);
+}
+/* Низкое здоровье перед боем: предупреждение, зелье, двойной клик для входа в бой */
+const dunLowHp = U => S.hero.hp < S.hero.maxHp * DUN_K.lowHp;
+function dunRisky(U, q) { const t = tileAt(U, q.x, q.y); return !!t && !t.done && (!(t.seen) || ['fight', 'elite', 'boss', 'chest', 'trap'].includes(t.t)); }
+function dunPotion(auto) {
+  const U = S.dun, h = S.hero; if (!U || U.phase !== 'explore') return false;
+  if (h.potions < 1) { if (!auto) toast('Зелий нет.'); return false; }
+  h.potions--; const a = healHero(Math.round(h.maxHp * .35 * (hasFeat('gourmet') ? 1.5 : 1)));
+  ulog(`🧪 ${h.name} ${auto ? 'перед дверью ' : ''}выпил зелье: +${a} HP (${h.hp}/${h.maxHp}).`, 'me'); return true;
 }
 function dunToggleAuto() { if (S.dun) { S.dun.auto = !S.dun.auto; S.dun.idle = 0; } }
 function dunTick(idt) {
@@ -225,7 +247,7 @@ function dunTick(idt) {
   if (U.phase === 'end') { U.t -= idt; if (U.t <= 0) S.dun = null; return; }
   if (U.phase !== 'explore') return;
   U.idle += idt;
-  if ((U.auto && U.idle >= 2.5) || U.idle >= 25) { if (!U.auto) ulog('Бог задумался — отряд пошёл сам.'); U.idle = 0; dunAutoStep(); }
+  if ((U.auto && U.idle >= 2.5) || U.idle >= 25) { if (!U.auto) ulog('Бог задумался — отряд пошёл сам.'); U.idle = 0; dunAutoStep(!U.auto); }
 }
 function dunAutoFinish() {
   let k = 0;
@@ -271,13 +293,15 @@ function validDun(U) {
   if (!tileAt(U, U.pos.x, U.pos.y)) return false;
   if (!U.tiles.some(t => t && t.t === 'boss')) return false;
   U.party = U.party.filter(p => p && typeof p.hero === 'string' && CLASSES[p.cls] && RACES[p.race]).slice(0, 5);
-  for (const p of U.party) { fixNum(p, 'hp', 100, 0, 100); fixNum(p, 'lvl', 1, 1, MAX_LVL); fixNum(p, 'gs', 0, 0, 999); }
+  for (const p of U.party) { if (!p.isMe && !BUILDS[p.bld]) p.bld = bldForBot(p.cls, p.race); fixNum(p, 'hp', 100, 0, 100); fixNum(p, 'lvl', 1, 1, MAX_LVL); fixNum(p, 'gs', 0, 0, 999); }
   if (!DUN_TIERS[U.diff]) U.diff = 'normal'; fixNum(U, 'rec', 0, 0, 999); fixNum(U, 'gm', 1, .3, 3);
   if (!U.rec) U.rec = typGS(U.tier); for (const p of U.party) if (!p.gs) p.gs = U.rec;
   U.loot = Array.isArray(U.loot) ? U.loot.filter(i => i && i.slot && validItem(i, i.slot)).map(sanitizeItem).slice(0, 10) : [];
   fixNum(U, 'keys', 0, 0, 3); fixNum(U, 'gold', 0, 0); fixNum(U, 'xp', 0, 0); fixNum(U, 'fights', 0, 0); fixNum(U, 'heals', 0, 0, 9); fixNum(U, 'idle', 0, 0, 60); fixNum(U, 't', 1, 0, 20); fixNum(U, 'tier', 1, 1, 30);
   U.auto = !!U.auto; if (typeof U.name !== 'string') U.name = 'Пещера';
   if (U.log.length > 40) U.log.length = 40;
+  fixNum(U, 'warnAt', -1, -1, DW * DH);
+  const LF = U.lastFight; U.lastFight = LF && typeof LF === 'object' && Array.isArray(LF.log) ? { title: String(LF.title || '').slice(0, 80), won: !!LF.won, turns: isNum(LF.turns) ? Math.max(0, Math.min(99, Math.round(LF.turns))) : 0, log: LF.log.filter(l => l && typeof l.t === 'string').slice(0, 14).map(l => ({ t: l.t.slice(0, 200), c: typeof l.c === 'string' ? l.c.replace(/[^a-z]/g, '').slice(0, 10) : 'sys' })) } : null;
   return true;
 }
 function sanitizeArena(o, h) {

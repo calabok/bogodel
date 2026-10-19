@@ -182,13 +182,16 @@ function makeSetItem(id, lvl, rar) {
 }
 /* ---------- Оценка вещей для авто-экипировки ---------- */
 function itemScore(it, h) {
-  if (!it) return 0; h = h || S.hero; const c = CLASSES[h.cls];
+  if (!it) return 0; h = h || S.hero; const c = CLASSES[h.cls], B = BUILDS[h.bld && h.bld.id];
   let s = 0;
-  for (const p of it.props) s += STATS.includes(p.k) ? (p.v || 1) * (p.k === c.prim ? 1.6 : p.k === 'con' ? 1.1 : .5) * 1.2 : 1.8;
+  const W = B ? bldStatW(h) : null, wm = W ? Math.max(...Object.values(W)) : 1;
+  for (const p of it.props) s += STATS.includes(p.k) ? (p.v || 1) * (W ? Math.max(.35, W[p.k] / wm * 1.6) : (p.k === c.prim ? 1.6 : p.k === 'con' ? 1.1 : .5)) * 1.2 : (B ? (B.props.includes(p.k) ? 2.8 : 1.4) : 1.8);
   const sl = it.slot, pl = it.plus || 0;
-  if (sl === 'weapon') { const off = h.eq.offhand === it; s += off ? ((it.die || 4) + 1) / 2 * .4 + pl * .5 : ((it.die || 4) + 1) / 2 + pl * 1.5 + (WCAT[it.cat] && WCAT[it.cat].cls.includes(h.cls) ? 1.5 : 0) + (it.cat === 'two' ? .6 : 0); }
+  if (B && it.kind && B.kind) s += it.kind === B.kind ? .8 : -.3;
+  if (sl === 'weapon') { const off = h.eq.offhand === it; s += off ? ((it.die || 4) + 1) / 2 * .4 + pl * .5 : ((it.die || 4) + 1) / 2 + pl * 1.5 + (WCAT[it.cat] && WCAT[it.cat].cls.includes(h.cls) ? 1.5 : 0) + (it.cat === 'two' ? .6 : 0)
+      + (B && !off ? (B.cats.includes(it.cat) ? 1.6 : 0) + (it.h2 ? (B.h2 ? 1.2 : B.sh ? -1.8 : 0) : 0) : 0); }
   else if (sl === 'armor') s += effAc(it);
-  else if (sl === 'offhand') s += effAc(it) * .5 + (it.blk || 0) * 22;
+  else if (sl === 'offhand') s += (effAc(it) * .5 + (it.blk || 0) * 22) * (B ? (B.sh ? 1.4 : B.h2 ? .6 : 1) : 1);
   else if (sl === 'gloves') s += (it.hit || 0) + pl * .5;
   else if (sl === 'helm' || sl === 'belt' || sl === 'boots') s += effAc(it) * .7;
   else s += pl * .5;
@@ -196,7 +199,7 @@ function itemScore(it, h) {
   return s;
 }
 function loadoutScore(h, eq) {
-  const hh = { cls: h.cls, eq }, c = CLASSES[h.cls]; let s = 0;
+  const hh = { cls: h.cls, eq, bld: h.bld, st: h.st }, c = CLASSES[h.cls]; let s = 0;
   for (const k of EQ_KEYS) if (eq[k]) s += itemScore(eq[k], hh);
   for (const p of setBonusProps(hh)) s += STATS.includes(p.k) ? (p.v || 1) * (p.k === c.prim ? 1.6 : .6) * 1.2 : 1.8;
   return s;
@@ -345,6 +348,7 @@ function lootDrop(boost, source, o) {
   diary(`${source || 'Нашёл'}: «${it.n}» — ${RARITY[it.rar].n}${it.set ? ' (комплект!)' : ''}${worn ? '. Сразу надел!' : !reqOk(h, it) ? '. Пока не по силам — в рюкзак.' : '. Положил в рюкзак.'}`, rareCls, itemDesc(it));
   if (worn && it.curse) diary(`Надел и пожалел: проклятие ${CURSES[it.curse.k].n}! ${CURSES[it.curse.k].d}.`, 'fight');
   if (SILENT && (it.rar >= 2 || it.set)) SILENT.c.items.push(it.n);
+  bldItem(it);
   return it;
 }
 /* Предметы из сохранений v6 и старше → структура v7 */
@@ -357,7 +361,7 @@ function upgradeItem(it) {
   return it;
 }
 /* Эффекты снаряжения в бою на дороге */
-function roadFx(h) { const g = gearFx(h); return { cat: wTraits(h).cat, xatk: g.xatk, blk: g.blk * .8, dodgeN: propCnt(h, 'dodge'), acrit: g.acrit }; }
+function roadFx(h) { const g = gearFx(h), B = BUILDS[h.bld && h.bld.id], f = B ? B.fx : {}; return { cat: wTraits(h).cat, xatk: g.xatk, blk: g.blk * .8 + (f.blk || 0) * .6, dodgeN: propCnt(h, 'dodge') + (f.dodge ? 1 : 0), acrit: g.acrit, bcrit: (f.crit || 0) * .8 }; }
 /* Лавка в городе: вещи по уровню героя, сначала в пустые слоты */
 function shopPick(h, L) {
   if (R() > .6) return null;
