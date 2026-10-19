@@ -8,6 +8,7 @@ random.seed(SEED)
 INV='''()=>{const S=GAME.S, e=[]; if(!S) return ['S null']; GAME.render();
  const walk=(o,p)=>{for(const k in o){const v=o[k]; if(typeof v==='number'&&!isFinite(v)) e.push('NaN '+p+'.'+k); else if(v&&typeof v==='object') walk(v,p+'.'+k);}}; walk(S,'S');
  const g=S.god,h=S.hero,f=S.flock;
+ if(!S.oly) e.push('no oly'); else { for(const R of GAME.REGIONS){const X=S.oly.reg[R.id]; if(!X){e.push('no reg '+R.id);continue;} let sum=0; for(const k in X.s){ if(X.s[k]<0) e.push('souls<0 '+R.id+' '+k); sum+=X.s[k]; } if(sum>R.pop+1) e.push('souls>pop '+R.id+' '+sum); if(X.own&&!GAME.GOD_IDS.includes(X.own)) e.push('bad owner '+R.id); } if(!GAME.REG_BY[h.reg]) e.push('bad hero reg '+h.reg); if(document.documentElement.scrollWidth>innerWidth+1) e.push('hscroll '+document.documentElement.scrollWidth); }
  if(g.faith<-1e-9||g.faith>GAME.maxFaith()+1e-6) e.push('faith '+g.faith+'/'+GAME.maxFaith());
  if(f.fol<0) e.push('fol<0 '+f.fol); if(f.army<0) e.push('army<0'); if(h.gold<0) e.push('gold<0 '+h.gold); if(h.potions<0) e.push('potions<0');
  if(h.hp>h.maxHp) e.push('hp>max'); if(h.hp<0) e.push('hp<0 '+h.hp);
@@ -84,7 +85,7 @@ ACT='''(r)=>{const modal=document.getElementById('modal').classList.contains('on
  if(!modal) bs=bs.filter(b=>(!['speed','speedCycle','sheet','help','pause'].includes(b.dataset.act))||Math.random()<.05);
  const pri=bs.filter(b=>['bldOpen','bldPick','bldPick','dpotion','fpot','fflee','itemD','itemD','equipInv','smith','liftS','sheet','fork','fz','fz','fz','fgo','ftarget','fpow','fauto','fclose','fmanual','dgo','dgo','dgo','dauto','dclose','apost','ajoin','aleave','chatToggle','evGive','evVote','evArmy','pprev','powerGo','learnGo','fhint','dexp','heroCol','dmore','pprev','powerGo','temple','miracle','recruit','challenge','resurrect','closeEv','feat','asi','asiOpen','lift','liftS','callDun','dunTier','dunTier','smith','sheet','mtab','mtab','dheal','dleave'].includes(b.dataset.act));
  const pool=(pri.length&&r<.8)?pri:bs; if(!pool.length) return 'none';
- const b=pool[Math.floor(Math.random()*pool.length)]; b.click(); return b.dataset.act+':'+(b.dataset.arg||'');}'''
+ const b=pool[Math.floor(Math.random()*pool.length)]; if(b.click) b.click(); else b.dispatchEvent(new MouseEvent('click',{bubbles:true})); return b.dataset.act+':'+(b.dataset.arg||'');}'''
 async def main():
     async with async_playwright() as p:
         br=await p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox'])

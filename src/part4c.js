@@ -50,7 +50,7 @@ function renderFight() {
     const tele = F.tele ? `<div class="telewarn">⚠ ${esc(F.fighters.find(f => f.id === F.tele.fid).name)} ударит ${ZONE_ACC[F.tele.zone]} всех! Поставьте блок на «${ZONE_RU[F.tele.zone]}».</div>` : '';
     const ok = mine && (F.my.atk.length >= me.atkN || F.my.act) && F.my.blk.length === me.blkN;
     const ids = pIds, hNow = F.hint && F.hint.turn === F.turn;
-    const hintBtn = F.auto ? '' : `<button class="btn small hintb" data-act="fhint" ${hNow || S.god.faith < HINT_COST ? 'disabled' : ''} title="Бог подсмотрит, куда целит самый опасный противник: в верх или в низ. Раз за ход.">👁 Подсказать · ${HINT_COST}</button>`;
+    const hintBtn = F.auto ? '' : `<button class="btn small hintb" data-act="fhint" ${hNow || S.god.faith < hintCost() ? 'disabled' : ''} title="Бог подсмотрит, куда целит самый опасный противник: в верх или в низ. Раз за ход.">👁 Подсказать · ${hintCost()}</button>`;
     const hintLine = hNow ? `<div class="fhint">${esc(F.hint.txt)}${F.hint.zones.length ? ' Синие пунктирные зоны — где ждать удара.' : ''}</div>` : '';
     mid = mine ? `${tele}${low}${F.absent ? '<div class="muted">🙏 Бога нет рядом — герой бьётся сам: осторожно, без сил. Нажмите что-нибудь, чтобы взять бой под контроль.</div>' : ''}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
       ${hintLine}<div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : `⚔ Ход — выберите ${F.my.atk.length < me.atkN && !F.my.act ? (me.atkN > 1 ? `${me.atkN} зоны удара` : 'удар') : ''}${F.my.atk.length < me.atkN && !F.my.act && F.my.blk.length !== me.blkN ? ' и ' : ''}${F.my.blk.length !== me.blkN ? 'блок' : ''}`}</button>${hintBtn}
@@ -187,3 +187,4 @@ window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldSt
   MOMENTS, MOM_BY, MOM_T, startMoment, answerMoment, timeoutMoment, forkPaused, momentButtons, momCtx, forkOptions, get momClock() { return momClock; },
   PWA, parseSave, checkUpdate, APP_BUILD,
   fightHint, HINT_COST, powerModal, powerEffect, powerWhy, routePos, themeOf, awayModal, get lastAway() { return lastAway; }, sfx, get audioCtx() { return audioCtx; }, diaryDetail, diary, NAV_TABS, renderDiary, get diaryLim() { return diaryLim; } };
+Object.assign(window.GAME, OLY_EXPORTS);

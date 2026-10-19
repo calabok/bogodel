@@ -2,10 +2,10 @@
 /* =====================================================================
    5) ПРАВИЛА: вера, характеристики, предметы, бой, жизнь героя
    ===================================================================== */
-const maxFaith = () => 100 + (S.god.lvl - 1) * 15 + S.flock.temple * 20;
-const faithRegen = () => 0.02 + 0.004 * Math.sqrt(Math.max(0, S.flock.fol)) + S.flock.temple * 0.006 + eqCount('faith') * 0.005;
+const maxFaith = () => 100 + (S.god.lvl - 1) * 15 + S.flock.temple * 20 + (olyB('maxf') ? 15 : 0);
+const faithRegen = () => 0.02 + 0.004 * Math.sqrt(Math.max(0, S.flock.fol)) + S.flock.temple * 0.006 + eqCount('faith') * 0.005 + olyFaith();
 const templeCost = () => Math.round(150 * Math.pow(S.flock.temple + 1, 1.6));
-const soldierCost = () => S.god.align <= -30 ? 10 : 15;
+const soldierCost = () => (S.god.align <= -30 ? 10 : 15) - (olyB('army') ? 3 : 0);
 const obeyChance = () => clamp(0.45 + S.hero.trust * 0.0055, 0.3, 1);
 function alignTitle(a) { return a >= 60 ? 'Всеблагой' : a >= 25 ? 'Добрый' : a > -25 ? 'Себе на уме' : a > -60 ? 'Суровый' : 'Гневный'; }
 function trustLabel(t) { return t < 20 ? 'считает вас выдумкой' : t < 40 ? 'сомневается в вас' : t < 60 ? 'прислушивается' : t < 80 ? 'уважает' : 'фанатично предан'; }
@@ -50,7 +50,7 @@ function toast(msg) {
   box.appendChild(el); setTimeout(() => el.remove(), innerWidth <= 760 ? 3200 : 4200);
 }
 function addFaith(v) { S.god.faith = clamp(S.god.faith + v, 0, maxFaith()); }
-function addTrust(v) { if (v > 0) v *= (hasFeat('devout') ? 1.5 : 1) * (S.hero.cls === 'cleric' ? 1.2 : 1); S.hero.trust = clamp(Math.round((S.hero.trust + v) * 10) / 10, 0, 100); }
+function addTrust(v) { if (v > 0) v *= (hasFeat('devout') ? 1.5 : 1) * (S.hero.cls === 'cleric' ? 1.2 : 1) * (olyB('trust') ? 1.2 : 1); S.hero.trust = clamp(Math.round((S.hero.trust + v) * 10) / 10, 0, 100); }
 function shiftAlign(v) { S.god.align = clamp(S.god.align + v, -100, 100); }
 function addGxp(v) {
   const g = S.god; g.xp += Math.round(v);
@@ -162,6 +162,11 @@ function applyFx(e) {
   if (e.potion) { const pv = e.potion > 0 ? e.potion : -Math.min(h.potions, -e.potion); h.potions += pv; if (pv) out.push((pv > 0 ? '+' : '−') + Math.abs(pv) + ' ' + plural(pv, 'зелье', 'зелья', 'зелий')); }
   if (e.shield) { S.buffs.shield += e.shield * 60; out.push('🛡 щит ' + e.shield + ' мин'); }
   if (e.tprog && S.flock.temple < 10) { S.flock.templeProg += e.tprog; out.push('+' + e.tprog + ' к стройке храма'); while (S.flock.temple < 10 && S.flock.templeProg >= templeCost()) { S.flock.templeProg -= templeCost(); S.flock.temple++; diary(`⛪ Паства отстроила ${TEMPLE_NAMES[S.flock.temple - 1]} во славу нашего бога!`, 'level'); } }
+  if (e.souls && S.oly && REG_BY[h.reg]) { const id = h.reg, X = S.oly.reg[id];
+    if (e.souls > 0) { const v = Math.round(olyConvert(id, 'me', e.souls)); if (v) out.push(`+${v} душ (${REG_BY[id].s})`); }
+    else { const v = Math.min(X.s.me || 0, -e.souls); if (v >= 1) { X.s.me -= v; out.push(`−${Math.round(v)} душ`); } }
+    X.hot = 120; regOwner(id); }
+  if (e.rsouls && e.rg && S.oly && REG_BY[h.reg] && GOD_IDS.includes(e.rg)) { const v = Math.round(olyConvert(h.reg, e.rg, e.rsouls)); if (v) out.push(`+${v} душ богу ${godName(e.rg)}`); regOwner(h.reg); }
   if (e.cure && h.inj.length) { const cu = healInjuries('one'); if (cu) out.push('травма исцелена'); }
   if (e.maxhp) { h.st.con = Math.min(20, h.st.con + 1); recalcHp(); out.push('Телосложение +1'); }
   if (e.luck) { S.buffs.luck += e.luck * (e.safe ? 120 : 10); out.push(e.safe ? '🍀 удача ' + (e.luck * 2) + ' мин' : '🍀 удача'); }
@@ -306,21 +311,21 @@ function winFight() {
   const h = S.hero, m = h.monster; if (!m) return;
   const rel = clamp(1 + .25 * (m.tier - h.lvl), .4, 2);
   const xp = Math.round(xpUnit(h.lvl) * 3.2 * rel * (m.vet ? 1.6 : 1));
-  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1) * (bldId(h) === 'trick' ? 1 + BUILDS.trick.fx.gold : 1));
+  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1) * (bldId(h) === 'trick' ? 1 + BUILDS.trick.fx.gold : 1) * (olyB('gold') ? 1.1 : 1));
   h.gold += gold; let fx = `+${gold} 💰, +${xp} опыта`;
   if (SILENT) SILENT.c.wins++;
   diary(pick(['Противник «{m}» побеждён! Забрал трофеи и чувство собственной важности.', 'Победа над противником «{m}»! Победный танец исполнен (зрителей не было).',
     '«{m}» больше не встанет. Сказал напоследок что-то умное. Никто не оценил — некому было.']).split('{m}').join(m.n), 'loot', fx);
-  h.monster = null; h.state = 'road'; momFightAt = momClock; momFightN = m.n;
+  h.monster = null; h.state = 'road'; momFightAt = momClock; momFightN = m.n; olyHero('win');
   gainXp(xp); questProgress(rnd(2, 5));
   const lootP = .35 + (h.race === 'elf' ? .2 : 0) + (hasFeat('treasure') ? .2 : 0) + (S.buffs.luck > 0 ? .2 : 0) + mod(statVal('wis')) * .02;
-  if (R() < lootP) { if (R() < .3) lootDrop(clamp((m.tier - h.lvl) * .3, 0, 1) + (S.buffs.luck > 0 ? .4 : 0), 'Трофей'); else { const it = addItem(); diary(`В карманах противника нашёлся «${it.n}».`, 'loot'); } }
+  if (R() < lootP * (olyB('loot') ? 1.1 : 1)) { if (R() < .3) lootDrop(clamp((m.tier - h.lvl) * .3, 0, 1) + (S.buffs.luck > 0 ? .4 : 0), 'Трофей'); else { const it = addItem(); diary(`В карманах противника нашёлся «${it.n}».`, 'loot'); } }
 }
 
 /* ---------- Отдых ---------- */
 function shortRest() {
   const h = S.hero; if (h.shortRests <= 0 || h.state !== 'road') return false;
-  h.shortRests--; const a = healHero(h.maxHp * .3 + mod(statVal('con')) * h.lvl);
+  h.shortRests--; const a = healHero((h.maxHp * .3 + mod(statVal('con')) * h.lvl) * (olyB('rest') ? 1.25 : 1));
   diary(pick(['Присел на пенёк перевести дух. Пенёк был не против.', 'Короткий привал: перевязал раны носовым платком.', 'Перекусил сухарём и посидел минутку. Жизнь налаживается.']), '', `+${a} HP (короткий отдых)`);
   return true;
 }
@@ -340,8 +345,8 @@ function restStep() {
 }
 
 /* ---------- Город ---------- */
-const priceMul = () => (1 - .04 * mod(statVal('cha'))) * (hasFeat('trader') ? .85 : 1) * (curseOn('magnet') ? 1 : 1);
-const sellMul = () => (1 + .04 * mod(statVal('cha'))) * (hasFeat('trader') ? 1.2 : 1) * (S.buffs.trade > 0 ? 1.5 : 1);
+const priceMul = () => (1 - .04 * mod(statVal('cha'))) * (hasFeat('trader') ? .85 : 1) * (curseOn('magnet') ? 1 : 1) * (olyB('shop') ? .9 : 1);
+const sellMul = () => (1 + .04 * mod(statVal('cha'))) * (hasFeat('trader') ? 1.2 : 1) * (S.buffs.trade > 0 ? 1.5 : 1) * (olyB('sell') ? 1.15 : 1);
 function townStep() {
   const h = S.hero, L = h.lvl;
   if (h.townStep === 0) {
@@ -362,7 +367,7 @@ function townStep() {
     }
   } else if (h.townStep === 2) {
     const parts = [];
-    const price = Math.max(3, Math.round((10 + 4 * L) * priceMul())); let bought = 0;
+    const price = Math.max(3, Math.round((10 + 4 * L) * priceMul() * (olyB('potion') ? .75 : 1))); let bought = 0;
     while (h.potions < 3 && h.gold > price * 2) { h.gold -= price; h.potions++; bought++; }
     if (bought) parts.push(`Купил ${bought} ${plural(bought, 'зелье', 'зелья', 'зелий')} у подозрительного алхимика.`);
     { const sl = EQ_KEYS.filter(x => smithOk(h.eq[x])).sort((a, b) => smithCost(h.eq[a]) - smithCost(h.eq[b]))[0]; if (sl && h.gold >= smithCost(h.eq[sl]) * 4) smithUpgrade(sl, true); }
@@ -377,8 +382,8 @@ function townStep() {
       if (don > 0) { h.gold -= don; const f = Math.max(1, Math.round(don * .25 / goldScale(L))); addFaith(f); diary(`Пожертвовал ${don} 💰 на храм моего бога. Пусть порадуется.`, 'god', `+${f} веры`); }
       else diary('Помолился у алтаря моего бога. Денег нет, зато искренне.', 'god');
     }
-    h.state = 'road'; h.loc = pick(PLACES); h.townStep = 0;
-    diary(`Отправляюсь дальше. Следующая цель: ${h.loc}.`);
+    h.state = 'road'; h.townStep = 0; const nx = olyLeaveTown(); h.loc = regLoc(h.reg);
+    diary(`Отправляюсь дальше. ${nx !== h.reg ? 'Бог велит идти ' + rTo(nx) + ', так что путь лежит туда.' : 'Пока брожу ' + rIn(h.reg) + '.'}`);
     return;
   }
   h.townStep++;
@@ -388,8 +393,9 @@ function preach() {
   if (curseOn('chatty') && R() < .3) { const n = Math.min(1, Math.floor(S.flock.fol)); S.flock.fol -= n; diary('Проклятие болтливости: три часа рассказывал прохожим про свои мозоли. Один последователь сбежал.', 'god', n ? '−1 паствы' : ''); return; }
   let n = 1 + Math.max(0, mod(statVal('cha'))) + (h.cls === 'cleric' ? Math.max(0, mod(statVal('wis'))) : 0) + (h.trust > 70 ? 1 : 0) + eqCount('preach');
   if (hasFeat('preacher')) n *= 2;
-  S.flock.fol += n;
-  diary(`Рассказал прохожим о величии моего бога. ${n} ${plural(n, 'человек уверовал', 'человека уверовали', 'человек уверовали')}.`, 'god', `+${n} паствы`);
+  if (olyB('preach')) n += 1;
+  S.flock.fol += n; const sv = Math.round(olyHero('preach', n));
+  diary(`Рассказал прохожим о величии моего бога. ${n} ${plural(n, 'человек уверовал', 'человека уверовали', 'человек уверовали')}.`, 'god', `+${n} паствы${sv ? `, +${sv} душ (${REG_BY[h.reg].s})` : ''}`);
 }
 function heroStep() {
   const h = S.hero;
@@ -397,9 +403,10 @@ function heroStep() {
   if (eqHas('regen') && h.hp < h.maxHp) healHero(h.maxHp * .02);
   if (h.state === 'fight') return fightStep();
   if (h.state === 'rest') return restStep();
-  if (h.state === 'town') return townStep();
+  if (h.state === 'town') { olyHero('town'); return townStep(); }
+  if (h.state === 'road') olyHero('walk');
   if ((h.hp < h.maxHp * .4 && h.shortRests <= 0) || h.inv.length >= 10) {
-    h.state = 'town'; h.townStep = 0; h.loc = pick(TOWNS);
+    h.state = 'town'; h.townStep = 0; h.loc = olyToTown();
     diary(h.hp < h.maxHp * .4 ? `Здоровье на исходе. Иду в ${h.loc} отлежаться.` : `Рюкзак трещит по швам. Пора в ${h.loc} на рынок.`);
     return;
   }
@@ -409,7 +416,7 @@ function heroStep() {
   else if (r < fightP + .10 + (hasFeat('treasure') ? .04 : 0)) { if (R() < .2) lootDrop(0, 'Нашёл в кустах'); else { const it = addItem(); diary(pick(['Нашёл под кустом «{i}». Беру, в хозяйстве пригодится.', 'В канаве лежал «{i}». Теперь он лежит в рюкзаке.', 'Выиграл в напёрстки «{i}». Напёрсточник плакал.']).replace('{i}', it.n), 'loot'); } }
   else if (r < fightP + .14 + (hasFeat('preacher') ? .03 : 0)) preach();
   else if (r < fightP + .22) diary(R() < .5 ? pick(CLASS_ROAD[h.cls]) : pick(h.trust < 35 ? THOUGHTS_LOW : THOUGHTS_HIGH), R() < .5 ? '' : 'god');
-  else { if (R() < .3) h.loc = pick(PLACES); diary(pick(ROAD)); questProgress(Math.round(rnd(4, 9) * (h.cls === 'ranger' ? 1.3 : 1) * (hasFeat('swift') ? 1.25 : 1))); return; }
+  else { olyWalk(); diary(pick(ROAD)); questProgress(Math.round(rnd(4, 9) * (h.cls === 'ranger' ? 1.3 : 1) * (hasFeat('swift') ? 1.25 : 1))); return; }
   questProgress(rnd(1, 2));
 }
 
@@ -425,8 +432,8 @@ function usePower(id) {
   const m = h.monster, lv = h.lvl;
   switch (id) {
     case 'heal': { const a = healHero(h.maxHp * .3 * mu); addTrust(2); const cu = h.inj.length ? healInjuries('one') : 0; diary('Почувствовал тёплый свет с небес. Раны затянулись. Спасибо, о {god}!', 'god', `+${a} HP, +2 доверия${cu ? ', травма исцелена' : ''}`); break; }
-    case 'bless': S.buffs.luck += 300 * mu; addTrust(1); diary('На меня снизошло благословение! Чувствую, что сегодня всё получится.', 'god', '🍀 удача на ' + Math.round(5 * mu) + ' мин'); break;
-    case 'shield': S.buffs.shield += 300 * mu; diary('Вокруг меня засиял божий щит. Комары в ярости.', 'god', '🛡 щит на ' + Math.round(5 * mu) + ' мин'); break;
+    case 'bless': S.buffs.luck += 300 * mu * (olyB('buff') ? 1.2 : 1); addTrust(1); diary('На меня снизошло благословение! Чувствую, что сегодня всё получится.', 'god', '🍀 удача на ' + Math.round(5 * mu) + ' мин'); break;
+    case 'shield': S.buffs.shield += 300 * mu * (olyB('buff') ? 1.2 : 1); diary('Вокруг меня засиял божий щит. Комары в ярости.', 'god', '🛡 щит на ' + Math.round(5 * mu) + ' мин'); break;
     case 'bolt':
       if (m) { const d = Math.round((10 + 6 * lv) * mu * (S.god.align <= -30 ? 1.3 : 1)); m.hp -= d; addTrust(1); diary(`С небес ударила молния и поджарила противника «${m.n}» (−${d})! Мой бог на моей стороне!`, 'god'); if (m.hp <= 0) winFight(); }
       else { const d = damageHero(h.maxHp * .12, 'Убит молнией собственного бога. Ирония.'); addTrust(-4); diary('В меня ударила молния. Я ничего не сделал! Наверное, это знак. Или бог промахнулся.', 'god', `−${d} HP, −4 доверия`); }
@@ -455,7 +462,12 @@ function learn(id) {
 }
 
 /* ---------- Глас божий ---------- */
+/* v12: «иди в лес», «защищай Годград» — герой идёт в регион (ключевые слова — начала названий) */
+const NW = '(^|[^а-яёa-z])';
+const REG_KEYS = { tuman: /туман/i, les: new RegExp(NW + 'лес', 'i'), pinki: /пинк/i, boloto: /болот/i, pereval: /перевал/i, godgrad: /годград/i, dolina: /долин/i, gora: new RegExp(NW + 'гор([уаеы]|$|[^а-яё])|понедельник', 'i'), kapust: /капуст/i, zamok: /замок|замк|храпун/i, ponty: /понт/i, pustosh: /пустош/i, bereg: /берег|русал/i, ovrag: /овраг/i };
+function voiceReg(t) { t = String(t || ''); if (!/(иди|ступай|отправляйся|шагай|защищ|обороня|держи|(^|\s)во? )/i.test(t)) return null; for (const id in REG_KEYS) if (REG_KEYS[id].test(t)) return id; return null; }
 const VOICE = [
+  { re: { test: t => !!voiceReg(t) }, f: v => { const id = voiceReg(v); olySend(id); return [`Услышал «${v}». Значит, мне ${REG_BY[id].to}!`, '']; } },
   { re: /отдых|привал|поспи|спать|спи\b|ночлег/i, f: v => { const h = S.hero;
       if (h.state === 'town') { if (h.hp >= h.maxHp) return ['Бог велит отдыхать, но я и так бодр как огурец.', '']; h.townStep = 2; startLongRest(S.flock.temple >= 1 ? 'temple' : 'inn'); return [`Услышал «${v}». Иду спать — бог плохого не посоветует.`, '']; }
       if (h.state === 'road') { if (h.shortRests > 0 && h.hp < h.maxHp) { shortRest(); return [`«${v}» — понял, привал!`, '']; } startLongRest('camp'); return [`«${v}» — разбиваю лагерь прямо здесь.`, '']; }
@@ -464,7 +476,7 @@ const VOICE = [
   { re: /бей|руби|атак|убей|дерись|сражай|мочи/i, f: v => { const m = S.hero.monster; if (m) { const d = Math.round(sheet().avg * 1.5); m.hp -= d; return [`Глас велит: «${v}»! Ударил противника «${m.n}» в полную силу (−${d}).`, '']; } if (S.hero.state === 'road') { startFight(); return ['Раз бог велит драться — найду с кем!', '']; } return ['Хотел подраться, но вокруг никого подходящего.', '']; } },
   { re: /коп|клад|золот|деньг|сокров/i, f: v => { if (check('wis', 12).ok) { const g = Math.round(rnd(8, 30) * goldScale(S.hero.lvl)); S.hero.gold += g; return [`По велению «${v}» копал землю и нашёл монеты!`, `+${g} 💰`]; } return ['Копал. Выкопал червяка. Назвал его Гошей. Гоша теперь мой друг.', '']; } },
   { re: /моли|верь|храм|пропов|вера|паств/i, f: v => { if (S.hero.state === 'road' || S.hero.state === 'town') { preach(); addFaith(3); return [`Услышав «${v}», произнёс пламенную речь на пеньке.`, '+3 веры']; } return ['Помолился про себя.', '']; } },
-  { re: /город|домой|торг|прода|рын/i, f: v => { if (S.hero.state === 'road') { S.hero.state = 'town'; S.hero.townStep = 0; S.hero.loc = pick(TOWNS); return [`Бог сказал «${v}» — разворачиваюсь в ${S.hero.loc}.`, '']; } return ['Хотел в город, но сейчас немного занят.', '']; } },
+  { re: /город|домой|торг|прода|рын/i, f: v => { if (S.hero.state === 'road') { S.hero.state = 'town'; S.hero.townStep = 0; S.hero.loc = olyToTown(); return [`Бог сказал «${v}» — разворачиваюсь в ${S.hero.loc}.`, '']; } return ['Хотел в город, но сейчас немного занят.', '']; } },
   { re: /беги|отступ|спаса|удира/i, f: v => { if (S.hero.monster) { S.hero.monster = null; S.hero.state = 'road'; return ['Сбежал с поля боя по божьему велению. Это не трусость, это стратегия.', '']; } return ['Побежал. Бежал долго. От кого — так и не понял.', '']; } },
   { re: /квест|задан|иди|вперёд|вперед|цел/i, f: v => { if (S.hero.state === 'rest') { S.hero.state = 'road'; S.hero.restT = 0; } questProgress(10); return [`«${v}» — бодро зашагал к цели!`, '+10% задания']; } }
 ];

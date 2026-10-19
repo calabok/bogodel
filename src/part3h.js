@@ -26,6 +26,14 @@ function momCheck(s, dc) {
   return k;
 }
 const gs = n => Math.round(n * goldScale(S.hero.lvl));     // сколько золота это «n» на уровне героя
+/* v12: контекст региона для моментов «Войны за Олимп» */
+function momRegCtx(h) {
+  if (!S.oly || !REG_BY[h.reg]) return { reg: null };
+  const X = S.oly.reg[h.reg], pop = REG_BY[h.reg].pop; let rg = null, rv = 0;
+  for (const g in X.s) if (g !== 'me' && X.s[g] > rv) { rv = X.s[g]; rg = g; }
+  if (rv < pop * .1) rg = null;
+  return { reg: h.reg, mine: X.own === 'me', rg, rgOwn: !!(X.own && X.own !== 'me'), share: (X.s.me || 0) / pop };
+}
 function momCtx() {
   const h = S.hero, g = S.god, L = h.lvl;
   return {
@@ -33,7 +41,8 @@ function momCtx() {
     after: momClock - momFightAt < 180 ? momFightN : '', dun: momClock - momDunAt < 900, dunOk: momDunOk,
     low: h.hp < h.maxHp * .45, hurt: h.hp < h.maxHp * .8, rich: h.gold > gs(160), poor: h.gold < gs(15),
     temple: S.flock.temple, fol: S.flock.fol, faith: g.faith, align: g.align, trust: h.trust, potions: h.potions,
-    night: (() => { const x = new Date().getHours(); return x >= 22 || x < 6; })()
+    night: (() => { const x = new Date().getHours(); return x >= 22 || x < 6; })(),
+    ...momRegCtx(h)
   };
 }
 /* ---------- Пул моментов ---------- */
@@ -318,6 +327,29 @@ const MOMENTS = [
         { l: 'Освятить вашим именем', a: 1, r: ['Алтарь засиял вашим светом. Местные потянулись молиться.', { faith: 6, fol: 1 }] }],
     n: ['Помолился у алтаря как есть. Немного веры всё же дошло.', { faith: 3 }] }
 ];
+/* v12: моменты «Войны за Олимп» — про регион, где сейчас герой. Эффекты souls (+души вам здесь), rsouls (+души сопернику) */
+MOMENTS.push(
+  { id: 'rgDebate', at: 'road', w: 2, when: c => !!c.rg, t: 'На площади {regv} проповедник бога {rg} собрал толпу и громко высмеивает моего бога.',
+    o: [{ l: 'Переспорить его', s: 'cha', dc: 13, ok: ['Переспорил проповедника так, что толпа перешла к нам вместе с ним.', { souls: 30, xp: 2 }], no: ['Запутался в словах. Толпа смеялась — надо мной.', { souls: -8, rsouls: 10 }] },
+        { l: 'Явить чудо', cost: 12, a: 1, r: ['С неба на площадь опустился сияющий пирог с вашим именем. Спорить стало не о чем.', { souls: 40 }] }],
+    n: ['Прошёл мимо. Толпа проводила меня жалостливыми взглядами.', { rsouls: 15 }] },
+  { id: 'rgAltar', at: 'road', when: c => c.rgOwn, t: 'На холме {regv} стоит алтарь бога {rg}, к нему тянутся местные.',
+    o: [{ l: 'Освятить вашим именем', cost: 15, a: 1, r: ['Алтарь засиял вашим светом. Местные решили, что так и было задумано.', { souls: 35 }] },
+        { l: 'Разобрать на дрова', a: -2, s: ['str', 'con'], dc: 12, ok: ['Разобрал алтарь и сварил на нём кашу для всех. Сытые люди добрее к моему богу.', { souls: 20, gold: 3 }], no: ['Алтарь оказался крепким, а местные — злыми. Пришлось уносить ноги.', { hp: -6, rsouls: 5 }] }],
+    n: ['Поклонился чужому алтарю из вежливости. Мой бог, кажется, ревнует.', { trust: -1 }] },
+  { id: 'rgPilgrims', at: 'any', when: c => c.mine && !!c.rg, t: 'Паломники, что живут {regv}, просят защитить их от проповедников бога {rg}.',
+    o: [{ l: 'Благословить их', cost: 8, a: 1, r: ['Паломники ушли сияющими и рассказали о вас каждому встречному.', { souls: 25, trust: 1 }] },
+        { l: 'Пусть герой проводит', s: 'con', dc: 12, ok: ['Проводил паломников до дома, отгоняя проповедников палкой.', { souls: 22, xp: 2 }], no: ['Проводил, но натёр мозоли и опоздал: проповедники уже успели.', { souls: 8, hp: -5 }] }],
+    n: ['Пожелал паломникам удачи. Удача без защиты — так себе.', { souls: -10, rsouls: 10 }] },
+  { id: 'rgFest', at: 'town', when: c => c.mine, t: '{Regv} праздник в честь моего бога: песни, пироги и ярмарка.',
+    o: [{ l: 'Явить знамение', cost: 10, a: 1, r: ['Над площадью вспыхнул ваш знак. Праздник продлили ещё на три дня.', { souls: 30, fol: 2 }] },
+        { l: 'Герой скажет тост', s: 'cha', dc: 12, ok: ['Сказал тост так, что прослезились даже стражники.', { souls: 20, gold: 4 }], no: ['Тост вышел про мозоли. Но выпили всё равно за моего бога.', { souls: 6 }] }],
+    n: ['Погулял на празднике, съел три пирога.', { souls: 5, hp: 4 }] },
+  { id: 'rgEmpty', at: 'road', when: c => c.reg && !c.mine && !c.rgOwn && c.share < .2, t: 'Деревушка {regv} ещё не выбрала, какому богу молиться. Старейшина присматривается.',
+    o: [{ l: 'Проповедовать', s: ['cha', 'wis'], dc: 12, ok: ['Старейшина кивнул и велел строить часовню вашему богу.', { souls: 30, xp: 2 }], no: ['Старейшина уснул посреди проповеди. Половина деревни — тоже.', { souls: 8 }] },
+        { l: 'Пролить благодатный дождь', cost: 10, a: 1, r: ['Пошёл тёплый дождь, урожай спасён. Деревня теперь ваша.', { souls: 35 }] }],
+    n: ['Помахал старейшине и пошёл дальше. Старейшина помахал богу соседа.', {}] }
+);
 const MOM_BY = {}; for (const m of MOMENTS) MOM_BY[m.id] = m;
 
 /* ---------- Механика ---------- */
@@ -342,6 +374,7 @@ function startMoment(id) {
   let m = id && MOM_BY[id], c = momCtx();
   if (!m) { const p = pickMoment(); if (!p) return false; m = p.m; c = p.c; }
   const v = { m: c.after || 'противник' };
+  if (c.reg) { v.reg = REG_BY[c.reg].n; v.regv = REG_BY[c.reg].v; v.Regv = v.regv[0].toUpperCase() + v.regv.slice(1); v.rgId = c.rg || (S.oly.reg[c.reg].own !== 'me' ? S.oly.reg[c.reg].own : null) || ''; v.rg = v.rgId ? godName(v.rgId) : 'чужой бог'; }
   const txt = tx(typeof m.t === 'function' ? m.t(v) : m.t, v);
   S.momHist = (S.momHist || []).filter(x => x !== m.id); S.momHist.push(m.id); if (S.momHist.length > MOM_HIST) S.momHist.shift();
   S.fork = { m: m.id, t: MOM_T, T: MOM_T, txt, v };
@@ -362,7 +395,7 @@ function momApply(m, k, how) {
     else if (o.s) { const k2 = momCheck(bestOf(o.s), o.dc || 12); res = k2.ok ? mo(o.ok[0], o.ok[1], k2) : mo(o.no[0], o.no[1], k2); }
     else res = mo(o.r[0], o.r[1]);
   }
-  const e = Object.assign({ safe: 1 }, res.e); if (e.xp > 0) e.xp *= MOM_XP;
+  const e = Object.assign({ safe: 1 }, res.e); if (e.xp > 0) e.xp *= MOM_XP; if (e.rsouls) e.rg = v.rgId;
   const fx = applyFx(e);
   const label = isN ? NOTHING : momLabel(o);
   const pre = how === 'self' ? `Бог молчал — решил сам: «${label}». ` : how === 'god' ? `«${label}». ` : '';

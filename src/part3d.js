@@ -195,7 +195,7 @@ function beginBattle(kind, allies, enemies, o) {
   allies.forEach(u => u.team = 0); enemies.forEach(u => u.team = 1);
   const F = { id: 'b' + Date.now().toString(36) + rnd(100, 999), kind, title: o.title || 'Бой', fighters: allies.concat(enemies), turn: 0, phase: 'intro', t: 3, T: 3, prep: 0,
     my: { atk: [], blk: [], target: null }, choices: {}, ready: false, log: [], auto: !!S.fightAuto || !!o.auto, powersLeft: 3, usedTurn: 0,
-    result: null, rew: '', win: null, rivalGod: o.rivalGod || null, ctx: o.ctx || {}, tele: null, lastAtk: {}, lastBlk: {}, lastTarget: {}, stuck: 0 };
+    result: null, rew: '', win: null, rivalGod: o.rivalGod || null, region: o.region || null, ctx: o.ctx || {}, tele: null, lastAtk: {}, lastBlk: {}, lastTarget: {}, stuck: 0 };
   S.fight = F; F._tg = {};
   /* подготовка: бог рядом — есть время осмотреться и выбрать зоны; без бога герой начинает почти сразу */
   if (!SILENT && !F.auto && godPresent()) { F.T = F.t = PREP_T; F.prep = 1; }
@@ -430,13 +430,14 @@ function fightZone(arg) {
    Стоит веры, раз за ход, не считается силой. Выбор противника фиксируется сразу, так что подсказка честная, но
    покрывает 3 зоны из 5 — блок на 2 соседние всё равно остаётся угадыванием. */
 const HINT_COST = 6;
+const hintCost = () => HINT_COST - (olyB('hint') ? 3 : 0);
 function fightHint() {
   const F = S.fight; if (!F || F.phase !== 'turn') return toast('Подсказка — только во время хода.');
   if (F.auto) return toast('В автобое герой не слушает подсказок.');
   const me = fMe(F); if (!me || !me.alive) return toast('Ваш герой уже не в строю.');
   if (F.hint && F.hint.turn === F.turn) return toast('Подсказка на этот ход уже есть.');
-  if (S.god.faith < HINT_COST) return toast('Не хватает веры.');
-  S.god.faith -= HINT_COST; addGxp(1);
+  if (S.god.faith < hintCost()) return toast('Не хватает веры.');
+  S.god.faith -= hintCost(); addGxp(1);
   const att = [];
   for (const e of fEnemies(F, me)) {
     if (!e.alive) continue;
@@ -562,6 +563,7 @@ function endBattle0(F, winTeam) {
       rivals.reportDuel({ godId: G.godId, playerWon: won });
       if (won) { S.stats.dwins++; const n = rnd(2, 5) + Math.floor(S.flock.army / 5); S.flock.fol += n; addTrust(5); addGxp(30); fx.push(`+${n} паствы`, '+5 доверия'); }
       else { const g = Math.floor(h.gold * .1), n = Math.min(Math.floor(S.flock.fol), rnd(1, 3)); h.gold -= g; S.flock.fol -= n; addTrust(-3); addGxp(12); fx.push(`−${g} 💰`, `−${n} паствы`, '−3 доверия'); }
+      if (F.region && S.oly) { const r = olyDuelResult(F.region, G.godId, won); if (r) fx.push(r); }
     } else addGxp(won ? 12 : 5);
     if (fat < 1) fx.push(`усталость: награда ×${fat.toFixed(2)}`);
     F.result = won ? `🏆 Победа! ${F.kind === 'godduel' ? 'Бог ' + F.rivalGod.name + ' посрамлён.' : ''}` : `💔 Поражение. ${F.kind === 'godduel' ? 'Бог ' + F.rivalGod.name + ' злорадствует.' : 'Бывает.'}`;
@@ -582,7 +584,7 @@ function startMonsterFight() {
   beginBattle('monster', [heroUnit()], [u], { title: `Ручной бой: ${m.n}`, intro: 'Бог берёт бой под контроль!' });
   return true;
 }
-async function startGodDuel(godId) {
+async function startGodDuel(godId, regId) {
   if (!heroFree() || S.hero.state !== 'road') return false;
   const h = S.hero, st = S; h.state = 'duel'; duelPending = true;
   let opp;
@@ -590,10 +592,11 @@ async function startGodDuel(godId) {
   if (S !== st || h.state !== 'duel' || S.fight || S.dun) { if (S === st && h.state === 'duel' && !S.fight) h.state = 'road'; return false; }
   const me = heroUnit(), foe = botUnit({ bld: opp.bld, name: opp.hero, race: opp.race, cls: opp.cls, lvl: opp.heroLvl, rating: 1000 + opp.lvl * 30 });
   me.avg *= 1 + Math.min(S.flock.army, 10) * .02; foe.avg *= 1 + Math.min(opp.army || 0, 10) * .02;
-  beginBattle('godduel', [me], [foe], { title: `Дуэль богов: ${S.god.name} против ${opp.god}`, rivalGod: { godId: opp.godId, name: opp.god, pers: opp.pers, lvl: opp.lvl, faith: 50 + opp.lvl * 12, left: 3 },
+  const RG = regId && REG_BY[regId] ? regId : null;
+  beginBattle('godduel', [me], [foe], { title: `Дуэль богов${RG ? ' за ' + REG_BY[RG].s : ''}: ${S.god.name} против ${opp.god}`, region: RG, rivalGod: { godId: opp.godId, name: opp.god, pers: opp.pers, lvl: opp.lvl, faith: 50 + opp.lvl * 12, left: 3 },
     intro: `${opp.hero} (${RACES[opp.race].n.toLowerCase()}-${CLASSES[opp.cls].n.toLowerCase()}) говорит, что ваш бог — «так себе».` });
   S.stats.duels++; S.timers.duel = Math.max(S.timers.duel, 1200);
-  diary(`⚔ Встретил героя по имени ${opp.hero} (его бог — ${opp.god}). Дуэль богов!`, 'duel');
+  diary(RG ? `⚔ Бог ${opp.god} принял вызов: дуэль за души региона «${REG_BY[RG].n}»! Против меня — ${opp.hero}.` : `⚔ Встретил героя по имени ${opp.hero} (его бог — ${opp.god}). Дуэль богов!`, 'duel');
   toast('⚔ Дуэль богов! Выбирайте удар и блок.');
   return true;
 }

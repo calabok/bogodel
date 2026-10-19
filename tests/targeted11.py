@@ -25,7 +25,7 @@ async def main():
             ctx,pg=await newpage(br,W)
             await pg.evaluate("(()=>{const G=GAME,S=G.S; S.god.lvl=4; S.god.sp=1; Object.assign(S.god.skills,{heal:1,bolt:1,rain:1}); G.simulateAway(2*3600); S.paused=true;})()"); await pg.evaluate(CLEAN)
             labels=await pg.evaluate("[...document.querySelectorAll('#mnav button')].map(b=>b.textContent.replace(/[^А-Яа-яЁё]/g,''))")
-            ok(f'{W}px: bottom nav = Силы|Паства|Арена|Пантеон|Герой, visible at bottom', labels==['Силы','Паства','Арена','Пантеон','Герой'] and await pg.evaluate("(()=>{const r=document.getElementById('mnav').getBoundingClientRect(); return r.height>=48&&r.bottom<=innerHeight+1&&r.bottom>innerHeight-30})()"), labels)
+            ok(f'{W}px: bottom nav = Силы|Паства|Арена|Олимп|Герой, visible at bottom', labels==['Силы','Паства','Арена','Олимп','Герой'] and await pg.evaluate("(()=>{const r=document.getElementById('mnav').getBoundingClientRect(); return r.height>=48&&r.bottom<=innerHeight+1&&r.bottom>innerHeight-30})()"), labels)
             bad=[]; small=[]
             for t,probe in [('powers','.pcard'),('flock','[data-act=temple]'),('arena','[data-act=apost]'),('gods','#rightBody [data-act=chatToggle]'),('hero','#rightBody .stgrid' if W>760 else '#diary .entry')]:
                 await pg.click(f'#mnav [data-arg={t}]'); await pg.wait_for_timeout(120)
@@ -65,7 +65,7 @@ async def main():
         ok('390px: «Закрыть» closes the modal', not await pg.evaluate("document.getElementById('modal').classList.contains('on')"))
         await pg.click('#mnav [data-arg=gods]'); await pg.click('#rightBody [data-act=chatToggle]'); await pg.wait_for_timeout(150)
         r=await pg.evaluate("(()=>{const p=document.querySelector('#chatDock .chatPanel').getBoundingClientRect(); const x=document.querySelector('.chatX').getBoundingClientRect(); return {w:p.width,h:p.height,iw:innerWidth,ih:innerHeight,x:x.height, inp:!!document.getElementById('chatIn').offsetParent}})()")
-        ok('390px: chat reachable from «Пантеон», opens full-screen with big close', r['w']==r['iw'] and r['h']>=r['ih']-1 and r['x']>=40 and r['inp'], r)
+        ok('390px: chat reachable from «Олимп», opens full-screen with big close', r['w']==r['iw'] and r['h']>=r['ih']-1 and r['x']>=40 and r['inp'], r)
         await pg.click('.chatX'); await pg.wait_for_timeout(80)
         r={'dun':await pg.evaluate("!!document.querySelector('#rightBody [data-act=callDun]')")}
         await pg.click('#mnav [data-arg=hero]'); await pg.click('#colHero [data-act=sheet]'); await pg.wait_for_timeout(120)
@@ -74,7 +74,7 @@ async def main():
         await pg.click('#mnav [data-arg=flock]'); r['temple']=await pg.evaluate("!!document.querySelector('#rightBody [data-act=temple]')&&!!document.querySelector('#rightBody [data-act=miracle]')&&!!document.querySelector('#rightBody [data-act=recruit]')")
         await pg.click('header [data-act=help]'); r['help']=await pg.evaluate("/Где что/.test(document.getElementById('modal').innerText)"); await pg.evaluate("GAME.closeModal()")
         r['debug']=await pg.evaluate("(()=>{document.querySelector('header [data-act=settings]').click(); const n=document.querySelectorAll('#modal [data-act=dbg]').length; GAME.closeModal(); return n>=10})()")
-        ok('390px: dungeons (Пантеон), items/gear (📋), temple/miracles/army (Паства), help (❔), debug (⚙) all reachable', all(r.values()), r)
+        ok('390px: dungeons (Олимп), items/gear (📋), temple/miracles/army (Паства), help (❔), debug (⚙) all reachable', all(r.values()), r)
         await pg.evaluate("(()=>{const G=GAME,S=G.S; S.hero.state='road'; G.startFight(); G.startMonsterFight(); S.ui.mtab='powers'; G.render();})()"); await pg.wait_for_timeout(100)
         r=await pg.evaluate("({ban:!!document.querySelector('#mBanner .mban'), dot:!!document.querySelector('#mnav button[data-arg=hero].dot')})")
         await pg.click('#mBanner [data-act=mtab]'); await pg.wait_for_timeout(150)
@@ -223,7 +223,7 @@ async def main():
         r=await pg.evaluate("""(()=>{const G=GAME; const old=JSON.parse(JSON.stringify(G.S)); old.ui={mtab:'diary'}; old.tab='flock'; delete old.dseq; old.diary=[{tm:'10:00',x:'a',c:'',f:''},{tm:'09:00',x:'b',c:'level',f:''},{tm:'08:00',x:'c',c:'',f:'',i:3}];
           const a=G.sanitize(JSON.parse(JSON.stringify(old))); old.ui={mtab:'more'}; const b=G.sanitize(JSON.parse(JSON.stringify(old))); old.ui={mtab:'powers',junk:1}; old.tab='weird'; const c=G.sanitize(JSON.parse(JSON.stringify(old)));
           const ids=a.diary.map(e=>e.i); return {a:a.ui.mtab, b:b.ui.mtab, c:c.ui.mtab, ctab:c.tab, junk:'junk' in c.ui, uniq:new Set(ids).size===3&&ids.every(x=>x>0), seq:a.dseq>Math.max(...ids), snd:a.ui.snd===false, col:a.ui.heroCol===false}})()""")
-        ok('migration: old tabs «Дневник»→Герой, «Ещё»→Паства/Пантеон; unknown tab → Силы; diary entries get unique ids; new ui fields default off', r['a']=='hero' and r['b']=='flock' and r['c']=='powers' and r['ctab']=='powers' and not r['junk'] and r['uniq'] and r['seq'] and r['snd'] and r['col'], r)
+        ok('migration: old tabs «Дневник»→Герой, «Ещё»→Паства/Олимп; unknown tab → Силы; diary entries get unique ids; new ui fields default off', r['a']=='hero' and r['b']=='flock' and r['c']=='powers' and r['ctab']=='powers' and not r['junk'] and r['uniq'] and r['seq'] and r['snd'] and r['col'], r)
         r=await pg.evaluate("(()=>{const G=GAME,S=G.S; S.hero.state='road'; S.fork=null; G.startMoment('troll'); S.ui.mtab='hero'; G.render(); const c=document.querySelector('#forkBox .fork.mom'); const cr=c.getBoundingClientRect(); const bs=[...c.querySelectorAll('[data-act=fork]')].map(b=>b.getBoundingClientRect()); return {vis:!!c.offsetParent, fit:cr.right<=innerWidth+1&&cr.left>=-1, minH:Math.min(...bs.map(b=>b.height)), accent:getComputedStyle(c,'::before').height}})()")
         ok('moment card in the new design: themed accent strip, fits 390px, buttons ≥44px', r['vis'] and r['fit'] and r['minH']>=44 and r['accent']=='5px', r)
         meta=await pg.evaluate("document.querySelector('meta[name=viewport]').content")

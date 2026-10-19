@@ -25,6 +25,7 @@ function setHTML(el, html) {
 const pct = (a, b) => clamp(b ? a / b * 100 : 0, 0, 100).toFixed(1) + '%';
 const bar = (cls, a, b, id) => `<div class="bar ${cls}"><i ${id ? 'id="' + id + '"' : ''} style="width:${pct(a, b)}"></i></div>`;
 const faithChip = () => `<span class="faithChip" title="Текущая вера">🔥 ${Math.floor(S.god.faith)} / ${maxFaith()}</span>`;
+function olyChip() { const O = S.oly, r = olyRank(); return `<button class="linkbtn olyc" data-act="mtab" data-arg="gods" title="Война за Олимп: ваше место в сезоне ${O.n} и сколько осталось">🏛 #${r}${r <= OLY_K.thrones ? ' ' + THRONES[r - 1][0] : ''} · ${fmtLeft(O.end - olyNow())}</button>`; }
 const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене ⚔', rest: 'отдыхает 💤', dungeon: 'в пещере 🏰' };
 /* ---------- Кукла героя (как в БК) и карточка предмета ---------- */
 const itemIc = it => it.slot === 'weapon' && WCAT[it.cat] ? WCAT[it.cat].ic : SLOT_IC[it.slot];
@@ -89,7 +90,10 @@ function renderHeader() {
   if (B.dataset.theme !== th) { B.dataset.theme = th; const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = th === 'evil' ? '#1e0c10' : th === 'neutral' ? '#121a28' : '#221a3e'; }
   $('hAv').textContent = GOD_AV[at] || '🙂';
   $('hGod').textContent = g.name;
-  $('hTitle').textContent = `${at} · паства ${Math.floor(S.flock.fol)}`;
+  const rw = S.oly && S.oly.rew;
+  $('hTitle').textContent = rw ? `${rw.ic} ${rw.title}` : `${at} · паства ${Math.floor(S.flock.fol)}`;
+  const av = $('hAv'), fc = 'gav' + (rw ? ' fr ' + rw.frame : ''); if (av.className !== fc) av.className = fc;
+  B.classList.toggle('olyF', !!rw); if (rw) { if (B.dataset.frame !== rw.frame) B.dataset.frame = rw.frame; } else if (B.dataset.frame) delete B.dataset.frame;
   const rate = faithRegen() * 60;
   setHTML($('hFaith'), `🔥 ${Math.floor(g.faith)} / ${maxFaith()}<span class="rate">+${rate >= 10 ? Math.round(rate) : rate.toFixed(1)}/мин</span>`);
   $('hFaithBar').style.width = pct(g.faith, maxFaith());
@@ -137,7 +141,7 @@ function renderHero() {
   const col = !!S.ui.heroCol;
   let html = `<div class="hc-top"><div class="hc-av">${CLS_IC[h.cls] || '🧔'}</div><div class="hc-id"><h2>${esc(h.name)}</h2><div class="hc-sub">${RACES[h.race].n} · ${CLASSES[h.cls].n} · ур. ${h.lvl}</div></div>
     <div class="hc-btns"><button class="btn small ghost" data-act="sheet" title="Характеристики, снаряжение, рюкзак">📋<span class="hideXS"> Герой</span></button><button class="btn small ghost hcol" data-act="heroCol" aria-expanded="${!col}" title="${col ? 'Развернуть карточку' : 'Свернуть карточку'}">${col ? '▾' : '▴'}</button></div></div>
-  <div class="hc-now"><span>📍 ${esc(h.loc)}</span><span class="st">${act}</span>${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
+  <div class="hc-now"><span>📍 ${S.oly && S.oly.reg[h.reg] && S.oly.reg[h.reg].own ? godDot(S.oly.reg[h.reg].own) : ''}${esc(h.loc)}</span><span class="st">${act}</span>${S.oly ? olyChip() : ''}${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
   ${routeHTML(h)}
   ${m && !S.fight ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div><div class="btns" style="margin-top:4px"><button class="btn small red" data-act="fmanual">🎯 Взять бой под контроль</button></div>` : ''}
   ${h.state === 'dead' ? `<div class="deadbox">💀 Герой мёртв. Встанет сам через ${fmtDur(Math.max(60, h.deadT))} (и обидится).<div class="btns"><button class="btn" data-act="resurrect" ${S.god.faith < 30 ? 'disabled' : ''}>✨ Воскресить · 30</button></div></div>` : ''}
@@ -204,8 +208,8 @@ function renderFeat() {
   <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам.${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${pf}${body}</div>`);
 }
 /* ---------- v11: дневник — живая лента. Ключ записи — e.i; DOM ограничен, новые записи добавляются без перерисовки всей ленты ---------- */
-const D_BIG = ['level', 'death', 'rare', 'fork', 'event', 'duel'], D_MED = ['fight', 'loot'];
-const D_IC = { fight: '⚔', loot: '💰', rare: '💎', level: '⭐', death: '💀', fork: '✨', event: '🌍', duel: '🤺', god: '🙏' };
+const D_BIG = ['level', 'death', 'rare', 'fork', 'event', 'duel'], D_MED = ['fight', 'loot', 'oly'];
+const D_IC = { fight: '⚔', loot: '💰', rare: '💎', level: '⭐', death: '💀', fork: '✨', event: '🌍', duel: '🤺', god: '🙏', oly: '🏛' };
 const D_PAGE = 40;
 let diaryLim = D_PAGE, diaryOpen = new Set(), diaryTopSeen = 0, diaryMoreV = -1;
 function fxSplit(f) { return String(f || '').split(/,\s+(?![^()]*\))/).filter(Boolean); }
@@ -374,7 +378,7 @@ function powerModal(id) {
     <div class="muted">У вас ${faithChip()}${why && L ? ` · <b style="color:#8c2e20">${esc(why)}</b>` : ''}</div>
     <div class="btns">${L ? `<button class="btn green" data-act="powerGo" data-arg="${id}" ${dis ? 'disabled' : ''}>✔ Применить · ${c}</button>` : ''}${canLearn ? `<button class="btn" data-act="learnGo" data-arg="${id}">${L ? 'Улучшить ★' : 'Изучить ★'}</button>` : !L ? `<span class="muted">${esc(why)}</span>` : ''}<button class="btn ghost" data-act="closeModal">Отмена</button></div></div>`);
 }
-const TAB_H = { powers: '✨ Силы', flock: '⛪ Паства', arena: '🤺 Арена', gods: '⚜ Пантеон', hero: '🧔 Герой' };
+const TAB_H = { powers: '✨ Силы', flock: '⛪ Паства', arena: '🤺 Арена', gods: '🏛 Олимп', hero: '🧔 Герой' };
 function renderRight() {
   const g = S.god, fl = S.flock, mob = innerWidth <= 760, tab = mob ? S.ui.mtab : S.tab;
   let html = '';
@@ -384,28 +388,18 @@ function renderRight() {
     html = `<div class="row" style="margin-bottom:6px"><span>Доступно для вложений</span>${faithChip()}</div>
       <div class="box"><h3>👥 Паства</h3><div class="big">${Math.floor(fl.fol)} 👥</div>
       <div class="muted">≈ ${Math.round(faithRegen() * 3600)} веры в час · запас веры ${Math.floor(g.faith)}/${mf}</div>${bar('faith', g.faith, mf)}</div>
-      <div class="box"><h3>⛪ Храм — ур. ${fl.temple}${fl.temple ? ' (' + TEMPLE_NAMES[fl.temple - 1] + ')' : ''}</h3>
+      <div class="box"><h3>⛪ Главный храм — ур. ${fl.temple}${fl.temple ? ' (' + TEMPLE_NAMES[fl.temple - 1] + ')' : ''}</h3>
       <div class="muted">Каждый уровень: больше веры и её запас, ночлег героя, +КД.</div>
       ${fl.temple < 10 ? `<div class="stat"><label><span>Стройка до ур. ${fl.temple + 1}</span><span>${Math.floor(fl.templeProg)} / ${tc}</span></label>${bar('faith', fl.templeProg, tc)}</div>
       <div class="btns">${[10, 50].map(n => `<button class="btn small" data-act="temple" data-arg="${n}" ${g.faith < n ? 'disabled' : ''}>Вложить ${n}</button>`).join('')}<button class="btn small" data-act="temple" data-arg="all" ${g.faith < 1 ? 'disabled' : ''}>Вложить всё (${Math.floor(g.faith)})</button></div>` : '<div class="muted"><b>Величайший храм мира построен.</b></div>'}</div>
       <div class="box"><h3>🌈 Чудеса</h3>
       <div class="btns">${MIRACLES.map(m => `<button class="btn small" data-act="miracle" data-arg="${m.id}" ${g.faith < m.cost ? 'disabled' : ''}>${m.n} (${m.cost})</button>`).join('')}</div></div>
       <div class="box"><h3>⚔ Божья армия — ${fl.army} солдат</h3>
-      <div class="muted">Солдат: ${soldierCost()} веры и 2 последователя. Помогает в дуэлях и событиях.</div>
+      <div class="muted">Солдат: ${soldierCost()} веры и 2 последователя. Штурмует регионы на карте Олимпа, сторожит ваши земли (каждый солдат −1% к чужим штурмам, до 30%), помогает в дуэлях и событиях.</div>
       <div class="btns"><button class="btn small red" data-act="recruit" data-arg="1" ${g.faith < soldierCost() || fl.fol < 2 ? 'disabled' : ''}>Набрать 1 (${soldierCost()})</button><button class="btn small red" data-act="recruit" data-arg="5" ${g.faith < soldierCost() * 5 || fl.fol < 10 ? 'disabled' : ''}>Набрать 5 (${soldierCost() * 5})</button></div></div>`;
   } else if (tab === 'arena') html = arenaTabHTML();
   else if (tab === 'hero') html = `<div class="sheet inl">${sheetHTML(true)}</div>`;
-  else {
-    const st = S.stats, C = S.chat, last = C.msgs.slice(-3);
-    html = `<div class="box"><h3>${GOD_AV[alignTitle(g.align)] || ''} ${esc(g.name)} — ${alignTitle(g.align).toLowerCase()}</h3><div class="stat"><label><span>Уровень бога ${g.lvl}</span><span>${g.xp}/${gxpNext(g.lvl)}</span></label>${bar('gxp', g.xp, gxpNext(g.lvl))}</div>
-      <div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div>
-      <div class="btns"><button class="btn small ghost" data-act="help">❔ Как играть</button><button class="btn small ghost" data-act="settings">⚙ Настройки и сохранение</button></div></div>
-      <div class="box"><h3>💬 Чат богов${C.unread ? ` <span class="faithChip" style="background:#b8412f">${C.unread} новых</span>` : ''}</h3>${last.map(m => `<div class="cm ${m.c}"><span class="tm">${esc(m.tm)}</span>${m.c === 'sys' ? esc(m.x) : `<b>${esc(m.from)}:</b> ${esc(m.x)}`}</div>`).join('') || '<div class="muted">Тихо.</div>'}
-      <div class="btns"><button class="btn small" data-act="chatToggle">${C.open ? '✕ Закрыть чат' : '💬 Открыть чат'}</button></div></div>
-      ${godsDunHTML()}
-      <div class="box"><h3>⚜ Соперники</h3>${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}</div>`;
-  }
+  else html = olyTabHTML();
   setHTML($('rightHead'), mob ? '' : `<h2 class="rph">${TAB_H[tab] || ''}</h2>`);
   if (mob && tab === 'hero') return;
   setHTML($('rightBody'), html);
@@ -424,7 +418,7 @@ function renderNav() {
   const p2 = $('pauseBtn2'); if (p2) { p2.textContent = S.paused ? '▶' : '⏸'; p2.classList.toggle('on', S.paused); }
   B.classList.toggle('rm', reducedMotion()); B.classList.toggle('busyF', !!(S.fight || S.dun));
 }
-function render() { renderNav(); renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
+function render() { renderNav(); renderHeader(); renderHero(); renderOlyBox(); refreshRegion(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
 
 /* ---------- Модальные окна ---------- */
 const DUN_TIER_KEYS = ['easy', 'normal', 'hard'];
@@ -472,7 +466,8 @@ function help() {
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
   <p><b>😇 Характер бога.</b> Добрые поступки и силы света сдвигают его к «доброму» (силы света на 20% дешевле, паства растёт сама), кары — к «гневному» (кары дешевле, молния сильнее, солдаты дешевле).</p>
-  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Пантеон | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Чат, пещеры и соперники — в «Пантеоне», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
+  <p><b>🏛 Война за Олимп.</b> Мир поделён на 14 регионов (лес, города, горы, болота, берег…), в каждом свои души. Регион принадлежит богу, у которого там больше всего верующих (не меньше 12% жителей), и даёт ему <b>+9 веры в час</b> и <b>свой бонус</b> (лес — добыча чаще, Годград — покупки дешевле, Понты — продажа дороже и т. д.). Ваши души растут, когда <b>герой ходит и проповедует в регионе</b> и побеждает там врагов; ещё помогают <b>храмы региона</b> (обращают сами и защищают), <b>штурм армией</b> (солдаты из «Паствы») и <b>дуэль богов за регион</b>. Отправить героя: кнопка на регионе или глас «иди в лес». Восемь богов-соперников тоже обращают души и иногда штурмуют ваши земли — в дневнике будет «⚠ Бог … обращает души в …». Без присмотра души остывают медленно (около 6% в сутки), так что день отсутствия не страшен. <b>Сезон — 4 недели</b>: каждый час вы получаете очки влияния (ОВ) за свои регионы и всех своих душ. В конце <b>топ-7 занимают троны Олимпа</b>: титул, рамка и «⚡ Олимпийский дар» на весь следующий сезон; затем карта сбрасывается, а герой, вещи, главный храм и армия остаются. Карта, таблица и хроника — во вкладке «🏛 Олимп».</p>
+  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Олимп | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Карта мира, таблица сезона, чат, пещеры и соперники — в «Олимпе», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
   <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Кнопка «👁 Подсказать» (6 веры, раз за ход) подсмотрит, бьёт ли самый опасный враг в верх или в низ. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
   <p><b>🤺 Арена</b> — вкладка с заявками: дуэли 1нс1, группы 3нс3 и 5нс5, хаотичные бои. Принимайте чужие или подавайте свои. За бои — опыт, золото и рейтинг; после поражения — травмы (штраф к характеристике, лечатся временем, отдыхом и храмом). <b>⚜ Дуэль богов</b> — тот же бой, но соперничающий бог тоже колдует.</p>
   <p><b>🏰 Пещеры</b> — карта 5×5: ведите отряд по комнатам, ищите 🗝 ключ и бейте 👑 босса. Это испытание: бесплатного лечения почти нет (один ⛲ источник и жрец), чем глубже — тем злее, 💀 элита на половине здоровья звереет. Боссы <b>объявляют</b> страшный удар по зоне — поставьте туда блок, иначе удар в 2,5 раза сильнее. Можно лечить отряд силой «Исцеление» между комнатами (раз за пещеру) и <b>отступить с добычей</b> (60% золота и опыта, все вещи). Если отряд разбит — героя вынесут, оставив 30%. Награда за босса — гарантированная редкая вещь и много опыта. Пещера не чаще раза в 4 часа. <b>💬 Чат</b> — пока с ботами, но они стараются. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
@@ -492,7 +487,7 @@ function settings() {
   <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">✨ Момент сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
   <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Пещера сейчас</button>
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
-  <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
+  <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button><button class="btn small blue" data-act="dbg" data-arg="d3">⏩ +3 дня</button><button class="btn small blue" data-act="dbg" data-arg="season">🏛 Конец сезона</button></div>
   <h3 style="margin-top:14px">Опасная зона</h3>
   <div class="btns"><button class="btn small red" data-act="reset">Начать заново (стереть сохранение)</button></div></div>`);
 }
@@ -501,7 +496,7 @@ function newGame() {
   const race = RACES[$('inRace').value] ? $('inRace').value : 'human', cls = CLASSES[$('inCls').value] ? $('inCls').value : 'warrior';
   S = defaultState(g, hn, race, cls); S.hero.maxHp = calcMaxHp(S.hero); S.hero.hp = S.hero.maxHp;
   diary(`Очнулся в канаве у Годграда. Помню только своё имя, что я ${RACES[race].n.toLowerCase()}-${CLASSES[cls].n.toLowerCase()} и что у меня есть бог — {god}. Пора совершать подвиги!`, 'god');
-  diary(`Взял первое задание: «${S.hero.quest.n}».`); initBuild(S.hero); closeModal(); save();
+  diary(`Взял первое задание: «${S.hero.quest.n}».`); initBuild(S.hero); S.oly = olyNewState(Date.now()); S.hero.loc = REG_BY[S.hero.reg].n; closeModal(); save();
 }
 
 /* ---------- Действия ---------- */
@@ -554,7 +549,8 @@ const ACT = {
     else if (a === 'monster') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startFight(); startMonsterFight(); }
     else if (a === 'dun') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
     else if (a === 'feat') { S.featQueue++; offerFeat(); }
-    else if (a === 'h1' || a === 'h8') { if (simulateAway(a === 'h1' ? 3600 : 8 * 3600, 'перемотка времени')) awayModal(); }
+    else if (a === 'h1' || a === 'h8' || a === 'd3') { if (simulateAway(a === 'h1' ? 3600 : a === 'h8' ? 8 * 3600 : 3 * 86400, 'перемотка времени')) awayModal(); }
+    else if (a === 'season') { S.oly.end = Date.now() - 1; olySeasonCheck(); }
     else if (a === 'event') startEvent(); else if (a === 'faith') addFaith(100); }
 };
 /* v11: какие действия игрока считаются «вмешательством бога» — их записи в дневнике подсвечиваются */
@@ -569,7 +565,7 @@ document.addEventListener('click', e => {
   try { f(b.dataset.arg); } finally { userActing = 0; }
   if (S) render();
 });
-document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.classList && e.target.classList.contains('entry') && e.target.dataset.act === 'dexp') { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && $('modal').classList.contains('on') && S) closeModal(); });
+document.addEventListener('keydown', e => { const t = e.target; if ((e.key === 'Enter' || e.key === ' ') && t && t.getAttribute && t.getAttribute('role') === 'button' && t.dataset && t.dataset.act && t.tagName !== 'BUTTON') { e.preventDefault(); t.dispatchEvent(new MouseEvent('click', { bubbles: true })); } if (e.key === 'Escape' && $('modal').classList.contains('on') && S) closeModal(); });
 $('voiceIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { userActing = 1; try { ACT.voice(); } finally { userActing = 0; } render(); } });
 window.addEventListener('beforeunload', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });

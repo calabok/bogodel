@@ -79,7 +79,7 @@ function defaultState(god, hero, race, cls) {
     hero: { name: hero, race, cls, st: genStats(cls, race), feats: [], lvl: 1, xp: 0, hp: 30, maxHp: 30, gold: 30, potions: 1,
       eq: starterEq(cls),
       inv: [], loc: 'Годград', state: 'road', monster: null, quest: newQuest(), trust: 40, deadT: 0, townStep: 0,
-      restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [] },
+      restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [], reg: 'godgrad' },
     flock: { fol: 3, temple: 0, templeProg: 0, army: 0 },
     buffs: { luck: 0, shield: 0, trade: 0 },
     timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
@@ -87,7 +87,8 @@ function defaultState(god, hero, race, cls) {
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], momHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
-    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero', heroCol: false, snd: false }, dseq: 0, lastSeen: Date.now()
+    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero', heroCol: false, snd: false }, dseq: 0, lastSeen: Date.now(),
+    oly: null   // v12: мир «Войны за Олимп» создаётся в newGame/sanitize (не через deepMerge — иначе «воскресали» бы души)
   };
   return S0;
 }
@@ -103,7 +104,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 9;
+const SAVE_VERSION = 10;
 /* v8: путь героя */
 function sanitizeBld(h) {
   const B = h.bld;
@@ -180,6 +181,7 @@ function migrate(o) {
   }
   if (v < 8) o._migratedV8 = 1;
   if (v < 9 && o.timers && typeof o.timers === 'object' && isNum(o.timers.fork)) o.timers.fork = Math.min(o.timers.fork, 300); // v9: моменты — первый скоро
+  if (v < 10) { o._migratedV10 = 1; if (o.hero && !o.hero.reg) o.hero.reg = regFromLoc(o.hero.loc); }; // v12: «Война за Олимп» — мир и сезон создаются в sanitizeOly с текущего момента
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
@@ -251,7 +253,7 @@ function sanitize(o) {
   for (const k in d.buffs) fixNum(o.buffs, k, 0, 0, 3600);
   if (!o.timers || typeof o.timers !== 'object') o.timers = d.timers;
   for (const k in d.timers) fixNum(o.timers, k, d.timers[k], -1, 100000);
-  fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20);
+  fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20 + 15);
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
   if (!NAV_TABS.includes(o.tab)) o.tab = 'powers';
@@ -309,6 +311,8 @@ function sanitize(o) {
       if (Array.isArray(e.d)) e.d = e.d.filter(x => typeof x === 'string').slice(0, 40).map(x => x.slice(0, 220)); else delete e.d; } }
   if (!o.stats || typeof o.stats !== 'object') o.stats = {};
   for (const k in d.stats) fixNum(o.stats, k, 0, 0);
+  sanitizeOly(o);
+  if (o._migratedV10 !== undefined) o._migratedV10 = 1;
   return o;
 }
 function load() {
@@ -347,6 +351,13 @@ class RivalProvider {
   /** Решения других богов в комнате подземелья. @returns {Promise<Array<{godId, vote?, act?, at}>>} */
   dungeonDecide(view) { throw new Error('not implemented'); }
   reportDungeon(result) { }
+  /* v12 «Война за Олимп». Ход мира раз в минуту игрового времени: вернуть действия других богов
+     [{ god, kind: 'focus'|'preach'|'storm'|'temple', reg, power?, n? }]. Синхронно: сетевой провайдер
+     отдаёт уже полученные с сервера действия (буфер), чтобы мир работал и в офлайн-досчёте. */
+  worldTurn(view, dt) { return []; }
+  /** Общий календарь сезона { n, start, end } или null — тогда сезон локальный (28 суток с начала мира). */
+  seasonCalendar() { return null; }
+  reportSeason(result) { }
 }
 
 const DUEL_COST = { bolt: 20, heal: 15, shield: 25, curse: 18, quake: 45, beast: 35, bless: 20, luck: 22, rain: 12 };

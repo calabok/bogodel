@@ -605,12 +605,69 @@ body.rm .fflash,body.rm .fly{display:none}
 @media (max-width:420px){.hideXS{display:none}}
 @media (max-width:360px){.glvl{display:none}.godInfo span{display:none}.pgrid{gap:6px}.pcard{padding:8px}.route .rn{font-size:10px}}
 @media (prefers-reduced-motion: reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+
+/* ===== v12: Война за Олимп ===== */
+.gdot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:4px;vertical-align:-1px;border:1px solid #0003;flex:none}
+.gdot.nil{background:#e8e0cc;border-color:#a89a7a}
+.omap{width:100%;height:auto;display:block;max-width:520px;margin:4px auto 2px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.omap .rg,.omap .olc{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.omap .rs{stroke-width:2}.omap .rg.mine .rs{stroke-width:4}
+.omap .rg:hover .rs,.omap .olc:hover polygon{stroke:#2b1d07;stroke-width:4}
+.omap .rg:focus,.omap .olc:focus{outline:none}.omap .rg:focus-visible .rs,.omap .olc:focus-visible polygon{stroke:#000;stroke-width:5}
+.omap .rg.goal .rs{stroke:#2b1d07;stroke-width:3.5;stroke-dasharray:7 4}
+.omap .rg.hot .rs{animation:rhot 1.3s ease-in-out 3}
+@keyframes rhot{50%{stroke:#fff;stroke-width:7}}
+.omap text{text-anchor:middle;dominant-baseline:auto;pointer-events:none}
+.omap .ri{font-size:25px}
+.omap .rn{font-size:12.5px;font-weight:800;fill:#24180a;paint-order:stroke;stroke:#fffd;stroke-width:3.5px;stroke-linejoin:round}
+.omap .rbar{fill:#0003}.omap .rbarf{fill:#22b8e6;stroke:#fff;stroke-width:.8}
+.omap .rt,.omap .rw,.omap .rg2{font-size:14px}
+.omap .rw{animation:rblink 1.4s ease-in-out infinite}
+@keyframes rblink{50%{opacity:.35}}
+.omap .rh circle{fill:#fff;stroke:#2b1d07;stroke-width:1.6}.omap .rh text{font-size:14px}
+.olegend{display:flex;flex-wrap:wrap;gap:3px 10px;font-size:11.5px;color:#6b5a3a;margin-top:4px;justify-content:center}
+.lbar{display:inline-block;width:22px;height:6px;border-radius:3px;background:#0003;vertical-align:middle;position:relative}.lbar i{position:absolute;left:0;top:0;bottom:0;width:60%;background:#22b8e6;border-radius:3px}
+.ohero{margin-top:6px;font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.olist{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:6px;margin-top:6px}
+.oli{display:flex!important;gap:4px;align-items:center;justify-content:flex-start;text-align:left}.oli span{margin-left:auto;font-weight:700}
+.oboard .orow{display:grid;grid-template-columns:20px 12px minmax(0,1fr) auto 44px;gap:6px;align-items:center;padding:6px 4px;border-bottom:1px dashed #d9c79c}
+.oboard .orow.me{background:#22b8e621;border-radius:8px}
+.oboard .ork{font-weight:800;text-align:center}.oboard .onm{min-width:0}.oboard .onm b{font-size:13.5px}
+.oboard .oinf{text-align:right;font-size:13px;line-height:1.15;white-space:nowrap}.oboard .oinf small{display:block;color:#7a6a4a;font-size:11px}
+.oboard .orow .btn{min-width:44px;padding:4px 0}
+.othr{font-size:11px;text-align:center;color:#a77b20;margin:2px 0;border-top:2px solid #e8c063;padding-top:2px;font-weight:700}
+.othi{font-size:14px}.obsp{width:44px}
+.osea .row h3{margin:0}.osea .ostat{display:flex;flex-wrap:wrap;gap:4px 14px;margin:6px 0;font-size:13px}
+.bar.season i{background:linear-gradient(90deg,#e8c063,#c9962b)}
+.orew{margin-top:6px;padding:8px;border-radius:10px;border:2px solid #c8814a;background:#fff8e0}.orew.f1{border-color:#f5c542;box-shadow:0 0 10px #f5c54266}.orew.f2{border-color:#9fb0c6}
+.olog{list-style:none;padding:0;margin:0;font-size:12.5px}.olog li{padding:2px 0;border-bottom:1px dotted #e3d6b3}.olog li.me{color:#16627e}.olog li.bad{color:#8c2e20}.olog li.warn{color:#8a5a00}.olog .tm{color:#9a8a6a;font-size:11px}
+.olyc{font-weight:700;text-decoration:none!important;color:#16627e!important;white-space:nowrap}
+.entry.oly{border-left-color:#22b8e6;background:linear-gradient(90deg,#e4f5fb,#fff)}.entry.oly .tx{color:#134f66}
+.olyintro{border:2px solid var(--gold);background:linear-gradient(180deg,#fffdf3,var(--parch));position:relative}
+.olyintro:before{content:"";position:absolute;left:0;right:0;top:0;height:5px;border-radius:14px 14px 0 0;background:linear-gradient(90deg,#22b8e6,var(--gold2),#22b8e6)}
+.olyintro p{margin:6px 0;font-size:14px}
+.rsheet .rown{margin:8px 0 4px;font-size:15px;display:flex;align-items:center;gap:2px}
+.rbonus{background:#fff6dc;border:1px solid #e0c68e;border-radius:10px;padding:8px;margin:6px 0;font-size:14px}.rbonus.on{background:#e7f6dc;border-color:#9fd08a}
+.rseg{display:flex;height:16px;border-radius:8px;overflow:hidden;background:#e8e0cc;margin:8px 0;border:1px solid #c8b78f}.rseg i{display:block;height:100%}.rseg .un{background:#e8e0cc}
+.rgods{list-style:none;padding:0;margin:0 0 6px}.rgods li{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:13.5px;border-bottom:1px dotted #e3d6b3}.rgods li span{margin-left:auto;color:#6b5a3a}.rgods li.me{font-weight:700}.rgods li.un{color:#7a6a4a}
+.rthr{background:#fde9e4;border:1px solid #e3a99a;border-radius:8px;padding:6px 8px;color:#8c2e20;margin:6px 0;font-size:13px}
+.rsheet h3{margin-top:12px}
+.season .sres,.awoly .sres{text-align:center;padding:12px;border-radius:14px;background:#fff8e0;border:2px solid #e0c68e;margin:8px 0}
+.sres.f1{border-color:#f5c542;box-shadow:0 0 14px #f5c54288}.sres.f2{border-color:#9fb0c6;box-shadow:0 0 10px #9fb0c666}.sres.f3{border-color:#c8814a}
+.sbig{font-size:46px;line-height:1.1}
+.sthr{padding-left:0;list-style:none;margin:4px 0 8px}.sthr li{display:flex;gap:6px;align-items:center;padding:5px 2px;border-bottom:1px dashed #e0d2ae;font-size:13.5px;flex-wrap:wrap}.sthr li span{margin-left:auto;color:#6b5a3a}.sthr li.me{font-weight:700;background:#22b8e621;border-radius:6px}
+.awoly{margin-top:10px}.awoly h3{margin-bottom:4px}
+.gav.fr{position:relative}.gav.fr.f1{box-shadow:0 0 0 3px #f5c542,0 0 12px #f5c542}.gav.fr.f2{box-shadow:0 0 0 3px #cfd8e3,0 0 10px #cfd8e3}.gav.fr.f3{box-shadow:0 0 0 3px #c8814a,0 0 8px #c8814a}
+body[data-frame=f1] #colHero{box-shadow:0 0 0 3px #f5c542,var(--shadow)}body[data-frame=f2] #colHero{box-shadow:0 0 0 3px #cfd8e3,var(--shadow)}body[data-frame=f3] #colHero{box-shadow:0 0 0 3px #c8814a,var(--shadow)}
+body.rm .omap .rg.hot .rs,body.rm .omap .rw{animation:none}
+@media (prefers-reduced-motion:reduce){.omap .rg.hot .rs,.omap .rw{animation:none}}
+@media (max-width:760px){.oboard .orow{grid-template-columns:18px 12px minmax(0,1fr) auto 44px;gap:5px}.olegend{font-size:11px}}
 </style>
 </head>
 <body>
 <header id="topbar">
   <div class="hrow">
-    <button class="godchip" data-act="mtab" data-arg="gods" title="Ваш бог: характер и пантеон"><span class="gav" id="hAv">🙂</span><span class="godInfo"><b id="hGod">—</b><span id="hTitle">—</span></span></button>
+    <button class="godchip" data-act="mtab" data-arg="gods" title="Ваш бог: характер, Олимп и соперники"><span class="gav" id="hAv">🙂</span><span class="godInfo"><b id="hGod">—</b><span id="hTitle">—</span></span></button>
     <div class="hspacer"></div>
     <div class="glvl" id="hLvl" title="Уровень бога: за него дают очки сил ★"><span id="hGxp">Ур. 1</span><div class="bar gxp"><i id="hGxpBar"></i></div></div>
     <div class="speed"><button data-act="speed" data-arg="1">×1</button><button data-act="speed" data-arg="2">×2</button><button data-act="speed" data-arg="5">×5</button><button data-act="speed" data-arg="10">×10</button><button data-act="pause" id="pauseBtn" title="Пауза">⏸</button></div>
@@ -627,6 +684,7 @@ body.rm .fflash,body.rm .fly{display:none}
   <section id="colCenter">
     <section id="colHero" class="card hcard"></section>
     <div id="mBanner"></div>
+    <div id="olyBox"></div>
     <div id="featBox"></div>
     <div id="forkBox"></div>
     <div id="fightBox"></div>
@@ -654,7 +712,7 @@ body.rm .fflash,body.rm .fly{display:none}
   </section>
 </main>
 <nav id="mnav" aria-label="Разделы">
-  <button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="flock"><b>⛪</b>Паства</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="gods"><b>⚜</b>Пантеон<i id="godsDot"></i></button><button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button>
+  <button data-act="mtab" data-arg="powers"><b>✨</b>Силы</button><button data-act="mtab" data-arg="flock"><b>⛪</b>Паства</button><button data-act="mtab" data-arg="arena"><b>🤺</b>Арена<i id="arenaDot2"></i></button><button data-act="mtab" data-arg="gods"><b>🏛</b>Олимп<i id="godsDot"></i></button><button data-act="mtab" data-arg="hero"><b>🧔</b>Герой</button>
 </nav>
 <div id="modal"></div>
 <div id="toasts"></div>
@@ -1257,7 +1315,7 @@ function defaultState(god, hero, race, cls) {
     hero: { name: hero, race, cls, st: genStats(cls, race), feats: [], lvl: 1, xp: 0, hp: 30, maxHp: 30, gold: 30, potions: 1,
       eq: starterEq(cls),
       inv: [], loc: 'Годград', state: 'road', monster: null, quest: newQuest(), trust: 40, deadT: 0, townStep: 0,
-      restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [] },
+      restT: 0, restKind: '', shortRests: 2, orcCd: 0, inj: [], reg: 'godgrad' },
     flock: { fol: 3, temple: 0, templeProg: 0, army: 0 },
     buffs: { luck: 0, shield: 0, trade: 0 },
     timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
@@ -1265,7 +1323,8 @@ function defaultState(god, hero, race, cls) {
     arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], momHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
-    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero', heroCol: false, snd: false }, dseq: 0, lastSeen: Date.now()
+    speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero', heroCol: false, snd: false }, dseq: 0, lastSeen: Date.now(),
+    oly: null   // v12: мир «Войны за Олимп» создаётся в newGame/sanitize (не через deepMerge — иначе «воскресали» бы души)
   };
   return S0;
 }
@@ -1281,7 +1340,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 9;
+const SAVE_VERSION = 10;
 /* v8: путь героя */
 function sanitizeBld(h) {
   const B = h.bld;
@@ -1358,6 +1417,7 @@ function migrate(o) {
   }
   if (v < 8) o._migratedV8 = 1;
   if (v < 9 && o.timers && typeof o.timers === 'object' && isNum(o.timers.fork)) o.timers.fork = Math.min(o.timers.fork, 300); // v9: моменты — первый скоро
+  if (v < 10) { o._migratedV10 = 1; if (o.hero && !o.hero.reg) o.hero.reg = regFromLoc(o.hero.loc); }; // v12: «Война за Олимп» — мир и сезон создаются в sanitizeOly с текущего момента
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
@@ -1429,7 +1489,7 @@ function sanitize(o) {
   for (const k in d.buffs) fixNum(o.buffs, k, 0, 0, 3600);
   if (!o.timers || typeof o.timers !== 'object') o.timers = d.timers;
   for (const k in d.timers) fixNum(o.timers, k, d.timers[k], -1, 100000);
-  fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20);
+  fixNum(g, 'faith', 0, 0, 100 + (g.lvl - 1) * 15 + f.temple * 20 + 15);
   if (![1, 2, 5, 10].includes(o.speed)) o.speed = 1;
   o.paused = !!o.paused;
   if (!NAV_TABS.includes(o.tab)) o.tab = 'powers';
@@ -1487,6 +1547,8 @@ function sanitize(o) {
       if (Array.isArray(e.d)) e.d = e.d.filter(x => typeof x === 'string').slice(0, 40).map(x => x.slice(0, 220)); else delete e.d; } }
   if (!o.stats || typeof o.stats !== 'object') o.stats = {};
   for (const k in d.stats) fixNum(o.stats, k, 0, 0);
+  sanitizeOly(o);
+  if (o._migratedV10 !== undefined) o._migratedV10 = 1;
   return o;
 }
 function load() {
@@ -1525,6 +1587,13 @@ class RivalProvider {
   /** Решения других богов в комнате подземелья. @returns {Promise<Array<{godId, vote?, act?, at}>>} */
   dungeonDecide(view) { throw new Error('not implemented'); }
   reportDungeon(result) { }
+  /* v12 «Война за Олимп». Ход мира раз в минуту игрового времени: вернуть действия других богов
+     [{ god, kind: 'focus'|'preach'|'storm'|'temple', reg, power?, n? }]. Синхронно: сетевой провайдер
+     отдаёт уже полученные с сервера действия (буфер), чтобы мир работал и в офлайн-досчёте. */
+  worldTurn(view, dt) { return []; }
+  /** Общий календарь сезона { n, start, end } или null — тогда сезон локальный (28 суток с начала мира). */
+  seasonCalendar() { return null; }
+  reportSeason(result) { }
 }
 
 const DUEL_COST = { bolt: 20, heal: 15, shield: 25, curse: 18, quake: 45, beast: 35, bless: 20, luck: 22, rain: 12 };
@@ -1634,10 +1703,10 @@ const rivals = new LocalAIProvider(() => S);
 /* =====================================================================
    5) ПРАВИЛА: вера, характеристики, предметы, бой, жизнь героя
    ===================================================================== */
-const maxFaith = () => 100 + (S.god.lvl - 1) * 15 + S.flock.temple * 20;
-const faithRegen = () => 0.02 + 0.004 * Math.sqrt(Math.max(0, S.flock.fol)) + S.flock.temple * 0.006 + eqCount('faith') * 0.005;
+const maxFaith = () => 100 + (S.god.lvl - 1) * 15 + S.flock.temple * 20 + (olyB('maxf') ? 15 : 0);
+const faithRegen = () => 0.02 + 0.004 * Math.sqrt(Math.max(0, S.flock.fol)) + S.flock.temple * 0.006 + eqCount('faith') * 0.005 + olyFaith();
 const templeCost = () => Math.round(150 * Math.pow(S.flock.temple + 1, 1.6));
-const soldierCost = () => S.god.align <= -30 ? 10 : 15;
+const soldierCost = () => (S.god.align <= -30 ? 10 : 15) - (olyB('army') ? 3 : 0);
 const obeyChance = () => clamp(0.45 + S.hero.trust * 0.0055, 0.3, 1);
 function alignTitle(a) { return a >= 60 ? 'Всеблагой' : a >= 25 ? 'Добрый' : a > -25 ? 'Себе на уме' : a > -60 ? 'Суровый' : 'Гневный'; }
 function trustLabel(t) { return t < 20 ? 'считает вас выдумкой' : t < 40 ? 'сомневается в вас' : t < 60 ? 'прислушивается' : t < 80 ? 'уважает' : 'фанатично предан'; }
@@ -1682,7 +1751,7 @@ function toast(msg) {
   box.appendChild(el); setTimeout(() => el.remove(), innerWidth <= 760 ? 3200 : 4200);
 }
 function addFaith(v) { S.god.faith = clamp(S.god.faith + v, 0, maxFaith()); }
-function addTrust(v) { if (v > 0) v *= (hasFeat('devout') ? 1.5 : 1) * (S.hero.cls === 'cleric' ? 1.2 : 1); S.hero.trust = clamp(Math.round((S.hero.trust + v) * 10) / 10, 0, 100); }
+function addTrust(v) { if (v > 0) v *= (hasFeat('devout') ? 1.5 : 1) * (S.hero.cls === 'cleric' ? 1.2 : 1) * (olyB('trust') ? 1.2 : 1); S.hero.trust = clamp(Math.round((S.hero.trust + v) * 10) / 10, 0, 100); }
 function shiftAlign(v) { S.god.align = clamp(S.god.align + v, -100, 100); }
 function addGxp(v) {
   const g = S.god; g.xp += Math.round(v);
@@ -1794,6 +1863,11 @@ function applyFx(e) {
   if (e.potion) { const pv = e.potion > 0 ? e.potion : -Math.min(h.potions, -e.potion); h.potions += pv; if (pv) out.push((pv > 0 ? '+' : '−') + Math.abs(pv) + ' ' + plural(pv, 'зелье', 'зелья', 'зелий')); }
   if (e.shield) { S.buffs.shield += e.shield * 60; out.push('🛡 щит ' + e.shield + ' мин'); }
   if (e.tprog && S.flock.temple < 10) { S.flock.templeProg += e.tprog; out.push('+' + e.tprog + ' к стройке храма'); while (S.flock.temple < 10 && S.flock.templeProg >= templeCost()) { S.flock.templeProg -= templeCost(); S.flock.temple++; diary(`⛪ Паства отстроила ${TEMPLE_NAMES[S.flock.temple - 1]} во славу нашего бога!`, 'level'); } }
+  if (e.souls && S.oly && REG_BY[h.reg]) { const id = h.reg, X = S.oly.reg[id];
+    if (e.souls > 0) { const v = Math.round(olyConvert(id, 'me', e.souls)); if (v) out.push(`+${v} душ (${REG_BY[id].s})`); }
+    else { const v = Math.min(X.s.me || 0, -e.souls); if (v >= 1) { X.s.me -= v; out.push(`−${Math.round(v)} душ`); } }
+    X.hot = 120; regOwner(id); }
+  if (e.rsouls && e.rg && S.oly && REG_BY[h.reg] && GOD_IDS.includes(e.rg)) { const v = Math.round(olyConvert(h.reg, e.rg, e.rsouls)); if (v) out.push(`+${v} душ богу ${godName(e.rg)}`); regOwner(h.reg); }
   if (e.cure && h.inj.length) { const cu = healInjuries('one'); if (cu) out.push('травма исцелена'); }
   if (e.maxhp) { h.st.con = Math.min(20, h.st.con + 1); recalcHp(); out.push('Телосложение +1'); }
   if (e.luck) { S.buffs.luck += e.luck * (e.safe ? 120 : 10); out.push(e.safe ? '🍀 удача ' + (e.luck * 2) + ' мин' : '🍀 удача'); }
@@ -1938,21 +2012,21 @@ function winFight() {
   const h = S.hero, m = h.monster; if (!m) return;
   const rel = clamp(1 + .25 * (m.tier - h.lvl), .4, 2);
   const xp = Math.round(xpUnit(h.lvl) * 3.2 * rel * (m.vet ? 1.6 : 1));
-  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1) * (bldId(h) === 'trick' ? 1 + BUILDS.trick.fx.gold : 1));
+  const gold = Math.round(rnd(2, 6) * m.tier * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1) * (hasFeat('treasure') ? 1.25 : 1) * (bldId(h) === 'trick' ? 1 + BUILDS.trick.fx.gold : 1) * (olyB('gold') ? 1.1 : 1));
   h.gold += gold; let fx = `+${gold} 💰, +${xp} опыта`;
   if (SILENT) SILENT.c.wins++;
   diary(pick(['Противник «{m}» побеждён! Забрал трофеи и чувство собственной важности.', 'Победа над противником «{m}»! Победный танец исполнен (зрителей не было).',
     '«{m}» больше не встанет. Сказал напоследок что-то умное. Никто не оценил — некому было.']).split('{m}').join(m.n), 'loot', fx);
-  h.monster = null; h.state = 'road'; momFightAt = momClock; momFightN = m.n;
+  h.monster = null; h.state = 'road'; momFightAt = momClock; momFightN = m.n; olyHero('win');
   gainXp(xp); questProgress(rnd(2, 5));
   const lootP = .35 + (h.race === 'elf' ? .2 : 0) + (hasFeat('treasure') ? .2 : 0) + (S.buffs.luck > 0 ? .2 : 0) + mod(statVal('wis')) * .02;
-  if (R() < lootP) { if (R() < .3) lootDrop(clamp((m.tier - h.lvl) * .3, 0, 1) + (S.buffs.luck > 0 ? .4 : 0), 'Трофей'); else { const it = addItem(); diary(`В карманах противника нашёлся «${it.n}».`, 'loot'); } }
+  if (R() < lootP * (olyB('loot') ? 1.1 : 1)) { if (R() < .3) lootDrop(clamp((m.tier - h.lvl) * .3, 0, 1) + (S.buffs.luck > 0 ? .4 : 0), 'Трофей'); else { const it = addItem(); diary(`В карманах противника нашёлся «${it.n}».`, 'loot'); } }
 }
 
 /* ---------- Отдых ---------- */
 function shortRest() {
   const h = S.hero; if (h.shortRests <= 0 || h.state !== 'road') return false;
-  h.shortRests--; const a = healHero(h.maxHp * .3 + mod(statVal('con')) * h.lvl);
+  h.shortRests--; const a = healHero((h.maxHp * .3 + mod(statVal('con')) * h.lvl) * (olyB('rest') ? 1.25 : 1));
   diary(pick(['Присел на пенёк перевести дух. Пенёк был не против.', 'Короткий привал: перевязал раны носовым платком.', 'Перекусил сухарём и посидел минутку. Жизнь налаживается.']), '', `+${a} HP (короткий отдых)`);
   return true;
 }
@@ -1972,8 +2046,8 @@ function restStep() {
 }
 
 /* ---------- Город ---------- */
-const priceMul = () => (1 - .04 * mod(statVal('cha'))) * (hasFeat('trader') ? .85 : 1) * (curseOn('magnet') ? 1 : 1);
-const sellMul = () => (1 + .04 * mod(statVal('cha'))) * (hasFeat('trader') ? 1.2 : 1) * (S.buffs.trade > 0 ? 1.5 : 1);
+const priceMul = () => (1 - .04 * mod(statVal('cha'))) * (hasFeat('trader') ? .85 : 1) * (curseOn('magnet') ? 1 : 1) * (olyB('shop') ? .9 : 1);
+const sellMul = () => (1 + .04 * mod(statVal('cha'))) * (hasFeat('trader') ? 1.2 : 1) * (S.buffs.trade > 0 ? 1.5 : 1) * (olyB('sell') ? 1.15 : 1);
 function townStep() {
   const h = S.hero, L = h.lvl;
   if (h.townStep === 0) {
@@ -1994,7 +2068,7 @@ function townStep() {
     }
   } else if (h.townStep === 2) {
     const parts = [];
-    const price = Math.max(3, Math.round((10 + 4 * L) * priceMul())); let bought = 0;
+    const price = Math.max(3, Math.round((10 + 4 * L) * priceMul() * (olyB('potion') ? .75 : 1))); let bought = 0;
     while (h.potions < 3 && h.gold > price * 2) { h.gold -= price; h.potions++; bought++; }
     if (bought) parts.push(`Купил ${bought} ${plural(bought, 'зелье', 'зелья', 'зелий')} у подозрительного алхимика.`);
     { const sl = EQ_KEYS.filter(x => smithOk(h.eq[x])).sort((a, b) => smithCost(h.eq[a]) - smithCost(h.eq[b]))[0]; if (sl && h.gold >= smithCost(h.eq[sl]) * 4) smithUpgrade(sl, true); }
@@ -2009,8 +2083,8 @@ function townStep() {
       if (don > 0) { h.gold -= don; const f = Math.max(1, Math.round(don * .25 / goldScale(L))); addFaith(f); diary(`Пожертвовал ${don} 💰 на храм моего бога. Пусть порадуется.`, 'god', `+${f} веры`); }
       else diary('Помолился у алтаря моего бога. Денег нет, зато искренне.', 'god');
     }
-    h.state = 'road'; h.loc = pick(PLACES); h.townStep = 0;
-    diary(`Отправляюсь дальше. Следующая цель: ${h.loc}.`);
+    h.state = 'road'; h.townStep = 0; const nx = olyLeaveTown(); h.loc = regLoc(h.reg);
+    diary(`Отправляюсь дальше. ${nx !== h.reg ? 'Бог велит идти ' + rTo(nx) + ', так что путь лежит туда.' : 'Пока брожу ' + rIn(h.reg) + '.'}`);
     return;
   }
   h.townStep++;
@@ -2020,8 +2094,9 @@ function preach() {
   if (curseOn('chatty') && R() < .3) { const n = Math.min(1, Math.floor(S.flock.fol)); S.flock.fol -= n; diary('Проклятие болтливости: три часа рассказывал прохожим про свои мозоли. Один последователь сбежал.', 'god', n ? '−1 паствы' : ''); return; }
   let n = 1 + Math.max(0, mod(statVal('cha'))) + (h.cls === 'cleric' ? Math.max(0, mod(statVal('wis'))) : 0) + (h.trust > 70 ? 1 : 0) + eqCount('preach');
   if (hasFeat('preacher')) n *= 2;
-  S.flock.fol += n;
-  diary(`Рассказал прохожим о величии моего бога. ${n} ${plural(n, 'человек уверовал', 'человека уверовали', 'человек уверовали')}.`, 'god', `+${n} паствы`);
+  if (olyB('preach')) n += 1;
+  S.flock.fol += n; const sv = Math.round(olyHero('preach', n));
+  diary(`Рассказал прохожим о величии моего бога. ${n} ${plural(n, 'человек уверовал', 'человека уверовали', 'человек уверовали')}.`, 'god', `+${n} паствы${sv ? `, +${sv} душ (${REG_BY[h.reg].s})` : ''}`);
 }
 function heroStep() {
   const h = S.hero;
@@ -2029,9 +2104,10 @@ function heroStep() {
   if (eqHas('regen') && h.hp < h.maxHp) healHero(h.maxHp * .02);
   if (h.state === 'fight') return fightStep();
   if (h.state === 'rest') return restStep();
-  if (h.state === 'town') return townStep();
+  if (h.state === 'town') { olyHero('town'); return townStep(); }
+  if (h.state === 'road') olyHero('walk');
   if ((h.hp < h.maxHp * .4 && h.shortRests <= 0) || h.inv.length >= 10) {
-    h.state = 'town'; h.townStep = 0; h.loc = pick(TOWNS);
+    h.state = 'town'; h.townStep = 0; h.loc = olyToTown();
     diary(h.hp < h.maxHp * .4 ? `Здоровье на исходе. Иду в ${h.loc} отлежаться.` : `Рюкзак трещит по швам. Пора в ${h.loc} на рынок.`);
     return;
   }
@@ -2041,7 +2117,7 @@ function heroStep() {
   else if (r < fightP + .10 + (hasFeat('treasure') ? .04 : 0)) { if (R() < .2) lootDrop(0, 'Нашёл в кустах'); else { const it = addItem(); diary(pick(['Нашёл под кустом «{i}». Беру, в хозяйстве пригодится.', 'В канаве лежал «{i}». Теперь он лежит в рюкзаке.', 'Выиграл в напёрстки «{i}». Напёрсточник плакал.']).replace('{i}', it.n), 'loot'); } }
   else if (r < fightP + .14 + (hasFeat('preacher') ? .03 : 0)) preach();
   else if (r < fightP + .22) diary(R() < .5 ? pick(CLASS_ROAD[h.cls]) : pick(h.trust < 35 ? THOUGHTS_LOW : THOUGHTS_HIGH), R() < .5 ? '' : 'god');
-  else { if (R() < .3) h.loc = pick(PLACES); diary(pick(ROAD)); questProgress(Math.round(rnd(4, 9) * (h.cls === 'ranger' ? 1.3 : 1) * (hasFeat('swift') ? 1.25 : 1))); return; }
+  else { olyWalk(); diary(pick(ROAD)); questProgress(Math.round(rnd(4, 9) * (h.cls === 'ranger' ? 1.3 : 1) * (hasFeat('swift') ? 1.25 : 1))); return; }
   questProgress(rnd(1, 2));
 }
 
@@ -2057,8 +2133,8 @@ function usePower(id) {
   const m = h.monster, lv = h.lvl;
   switch (id) {
     case 'heal': { const a = healHero(h.maxHp * .3 * mu); addTrust(2); const cu = h.inj.length ? healInjuries('one') : 0; diary('Почувствовал тёплый свет с небес. Раны затянулись. Спасибо, о {god}!', 'god', `+${a} HP, +2 доверия${cu ? ', травма исцелена' : ''}`); break; }
-    case 'bless': S.buffs.luck += 300 * mu; addTrust(1); diary('На меня снизошло благословение! Чувствую, что сегодня всё получится.', 'god', '🍀 удача на ' + Math.round(5 * mu) + ' мин'); break;
-    case 'shield': S.buffs.shield += 300 * mu; diary('Вокруг меня засиял божий щит. Комары в ярости.', 'god', '🛡 щит на ' + Math.round(5 * mu) + ' мин'); break;
+    case 'bless': S.buffs.luck += 300 * mu * (olyB('buff') ? 1.2 : 1); addTrust(1); diary('На меня снизошло благословение! Чувствую, что сегодня всё получится.', 'god', '🍀 удача на ' + Math.round(5 * mu) + ' мин'); break;
+    case 'shield': S.buffs.shield += 300 * mu * (olyB('buff') ? 1.2 : 1); diary('Вокруг меня засиял божий щит. Комары в ярости.', 'god', '🛡 щит на ' + Math.round(5 * mu) + ' мин'); break;
     case 'bolt':
       if (m) { const d = Math.round((10 + 6 * lv) * mu * (S.god.align <= -30 ? 1.3 : 1)); m.hp -= d; addTrust(1); diary(`С небес ударила молния и поджарила противника «${m.n}» (−${d})! Мой бог на моей стороне!`, 'god'); if (m.hp <= 0) winFight(); }
       else { const d = damageHero(h.maxHp * .12, 'Убит молнией собственного бога. Ирония.'); addTrust(-4); diary('В меня ударила молния. Я ничего не сделал! Наверное, это знак. Или бог промахнулся.', 'god', `−${d} HP, −4 доверия`); }
@@ -2087,7 +2163,12 @@ function learn(id) {
 }
 
 /* ---------- Глас божий ---------- */
+/* v12: «иди в лес», «защищай Годград» — герой идёт в регион (ключевые слова — начала названий) */
+const NW = '(^|[^а-яёa-z])';
+const REG_KEYS = { tuman: /туман/i, les: new RegExp(NW + 'лес', 'i'), pinki: /пинк/i, boloto: /болот/i, pereval: /перевал/i, godgrad: /годград/i, dolina: /долин/i, gora: new RegExp(NW + 'гор([уаеы]|$|[^а-яё])|понедельник', 'i'), kapust: /капуст/i, zamok: /замок|замк|храпун/i, ponty: /понт/i, pustosh: /пустош/i, bereg: /берег|русал/i, ovrag: /овраг/i };
+function voiceReg(t) { t = String(t || ''); if (!/(иди|ступай|отправляйся|шагай|защищ|обороня|держи|(^|\s)во? )/i.test(t)) return null; for (const id in REG_KEYS) if (REG_KEYS[id].test(t)) return id; return null; }
 const VOICE = [
+  { re: { test: t => !!voiceReg(t) }, f: v => { const id = voiceReg(v); olySend(id); return [`Услышал «${v}». Значит, мне ${REG_BY[id].to}!`, '']; } },
   { re: /отдых|привал|поспи|спать|спи\b|ночлег/i, f: v => { const h = S.hero;
       if (h.state === 'town') { if (h.hp >= h.maxHp) return ['Бог велит отдыхать, но я и так бодр как огурец.', '']; h.townStep = 2; startLongRest(S.flock.temple >= 1 ? 'temple' : 'inn'); return [`Услышал «${v}». Иду спать — бог плохого не посоветует.`, '']; }
       if (h.state === 'road') { if (h.shortRests > 0 && h.hp < h.maxHp) { shortRest(); return [`«${v}» — понял, привал!`, '']; } startLongRest('camp'); return [`«${v}» — разбиваю лагерь прямо здесь.`, '']; }
@@ -2096,7 +2177,7 @@ const VOICE = [
   { re: /бей|руби|атак|убей|дерись|сражай|мочи/i, f: v => { const m = S.hero.monster; if (m) { const d = Math.round(sheet().avg * 1.5); m.hp -= d; return [`Глас велит: «${v}»! Ударил противника «${m.n}» в полную силу (−${d}).`, '']; } if (S.hero.state === 'road') { startFight(); return ['Раз бог велит драться — найду с кем!', '']; } return ['Хотел подраться, но вокруг никого подходящего.', '']; } },
   { re: /коп|клад|золот|деньг|сокров/i, f: v => { if (check('wis', 12).ok) { const g = Math.round(rnd(8, 30) * goldScale(S.hero.lvl)); S.hero.gold += g; return [`По велению «${v}» копал землю и нашёл монеты!`, `+${g} 💰`]; } return ['Копал. Выкопал червяка. Назвал его Гошей. Гоша теперь мой друг.', '']; } },
   { re: /моли|верь|храм|пропов|вера|паств/i, f: v => { if (S.hero.state === 'road' || S.hero.state === 'town') { preach(); addFaith(3); return [`Услышав «${v}», произнёс пламенную речь на пеньке.`, '+3 веры']; } return ['Помолился про себя.', '']; } },
-  { re: /город|домой|торг|прода|рын/i, f: v => { if (S.hero.state === 'road') { S.hero.state = 'town'; S.hero.townStep = 0; S.hero.loc = pick(TOWNS); return [`Бог сказал «${v}» — разворачиваюсь в ${S.hero.loc}.`, '']; } return ['Хотел в город, но сейчас немного занят.', '']; } },
+  { re: /город|домой|торг|прода|рын/i, f: v => { if (S.hero.state === 'road') { S.hero.state = 'town'; S.hero.townStep = 0; S.hero.loc = olyToTown(); return [`Бог сказал «${v}» — разворачиваюсь в ${S.hero.loc}.`, '']; } return ['Хотел в город, но сейчас немного занят.', '']; } },
   { re: /беги|отступ|спаса|удира/i, f: v => { if (S.hero.monster) { S.hero.monster = null; S.hero.state = 'road'; return ['Сбежал с поля боя по божьему велению. Это не трусость, это стратегия.', '']; } return ['Побежал. Бежал долго. От кого — так и не понял.', '']; } },
   { re: /квест|задан|иди|вперёд|вперед|цел/i, f: v => { if (S.hero.state === 'rest') { S.hero.state = 'road'; S.hero.restT = 0; } questProgress(10); return [`«${v}» — бодро зашагал к цели!`, '+10% задания']; } }
 ];
@@ -2232,6 +2313,14 @@ function momCheck(s, dc) {
   return k;
 }
 const gs = n => Math.round(n * goldScale(S.hero.lvl));     // сколько золота это «n» на уровне героя
+/* v12: контекст региона для моментов «Войны за Олимп» */
+function momRegCtx(h) {
+  if (!S.oly || !REG_BY[h.reg]) return { reg: null };
+  const X = S.oly.reg[h.reg], pop = REG_BY[h.reg].pop; let rg = null, rv = 0;
+  for (const g in X.s) if (g !== 'me' && X.s[g] > rv) { rv = X.s[g]; rg = g; }
+  if (rv < pop * .1) rg = null;
+  return { reg: h.reg, mine: X.own === 'me', rg, rgOwn: !!(X.own && X.own !== 'me'), share: (X.s.me || 0) / pop };
+}
 function momCtx() {
   const h = S.hero, g = S.god, L = h.lvl;
   return {
@@ -2239,7 +2328,8 @@ function momCtx() {
     after: momClock - momFightAt < 180 ? momFightN : '', dun: momClock - momDunAt < 900, dunOk: momDunOk,
     low: h.hp < h.maxHp * .45, hurt: h.hp < h.maxHp * .8, rich: h.gold > gs(160), poor: h.gold < gs(15),
     temple: S.flock.temple, fol: S.flock.fol, faith: g.faith, align: g.align, trust: h.trust, potions: h.potions,
-    night: (() => { const x = new Date().getHours(); return x >= 22 || x < 6; })()
+    night: (() => { const x = new Date().getHours(); return x >= 22 || x < 6; })(),
+    ...momRegCtx(h)
   };
 }
 /* ---------- Пул моментов ---------- */
@@ -2524,6 +2614,29 @@ const MOMENTS = [
         { l: 'Освятить вашим именем', a: 1, r: ['Алтарь засиял вашим светом. Местные потянулись молиться.', { faith: 6, fol: 1 }] }],
     n: ['Помолился у алтаря как есть. Немного веры всё же дошло.', { faith: 3 }] }
 ];
+/* v12: моменты «Войны за Олимп» — про регион, где сейчас герой. Эффекты souls (+души вам здесь), rsouls (+души сопернику) */
+MOMENTS.push(
+  { id: 'rgDebate', at: 'road', w: 2, when: c => !!c.rg, t: 'На площади {regv} проповедник бога {rg} собрал толпу и громко высмеивает моего бога.',
+    o: [{ l: 'Переспорить его', s: 'cha', dc: 13, ok: ['Переспорил проповедника так, что толпа перешла к нам вместе с ним.', { souls: 30, xp: 2 }], no: ['Запутался в словах. Толпа смеялась — надо мной.', { souls: -8, rsouls: 10 }] },
+        { l: 'Явить чудо', cost: 12, a: 1, r: ['С неба на площадь опустился сияющий пирог с вашим именем. Спорить стало не о чем.', { souls: 40 }] }],
+    n: ['Прошёл мимо. Толпа проводила меня жалостливыми взглядами.', { rsouls: 15 }] },
+  { id: 'rgAltar', at: 'road', when: c => c.rgOwn, t: 'На холме {regv} стоит алтарь бога {rg}, к нему тянутся местные.',
+    o: [{ l: 'Освятить вашим именем', cost: 15, a: 1, r: ['Алтарь засиял вашим светом. Местные решили, что так и было задумано.', { souls: 35 }] },
+        { l: 'Разобрать на дрова', a: -2, s: ['str', 'con'], dc: 12, ok: ['Разобрал алтарь и сварил на нём кашу для всех. Сытые люди добрее к моему богу.', { souls: 20, gold: 3 }], no: ['Алтарь оказался крепким, а местные — злыми. Пришлось уносить ноги.', { hp: -6, rsouls: 5 }] }],
+    n: ['Поклонился чужому алтарю из вежливости. Мой бог, кажется, ревнует.', { trust: -1 }] },
+  { id: 'rgPilgrims', at: 'any', when: c => c.mine && !!c.rg, t: 'Паломники, что живут {regv}, просят защитить их от проповедников бога {rg}.',
+    o: [{ l: 'Благословить их', cost: 8, a: 1, r: ['Паломники ушли сияющими и рассказали о вас каждому встречному.', { souls: 25, trust: 1 }] },
+        { l: 'Пусть герой проводит', s: 'con', dc: 12, ok: ['Проводил паломников до дома, отгоняя проповедников палкой.', { souls: 22, xp: 2 }], no: ['Проводил, но натёр мозоли и опоздал: проповедники уже успели.', { souls: 8, hp: -5 }] }],
+    n: ['Пожелал паломникам удачи. Удача без защиты — так себе.', { souls: -10, rsouls: 10 }] },
+  { id: 'rgFest', at: 'town', when: c => c.mine, t: '{Regv} праздник в честь моего бога: песни, пироги и ярмарка.',
+    o: [{ l: 'Явить знамение', cost: 10, a: 1, r: ['Над площадью вспыхнул ваш знак. Праздник продлили ещё на три дня.', { souls: 30, fol: 2 }] },
+        { l: 'Герой скажет тост', s: 'cha', dc: 12, ok: ['Сказал тост так, что прослезились даже стражники.', { souls: 20, gold: 4 }], no: ['Тост вышел про мозоли. Но выпили всё равно за моего бога.', { souls: 6 }] }],
+    n: ['Погулял на празднике, съел три пирога.', { souls: 5, hp: 4 }] },
+  { id: 'rgEmpty', at: 'road', when: c => c.reg && !c.mine && !c.rgOwn && c.share < .2, t: 'Деревушка {regv} ещё не выбрала, какому богу молиться. Старейшина присматривается.',
+    o: [{ l: 'Проповедовать', s: ['cha', 'wis'], dc: 12, ok: ['Старейшина кивнул и велел строить часовню вашему богу.', { souls: 30, xp: 2 }], no: ['Старейшина уснул посреди проповеди. Половина деревни — тоже.', { souls: 8 }] },
+        { l: 'Пролить благодатный дождь', cost: 10, a: 1, r: ['Пошёл тёплый дождь, урожай спасён. Деревня теперь ваша.', { souls: 35 }] }],
+    n: ['Помахал старейшине и пошёл дальше. Старейшина помахал богу соседа.', {}] }
+);
 const MOM_BY = {}; for (const m of MOMENTS) MOM_BY[m.id] = m;
 
 /* ---------- Механика ---------- */
@@ -2548,6 +2661,7 @@ function startMoment(id) {
   let m = id && MOM_BY[id], c = momCtx();
   if (!m) { const p = pickMoment(); if (!p) return false; m = p.m; c = p.c; }
   const v = { m: c.after || 'противник' };
+  if (c.reg) { v.reg = REG_BY[c.reg].n; v.regv = REG_BY[c.reg].v; v.Regv = v.regv[0].toUpperCase() + v.regv.slice(1); v.rgId = c.rg || (S.oly.reg[c.reg].own !== 'me' ? S.oly.reg[c.reg].own : null) || ''; v.rg = v.rgId ? godName(v.rgId) : 'чужой бог'; }
   const txt = tx(typeof m.t === 'function' ? m.t(v) : m.t, v);
   S.momHist = (S.momHist || []).filter(x => x !== m.id); S.momHist.push(m.id); if (S.momHist.length > MOM_HIST) S.momHist.shift();
   S.fork = { m: m.id, t: MOM_T, T: MOM_T, txt, v };
@@ -2568,7 +2682,7 @@ function momApply(m, k, how) {
     else if (o.s) { const k2 = momCheck(bestOf(o.s), o.dc || 12); res = k2.ok ? mo(o.ok[0], o.ok[1], k2) : mo(o.no[0], o.no[1], k2); }
     else res = mo(o.r[0], o.r[1]);
   }
-  const e = Object.assign({ safe: 1 }, res.e); if (e.xp > 0) e.xp *= MOM_XP;
+  const e = Object.assign({ safe: 1 }, res.e); if (e.xp > 0) e.xp *= MOM_XP; if (e.rsouls) e.rg = v.rgId;
   const fx = applyFx(e);
   const label = isN ? NOTHING : momLabel(o);
   const pre = how === 'self' ? `Бог молчал — решил сам: «${label}». ` : how === 'god' ? `«${label}». ` : '';
@@ -3210,6 +3324,7 @@ function passiveTick(gdt) {
   if (S.timers.dunCd > 0) S.timers.dunCd = Math.max(0, S.timers.dunCd - gdt);
   bldTick(gdt);
   if (h.inj.length) { for (const j of h.inj) j.t -= gdt; const n = h.inj.length; h.inj = h.inj.filter(j => j.t > 0); if (h.inj.length !== n) { recalcHp(); diary('🩹 Травма зажила. Снова как новенький (почти).', 'level'); } }
+  olyTick(gdt);
   S.timers.rivals -= gdt;
   if (S.timers.rivals <= 0) { S.timers.rivals = PACE.rivals; const r = pick(S.rivals); if (r.lvl < S.god.lvl + 2 && R() < .5) r.lvl++; r.hlvl = clamp(h.lvl + rnd(-1, 1), 1, MAX_LVL); if (R() < .5) r.army += rnd(0, 2); }
 }
@@ -3237,6 +3352,10 @@ function step(realDt) {
   chat.tick(idt);
   saveAcc += realDt; if (saveAcc > 5) { saveAcc = 0; save(); }
 }
+function olyAway(o0, seasons) {
+  const o1 = olySnap(), lost = o0.regs.filter(x => !o1.regs.includes(x)), got = o1.regs.filter(x => !o0.regs.includes(x));
+  return { r0: o0.rank, r1: o1.rank, n0: o0.regs.length, n1: o1.regs.length, lost: seasons.length ? [] : lost, got: seasons.length ? [] : got, seasons, n: o1.n, inf: o1.inf };
+}
 function fmtDur(sec) { const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60); return h ? `${h} ч ${m} мин` : `${m} мин`; }
 /* Офлайн-симуляция: герой живёт сам (75% темпа), развилки решает сам, итог — сжатая сводка в дневнике */
 function simulateAway(sec, why) {
@@ -3249,25 +3368,27 @@ function simulateAway(sec, why) {
   if (S.ev) S.ev = null;
   const c = { wins: 0, deaths: 0, quests: 0, forks: 0, lvls: 0, items: [] };
   const g0 = h.gold, f0 = Math.floor(S.flock.fol), l0 = h.lvl, fa0 = S.god.faith;
-  SILENT = { buf: [], c };
+  const base = Date.now() - sec * 1000, o0 = S.oly ? olySnap() : null;
+  SILENT = { buf: [], c }; OLY_NOW = base;
   let buf;
   try {
     if (S.fork) timeoutFork(true);
     const stepDt = ((PACE.step[0] + PACE.step[1]) / 2) / PACE.offEff;
     let t = 0, forkT = Math.max(PACE.forkOff[0] / 2, S.timers.fork);
     while (t < cap) {
-      t += stepDt;
+      t += stepDt; OLY_NOW = base + t * 1000;
       syncGuards();
       passiveTick(stepDt);
       forkT -= stepDt;
       if (forkT <= 0 && (h.state === 'road' || h.state === 'town')) { if (startFork() !== false && S.fork) timeoutFork(true); forkT = rspan(PACE.forkOff); }
       heroStep();
     }
+    if (sec > cap) olyFastForward(sec - cap); // герой спит, а мир живёт дальше: боги-соперники, храмы, конец сезона
     S.timers.fork = Math.min(PACE.fork[1], Math.max(60, forkT));
     S.timers.hero = Math.min(S.timers.hero, 5);
-  } finally { buf = SILENT.buf; SILENT = null; }
+  } finally { buf = SILENT.buf; SILENT = null; OLY_NOW = null; }
   // яркие моменты: уровни, черты, редкие вещи, смерти + пара смешных развилок
-  const pri = buf.filter(e => ['level', 'rare', 'death'].includes(e.c));
+  const pri = buf.filter(e => ['level', 'rare', 'death'].includes(e.c) || (e.c === 'oly' && /^(🏛|💔|👑|⚡|🔥 Сезон|🌊|🌾|🍷|🥟)/.test(e.x)));
   const forks = buf.filter(e => e.c === 'fork' && !/^(🙏|✨)/.test(e.x)).sort(() => R() - .5).slice(0, 2);
   const hl = pri.slice(-8).concat(forks);
   for (const e of hl.reverse()) { e.x = '⏳ ' + e.x; S.diary.unshift(e); }
@@ -3276,7 +3397,7 @@ function simulateAway(sec, why) {
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
   /* v11: сводка для отдельной карточки «Пока вас не было» */
-  lastAway = { sec: cap, slept: sec > cap, why: why || '', wins: c.wins, deaths: c.deaths, quests: c.quests, forks: c.forks, gold: gd, fol: fd, fa0: Math.floor(fa0), fa1: Math.floor(S.god.faith), l0, l1: h.lvl, items: c.items.slice(0, 6), hl: hl.slice(0, 6).map(e => ({ x: e.x.replace(/^⏳ /, ''), c: e.c })) };
+  lastAway = { sec: cap, slept: sec > cap, why: why || '', wins: c.wins, deaths: c.deaths, quests: c.quests, forks: c.forks, gold: gd, fol: fd, fa0: Math.floor(fa0), fa1: Math.floor(S.god.faith), l0, l1: h.lvl, items: c.items.slice(0, 6), hl: hl.slice(0, 6).map(e => ({ x: e.x.replace(/^⏳ /, ''), c: e.c })), oly: o0 ? olyAway(o0, c.seasons || []) : null };
   return c;
 }
 let lastAway = null;
@@ -3287,6 +3408,7 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV10) { delete S._migratedV10; diary('🏛 Обновление мира: началась «Война за Олимп»! Мир поделён на 14 регионов, и боги-соперники обращают в них души. Регион принадлежит богу с самой большой паствой и даёт веру и бонус. Через 4 недели топ-7 богов займут троны Олимпа. Карта и таблица — во вкладке «🏛 Олимп».', 'oly'); }
   if (S._migratedV8) { delete S._migratedV8; const id = bldId(S.hero); diary(`🧭 Обновление мира: герои теперь сами выбирают путь. Посмотрев на свои мускулы и рюкзак, ${S.hero.name} решил, что он — ${bldName(id)}. Посоветовать другой путь можно в «📋 Герой».`, 'rare'); }
   if (S._migratedV7) { delete S._migratedV7; diary(`🧥 Обновление мира: у героя теперь 10 слотов — шлем, перчатки, сапоги, пояс, щит и второе кольцо. Новые слоты пока пусты; у вещей появились требования, 9 комплектов и 15 легендарок. Старое снаряжение на месте.`, 'rare'); }
   if (S._migratedV6) { delete S._migratedV6; diary(`⚒ Обновление мира: у снаряжения появилась сила — ⚔ ГС (сейчас ${gearScore(S.hero)}). Подземелья теперь трёх сложностей с рекомендуемым ГС: недобор — монстры злее, перебор — легче. Огонь, вампиризм, шипы и серебро работают в бою, у боссов есть слабости. Кузнец в городе точит вещи за золото.`, 'level'); }
@@ -3490,7 +3612,7 @@ function beginBattle(kind, allies, enemies, o) {
   allies.forEach(u => u.team = 0); enemies.forEach(u => u.team = 1);
   const F = { id: 'b' + Date.now().toString(36) + rnd(100, 999), kind, title: o.title || 'Бой', fighters: allies.concat(enemies), turn: 0, phase: 'intro', t: 3, T: 3, prep: 0,
     my: { atk: [], blk: [], target: null }, choices: {}, ready: false, log: [], auto: !!S.fightAuto || !!o.auto, powersLeft: 3, usedTurn: 0,
-    result: null, rew: '', win: null, rivalGod: o.rivalGod || null, ctx: o.ctx || {}, tele: null, lastAtk: {}, lastBlk: {}, lastTarget: {}, stuck: 0 };
+    result: null, rew: '', win: null, rivalGod: o.rivalGod || null, region: o.region || null, ctx: o.ctx || {}, tele: null, lastAtk: {}, lastBlk: {}, lastTarget: {}, stuck: 0 };
   S.fight = F; F._tg = {};
   /* подготовка: бог рядом — есть время осмотреться и выбрать зоны; без бога герой начинает почти сразу */
   if (!SILENT && !F.auto && godPresent()) { F.T = F.t = PREP_T; F.prep = 1; }
@@ -3725,13 +3847,14 @@ function fightZone(arg) {
    Стоит веры, раз за ход, не считается силой. Выбор противника фиксируется сразу, так что подсказка честная, но
    покрывает 3 зоны из 5 — блок на 2 соседние всё равно остаётся угадыванием. */
 const HINT_COST = 6;
+const hintCost = () => HINT_COST - (olyB('hint') ? 3 : 0);
 function fightHint() {
   const F = S.fight; if (!F || F.phase !== 'turn') return toast('Подсказка — только во время хода.');
   if (F.auto) return toast('В автобое герой не слушает подсказок.');
   const me = fMe(F); if (!me || !me.alive) return toast('Ваш герой уже не в строю.');
   if (F.hint && F.hint.turn === F.turn) return toast('Подсказка на этот ход уже есть.');
-  if (S.god.faith < HINT_COST) return toast('Не хватает веры.');
-  S.god.faith -= HINT_COST; addGxp(1);
+  if (S.god.faith < hintCost()) return toast('Не хватает веры.');
+  S.god.faith -= hintCost(); addGxp(1);
   const att = [];
   for (const e of fEnemies(F, me)) {
     if (!e.alive) continue;
@@ -3857,6 +3980,7 @@ function endBattle0(F, winTeam) {
       rivals.reportDuel({ godId: G.godId, playerWon: won });
       if (won) { S.stats.dwins++; const n = rnd(2, 5) + Math.floor(S.flock.army / 5); S.flock.fol += n; addTrust(5); addGxp(30); fx.push(`+${n} паствы`, '+5 доверия'); }
       else { const g = Math.floor(h.gold * .1), n = Math.min(Math.floor(S.flock.fol), rnd(1, 3)); h.gold -= g; S.flock.fol -= n; addTrust(-3); addGxp(12); fx.push(`−${g} 💰`, `−${n} паствы`, '−3 доверия'); }
+      if (F.region && S.oly) { const r = olyDuelResult(F.region, G.godId, won); if (r) fx.push(r); }
     } else addGxp(won ? 12 : 5);
     if (fat < 1) fx.push(`усталость: награда ×${fat.toFixed(2)}`);
     F.result = won ? `🏆 Победа! ${F.kind === 'godduel' ? 'Бог ' + F.rivalGod.name + ' посрамлён.' : ''}` : `💔 Поражение. ${F.kind === 'godduel' ? 'Бог ' + F.rivalGod.name + ' злорадствует.' : 'Бывает.'}`;
@@ -3877,7 +4001,7 @@ function startMonsterFight() {
   beginBattle('monster', [heroUnit()], [u], { title: `Ручной бой: ${m.n}`, intro: 'Бог берёт бой под контроль!' });
   return true;
 }
-async function startGodDuel(godId) {
+async function startGodDuel(godId, regId) {
   if (!heroFree() || S.hero.state !== 'road') return false;
   const h = S.hero, st = S; h.state = 'duel'; duelPending = true;
   let opp;
@@ -3885,10 +4009,11 @@ async function startGodDuel(godId) {
   if (S !== st || h.state !== 'duel' || S.fight || S.dun) { if (S === st && h.state === 'duel' && !S.fight) h.state = 'road'; return false; }
   const me = heroUnit(), foe = botUnit({ bld: opp.bld, name: opp.hero, race: opp.race, cls: opp.cls, lvl: opp.heroLvl, rating: 1000 + opp.lvl * 30 });
   me.avg *= 1 + Math.min(S.flock.army, 10) * .02; foe.avg *= 1 + Math.min(opp.army || 0, 10) * .02;
-  beginBattle('godduel', [me], [foe], { title: `Дуэль богов: ${S.god.name} против ${opp.god}`, rivalGod: { godId: opp.godId, name: opp.god, pers: opp.pers, lvl: opp.lvl, faith: 50 + opp.lvl * 12, left: 3 },
+  const RG = regId && REG_BY[regId] ? regId : null;
+  beginBattle('godduel', [me], [foe], { title: `Дуэль богов${RG ? ' за ' + REG_BY[RG].s : ''}: ${S.god.name} против ${opp.god}`, region: RG, rivalGod: { godId: opp.godId, name: opp.god, pers: opp.pers, lvl: opp.lvl, faith: 50 + opp.lvl * 12, left: 3 },
     intro: `${opp.hero} (${RACES[opp.race].n.toLowerCase()}-${CLASSES[opp.cls].n.toLowerCase()}) говорит, что ваш бог — «так себе».` });
   S.stats.duels++; S.timers.duel = Math.max(S.timers.duel, 1200);
-  diary(`⚔ Встретил героя по имени ${opp.hero} (его бог — ${opp.god}). Дуэль богов!`, 'duel');
+  diary(RG ? `⚔ Бог ${opp.god} принял вызов: дуэль за души региона «${REG_BY[RG].n}»! Против меня — ${opp.hero}.` : `⚔ Встретил героя по имени ${opp.hero} (его бог — ${opp.god}). Дуэль богов!`, 'duel');
   toast('⚔ Дуэль богов! Выбирайте удар и блок.');
   return true;
 }
@@ -4261,6 +4386,7 @@ function validFight(F) {
   F.my.atk = Array.isArray(F.my.atk) ? [...new Set(F.my.atk.filter(z => ZONES.includes(z)))].slice(0, me.atkN) : [];
   F.my.blk = Array.isArray(F.my.blk) ? [...new Set(F.my.blk.filter(z => ZONES.includes(z)))].slice(0, me.blkN) : [];
   if (!ids.includes(F.my.target)) F.my.target = null;
+  if (F.region !== undefined && !(typeof F.region === 'string' && REG_BY[F.region])) F.region = null;
   if (!F.choices || typeof F.choices !== 'object') F.choices = {};
   for (const k of ['lastAtk', 'lastBlk', 'lastTarget', 'ctx']) if (!F[k] || typeof F[k] !== 'object') F[k] = {};
   fixNum(F, 'turn', 0, 0, 999); fixNum(F, 'T', TURN_T, 1, TURN_T); fixNum(F, 't', F.T, 0, F.T); fixNum(F, 'powersLeft', 3, 0, 3); F.powersLeft = Math.floor(F.powersLeft); fixNum(F, 'usedTurn', 0, 0, 3); fixNum(F, 'stuck', 0, 0);
@@ -4307,6 +4433,470 @@ function sanitizeArena(o, h) {
 }
 
 /* =====================================================================
+   13) ВОЙНА ЗА ОЛИМП (v12): карта регионов, души, боги-соперники, сезон
+   ---------------------------------------------------------------------
+   • 14 регионов (+ Олимп в центре), у каждого свои души (население). Душа принадлежит одному богу или ничья.
+   • Владелец региона — бог с наибольшей долей (не меньше 12% населения; чтобы отнять, нужно на 5% больше владельца).
+     Владелец получает веру и бонус региона, а также очки влияния (ОВ) каждый час.
+   • Души растут: герой ходит, проповедует и побеждает в регионе, храм региона обращает сам, штурм армией,
+     дуэль богов в регионе, божественные моменты. Без присутствия души медленно остывают (0,25% в час).
+   • Боги-соперники — только через RivalProvider.worldTurn (сейчас LocalAIProvider). Сетевой провайдер
+     будет возвращать те же действия от настоящих игроков: { god, kind: 'focus'|'preach'|'storm'|'temple', reg, power|n }.
+   • Сезон — 28 суток реального времени. В конце топ-7 по ОВ занимают троны Олимпа; игрок с троном получает
+     титул, рамку и «Олимпийский дар» на весь следующий сезон. Карта сбрасывается, герой и вещи остаются.
+   ===================================================================== */
+const OLY_K = {
+  season: 28 * 86400e3,  // длина сезона, мс реального времени
+  step: 60,              // шаг мира, с
+  minShare: .12, hyst: 1.05,
+  decay: .0025,          // остывание душ без присутствия, доля в час
+  steal: .6,             // переманивать чужие души труднее, чем обращать ничьи
+  bot: 62,               // душ в час у бога-бота в походе (×сила бога)
+  heroWalk: 1.1, heroTown: 1.4, heroPreach: 5, heroWin: 3,
+  tConv: 9, tDef: .12, tCost: [60, 120, 200, 320, 480], tMax: 5, tReq: .08,
+  stormPer: 12, stormLoss: .25, stormCd: 1800, stormMax: 30, stormMin: 3,
+  duelCd: 1800, duelWin: .10, duelLose: .05,
+  regFaith: .0025,       // вера в секунду за каждый свой регион
+  infBase: 6, infPop: 120, infSoul: 160,
+  thrones: 7, giftCd: 6 * 3600, giftShare: .06,
+  holdT: 2 * 3600, startShare: .3,
+  amb: 1.6, sprint: 1.3, sprintT: 5 * 86400e3, // претенденты сильнее; в последние 5 дней — финишный рывок
+               // сила двух ботов-претендентов
+  heroOff: .85,           // герой без присмотра бога (офлайн) проповедует вполсилы
+  offDef: .6,            // пока бога нет у экрана, его прихожан переманивать труднее (сутки без игры — не катастрофа)
+  spread: .08            // большая религия растекается: −8% обращения за каждый регион сверх двух
+};
+/* Регионы: сетка шестиугольников 5×3 (нечётные колонки сдвинуты вниз), центр (2,1) — Олимп */
+const REGIONS = [
+  { id: 'les', v: 'в Лесу Чего-То-Там', to: 'в Лес Чего-То-Там', n: 'Лес Чего-То-Там', s: 'Лес', ic: '🌲', k: 'forest', c: 0, r: 0, pop: 800, b: 'loot', bt: 'добыча с врагов на 10% чаще' },
+  { id: 'pinki', v: 'в Нижних Пинках', to: 'в Нижние Пинки', n: 'Нижние Пинки', s: 'Пинки', ic: '🏡', k: 'village', c: 0, r: 1, pop: 1000, town: 1, b: 'preach', bt: 'проповеди героя: +1 паствы' },
+  { id: 'boloto', v: 'на Болоте Уныния', to: 'на Болото Уныния', n: 'Болото Уныния', s: 'Болото', ic: '🐸', k: 'swamp', c: 0, r: 2, pop: 650, b: 'potion', bt: 'зелья на 25% дешевле' },
+  { id: 'pereval', v: 'на Перевале Последней Надежды', to: 'на Перевал Последней Надежды', n: 'Перевал Последней Надежды', s: 'Перевал', ic: '⛰', k: 'mount', c: 1, r: 0, pop: 600, b: 'army', bt: 'солдаты на 3 веры дешевле' },
+  { id: 'godgrad', v: 'в Годграде', to: 'в Годград', n: 'Годград', s: 'Годград', ic: '🏰', k: 'city', c: 1, r: 1, pop: 1400, town: 1, b: 'shop', bt: 'покупки в городах на 10% дешевле' },
+  { id: 'dolina', v: 'в Долине Носков', to: 'в Долину Носков', n: 'Долина Носков', s: 'Долина', ic: '🧦', k: 'valley', c: 1, r: 2, pop: 850, b: 'trust', bt: 'доверие героя растёт на 20% быстрее' },
+  { id: 'gora', v: 'на Горе Вечного Понедельника', to: 'на Гору Вечного Понедельника', n: 'Гора Вечного Понедельника', s: 'Гора', ic: '🗻', k: 'mount', c: 2, r: 0, pop: 600, b: 'maxf', bt: 'запас веры +15' },
+  { id: 'kapust', v: 'в Капустинске', to: 'в Капустинск', n: 'Капустинск', s: 'Капустинск', ic: '🥬', k: 'field', c: 2, r: 2, pop: 1100, town: 1, b: 'faith', bt: 'вера +14 в час' },
+  { id: 'zamok', v: 'в Замке барона Храпуна', to: 'в Замок барона Храпуна', n: 'Замок барона Храпуна', s: 'Замок', ic: '🏯', k: 'castle', c: 3, r: 0, pop: 750, b: 'gold', bt: '+10% золота за победы' },
+  { id: 'ponty', v: 'в Больших Понтах', to: 'в Большие Понты', n: 'Большие Понты', s: 'Понты', ic: '🏙', k: 'city', c: 3, r: 1, pop: 1300, town: 1, b: 'sell', bt: 'продажа добра +15%' },
+  { id: 'pustosh', v: 'в Пустоши Забытых Паролей', to: 'в Пустошь Забытых Паролей', n: 'Пустошь Забытых Паролей', s: 'Пустошь', ic: '🏜', k: 'waste', c: 3, r: 2, pop: 550, b: 'temple', bt: 'храмы в регионах на 15% дешевле' },
+  { id: 'bereg', v: 'на Берегу Русалок', to: 'на Берег Русалок', n: 'Берег Русалок', s: 'Берег', ic: '🌊', k: 'coast', c: 4, r: 0, pop: 700, b: 'rest', bt: 'короткий отдых лечит на 25% больше' },
+  { id: 'ovrag', v: 'в Овраге Сомнений', to: 'в Овраг Сомнений', n: 'Овраг Сомнений', s: 'Овраг', ic: '🕳', k: 'ravine', c: 4, r: 1, pop: 600, b: 'hint', bt: '«👁 Подсказать» в бою на 3 веры дешевле' },
+  { id: 'tuman', v: 'в Туманных болотах', to: 'в Туманные болота', n: 'Туманные болота', s: 'Туман', ic: '🌫', k: 'swamp', c: 4, r: 2, pop: 700, b: 'buff', bt: 'щит и благословение длятся на 20% дольше' }
+];
+const REG_BY = {}; for (const R0 of REGIONS) REG_BY[R0.id] = R0;
+const OLY_HEX = 50;
+const hexXY = (c, r) => ({ x: 52 + c * 75, y: 46 + r * 86.6 + (c % 2 ? 43.3 : 0) });
+const OLY_CEN = hexXY(2, 1);
+function hexAdj(a, b) {
+  const dc = b.c - a.c, dr = b.r - a.r;
+  if (dc === 0) return Math.abs(dr) === 1;
+  if (Math.abs(dc) !== 1) return false;
+  return a.c % 2 ? (dr === 0 || dr === 1) : (dr === 0 || dr === -1);
+}
+for (const A of REGIONS) { Object.assign(A, hexXY(A.c, A.r)); A.nb = REGIONS.filter(B => B !== A && hexAdj(A, B)).map(B => B.id); }
+const TOWN_REGS = REGIONS.filter(x => x.town).map(x => x.id);
+/* Боги на карте: вы (me) и 8 соперников. Цвета, родина, девиз */
+const GOD_IDS = ['me'].concat(RIVALS_BASE.map(b => b.id));
+const GOD_COL = { me: '#22b8e6', g1: '#d0453a', g2: '#e07fae', g3: '#8e5bd6', g4: '#2f9e8f', g5: '#e08a2c', g6: '#4f5fcf', g7: '#d4b21f', g8: '#5f9a3a' };
+const GOD_HOME = { me: 'godgrad', g1: 'zamok', g2: 'dolina', g3: 'ovrag', g4: 'les', g5: 'kapust', g6: 'gora', g7: 'ponty', g8: 'tuman' };
+const GOD_MOTTO = { g1: 'Сначала бьёт, потом обращает', g2: 'Обнимет, накормит, обратит', g3: 'Переманивает тех, кто плохо лежит', g4: 'Молча держит своё',
+  g5: 'Обещает колбасу каждому', g6: 'Наводит тоску и штурмует', g7: 'Сияет и строит храмы', g8: 'Древний, медленный, упрямый' };
+const PERS_OLY = { aggr: { conv: 1, storm: .45, temple: .05, att: 1.6, def: .6 }, heal: { conv: 1.05, storm: .08, temple: .2, att: .6, def: 1.2 },
+  trick: { conv: 1.1, storm: .2, temple: .06, att: 1.1, def: .7 }, def: { conv: .9, storm: .1, temple: .16, att: .5, def: 2 } };
+const TEMPLE_R = ['часовня', 'храм', 'собор', 'лавра', 'святыня'];
+const THRONES = [['👑', 'Верховный бог Олимпа'], ['⚡', 'Громовержец'], ['🔥', 'Хранитель очага'], ['🌊', 'Повелитель морей'], ['🌾', 'Владыка урожая'], ['🍷', 'Покровитель пиров'], ['🥟', 'Хозяин подземных пельменей']];
+const frameOf = rank => rank === 1 ? 'f1' : rank <= 3 ? 'f2' : 'f3';
+let OLY_NOW = null, OLY_SLEEP = false;      // во время офлайн-симуляции: «виртуальное» время и сон героя
+const olyNow = () => OLY_NOW !== null ? OLY_NOW : Date.now();
+const godName = g => g === 'me' ? S.god.name : (RIVALS_BASE.find(b => b.id === g) || {}).name || '?';
+const godShort = g => g === 'me' ? 'вы' : godName(g);
+const rivalOf = g => S.rivals.find(r => r.id === g);
+const regLoc = id => { const R0 = REG_BY[id]; return R0 ? R0.n : ''; };
+const rIn = id => REG_BY[id] ? REG_BY[id].v : '', rTo = id => REG_BY[id] ? REG_BY[id].to : '';
+
+/* ---------- Состояние мира ---------- */
+function olyNewWorld(n, start) {
+  const reg = {};
+  for (const R0 of REGIONS) reg[R0.id] = { s: {}, tp: {}, own: null, cdS: 0, cdD: 0, hot: 0 };
+  for (const g of GOD_IDS) {
+    const hid = GOD_HOME[g], X = reg[hid];
+    X.s[g] = Math.round(REG_BY[hid].pop * OLY_K.startShare); X.tp[g] = 1; X.own = g;
+    for (const nb of REG_BY[hid].nb) reg[nb].s[g] = (reg[nb].s[g] || 0) + Math.round(REG_BY[nb].pop * (.03 + R() * .03));
+  }
+  const inf = {}; for (const g of GOD_IDS) inf[g] = 0;
+  const amb = RIVALS_BASE.map(b => b.id).sort(() => R() - .5).slice(0, 2); // два «претендента» сезона — сильнее остальных
+  const bots = {}; for (const b of RIVALS_BASE) bots[b.id] = { r: GOD_HOME[b.id], t: rnd(300, 1800), a: amb.includes(b.id) ? OLY_K.amb : 1 };
+  return { n, start, end: start + OLY_K.season, reg, inf, bots, acc: 0, log: [], hold: null, dest: null, gift: 0 };
+}
+function olyNewState(now) {
+  const O = olyNewWorld(1, now); O.v = 1; O.intro = 0; O.rew = null; O.hist = []; O.last = null; return O;
+}
+/* Санация сохранения: всё, что не похоже на мир, — новый мир с текущего момента (честный старт сезона) */
+function sanitizeOly(o) {
+  const now = Date.now(), O = o.oly, h = o.hero;
+  const okW = O && typeof O === 'object' && isNum(O.n) && isNum(O.start) && isNum(O.end) && O.reg && typeof O.reg === 'object' && O.end > O.start && O.end - O.start <= OLY_K.season * 1.01;
+  if (!okW) {
+    const keep = O && typeof O === 'object' ? O : {};
+    o.oly = olyNewState(now);
+    if (keep.intro) o.oly.intro = 1;
+  }
+  const W = o.oly;
+  W.v = 1; W.n = Math.max(1, Math.floor(W.n)); W.intro = W.intro ? 1 : 0;
+  if (W.start > now + 60e3) { W.start = now; W.end = now + OLY_K.season; } // часы ушли вперёд — не ломаем сезон
+  for (const R0 of REGIONS) {
+    let X = W.reg[R0.id]; if (!X || typeof X !== 'object') X = W.reg[R0.id] = { s: {}, tp: {}, own: null };
+    if (!X.s || typeof X.s !== 'object') X.s = {}; if (!X.tp || typeof X.tp !== 'object') X.tp = {};
+    let sum = 0;
+    for (const g of Object.keys(X.s)) { if (!GOD_IDS.includes(g) || !isNum(X.s[g]) || X.s[g] <= 0) delete X.s[g]; else sum += X.s[g]; }
+    if (sum > R0.pop) for (const g in X.s) X.s[g] *= R0.pop / sum;
+    for (const g of Object.keys(X.tp)) { if (!GOD_IDS.includes(g) || !isNum(X.tp[g]) || X.tp[g] < 1) delete X.tp[g]; else X.tp[g] = Math.min(OLY_K.tMax, Math.floor(X.tp[g])); }
+    if (X.own !== null && !GOD_IDS.includes(X.own)) X.own = null;
+    if (X.own === undefined) X.own = null;
+    for (const k of ['cdS', 'cdD', 'hot']) fixNum(X, k, 0, 0, 1e6);
+    for (const k of Object.keys(X)) if (!['s', 'tp', 'own', 'cdS', 'cdD', 'hot'].includes(k)) delete X[k];
+  }
+  for (const k of Object.keys(W.reg)) if (!REG_BY[k]) delete W.reg[k];
+  if (!W.inf || typeof W.inf !== 'object') W.inf = {};
+  for (const g of GOD_IDS) fixNum(W.inf, g, 0, 0, 1e9);
+  for (const k of Object.keys(W.inf)) if (!GOD_IDS.includes(k)) delete W.inf[k];
+  if (!W.bots || typeof W.bots !== 'object') W.bots = {};
+  for (const b of RIVALS_BASE) { let B = W.bots[b.id]; if (!B || typeof B !== 'object' || !REG_BY[B.r]) B = W.bots[b.id] = { r: GOD_HOME[b.id], t: rnd(60, 900) }; fixNum(B, 't', 300, 0, 7200); }
+  for (const k in W.bots) { const B = W.bots[k]; if (B && !(B.a >= 1 && B.a <= 2)) B.a = 1; }
+  for (const k of Object.keys(W.bots)) if (!RIVALS_BASE.find(b => b.id === k)) delete W.bots[k];
+  fixNum(W, 'acc', 0, 0, 3600); fixNum(W, 'gift', 0, 0, OLY_K.giftCd);
+  W.log = Array.isArray(W.log) ? W.log.filter(e => e && typeof e.x === 'string').slice(0, 30).map(e => ({ tm: typeof e.tm === 'string' ? e.tm.slice(0, 12) : '', x: e.x.slice(0, 200), c: typeof e.c === 'string' ? e.c.slice(0, 8) : '' })) : [];
+  W.dest = REG_BY[W.dest] ? W.dest : null;
+  W.hold = W.hold && REG_BY[W.hold.r] && isNum(W.hold.t) && W.hold.t > 0 ? { r: W.hold.r, t: Math.min(W.hold.t, OLY_K.holdT) } : null;
+  const rw = W.rew;
+  W.rew = rw && typeof rw === 'object' && isNum(rw.rank) && rw.rank >= 1 && rw.rank <= OLY_K.thrones && isNum(rw.n) ? { n: Math.floor(rw.n), rank: Math.floor(rw.rank), title: THRONES[Math.floor(rw.rank) - 1][1], ic: THRONES[Math.floor(rw.rank) - 1][0], frame: frameOf(Math.floor(rw.rank)) } : null;
+  W.hist = Array.isArray(W.hist) ? W.hist.filter(x => x && isNum(x.n) && isNum(x.rank)).slice(-12).map(x => ({ n: Math.floor(x.n), rank: Math.floor(x.rank), inf: isNum(x.inf) ? Math.round(x.inf) : 0, regs: isNum(x.regs) ? Math.floor(x.regs) : 0, of: isNum(x.of) ? Math.floor(x.of) : GOD_IDS.length })) : [];
+  const L = W.last; W.last = L && typeof L === 'object' && isNum(L.n) && isNum(L.rank) && Array.isArray(L.top) ? { n: Math.floor(L.n), rank: Math.floor(L.rank), at: isNum(L.at) ? L.at : now, top: L.top.filter(t => t && GOD_IDS.includes(t.g)).slice(0, GOD_IDS.length).map(t => ({ g: t.g, inf: isNum(t.inf) ? Math.round(t.inf) : 0, regs: isNum(t.regs) ? Math.floor(t.regs) : 0 })), seen: L.seen ? 1 : 0 } : null;
+  for (const k of Object.keys(W)) if (!['v', 'n', 'start', 'end', 'reg', 'inf', 'bots', 'acc', 'log', 'hold', 'dest', 'gift', 'intro', 'rew', 'hist', 'last'].includes(k)) delete W[k];
+  if (!REG_BY[h.reg]) h.reg = regFromLoc(h.loc);
+  h.loc = REG_BY[h.reg].n;
+  for (const R0 of REGIONS) { const X = W.reg[R0.id]; if (X.own && !((X.s[X.own] || 0) >= R0.pop * OLY_K.minShare)) X.own = null; }
+}
+function regFromLoc(loc) {
+  loc = String(loc || '').toLowerCase();
+  const f = REGIONS.find(R0 => loc.includes(R0.s.toLowerCase().slice(0, 5)) || loc.includes(R0.n.toLowerCase().slice(0, 6)));
+  return f ? f.id : 'godgrad';
+}
+
+/* ---------- Расчёты ---------- */
+const regPop = id => REG_BY[id].pop;
+function regSum(X) { let s = 0; for (const g in X.s) s += X.s[g]; return s; }
+const mySouls = id => (S.oly.reg[id].s.me || 0);
+const myShare = id => mySouls(id) / regPop(id);
+const mySpread = () => 1 / (1 + OLY_K.spread * Math.max(0, olyOwned('me') - 2));
+function olyOwned(g) { let n = 0; for (const R0 of REGIONS) if (S.oly.reg[R0.id].own === g) n++; return n; }
+function olySouls(g) { let n = 0; for (const R0 of REGIONS) n += S.oly.reg[R0.id].s[g] || 0; return n; }
+function olyRate(g) { // ОВ в час
+  let v = olySouls(g) / OLY_K.infSoul;
+  for (const R0 of REGIONS) if (S.oly.reg[R0.id].own === g) v += OLY_K.infBase + R0.pop / OLY_K.infPop;
+  return v;
+}
+function olyRanking() {
+  const O = S.oly;
+  return GOD_IDS.map(g => ({ g, inf: O.inf[g] || 0, regs: olyOwned(g), souls: olySouls(g), rate: olyRate(g) })).sort((a, b) => b.inf - a.inf || b.rate - a.rate || (a.g === 'me' ? -1 : 1));
+}
+const olyRank = () => olyRanking().findIndex(x => x.g === 'me') + 1;
+function olyB(key) { if (!S || !S.oly) return false; for (const R0 of REGIONS) if (R0.b === key && S.oly.reg[R0.id].own === 'me') return true; return false; }
+const olyFaith = () => S && S.oly ? olyOwned('me') * OLY_K.regFaith + (olyB('faith') ? .004 : 0) : 0;
+const heroIn = id => S.hero.reg === id && S.hero.state !== 'dead' && !OLY_SLEEP;
+function olyDef(id, g) { const X = S.oly.reg[id]; let d = 1 - OLY_K.tDef * (X.tp[g] || 0); if (g === 'me' && heroIn(id)) d *= .6; if (g === 'me' && (SILENT || OLY_SLEEP)) d *= OLY_K.offDef; return Math.max(.25, d); }
+function regTempleCost(id) { const L = S.oly.reg[id].tp.me || 0; return L >= OLY_K.tMax ? 0 : Math.round(OLY_K.tCost[L] * (olyB('temple') ? .85 : 1)); }
+function olyLog(x, c) { const O = S.oly; O.log.unshift({ tm: nowStr(), x, c: c || '' }); if (O.log.length > 30) O.log.length = 30; }
+/* Обращение душ: из ничьих легко, чужие — труднее (steal) и с учётом храмов/присутствия героя */
+function olyConvert(id, g, amt) {
+  if (!(amt > 0) || !S.oly.reg[id]) return 0;
+  const X = S.oly.reg[id], pop = regPop(id), un = Math.max(0, pop - regSum(X));
+  const oth = []; let ow = 0;
+  for (const k in X.s) if (k !== g && X.s[k] > 0) { const w = X.s[k] * olyDef(id, k); oth.push([k, w]); ow += w; }
+  const W = un + ow; if (W <= 0) return 0;
+  const fu = un / W; let got = Math.min(un, amt * fu);
+  const st = amt * (1 - fu) * OLY_K.steal;
+  for (const [k, w] of oth) { const take = Math.min(X.s[k], st * w / ow); X.s[k] -= take; got += take; if (X.s[k] < .5) delete X.s[k]; }
+  X.s[g] = (X.s[g] || 0) + got;
+  return got;
+}
+/* Смена владельца с гистерезисом */
+function regOwner(id) {
+  const O = S.oly, X = O.reg[id], pop = regPop(id), cur = X.own, cv = cur ? (X.s[cur] || 0) : 0;
+  let best = null, bv = 0; for (const g in X.s) if (X.s[g] > bv) { bv = X.s[g]; best = g; }
+  let nw = cur;
+  if (!cur || cv < pop * OLY_K.minShare) nw = bv >= pop * OLY_K.minShare ? best : null;
+  else if (best !== cur && bv > cv * OLY_K.hyst + 2) nw = best;
+  if (nw === cur) return;
+  X.own = nw; X.hot = 180;
+  const R0 = REG_BY[id];
+  if (nw === 'me') {
+    diary(`🏛 ${R0.ic} ${R0.n} теперь мой! Здешние души молятся ${S.god.name}. Бонус: ${R0.bt}.`, 'oly', `+${Math.round(OLY_K.regFaith * 3600)} веры в час`);
+    if (!SILENT) { toast(`🏛 ${R0.n} — ваш регион! ${R0.bt}`); sfx('level'); }
+    olyLog(`🏛 Вы заняли ${R0.n}${cur ? ` (было: ${godName(cur)})` : ''}`, 'me');
+  } else if (cur === 'me') {
+    diary(`💔 ${R0.ic} ${R0.n} потерян: ${nw ? 'там теперь правит бог ' + godName(nw) : 'души разбрелись, регион ничей'}. Боже, верни его!`, 'oly');
+    if (!SILENT) toast(`💔 Потерян регион ${R0.n}${nw ? ' — его забрал ' + godName(nw) : ''}`);
+    olyLog(`💔 ${R0.n} ушёл от вас${nw ? ' к богу ' + godName(nw) : ''}`, 'bad');
+  } else olyLog(nw ? `${R0.ic} ${R0.n}: теперь правит ${godName(nw)}${cur ? ` (вместо ${godName(cur)})` : ''}` : `${R0.ic} ${R0.n} стал ничьим`, '');
+}
+
+/* ---------- Действия бога-игрока ---------- */
+function olySend(id) {
+  const R0 = REG_BY[id], O = S.oly, h = S.hero; if (!R0) return false;
+  if (h.reg === id) { O.dest = null; O.hold = { r: id, t: OLY_K.holdT }; diary(`Бог велит стоять за регион «${R0.n}». Остаюсь здесь и несу слово!`, 'oly'); return true; }
+  O.dest = id; O.hold = null;
+  const d = regDist(h.reg, id);
+  diary(`🧭 Бог велит идти ${R0.to}. Путь неблизкий (${d} ${plural(d, 'переход', 'перехода', 'переходов')}), но я уже шагаю!`, 'oly');
+  return true;
+}
+function olyTemple(id) {
+  const R0 = REG_BY[id], X = S.oly.reg[id], L = X.tp.me || 0; if (!R0) return;
+  if (L >= OLY_K.tMax) return toast('Храм здесь уже величайший.');
+  if (myShare(id) < OLY_K.tReq && S.hero.reg !== id) return toast(`Строить можно, где у вас от ${Math.round(OLY_K.tReq * 100)}% душ или где сейчас герой.`);
+  const c = regTempleCost(id); if (S.god.faith < c) return toast('Не хватает веры.');
+  S.god.faith -= c; X.tp.me = L + 1; addGxp(c / 5); X.hot = 120;
+  diary(`⛪ ${R0.v[0].toUpperCase() + R0.v.slice(1)} ${L ? 'расширили' : 'построили'} ${TEMPLE_R[L]} во славу моего бога.`, 'oly', `−${c} веры, храм ур. ${L + 1}: +${OLY_K.tConv * (L + 1)} душ в час, защита ${Math.round(OLY_K.tDef * (L + 1) * 100)}%`);
+  olyLog(`⛪ Вы: ${TEMPLE_R[L]} ${R0.v}`, 'me');
+}
+/* Штурм: солдаты переманивают души владельца (или главного соперника) в регионе */
+function stormTarget(id, g) {
+  const X = S.oly.reg[id]; if (X.own && X.own !== g) return X.own;
+  let best = null, bv = 0; for (const k in X.s) if (k !== g && X.s[k] > bv) { bv = X.s[k]; best = k; } return best;
+}
+function olyStormCalc(id, g, n) {
+  const X = S.oly.reg[id], tg = stormTarget(id, g);
+  const garrison = tg === 'me' ? S.flock.army : tg ? ((rivalOf(tg) || {}).army || 0) : 0;
+  const def = tg ? Math.max(.3, 1 - .1 * (X.tp[tg] || 0) - Math.min(.3, garrison * .01) - (tg === 'me' && heroIn(id) ? .15 : 0)) : 1;
+  const take = tg ? Math.min(X.s[tg] || 0, n * OLY_K.stormPer * def) : Math.min(Math.max(0, regPop(id) - regSum(X)), n * OLY_K.stormPer * .7);
+  return { tg, take, gain: tg ? take * .8 : take, loss: Math.min(n, Math.ceil(n * OLY_K.stormLoss * (tg ? 1.2 - def * .4 : .5))) };
+}
+function olyStorm(id, g, n) {
+  const X = S.oly.reg[id], c = olyStormCalc(id, g, n);
+  if (c.tg) { X.s[c.tg] = Math.max(0, (X.s[c.tg] || 0) - c.take); if (X.s[c.tg] < .5) delete X.s[c.tg]; }
+  X.s[g] = (X.s[g] || 0) + c.gain; X.hot = 180;
+  return c;
+}
+function olyStormMe(id, n) {
+  const R0 = REG_BY[id], X = S.oly.reg[id], O = S.oly; if (!R0) return;
+  n = n === 'all' ? S.flock.army : Math.min(+n || 0, S.flock.army, OLY_K.stormMax);
+  n = Math.min(n, OLY_K.stormMax);
+  if (n < 1) return toast('Армии нет. Наберите солдат во вкладке «Паства».');
+  if (X.cdS > 0) return toast(`Армия ещё не оправилась после штурма здесь (${fmtDur(X.cdS)}).`);
+  if (!stormTarget(id, 'me') && regSum(X) >= regPop(id) - 1) return toast('Здесь некого штурмовать.');
+  const c = olyStorm(id, 'me', n);
+  S.flock.army -= c.loss; X.cdS = OLY_K.stormCd; addGxp(n * 2); shiftAlign(-1);
+  diary(`⚔ Божья армия (${n} ${plural(n, 'солдат', 'солдата', 'солдат')}) штурмует регион ${R0.n}${c.tg ? ` — оплот бога ${godName(c.tg)}` : ''}! ${c.tg ? 'Жрецы разбежались, прихожане перешли к нам.' : 'Ничейные души впечатлены вилами.'}`, 'oly', `+${Math.round(c.gain)} душ${c.tg ? `, у ${godShort(c.tg)} −${Math.round(c.take)}` : ''}, погибло солдат: ${c.loss}`);
+  olyLog(`⚔ Вы штурмовали регион ${R0.n}: +${Math.round(c.gain)} душ`, 'me');
+  regOwner(id);
+  if (!SILENT) sfx('crit');
+}
+/* Дуэль богов в регионе — обычная дуэль богов (startGodDuel) с ставкой душ */
+function olyDuel(id) {
+  const X = S.oly.reg[id], g = X.own && X.own !== 'me' ? X.own : stormTarget(id, 'me');
+  if (!g || g === 'me') return toast('Здесь не с кем драться за души.');
+  if (X.cdD > 0) return toast(`За этот регион уже бились недавно (${fmtDur(X.cdD)}).`);
+  if (S.god.faith < 10) return toast('Нужно 10 веры.');
+  if (S.fight || S.dun || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят — дуэль начнётся, когда он будет в пути.');
+  S.god.faith -= 10; X.cdD = OLY_K.duelCd;
+  startGodDuel(g, id).then(ok => { if (!ok && S) { addFaith(10); X.cdD = 0; } });
+  return true;
+}
+function olyDuelResult(id, g, won) {
+  const R0 = REG_BY[id], X = S.oly.reg[id]; if (!R0 || !X) return '';
+  if (won) { const take = Math.min(X.s[g] || 0, R0.pop * OLY_K.duelWin); X.s[g] = (X.s[g] || 0) - take; X.s.me = (X.s.me || 0) + take; X.hot = 180; regOwner(id); olyLog(`🤺 Вы победили ${godName(g)} в дуэли за регион ${R0.n}`, 'me'); return `+${Math.round(take)} душ (${R0.s})`; }
+  const take = Math.min(X.s.me || 0, R0.pop * OLY_K.duelLose); X.s.me = (X.s.me || 0) - take; X.s[g] = (X.s[g] || 0) + take; X.hot = 180; regOwner(id); olyLog(`🤺 ${godName(g)} отстоял регион ${R0.n} в дуэли`, 'bad');
+  return take >= 1 ? `−${Math.round(take)} душ (${R0.s})` : '';
+}
+/* Олимпийский дар — награда трона на весь следующий сезон */
+function olyGift() {
+  const O = S.oly; if (!O.rew) return toast('Дар есть только у богов с троном Олимпа.');
+  if (O.gift > 0) return toast(`Дар восстановится через ${fmtDur(O.gift)}.`);
+  const id = S.hero.reg, R0 = REG_BY[id];
+  const got = olyConvert(id, 'me', R0.pop * OLY_K.giftShare * 1.6); addFaith(25); O.gift = OLY_K.giftCd; S.oly.reg[id].hot = 180;
+  diary(`${O.rew.ic} Олимпийский дар! ${R0.v[0].toUpperCase() + R0.v.slice(1)} разверзлись небеса, и сам ${O.rew.title} явился народу.`, 'oly', `+${Math.round(got)} душ, +25 веры`);
+  regOwner(id);
+}
+/* ---------- Герой на карте ---------- */
+function regDist(a, b) { if (a === b) return 0; const p = regPath(a, b); return p ? p.length : 99; }
+function regPath(a, b) {
+  if (!REG_BY[a] || !REG_BY[b]) return null;
+  const prev = { [a]: null }, q = [a];
+  while (q.length) { const x = q.shift(); if (x === b) break; for (const y of REG_BY[x].nb) if (!(y in prev)) { prev[y] = x; q.push(y); } }
+  if (!(b in prev)) return null;
+  const path = []; for (let x = b; x !== a; x = prev[x]) path.unshift(x); return path;
+}
+const olyGoal = () => { const O = S.oly; return O.dest || (O.hold && O.hold.t > 0 ? O.hold.r : null); };
+function nearestTown(id) { if (REG_BY[id].town) return id; return TOWN_REGS.slice().sort((a, b) => regDist(id, a) - regDist(id, b) || (a === 'godgrad' ? -1 : 1))[0]; }
+function olyEnter(id, quiet) {
+  const h = S.hero, O = S.oly, R0 = REG_BY[id]; if (!R0 || h.reg === id) return;
+  h.reg = id; h.loc = R0.n;
+  if (O.dest === id) { O.dest = null; O.hold = { r: id, t: OLY_K.holdT }; diary(`🧭 Дошёл до места: ${R0.n}, как велел бог. Буду нести здесь его слово.`, 'oly'); return; }
+  if (!quiet && R() < .5) { const X = O.reg[id]; diary(X.own === 'me' ? `Вхожу ${R0.to}. Тут молятся моему богу — приятно!` : X.own ? `Вхожу ${R0.to}. Здесь правит бог ${godName(X.own)}. Ничего, переубедим.` : `Вхожу ${R0.to}. Здесь пока никто никому не молится.`); }
+}
+/* Шаг пешком: идём к цели бога или (редко) бродим по соседям */
+function olyWalk() {
+  const h = S.hero, goal = olyGoal();
+  if (goal && goal !== h.reg) { if (R() < .6) { const p = regPath(h.reg, goal); if (p && p.length) olyEnter(p[0]); } return; }
+  if (!goal && R() < .1) { const nb = REG_BY[h.reg].nb; olyEnter(pick(nb)); }
+}
+function olyToTown() { const h = S.hero, t = nearestTown(h.reg); if (t !== h.reg) olyEnter(t, true); return REG_BY[h.reg].n; }
+function olyLeaveTown() {
+  const h = S.hero, goal = olyGoal();
+  if (goal && goal !== h.reg) { const p = regPath(h.reg, goal); if (p && p.length) olyEnter(p[0], true); return goal; }
+  if (!goal && R() < .6) { const nb = REG_BY[h.reg].nb; olyEnter(pick(nb), true); }
+  return h.reg;
+}
+/* Вклад героя: прогулка, город, проповедь, победа (в регионе, где он сейчас) */
+function olyHero(kind, n) {
+  if (!S || !S.oly) return 0;
+  const h = S.hero, id = h.reg; if (!REG_BY[id] || h.state === 'dead') return 0;
+  const cha = 1 + .08 * mod(statVal('cha'));
+  const v = kind === 'walk' ? OLY_K.heroWalk * cha : kind === 'town' ? OLY_K.heroTown * cha : kind === 'preach' ? OLY_K.heroPreach * (n || 1) : kind === 'win' ? OLY_K.heroWin : +n || 0;
+  const got = olyConvert(id, 'me', v * (SILENT ? OLY_K.heroOff : 1) * mySpread());
+  if (kind === 'preach' || kind === 'win') regOwner(id);
+  return got;
+}
+
+/* ---------- Ход мира ---------- */
+function olyTick(gdt) {
+  if (!S) return;
+  if (!S.oly) S.oly = olyNewState(olyNow());
+  const O = S.oly;
+  O.acc += gdt;
+  while (O.acc >= OLY_K.step) { O.acc -= OLY_K.step; olyStep(OLY_K.step); }
+  olySeasonCheck();
+}
+function olyStep(dt) {
+  const O = S.oly, hrs = dt / 3600;
+  for (const R0 of REGIONS) {
+    const X = O.reg[R0.id];
+    if (X.cdS > 0) X.cdS = Math.max(0, X.cdS - dt); if (X.cdD > 0) X.cdD = Math.max(0, X.cdD - dt); if (X.hot > 0) X.hot = Math.max(0, X.hot - dt);
+    for (const g in X.s) {
+      const pres = g === 'me' ? heroIn(R0.id) : O.bots[g] && O.bots[g].r === R0.id;
+      if (!pres) { X.s[g] *= 1 - OLY_K.decay * hrs * (1 - .15 * (X.tp[g] || 0)); if (X.s[g] < .5) delete X.s[g]; }
+    }
+    for (const g in X.tp) olyConvert(R0.id, g, OLY_K.tConv * X.tp[g] * hrs * (g === 'me' ? mySpread() : 1));
+  }
+  if (O.hold) { O.hold.t -= dt; if (O.hold.t <= 0) O.hold = null; }
+  if (O.gift > 0) O.gift = Math.max(0, O.gift - dt);
+  const acts = rivals.worldTurn(olyView(), dt) || [];
+  for (const a of acts) olyApply(a);
+  for (const R0 of REGIONS) regOwner(R0.id);
+  for (const g of GOD_IDS) O.inf[g] = (O.inf[g] || 0) + hrs * olyRate(g);
+}
+/* Что видят боги-соперники (тот же вид получит сетевой провайдер) */
+function olyView() {
+  const O = S.oly, rk = olyRanking();
+  return { leader: rk[0].g, me: { reg: S.hero.reg, army: S.flock.army },
+    regs: REGIONS.map(R0 => ({ id: R0.id, pop: R0.pop, nb: R0.nb, own: O.reg[R0.id].own, s: O.reg[R0.id].s, tp: O.reg[R0.id].tp })),
+    gods: rk.map(x => ({ id: x.g, inf: x.inf, regs: x.regs, souls: x.souls })) };
+}
+/* Применить действие соперника (бот или, в будущем, настоящий игрок) */
+function olyApply(a) {
+  if (!a || !GOD_IDS.includes(a.god) || a.god === 'me' || !REG_BY[a.reg]) return;
+  const O = S.oly, R0 = REG_BY[a.reg], X = O.reg[a.reg], nm = godName(a.god);
+  if (a.kind === 'focus') {
+    if (O.bots[a.god]) O.bots[a.god].r = a.reg;
+    const mine = X.own === 'me' || myShare(a.reg) >= .15;
+    if (mine && X.own !== a.god) {
+      X.hot = 120;
+      diary(`⚠ Бог ${nm} обращает души ${R0.v}${X.own === 'me' ? ' — это наш регион!' : '.'}`, 'oly');
+      if (!SILENT) toast(`⚠ ${nm} обращает души ${R0.v}`);
+    }
+    olyLog(`${R0.ic} ${nm} проповедует ${R0.v}`, mine ? 'warn' : '');
+  } else if (a.kind === 'preach') olyConvert(a.reg, a.god, Math.max(0, +a.power || 0));
+  else if (a.kind === 'temple') {
+    const L = X.tp[a.god] || 0; if (L >= 3) return; X.tp[a.god] = L + 1; X.hot = 90;
+    olyLog(`⛪ ${nm}: ${TEMPLE_R[L]} ${R0.v}`, '');
+  } else if (a.kind === 'storm') {
+    const r = rivalOf(a.god); const n = Math.min(Math.floor(+a.n || 0), r ? Math.floor(r.army) : 0); if (n < OLY_K.stormMin) return;
+    const c = olyStorm(a.reg, a.god, n); if (r) r.army = Math.max(0, r.army - c.loss);
+    if (c.tg === 'me') {
+      diary(`🔥 Армия бога ${nm} (${n}) штурмует наш регион ${R0.n}! Наши прихожане разбегаются.`, 'oly', `−${Math.round(c.take)} душ${S.flock.army ? `, гарнизон из ${S.flock.army} солдат сдерживал врага` : ''}`);
+      if (!SILENT) toast(`🔥 ${nm} штурмует ${R0.n}: −${Math.round(c.take)} ваших душ`);
+      olyLog(`🔥 ${nm} штурмовал ваш регион ${R0.n}`, 'bad');
+    } else olyLog(`🔥 ${nm} штурмовал регион ${R0.n}${c.tg ? ' (' + godName(c.tg) + ')' : ''}`, '');
+  }
+}
+
+/* ---------- Сезон ---------- */
+function olySeasonCheck() {
+  const O = S.oly; let guard = 0;
+  while (olyNow() >= S.oly.end && guard++ < 60) olySeasonEnd();
+  return O !== S.oly;
+}
+function olySeasonEnd() {
+  const O = S.oly, rk = olyRanking(), rank = rk.findIndex(x => x.g === 'me') + 1, n = O.n, end = O.end;
+  const me = rk[rank - 1];
+  O.hist.push({ n, rank, inf: Math.round(me.inf), regs: me.regs, of: GOD_IDS.length }); if (O.hist.length > 12) O.hist.shift();
+  const throne = rank <= OLY_K.thrones ? THRONES[rank - 1] : null;
+  const last = { n, rank, at: end, top: rk.map(x => ({ g: x.g, inf: Math.round(x.inf), regs: x.regs })), seen: 0 };
+  try { rivals.reportSeason({ n, rank, top: last.top }); } catch (e) { }
+  const W = olyNewWorld(n + 1, end);
+  W.v = 1; W.intro = O.intro; W.hist = O.hist; W.last = last;
+  W.rew = throne ? { n: n + 1, rank, title: throne[1], ic: throne[0], frame: frameOf(rank) } : null;
+  S.oly = W;
+  for (const r of S.rivals) r.army = Math.min(r.army, 12);
+  if (throne) { addGxp(60 - rank * 5); diary(`${throne[0]} Сезон ${n} окончен: ${S.god.name} занял трон Олимпа №${rank} — «${throne[1]}»! Новый сезон: карта снова чиста, но мой бог теперь носит титул, рамку и Олимпийский дар.`, 'oly', `место ${rank} из ${GOD_IDS.length}, ${Math.round(me.inf)} ОВ`); }
+  else diary(`🏛 Сезон ${n} окончен: ${S.god.name} — ${rank}-й из ${GOD_IDS.length}, без трона. Ничего, новый сезон — новая война за Олимп!`, 'oly', `${Math.round(me.inf)} ОВ`);
+  if (SILENT) SILENT.c.seasons = (SILENT.c.seasons || []).concat([{ n, rank, title: throne ? throne[1] : '' }]);
+  else { toast(`🏛 Сезон ${n} окончен: вы ${rank}-й!`); if (typeof seasonModal === 'function' && typeof document !== 'undefined') setTimeout(() => { if (S && S.oly.last && !S.oly.last.seen) seasonModal(); }, 50); }
+  S.hero.reg = S.hero.reg || 'godgrad';
+}
+/* Офлайн: дозапуск мира, когда герой уже спит (после 24 ч симуляции), крупными шагами */
+function olyFastForward(sec) {
+  const prevSleep = OLY_SLEEP; OLY_SLEEP = true;
+  try { let t = 0; const st = 600; while (t < sec) { const d = Math.min(st, sec - t); t += d; if (OLY_NOW !== null) OLY_NOW += d * 1000; S.oly.acc += d; while (S.oly.acc >= OLY_K.step) { S.oly.acc -= OLY_K.step; olyStep(OLY_K.step); } olySeasonCheck(); } }
+  finally { OLY_SLEEP = prevSleep; }
+}
+function olySnap() { const O = S.oly; return { n: O.n, rank: olyRank(), regs: REGIONS.filter(R0 => O.reg[R0.id].own === 'me').map(R0 => R0.id), inf: Math.round(O.inf.me || 0) }; }
+
+/* ---------- Соперники на карте: локальный ИИ ---------- */
+Object.assign(LocalAIProvider.prototype, {
+  seasonCalendar() { return null; },   // локальный сезон (сервер вернёт общий календарь { n, start, end })
+  reportSeason(res) { for (const t of res.top.slice(0, OLY_K.thrones)) { const r = this.st().rivals.find(x => x.id === t.g); if (r && R() < .5) r.lvl = Math.min(r.lvl + 1, this.st().god.lvl + 3); } },
+  worldTurn(view, dt) {
+    const st = this.st(), O = st.oly, out = [], hrs = dt / 3600;
+    for (const g of st.rivals) {
+      const B = O.bots[g.id]; if (!B) continue;
+      const P = PERS_OLY[g.pers] || PERS_OLY.def, mine = view.regs.filter(x => x.own === g.id), owned = mine.length;
+      B.t -= dt;
+      if (B.t <= 0) {
+        const tgt = this._target(g, view, P, B);
+        B.t = rnd(900, 2700);
+        if (tgt) out.push({ god: g.id, kind: 'focus', reg: tgt });
+      }
+      const pow = (.85 + .06 * Math.min(g.lvl, 10)) * P.conv * (B.a || 1) * (B.a > 1 && O.end - olyNow() < OLY_K.sprintT ? OLY_K.sprint : 1) / (1 + (B.a > 1 ? .08 : .15) * Math.max(0, owned - 1));
+      out.push({ god: g.id, kind: 'preach', reg: B.r, power: OLY_K.bot * pow * hrs });
+      if (R() < .4 * hrs) g.army += 1;
+      if (g.army >= 4 && R() < P.storm * hrs) {
+        const cand = view.regs.filter(x => x.own && x.own !== g.id).map(x => ({ x, w: 1 + (x.own === view.leader ? (B.a > 1 ? 2.5 : .8) : 0) + (x.own === 'me' && g.pers === 'aggr' ? 1 : 0) + (x.nb.some(n => mine.find(m => m.id === n)) ? 1 : 0) + R() }));
+        cand.sort((a, b) => b.w - a.w);
+        if (cand.length) out.push({ god: g.id, kind: 'storm', reg: cand[0].x.id, n: Math.min(Math.floor(g.army), 4 + Math.min(g.lvl, 8) * 2) });
+      }
+      if (owned && R() < P.temple * hrs) { const t = mine.filter(x => (x.tp[g.id] || 0) < 3).sort(() => R() - .5)[0]; if (t) out.push({ god: g.id, kind: 'temple', reg: t.id }); }
+    }
+    return out;
+  },
+  _target(g, view, P, B) {
+    const lb = B && B.a > 1 ? 2.5 : .8; // претенденты охотятся за лидером, остальные больше заняты соседями
+    const mine = new Set(view.regs.filter(x => x.own === g.id).map(x => x.id));
+    let best = null, bw = -1e9;
+    for (const x of view.regs) {
+      const my = x.s[g.id] || 0, own = x.own;
+      let w = R() * 1.5;
+      if (!own) w += 2.2;
+      else if (own === g.id) { let sec = 0; for (const k in x.s) if (k !== g.id) sec = Math.max(sec, x.s[k]); w += sec > my * .7 ? 2.5 * P.def : -1.5; }
+      else { w += .6 * P.att + (own === view.leader ? lb : 0) + (own === 'me' && g.pers === 'aggr' ? .8 : 0); if (my > x.pop * .15) w += 1; }
+      if (x.nb.some(n => mine.has(n))) w += 1;
+      if (!mine.size && x.id === GOD_HOME[g.id]) w += 3;
+      if (w > bw) { bw = w; best = x.id; }
+    }
+    return best;
+  }
+});
+
+/* =====================================================================
    5) ИНТЕРФЕЙС
    ===================================================================== */
 /* Мини-«морфинг» DOM: обновляем только изменившиеся узлы, чтобы кнопки не пересоздавались и клики не терялись */
@@ -4332,6 +4922,7 @@ function setHTML(el, html) {
 const pct = (a, b) => clamp(b ? a / b * 100 : 0, 0, 100).toFixed(1) + '%';
 const bar = (cls, a, b, id) => `<div class="bar ${cls}"><i ${id ? 'id="' + id + '"' : ''} style="width:${pct(a, b)}"></i></div>`;
 const faithChip = () => `<span class="faithChip" title="Текущая вера">🔥 ${Math.floor(S.god.faith)} / ${maxFaith()}</span>`;
+function olyChip() { const O = S.oly, r = olyRank(); return `<button class="linkbtn olyc" data-act="mtab" data-arg="gods" title="Война за Олимп: ваше место в сезоне ${O.n} и сколько осталось">🏛 #${r}${r <= OLY_K.thrones ? ' ' + THRONES[r - 1][0] : ''} · ${fmtLeft(O.end - olyNow())}</button>`; }
 const STATE_RU = { road: 'в пути', fight: 'в бою', town: 'в городе', dead: 'мёртв 💀', duel: 'на арене ⚔', rest: 'отдыхает 💤', dungeon: 'в пещере 🏰' };
 /* ---------- Кукла героя (как в БК) и карточка предмета ---------- */
 const itemIc = it => it.slot === 'weapon' && WCAT[it.cat] ? WCAT[it.cat].ic : SLOT_IC[it.slot];
@@ -4396,7 +4987,10 @@ function renderHeader() {
   if (B.dataset.theme !== th) { B.dataset.theme = th; const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = th === 'evil' ? '#1e0c10' : th === 'neutral' ? '#121a28' : '#221a3e'; }
   $('hAv').textContent = GOD_AV[at] || '🙂';
   $('hGod').textContent = g.name;
-  $('hTitle').textContent = `${at} · паства ${Math.floor(S.flock.fol)}`;
+  const rw = S.oly && S.oly.rew;
+  $('hTitle').textContent = rw ? `${rw.ic} ${rw.title}` : `${at} · паства ${Math.floor(S.flock.fol)}`;
+  const av = $('hAv'), fc = 'gav' + (rw ? ' fr ' + rw.frame : ''); if (av.className !== fc) av.className = fc;
+  B.classList.toggle('olyF', !!rw); if (rw) { if (B.dataset.frame !== rw.frame) B.dataset.frame = rw.frame; } else if (B.dataset.frame) delete B.dataset.frame;
   const rate = faithRegen() * 60;
   setHTML($('hFaith'), `🔥 ${Math.floor(g.faith)} / ${maxFaith()}<span class="rate">+${rate >= 10 ? Math.round(rate) : rate.toFixed(1)}/мин</span>`);
   $('hFaithBar').style.width = pct(g.faith, maxFaith());
@@ -4444,7 +5038,7 @@ function renderHero() {
   const col = !!S.ui.heroCol;
   let html = `<div class="hc-top"><div class="hc-av">${CLS_IC[h.cls] || '🧔'}</div><div class="hc-id"><h2>${esc(h.name)}</h2><div class="hc-sub">${RACES[h.race].n} · ${CLASSES[h.cls].n} · ур. ${h.lvl}</div></div>
     <div class="hc-btns"><button class="btn small ghost" data-act="sheet" title="Характеристики, снаряжение, рюкзак">📋<span class="hideXS"> Герой</span></button><button class="btn small ghost hcol" data-act="heroCol" aria-expanded="${!col}" title="${col ? 'Развернуть карточку' : 'Свернуть карточку'}">${col ? '▾' : '▴'}</button></div></div>
-  <div class="hc-now"><span>📍 ${esc(h.loc)}</span><span class="st">${act}</span>${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
+  <div class="hc-now"><span>📍 ${S.oly && S.oly.reg[h.reg] && S.oly.reg[h.reg].own ? godDot(S.oly.reg[h.reg].own) : ''}${esc(h.loc)}</span><span class="st">${act}</span>${S.oly ? olyChip() : ''}${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
   ${routeHTML(h)}
   ${m && !S.fight ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div><div class="btns" style="margin-top:4px"><button class="btn small red" data-act="fmanual">🎯 Взять бой под контроль</button></div>` : ''}
   ${h.state === 'dead' ? `<div class="deadbox">💀 Герой мёртв. Встанет сам через ${fmtDur(Math.max(60, h.deadT))} (и обидится).<div class="btns"><button class="btn" data-act="resurrect" ${S.god.faith < 30 ? 'disabled' : ''}>✨ Воскресить · 30</button></div></div>` : ''}
@@ -4511,8 +5105,8 @@ function renderFeat() {
   <div class="muted" style="margin-bottom:6px">Не выберете за ~${mins} мин игрового времени — герой решит сам.${S.featQueue > 1 ? ` В очереди ещё ${S.featQueue - 1}.` : ''}</div>${pf}${body}</div>`);
 }
 /* ---------- v11: дневник — живая лента. Ключ записи — e.i; DOM ограничен, новые записи добавляются без перерисовки всей ленты ---------- */
-const D_BIG = ['level', 'death', 'rare', 'fork', 'event', 'duel'], D_MED = ['fight', 'loot'];
-const D_IC = { fight: '⚔', loot: '💰', rare: '💎', level: '⭐', death: '💀', fork: '✨', event: '🌍', duel: '🤺', god: '🙏' };
+const D_BIG = ['level', 'death', 'rare', 'fork', 'event', 'duel'], D_MED = ['fight', 'loot', 'oly'];
+const D_IC = { fight: '⚔', loot: '💰', rare: '💎', level: '⭐', death: '💀', fork: '✨', event: '🌍', duel: '🤺', god: '🙏', oly: '🏛' };
 const D_PAGE = 40;
 let diaryLim = D_PAGE, diaryOpen = new Set(), diaryTopSeen = 0, diaryMoreV = -1;
 function fxSplit(f) { return String(f || '').split(/,\s+(?![^()]*\))/).filter(Boolean); }
@@ -4681,7 +5275,7 @@ function powerModal(id) {
     <div class="muted">У вас ${faithChip()}${why && L ? ` · <b style="color:#8c2e20">${esc(why)}</b>` : ''}</div>
     <div class="btns">${L ? `<button class="btn green" data-act="powerGo" data-arg="${id}" ${dis ? 'disabled' : ''}>✔ Применить · ${c}</button>` : ''}${canLearn ? `<button class="btn" data-act="learnGo" data-arg="${id}">${L ? 'Улучшить ★' : 'Изучить ★'}</button>` : !L ? `<span class="muted">${esc(why)}</span>` : ''}<button class="btn ghost" data-act="closeModal">Отмена</button></div></div>`);
 }
-const TAB_H = { powers: '✨ Силы', flock: '⛪ Паства', arena: '🤺 Арена', gods: '⚜ Пантеон', hero: '🧔 Герой' };
+const TAB_H = { powers: '✨ Силы', flock: '⛪ Паства', arena: '🤺 Арена', gods: '🏛 Олимп', hero: '🧔 Герой' };
 function renderRight() {
   const g = S.god, fl = S.flock, mob = innerWidth <= 760, tab = mob ? S.ui.mtab : S.tab;
   let html = '';
@@ -4691,28 +5285,18 @@ function renderRight() {
     html = `<div class="row" style="margin-bottom:6px"><span>Доступно для вложений</span>${faithChip()}</div>
       <div class="box"><h3>👥 Паства</h3><div class="big">${Math.floor(fl.fol)} 👥</div>
       <div class="muted">≈ ${Math.round(faithRegen() * 3600)} веры в час · запас веры ${Math.floor(g.faith)}/${mf}</div>${bar('faith', g.faith, mf)}</div>
-      <div class="box"><h3>⛪ Храм — ур. ${fl.temple}${fl.temple ? ' (' + TEMPLE_NAMES[fl.temple - 1] + ')' : ''}</h3>
+      <div class="box"><h3>⛪ Главный храм — ур. ${fl.temple}${fl.temple ? ' (' + TEMPLE_NAMES[fl.temple - 1] + ')' : ''}</h3>
       <div class="muted">Каждый уровень: больше веры и её запас, ночлег героя, +КД.</div>
       ${fl.temple < 10 ? `<div class="stat"><label><span>Стройка до ур. ${fl.temple + 1}</span><span>${Math.floor(fl.templeProg)} / ${tc}</span></label>${bar('faith', fl.templeProg, tc)}</div>
       <div class="btns">${[10, 50].map(n => `<button class="btn small" data-act="temple" data-arg="${n}" ${g.faith < n ? 'disabled' : ''}>Вложить ${n}</button>`).join('')}<button class="btn small" data-act="temple" data-arg="all" ${g.faith < 1 ? 'disabled' : ''}>Вложить всё (${Math.floor(g.faith)})</button></div>` : '<div class="muted"><b>Величайший храм мира построен.</b></div>'}</div>
       <div class="box"><h3>🌈 Чудеса</h3>
       <div class="btns">${MIRACLES.map(m => `<button class="btn small" data-act="miracle" data-arg="${m.id}" ${g.faith < m.cost ? 'disabled' : ''}>${m.n} (${m.cost})</button>`).join('')}</div></div>
       <div class="box"><h3>⚔ Божья армия — ${fl.army} солдат</h3>
-      <div class="muted">Солдат: ${soldierCost()} веры и 2 последователя. Помогает в дуэлях и событиях.</div>
+      <div class="muted">Солдат: ${soldierCost()} веры и 2 последователя. Штурмует регионы на карте Олимпа, сторожит ваши земли (каждый солдат −1% к чужим штурмам, до 30%), помогает в дуэлях и событиях.</div>
       <div class="btns"><button class="btn small red" data-act="recruit" data-arg="1" ${g.faith < soldierCost() || fl.fol < 2 ? 'disabled' : ''}>Набрать 1 (${soldierCost()})</button><button class="btn small red" data-act="recruit" data-arg="5" ${g.faith < soldierCost() * 5 || fl.fol < 10 ? 'disabled' : ''}>Набрать 5 (${soldierCost() * 5})</button></div></div>`;
   } else if (tab === 'arena') html = arenaTabHTML();
   else if (tab === 'hero') html = `<div class="sheet inl">${sheetHTML(true)}</div>`;
-  else {
-    const st = S.stats, C = S.chat, last = C.msgs.slice(-3);
-    html = `<div class="box"><h3>${GOD_AV[alignTitle(g.align)] || ''} ${esc(g.name)} — ${alignTitle(g.align).toLowerCase()}</h3><div class="stat"><label><span>Уровень бога ${g.lvl}</span><span>${g.xp}/${gxpNext(g.lvl)}</span></label>${bar('gxp', g.xp, gxpNext(g.lvl))}</div>
-      <div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div>
-      <div class="btns"><button class="btn small ghost" data-act="help">❔ Как играть</button><button class="btn small ghost" data-act="settings">⚙ Настройки и сохранение</button></div></div>
-      <div class="box"><h3>💬 Чат богов${C.unread ? ` <span class="faithChip" style="background:#b8412f">${C.unread} новых</span>` : ''}</h3>${last.map(m => `<div class="cm ${m.c}"><span class="tm">${esc(m.tm)}</span>${m.c === 'sys' ? esc(m.x) : `<b>${esc(m.from)}:</b> ${esc(m.x)}`}</div>`).join('') || '<div class="muted">Тихо.</div>'}
-      <div class="btns"><button class="btn small" data-act="chatToggle">${C.open ? '✕ Закрыть чат' : '💬 Открыть чат'}</button></div></div>
-      ${godsDunHTML()}
-      <div class="box"><h3>⚜ Соперники</h3>${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}</div>`;
-  }
+  else html = olyTabHTML();
   setHTML($('rightHead'), mob ? '' : `<h2 class="rph">${TAB_H[tab] || ''}</h2>`);
   if (mob && tab === 'hero') return;
   setHTML($('rightBody'), html);
@@ -4731,7 +5315,7 @@ function renderNav() {
   const p2 = $('pauseBtn2'); if (p2) { p2.textContent = S.paused ? '▶' : '⏸'; p2.classList.toggle('on', S.paused); }
   B.classList.toggle('rm', reducedMotion()); B.classList.toggle('busyF', !!(S.fight || S.dun));
 }
-function render() { renderNav(); renderHeader(); renderHero(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
+function render() { renderNav(); renderHeader(); renderHero(); renderOlyBox(); refreshRegion(); renderEvent(); renderFeat(); renderFork(); renderFight(); renderDunMap(); renderRight(); renderDiary(); renderChat(); }
 
 /* ---------- Модальные окна ---------- */
 const DUN_TIER_KEYS = ['easy', 'normal', 'hard'];
@@ -4779,7 +5363,8 @@ function help() {
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
   <p><b>😇 Характер бога.</b> Добрые поступки и силы света сдвигают его к «доброму» (силы света на 20% дешевле, паства растёт сама), кары — к «гневному» (кары дешевле, молния сильнее, солдаты дешевле).</p>
-  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Пантеон | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Чат, пещеры и соперники — в «Пантеоне», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
+  <p><b>🏛 Война за Олимп.</b> Мир поделён на 14 регионов (лес, города, горы, болота, берег…), в каждом свои души. Регион принадлежит богу, у которого там больше всего верующих (не меньше 12% жителей), и даёт ему <b>+9 веры в час</b> и <b>свой бонус</b> (лес — добыча чаще, Годград — покупки дешевле, Понты — продажа дороже и т. д.). Ваши души растут, когда <b>герой ходит и проповедует в регионе</b> и побеждает там врагов; ещё помогают <b>храмы региона</b> (обращают сами и защищают), <b>штурм армией</b> (солдаты из «Паствы») и <b>дуэль богов за регион</b>. Отправить героя: кнопка на регионе или глас «иди в лес». Восемь богов-соперников тоже обращают души и иногда штурмуют ваши земли — в дневнике будет «⚠ Бог … обращает души в …». Без присмотра души остывают медленно (около 6% в сутки), так что день отсутствия не страшен. <b>Сезон — 4 недели</b>: каждый час вы получаете очки влияния (ОВ) за свои регионы и всех своих душ. В конце <b>топ-7 занимают троны Олимпа</b>: титул, рамка и «⚡ Олимпийский дар» на весь следующий сезон; затем карта сбрасывается, а герой, вещи, главный храм и армия остаются. Карта, таблица и хроника — во вкладке «🏛 Олимп».</p>
+  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Олимп | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Карта мира, таблица сезона, чат, пещеры и соперники — в «Олимпе», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
   <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Кнопка «👁 Подсказать» (6 веры, раз за ход) подсмотрит, бьёт ли самый опасный враг в верх или в низ. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
   <p><b>🤺 Арена</b> — вкладка с заявками: дуэли 1нс1, группы 3нс3 и 5нс5, хаотичные бои. Принимайте чужие или подавайте свои. За бои — опыт, золото и рейтинг; после поражения — травмы (штраф к характеристике, лечатся временем, отдыхом и храмом). <b>⚜ Дуэль богов</b> — тот же бой, но соперничающий бог тоже колдует.</p>
   <p><b>🏰 Пещеры</b> — карта 5×5: ведите отряд по комнатам, ищите 🗝 ключ и бейте 👑 босса. Это испытание: бесплатного лечения почти нет (один ⛲ источник и жрец), чем глубже — тем злее, 💀 элита на половине здоровья звереет. Боссы <b>объявляют</b> страшный удар по зоне — поставьте туда блок, иначе удар в 2,5 раза сильнее. Можно лечить отряд силой «Исцеление» между комнатами (раз за пещеру) и <b>отступить с добычей</b> (60% золота и опыта, все вещи). Если отряд разбит — героя вынесут, оставив 30%. Награда за босса — гарантированная редкая вещь и много опыта. Пещера не чаще раза в 4 часа. <b>💬 Чат</b> — пока с ботами, но они стараются. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
@@ -4799,7 +5384,7 @@ function settings() {
   <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">✨ Момент сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
   <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Пещера сейчас</button>
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
-  <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
+  <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button><button class="btn small blue" data-act="dbg" data-arg="d3">⏩ +3 дня</button><button class="btn small blue" data-act="dbg" data-arg="season">🏛 Конец сезона</button></div>
   <h3 style="margin-top:14px">Опасная зона</h3>
   <div class="btns"><button class="btn small red" data-act="reset">Начать заново (стереть сохранение)</button></div></div>`);
 }
@@ -4808,7 +5393,7 @@ function newGame() {
   const race = RACES[$('inRace').value] ? $('inRace').value : 'human', cls = CLASSES[$('inCls').value] ? $('inCls').value : 'warrior';
   S = defaultState(g, hn, race, cls); S.hero.maxHp = calcMaxHp(S.hero); S.hero.hp = S.hero.maxHp;
   diary(`Очнулся в канаве у Годграда. Помню только своё имя, что я ${RACES[race].n.toLowerCase()}-${CLASSES[cls].n.toLowerCase()} и что у меня есть бог — {god}. Пора совершать подвиги!`, 'god');
-  diary(`Взял первое задание: «${S.hero.quest.n}».`); initBuild(S.hero); closeModal(); save();
+  diary(`Взял первое задание: «${S.hero.quest.n}».`); initBuild(S.hero); S.oly = olyNewState(Date.now()); S.hero.loc = REG_BY[S.hero.reg].n; closeModal(); save();
 }
 
 /* ---------- Действия ---------- */
@@ -4861,7 +5446,8 @@ const ACT = {
     else if (a === 'monster') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startFight(); startMonsterFight(); }
     else if (a === 'dun') { if (busy) return toast('Герой уже занят.'); S.fork = null; free(); startDungeon(true); }
     else if (a === 'feat') { S.featQueue++; offerFeat(); }
-    else if (a === 'h1' || a === 'h8') { if (simulateAway(a === 'h1' ? 3600 : 8 * 3600, 'перемотка времени')) awayModal(); }
+    else if (a === 'h1' || a === 'h8' || a === 'd3') { if (simulateAway(a === 'h1' ? 3600 : a === 'h8' ? 8 * 3600 : 3 * 86400, 'перемотка времени')) awayModal(); }
+    else if (a === 'season') { S.oly.end = Date.now() - 1; olySeasonCheck(); }
     else if (a === 'event') startEvent(); else if (a === 'faith') addFaith(100); }
 };
 /* v11: какие действия игрока считаются «вмешательством бога» — их записи в дневнике подсвечиваются */
@@ -4876,7 +5462,7 @@ document.addEventListener('click', e => {
   try { f(b.dataset.arg); } finally { userActing = 0; }
   if (S) render();
 });
-document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.classList && e.target.classList.contains('entry') && e.target.dataset.act === 'dexp') { e.preventDefault(); e.target.click(); } if (e.key === 'Escape' && $('modal').classList.contains('on') && S) closeModal(); });
+document.addEventListener('keydown', e => { const t = e.target; if ((e.key === 'Enter' || e.key === ' ') && t && t.getAttribute && t.getAttribute('role') === 'button' && t.dataset && t.dataset.act && t.tagName !== 'BUTTON') { e.preventDefault(); t.dispatchEvent(new MouseEvent('click', { bubbles: true })); } if (e.key === 'Escape' && $('modal').classList.contains('on') && S) closeModal(); });
 $('voiceIn').addEventListener('keydown', e => { if (e.key === 'Enter' && S) { userActing = 1; try { ACT.voice(); } finally { userActing = 0; } render(); } });
 window.addEventListener('beforeunload', save);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
@@ -4981,13 +5567,182 @@ function awayModal() {
     <div class="stat"><label><span>🔥 Вера: ${a.fa0} → ${a.fa1}</span><span>${a.fa1}/${mf}</span></label>${bar('faith', a.fa1, mf)}</div>
     ${a.items.length ? `<div class="muted" style="margin-top:6px">💎 Ценные находки: ${a.items.map(esc).join(', ')}</div>` : ''}
     ${a.hl.length ? `<h3 style="margin-top:10px">Главное из дневника</h3><ul class="awhl">${a.hl.map(e => `<li>${D_IC[e.c] ? D_IC[e.c] + ' ' : ''}${esc(e.x)}</li>`).join('')}</ul>` : ''}
-    <div class="btns"><button class="btn green mcbig" data-act="closeModal">Продолжить ▶</button></div></div>`, { noBar: 1 });
+    ${awayOlyHTML(a.oly)}
+    <div class="btns"><button class="btn green mcbig" data-act="awayOk">Продолжить ▶</button></div></div>`, { noBar: 1 });
 }
+
+/* =====================================================================
+   13б) ВОЙНА ЗА ОЛИМП — интерфейс: вкладка «Олимп», карта, лист региона, итоги сезона, вступление
+   ===================================================================== */
+const RKIND_RU = { forest: 'лес', village: 'деревня', swamp: 'болото', mount: 'горы', city: 'город', valley: 'долина', field: 'поля', castle: 'замок', waste: 'пустошь', coast: 'побережье', ravine: 'овраг' };
+const KIND_COL = { forest: '#cfe3b4', village: '#efe2bd', swamp: '#c9d7b0', mount: '#dcd6cc', city: '#e9dcc8', valley: '#d9ebc4', field: '#f1e6a8', castle: '#e2d5c4', waste: '#ecdab0', coast: '#c4e0ea', ravine: '#d6ccbd' };
+let olyListOpen = false;
+const fmtInf = v => v >= 10000 ? (v / 1000).toFixed(v >= 100000 ? 0 : 1).replace('.', ',') + ' тыс.' : String(Math.round(v));
+function fmtLeft(ms) { const s = Math.max(0, ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60); return d ? `${d} д ${h} ч` : h ? `${h} ч ${m} мин` : `${m} мин`; }
+const godDot = g => `<i class="gdot" style="background:${GOD_COL[g] || '#999'}"></i>`;
+function hexPts(x, y, r) { const p = []; for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i; p.push((x + r * Math.cos(a)).toFixed(1) + ',' + (y + r * Math.sin(a)).toFixed(1)); } return p.join(' '); }
+function regThreat(id) { const O = S.oly, X = O.reg[id]; if (!(X.own === 'me' || myShare(id) >= .15)) return null; for (const g in O.bots) if (O.bots[g].r === id && X.own !== g) return g; return null; }
+function heroGoalTxt() {
+  const O = S.oly, h = S.hero, g = olyGoal();
+  if (O.dest && O.dest !== h.reg) { const d = regDist(h.reg, O.dest); return `идёт ${REG_BY[O.dest].to} (${d} ${plural(d, 'переход', 'перехода', 'переходов')})`; }
+  if (O.hold && O.hold.r === h.reg) return `держит ${REG_BY[h.reg].s} ещё ${fmtDur(Math.max(60, O.hold.t))}`;
+  return g ? '' : 'бродит сам';
+}
+/* ---------- Карта (SVG): шестиугольники, цвет — владелец, полоска — ваша доля ---------- */
+function olyMapSVG() {
+  const O = S.oly, h = S.hero, r = OLY_HEX - 2;
+  const parts = REGIONS.map(R0 => {
+    const X = O.reg[R0.id], own = X.own, sh = myShare(R0.id), th = regThreat(R0.id), here = h.reg === R0.id, goal = O.dest === R0.id;
+    const lbl = `${R0.n}: ${own ? (own === 'me' ? 'ваш регион' : 'владелец ' + godName(own)) : 'ничей'}, ваших душ ${Math.round(sh * 100)}%${here ? ', здесь герой' : ''}${th ? ', здесь проповедует ' + godName(th) : ''}`;
+    return `<g class="rg${own === 'me' ? ' mine' : ''}${X.hot > 0 ? ' hot' : ''}${goal ? ' goal' : ''}${th ? ' thr' : ''}" data-act="reg" data-arg="${R0.id}" role="button" tabindex="0" aria-label="${esc(lbl)}">
+      <polygon class="rb" points="${hexPts(R0.x, R0.y, r)}" fill="${KIND_COL[R0.k]}"/>
+      ${own ? `<polygon class="ro" points="${hexPts(R0.x, R0.y, r)}" fill="${GOD_COL[own]}" fill-opacity="${own === 'me' ? .62 : .5}"/>` : ''}
+      <polygon class="rs" points="${hexPts(R0.x, R0.y, r)}" fill="none" stroke="${own ? GOD_COL[own] : '#a89a7a'}"/>
+      <text class="ri" x="${R0.x}" y="${R0.y - 6}">${R0.ic}</text>
+      <text class="rn" x="${R0.x}" y="${R0.y + 15}">${esc(R0.s)}</text>
+      <rect class="rbar" x="${R0.x - 26}" y="${R0.y + 22}" width="52" height="6" rx="3"/><rect class="rbarf" x="${R0.x - 26}" y="${R0.y + 22}" width="${(52 * Math.min(1, sh)).toFixed(1)}" height="6" rx="3"/>
+      ${X.tp.me ? `<text class="rt" x="${R0.x - 31}" y="${R0.y - 20}">⛪</text>` : ''}
+      ${th ? `<text class="rw" x="${R0.x - 28}" y="${R0.y + 2}">⚠</text>` : ''}
+      ${here ? `<g class="rh"><circle cx="${R0.x + 27}" cy="${R0.y - 22}" r="12"/><text x="${R0.x + 27}" y="${R0.y - 18}">${S.hero.state === 'dead' ? '💀' : CLS_IC[h.cls] || '🧔'}</text></g>` : goal ? `<text class="rg2" x="${R0.x + 27}" y="${R0.y - 18}">🚩</text>` : ''}
+    </g>`;
+  }).join('');
+  const C = OLY_CEN;
+  return `<svg class="omap" viewBox="0 0 404 308" role="group" aria-label="Карта мира: 14 регионов вокруг Олимпа">
+    <defs><linearGradient id="olyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset="1" stop-color="#e2b84a"/></linearGradient></defs>
+    <g class="olc" data-act="olyInfo" role="button" tabindex="0" aria-label="Олимп: таблица сезона"><polygon points="${hexPts(C.x, C.y, r)}" fill="url(#olyG)" stroke="#b88a1c" stroke-width="2"/><text class="ri" x="${C.x}" y="${C.y - 4}">🏛</text><text class="rn" x="${C.x}" y="${C.y + 18}">Олимп</text></g>
+    ${parts}</svg>`;
+}
+function olyLegend() {
+  return `<div class="olegend"><span>${godDot('me')} вы</span><span><i class="gdot" style="background:${KIND_COL.field};border:1px solid #a89a7a"></i> ничей</span><span><i class="lbar"><i></i></i> ваша доля</span><span>⛪ ваш храм</span><span>⚠ соперник обращает ваши души</span><span>🚩 цель героя</span></div>`;
+}
+/* ---------- Таблица сезона ---------- */
+function olyBoardHTML(full) {
+  const rk = olyRanking(), g = S.god, busy = S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending;
+  return `<div class="oboard">${rk.map((x, i) => {
+    const r = x.g === 'me' ? null : rivalOf(x.g), th = i < OLY_K.thrones ? THRONES[i][0] : '';
+    return `${i === OLY_K.thrones ? '<div class="othr">— выше черты: троны Олимпа —</div>' : ''}<div class="orow ${x.g === 'me' ? 'me' : ''}">
+      <span class="ork">${i + 1}</span>${godDot(x.g)}<div class="onm"><b>${esc(x.g === 'me' ? g.name + ' (вы)' : godName(x.g))}</b> ${th ? `<span class="othi" title="Трон «${THRONES[i][1]}»">${th}</span>` : ''}
+      <div class="muted small">${x.regs} ${plural(x.regs, 'регион', 'региона', 'регионов')} · ${fmtInf(x.souls)} душ${r ? ` · ${PERS[r.pers]}: ${esc(GOD_MOTTO[x.g] || '')}` : ''}</div>
+      ${r && full ? `<div class="muted small">герой ${esc(r.hero)} (ур. ${r.hlvl}) · армия ${Math.floor(r.army)} · против вас ${r.w}:${r.l}</div>` : ''}</div>
+      <span class="oinf"><b>${fmtInf(x.inf)}</b><small>+${Math.round(x.rate)}/ч</small></span>
+      ${r ? `<button class="btn small red" data-act="challenge" data-arg="${x.g}" ${busy ? 'disabled' : ''} title="Дуэль богов (10 веры)" aria-label="Вызвать на дуэль: ${esc(godName(x.g))}">⚔</button>` : '<span class="obsp"></span>'}</div>`;
+  }).join('')}</div>`;
+}
+function olySeasonBox() {
+  const O = S.oly, now = olyNow(), rank = olyRank(), me = olyRanking()[rank - 1], left = O.end - now;
+  return `<div class="box osea"><div class="row"><h3>🏛 Сезон ${O.n} · Война за Олимп</h3><span class="muted small">до конца ${fmtLeft(left)}</span></div>
+    ${bar('season', now - O.start, O.end - O.start)}
+    <div class="ostat"><span><b>#${rank}</b> из ${GOD_IDS.length}</span><span><b>${fmtInf(me.inf)}</b> ОВ <small>(+${Math.round(me.rate)}/ч)</small></span><span><b>${me.regs}</b> ${plural(me.regs, 'регион', 'региона', 'регионов')}</span><span><b>${fmtInf(me.souls)}</b> душ</span></div>
+    <div class="muted small">${rank <= OLY_K.thrones ? `Сейчас вы на троне «${THRONES[rank - 1][1]}».` : `До трона: обойти ${rank - OLY_K.thrones} ${plural(rank - OLY_K.thrones, 'бога', 'богов', 'богов')}.`} Очки влияния (ОВ) капают каждый час: за свои регионы и за всех ваших душ.</div>
+    ${O.rew ? `<div class="orew ${O.rew.frame}">${O.rew.ic} Ваш титул прошлого сезона: <b>${esc(O.rew.title)}</b><div class="btns"><button class="btn small green" data-act="ogift" ${O.gift > 0 ? 'disabled' : ''}>⚡ Олимпийский дар${O.gift > 0 ? ' · через ' + fmtDur(O.gift) : ''}</button><span class="muted small">+${Math.round(OLY_K.giftShare * 160)}% душ региона, где герой, и +25 веры; раз в 6 ч</span></div></div>` : ''}
+    ${O.last ? `<div class="muted small">Прошлый сезон ${O.last.n}: вы ${O.last.rank}-й. <button class="linkbtn" data-act="seasonShow">итоги</button></div>` : ''}</div>`;
+}
+function olyTabHTML() {
+  const O = S.oly, h = S.hero, g = S.god, C = S.chat, last = C.msgs.slice(-3), st = S.stats, here = REG_BY[h.reg];
+  const hx = heroGoalTxt();
+  return `${olySeasonBox()}
+  <div class="box omapbox"><div class="row"><h3>🗺 Карта мира</h3><span class="muted small">нажмите на регион</span></div>${olyMapSVG()}${olyLegend()}
+    <div class="ohero">${CLS_IC[h.cls] || '🧔'} ${esc(h.name)} ${esc(here.v)}${hx ? ' · ' + esc(hx) : ''} <button class="btn small ghost" data-act="reg" data-arg="${h.reg}">Регион героя</button></div>
+    <div class="btns"><button class="btn small ghost" data-act="olyList" aria-expanded="${olyListOpen}">${olyListOpen ? '▴ Скрыть список' : '▾ Список регионов'}</button></div>
+    ${olyListOpen ? `<div class="olist">${REGIONS.map(R0 => { const X = O.reg[R0.id]; return `<button class="btn small ghost oli" data-act="reg" data-arg="${R0.id}">${R0.ic} ${esc(R0.s)} ${X.own ? godDot(X.own) : '<i class="gdot nil"></i>'}<span>${Math.round(myShare(R0.id) * 100)}%</span></button>`; }).join('')}</div>` : ''}</div>
+  <div class="box"><h3>🏆 Таблица сезона</h3>${olyBoardHTML(true)}<div class="muted small">⚔ — дуэль богов (10 веры). Дуэль за души конкретного региона — в листе региона.</div></div>
+  <div class="box"><h3>📜 Хроника войны</h3>${O.log.length ? `<ul class="olog">${O.log.slice(0, 7).map(e => `<li class="${e.c}"><span class="tm">${esc(e.tm)}</span> ${esc(e.x)}</li>`).join('')}</ul>` : '<div class="muted">Пока тихо. Боги точат кадила.</div>'}</div>
+  <div class="box"><h3>${GOD_AV[alignTitle(g.align)] || ''} ${esc(g.name)} — ${alignTitle(g.align).toLowerCase()}</h3><div class="stat"><label><span>Уровень бога ${g.lvl}</span><span>${g.xp}/${gxpNext(g.lvl)}</span></label>${bar('gxp', g.xp, gxpNext(g.lvl))}</div>
+    <div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})${O.hist.length ? ` · Сезоны: ${O.hist.map(x => '#' + x.rank).join(', ')}` : ''}</div>
+    <div class="btns"><button class="btn small ghost" data-act="help">❔ Как играть</button><button class="btn small ghost" data-act="settings">⚙ Настройки и сохранение</button></div></div>
+  <div class="box"><h3>💬 Чат богов${C.unread ? ` <span class="faithChip" style="background:#b8412f">${C.unread} новых</span>` : ''}</h3>${last.map(m => `<div class="cm ${m.c}"><span class="tm">${esc(m.tm)}</span>${m.c === 'sys' ? esc(m.x) : `<b>${esc(m.from)}:</b> ${esc(m.x)}`}</div>`).join('') || '<div class="muted">Тихо.</div>'}
+    <div class="btns"><button class="btn small" data-act="chatToggle">${C.open ? '✕ Закрыть чат' : '💬 Открыть чат'}</button></div></div>
+  ${godsDunHTML()}`;
+}
+/* ---------- Лист региона ---------- */
+let regOpen = null;
+function regionHTML(id) {
+  const R0 = REG_BY[id], O = S.oly, X = O.reg[id], h = S.hero, g = S.god; if (!R0) return '';
+  const pop = R0.pop, sum = regSum(X), un = Math.max(0, pop - sum), own = X.own, mine = own === 'me';
+  const gods = Object.keys(X.s).filter(k => X.s[k] >= 1).sort((a, b) => X.s[b] - X.s[a]);
+  const seg = gods.map(k => `<i style="width:${(X.s[k] / pop * 100).toFixed(2)}%;background:${GOD_COL[k]}" title="${esc(godName(k))}: ${Math.round(X.s[k])}"></i>`).join('');
+  const thr = Object.keys(O.bots).filter(k => O.bots[k].r === id);
+  const here = h.reg === id, going = O.dest === id, holding = O.hold && O.hold.r === id;
+  const tL = X.tp.me || 0, tc = regTempleCost(id), canT = tL < OLY_K.tMax && (myShare(id) >= OLY_K.tReq || here);
+  const tg = stormTarget(id, 'me'), army = S.flock.army, sc = n => olyStormCalc(id, 'me', Math.min(n, army, OLY_K.stormMax));
+  const stormable = (tg || un > 1) && !(mine && !tg);
+  const duelG = own && !mine ? own : tg && tg !== 'me' ? tg : null;
+  const busy = S.fight || S.dun || h.state !== 'road' || duelPending;
+  const need = Math.round(pop * OLY_K.minShare), next = own && !mine ? Math.max(need, Math.round((X.s[own] || 0) * OLY_K.hyst + 3)) : need;
+  const rate = Math.round(OLY_K.infBase + pop / OLY_K.infPop);
+  const st5 = sc(5), stA = sc(army);
+  return `<div class="rsheet"><h2>${R0.ic} ${esc(R0.n)}</h2>
+    <div class="muted">${RKIND_RU[R0.k]}${R0.town ? ' · есть город' : ''} · ${pop} душ · соседи: ${R0.nb.map(n => REG_BY[n].s).join(', ')}</div>
+    <div class="rown">${own ? `${godDot(own)} Владелец: <b>${esc(mine ? 'вы' : godName(own))}</b>` : `<i class="gdot nil"></i> <b>Ничей регион</b> — нужно от ${need} душ (12%)`}</div>
+    <div class="rbonus ${mine ? 'on' : ''}">🎁 Бонус владельцу: <b>${esc(R0.bt)}</b>${mine ? ' — <b>ваш!</b>' : ''}<br><span class="small">а ещё +${Math.round(OLY_K.regFaith * 3600)} веры в час и +${rate} ОВ в час</span></div>
+    <div class="rseg" role="img" aria-label="Доли богов в регионе">${seg}<i class="un" style="width:${(un / pop * 100).toFixed(2)}%"></i></div>
+    <ul class="rgods">${gods.slice(0, 6).map(k => `<li class="${k === 'me' ? 'me' : ''}">${godDot(k)} ${esc(k === 'me' ? 'Вы' : godName(k))}<span>${Math.round(X.s[k])} · ${Math.round(X.s[k] / pop * 100)}%${X.tp[k] ? ` · ⛪${X.tp[k]}` : ''}</span></li>`).join('')}<li class="un"><i class="gdot nil"></i> Ничьи души<span>${Math.round(un)} · ${Math.round(un / pop * 100)}%</span></li></ul>
+    ${!mine ? `<div class="muted small">Чтобы забрать регион, нужно ${next} ваших душ (сейчас ${Math.round(X.s.me || 0)}).</div>` : ''}
+    ${thr.length ? `<div class="rthr">${thr.map(k => `⚠ Бог ${esc(godName(k))} сейчас обращает здесь души`).join('<br>')}</div>` : ''}
+    <h3>🧔 Герой</h3><div class="muted">${here ? (holding ? `Герой здесь и держит регион ещё ${fmtDur(Math.max(60, O.hold.t))}: ходит, проповедует, защищает ваших прихожан (соперники переманивают их на 40% хуже).` : 'Герой здесь: каждый его шаг, проповедь и победа приносят души.') : going ? `Герой идёт сюда: ещё ${regDist(h.reg, id)} ${plural(regDist(h.reg, id), 'переход', 'перехода', 'переходов')} (≈ ${Math.max(3, regDist(h.reg, id) * 3)} мин при ×1).` : `Герой сейчас ${esc(REG_BY[h.reg].v)}, отсюда ${regDist(h.reg, id)} ${plural(regDist(h.reg, id), 'переход', 'перехода', 'переходов')}.`}</div>
+    <div class="btns"><button class="btn" data-act="rsend" data-arg="${id}" ${going || (here && holding) || h.state === 'dead' ? 'disabled' : ''}>${here ? '🛡 Держать регион (2 ч)' : going ? '🚶 Уже идёт' : '🚶 Отправить героя'}</button></div>
+    <h3>⛪ Храм региона${tL ? ` — ${TEMPLE_R[tL - 1]} (ур. ${tL})` : ''}</h3><div class="muted small">Храм сам обращает ${OLY_K.tConv} душ в час за уровень и защищает ваших прихожан (−${Math.round(OLY_K.tDef * 100)}% к чужим проповедям и штурмам за уровень).${!canT && tL < OLY_K.tMax ? ` Строить можно, где у вас от ${Math.round(OLY_K.tReq * 100)}% душ или где сейчас герой.` : ''}</div>
+    <div class="btns">${tL < OLY_K.tMax ? `<button class="btn" data-act="rtemple" data-arg="${id}" ${!canT || g.faith < tc ? 'disabled' : ''}>${tL ? `⛪ Улучшить до ур. ${tL + 1}` : '⛪ Построить часовню'} · ${tc} веры</button>` : '<span class="muted">Храм здесь — величайший (ур. 5).</span>'}</div>
+    <h3>⚔ Штурм армией</h3><div class="muted small">${tg ? `Солдаты переманят прихожан бога ${esc(godName(tg))} (его храм и армия мешают). ` : stormable ? 'Солдаты убедят ничьи души (вилами). ' : 'Здесь некого штурмовать. '}У вас ${army} ${plural(army, 'солдат', 'солдата', 'солдат')}${X.cdS > 0 ? ` · армия оправится через ${fmtDur(X.cdS)}` : ''}. Набор — во вкладке «Паства».</div>
+    ${stormable && army ? `<div class="muted small">5 солдат: ≈ +${Math.round(st5.gain)} душ, потери ~${st5.loss} · все (${Math.min(army, OLY_K.stormMax)}): ≈ +${Math.round(stA.gain)}, потери ~${stA.loss}</div>` : ''}
+    <div class="btns"><button class="btn red" data-act="rstorm" data-arg="${id}:5" ${!stormable || army < 1 || X.cdS > 0 ? 'disabled' : ''}>⚔ Штурм · 5</button><button class="btn red" data-act="rstorm" data-arg="${id}:all" ${!stormable || army < 1 || X.cdS > 0 ? 'disabled' : ''}>⚔ Все силы (${Math.min(army, OLY_K.stormMax)})</button></div>
+    <h3>🤺 Дуэль богов за регион</h3><div class="muted small">${duelG ? `Бой по зонам с героем бога ${esc(godName(duelG))}. Победа: +${Math.round(OLY_K.duelWin * 100)}% душ региона от него, поражение: −${Math.round(OLY_K.duelLose * 100)}% ваших.` : 'Вызывать здесь некого.'}${X.cdD > 0 ? ` Следующая дуэль через ${fmtDur(X.cdD)}.` : ''}</div>
+    <div class="btns"><button class="btn red" data-act="rduel" data-arg="${id}" ${!duelG || X.cdD > 0 || busy || g.faith < 10 ? 'disabled' : ''}>🤺 На дуэль${duelG ? ': ' + esc(godName(duelG)) : ''} · 10 веры</button></div>
+    ${O.rew && here ? `<div class="btns"><button class="btn green" data-act="ogift" ${O.gift > 0 ? 'disabled' : ''}>⚡ Олимпийский дар${O.gift > 0 ? ' · ' + fmtDur(O.gift) : ''}</button></div>` : ''}
+    <div class="muted small" style="margin-top:8px">Души растут от шагов и проповедей героя, побед в регионе, храмов, штурмов, дуэлей и божественных моментов. Без вашего присутствия они понемногу остывают (около 6% в сутки, храм замедляет).</div></div>`;
+}
+function regionModal(id) { if (!REG_BY[id]) return; regOpen = id; modal(regionHTML(id)); }
+function refreshRegion() { const m = $('modal'); if (!regOpen || !m.classList.contains('on')) { regOpen = null; return; } const c = m.querySelector('.rsheet'); if (!c) { regOpen = null; return; } setHTML(c.parentNode, `<button class="mx" data-act="closeModal" aria-label="Закрыть">✕</button>${regionHTML(regOpen)}<div class="mcbar"><button class="btn" data-act="closeModal">✕ Закрыть</button></div>`); }
+/* ---------- Итоги сезона ---------- */
+function seasonHTML(L) {
+  const th = L.rank <= OLY_K.thrones ? THRONES[L.rank - 1] : null;
+  return `<div class="season"><h2>🏛 Сезон ${L.n} окончен</h2>
+    <div class="sres ${th ? frameOf(L.rank) : ''}">${th ? `<div class="sbig">${th[0]}</div><b>${L.rank}-е место — трон «${esc(th[1])}»!</b><div class="small">Весь следующий сезон: титул, ${L.rank === 1 ? 'золотая' : L.rank <= 3 ? 'серебряная' : 'бронзовая'} рамка и «⚡ Олимпийский дар».</div>` : `<div class="sbig">🏛</div><b>${L.rank}-е место из ${L.top.length}</b><div class="small">Трона нет — нужно войти в семёрку. В новом сезоне всё сначала!</div>`}</div>
+    <h3>Троны Олимпа</h3><ol class="sthr">${L.top.slice(0, OLY_K.thrones).map((t, i) => `<li class="${t.g === 'me' ? 'me' : ''}">${THRONES[i][0]} ${godDot(t.g)} <b>${esc(t.g === 'me' ? S.god.name + ' (вы)' : godName(t.g))}</b> — ${esc(THRONES[i][1])}<span>${fmtInf(t.inf)} ОВ</span></li>`).join('')}</ol>
+    <div class="muted">Новый сезон начался: карта снова поделена поровну, храмы в регионах и очки влияния обнулены. Уровень героя, вещи, главный храм и армия — на месте.</div>
+    <div class="btns"><button class="btn green mcbig" data-act="seasonOk">В новый сезон ▶</button></div></div>`;
+}
+function seasonModal() { const L = S.oly.last; if (!L) return; modal(seasonHTML(L), { noBar: 1 }); }
+/* ---------- Вступление (один раз; и для старых сохранений после обновления) ---------- */
+function renderOlyBox() {
+  const box = $('olyBox'); if (!box) return;
+  setHTML(box, S.oly && !S.oly.intro ? `<div class="card olyintro"><h2>🏛 Война за Олимп</h2>
+    <p>Мир поделён на <b>14 регионов</b>. Регион принадлежит богу с самой большой паствой и даёт <b>веру и бонус</b>. Боги-соперники тоже обращают души — защищайте свои земли и забирайте чужие: <b>отправьте героя</b>, <b>постройте храм</b>, пошлите <b>армию на штурм</b> или вызовите бога на <b>дуэль</b>.</p>
+    <p>Сезон длится <b>4 недели</b>. <b>Топ-7</b> богов по очкам влияния займут троны Олимпа: титул, рамка и особая сила на весь следующий сезон.</p>
+    <div class="btns"><button class="btn green" data-act="olyGo">🗺 Открыть карту</button><button class="btn ghost" data-act="olyIntro">Понятно</button></div></div>` : '');
+}
+/* ---------- В сводке «Пока вас не было» ---------- */
+function awayOlyHTML(o) {
+  if (!o) return '';
+  const se = o.seasons && o.seasons.length ? o.seasons[o.seasons.length - 1] : null;
+  return `<div class="awoly"><h3>🏛 Война за Олимп</h3>${se ? `<div class="fhint sres ${se.rank <= OLY_K.thrones ? frameOf(se.rank) : ''}">🏛 Сезон ${se.n} завершился, пока вас не было: вы <b>${se.rank}-й</b>${se.title ? ` — трон «${esc(se.title)}»!` : '.'} Уже идёт сезон ${o.n}.</div>` : ''}
+    <div class="awgrid"><div class="awt ${o.r1 < o.r0 ? 'good' : o.r1 > o.r0 ? 'bad' : ''}"><b>#${o.r0} → #${o.r1}</b>место</div><div class="awt ${o.n1 > o.n0 ? 'good' : o.n1 < o.n0 ? 'bad' : ''}"><b>${o.n0} → ${o.n1}</b>регионов</div></div>
+    ${o.got.length ? `<div class="muted">🏛 Заняли: ${o.got.map(x => REG_BY[x].n).join(', ')}</div>` : ''}${o.lost.length ? `<div class="muted">💔 Потеряли: ${o.lost.map(x => REG_BY[x].n).join(', ')}</div>` : ''}</div>`;
+}
+Object.assign(ACT, {
+  reg: a => regionModal(a),
+  rsend: a => { if (!REG_BY[a]) return; olySend(a); toast(S.hero.reg === a ? `🛡 Герой держит ${REG_BY[a].s}` : `🚶 Герой идёт ${REG_BY[a].to}`); },
+  rtemple: a => { if (REG_BY[a]) olyTemple(a); },
+  rstorm: a => { const [id, n] = String(a).split(':'); if (REG_BY[id]) olyStormMe(id, n === 'all' ? 'all' : +n); },
+  rduel: a => { if (REG_BY[a] && olyDuel(a)) closeModal(); },
+  ogift: () => olyGift(),
+  olyList: () => { olyListOpen = !olyListOpen; },
+  olyInfo: () => { const b = document.querySelector('.osea'); if (b) b.scrollIntoView({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' }); },
+  olyIntro: () => { S.oly.intro = 1; save(); },
+  olyGo: () => { S.oly.intro = 1; ACT.mtab('gods'); save(); },
+  seasonShow: () => seasonModal(),
+  awayOk: () => { closeModal(); if (S.oly.last && !S.oly.last.seen) seasonModal(); },
+  seasonOk: () => { if (S.oly.last) S.oly.last.seen = 1; closeModal(); save(); }
+});
+['rsend', 'rtemple', 'rstorm', 'rduel', 'ogift'].forEach(k => USER_ACTS.add(k));
+const OLY_EXPORTS = ({ olyApply, olyConvert, regOwner, OLY_K, REGIONS, REG_BY, GOD_IDS, PERS_OLY, olyTick, olyStep, olySend, olyTemple, olyStormMe, olyStormCalc, olyDuel, olyDuelResult, olyGift, olyRanking, olyRank, myShare, mySouls, olyOwned, olySouls, olyRate,
+  olySeasonEnd, olySeasonCheck, olyNewState, sanitizeOly, olyFastForward, olyView, olyHero, regDist, regTempleCost, regionModal, seasonModal, recruit, soldierCost, regThreat,
+  setOlyNow: v => { OLY_NOW = v; }, getLastAway: () => lastAway, awayModal: () => awayModal() });
 
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261019-164352';
+const APP_BUILD = '20261019-205103';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -5143,7 +5898,7 @@ function renderFight() {
     const tele = F.tele ? `<div class="telewarn">⚠ ${esc(F.fighters.find(f => f.id === F.tele.fid).name)} ударит ${ZONE_ACC[F.tele.zone]} всех! Поставьте блок на «${ZONE_RU[F.tele.zone]}».</div>` : '';
     const ok = mine && (F.my.atk.length >= me.atkN || F.my.act) && F.my.blk.length === me.blkN;
     const ids = pIds, hNow = F.hint && F.hint.turn === F.turn;
-    const hintBtn = F.auto ? '' : `<button class="btn small hintb" data-act="fhint" ${hNow || S.god.faith < HINT_COST ? 'disabled' : ''} title="Бог подсмотрит, куда целит самый опасный противник: в верх или в низ. Раз за ход.">👁 Подсказать · ${HINT_COST}</button>`;
+    const hintBtn = F.auto ? '' : `<button class="btn small hintb" data-act="fhint" ${hNow || S.god.faith < hintCost() ? 'disabled' : ''} title="Бог подсмотрит, куда целит самый опасный противник: в верх или в низ. Раз за ход.">👁 Подсказать · ${hintCost()}</button>`;
     const hintLine = hNow ? `<div class="fhint">${esc(F.hint.txt)}${F.hint.zones.length ? ' Синие пунктирные зоны — где ждать удара.' : ''}</div>` : '';
     mid = mine ? `${tele}${low}${F.absent ? '<div class="muted">🙏 Бога нет рядом — герой бьётся сам: осторожно, без сил. Нажмите что-нибудь, чтобы взять бой под контроль.</div>' : ''}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
       ${hintLine}<div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : `⚔ Ход — выберите ${F.my.atk.length < me.atkN && !F.my.act ? (me.atkN > 1 ? `${me.atkN} зоны удара` : 'удар') : ''}${F.my.atk.length < me.atkN && !F.my.act && F.my.blk.length !== me.blkN ? ' и ' : ''}${F.my.blk.length !== me.blkN ? 'блок' : ''}`}</button>${hintBtn}
@@ -5280,6 +6035,7 @@ window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldSt
   MOMENTS, MOM_BY, MOM_T, startMoment, answerMoment, timeoutMoment, forkPaused, momentButtons, momCtx, forkOptions, get momClock() { return momClock; },
   PWA, parseSave, checkUpdate, APP_BUILD,
   fightHint, HINT_COST, powerModal, powerEffect, powerWhy, routePos, themeOf, awayModal, get lastAway() { return lastAway; }, sfx, get audioCtx() { return audioCtx; }, diaryDetail, diary, NAV_TABS, renderDiary, get diaryLim() { return diaryLim; } };
+Object.assign(window.GAME, OLY_EXPORTS);
 </script>
 </body>
 </html>

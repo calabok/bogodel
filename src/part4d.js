@@ -98,5 +98,6 @@ function awayModal() {
     <div class="stat"><label><span>🔥 Вера: ${a.fa0} → ${a.fa1}</span><span>${a.fa1}/${mf}</span></label>${bar('faith', a.fa1, mf)}</div>
     ${a.items.length ? `<div class="muted" style="margin-top:6px">💎 Ценные находки: ${a.items.map(esc).join(', ')}</div>` : ''}
     ${a.hl.length ? `<h3 style="margin-top:10px">Главное из дневника</h3><ul class="awhl">${a.hl.map(e => `<li>${D_IC[e.c] ? D_IC[e.c] + ' ' : ''}${esc(e.x)}</li>`).join('')}</ul>` : ''}
-    <div class="btns"><button class="btn green mcbig" data-act="closeModal">Продолжить ▶</button></div></div>`, { noBar: 1 });
+    ${awayOlyHTML(a.oly)}
+    <div class="btns"><button class="btn green mcbig" data-act="awayOk">Продолжить ▶</button></div></div>`, { noBar: 1 });
 }

@@ -86,7 +86,7 @@ async def main():
         # 10) миграция: старое сохранение v8 с молитвой в процессе
         ctx,pg=await newgame(br)
         r=await pg.evaluate("""(()=>{const G=GAME; const o=JSON.parse(JSON.stringify(G.S)); o.v=8; delete o.momHist; o.fork={i:2,t:22,T:30,cls:true}; o.timers.fork=1000; localStorage.setItem(G.SAVE_KEY, JSON.stringify(o)); const s=G.load(); return {v:s.v, fork:s.fork, hist:s.momHist, tf:s.timers.fork}})()""")
-        ok('migration v8 → v9: legacy pending prayer kept (T=150), momHist added, first moment within 5 min', r['v']==9 and r['fork'] and r['fork']['T']==150 and r['fork']['i']==2 and r['hist']==[] and r['tf']<=300, r)
+        ok('migration v8 → v9: legacy pending prayer kept (T=150), momHist added, first moment within 5 min', r['v']>=9 and r['fork'] and r['fork']['T']==150 and r['fork']['i']==2 and r['hist']==[] and r['tf']<=300, r)
         r=await pg.evaluate("""(()=>{const G=GAME,S=G.S; S.fork=null; S.hero.state='road'; G.startMoment('library'); const txt=S.fork.txt; G.save(); const s=G.load(); const bad=JSON.parse(JSON.stringify(S)); bad.fork={m:'nope',t:5,txt:'x'}; localStorage.setItem(G.SAVE_KEY, JSON.stringify(bad)); const s2=G.load(); bad.fork={m:'troll',t:'x'}; localStorage.setItem(G.SAVE_KEY, JSON.stringify(bad)); const s3=G.load(); G.save(); return {same:s.fork&&s.fork.txt===txt&&s.fork.m==='library', bad1:s2.fork, bad2:s3.fork}})()""")
         ok('save/reload keeps a pending moment; corrupted moment in save is dropped safely', r['same'] and r['bad1'] is None and r['bad2'] is None, r)
         await ctx.close()

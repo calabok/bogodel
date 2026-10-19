@@ -292,6 +292,7 @@ function validFight(F) {
   F.my.atk = Array.isArray(F.my.atk) ? [...new Set(F.my.atk.filter(z => ZONES.includes(z)))].slice(0, me.atkN) : [];
   F.my.blk = Array.isArray(F.my.blk) ? [...new Set(F.my.blk.filter(z => ZONES.includes(z)))].slice(0, me.blkN) : [];
   if (!ids.includes(F.my.target)) F.my.target = null;
+  if (F.region !== undefined && !(typeof F.region === 'string' && REG_BY[F.region])) F.region = null;
   if (!F.choices || typeof F.choices !== 'object') F.choices = {};
   for (const k of ['lastAtk', 'lastBlk', 'lastTarget', 'ctx']) if (!F[k] || typeof F[k] !== 'object') F[k] = {};
   fixNum(F, 'turn', 0, 0, 999); fixNum(F, 'T', TURN_T, 1, TURN_T); fixNum(F, 't', F.T, 0, F.T); fixNum(F, 'powersLeft', 3, 0, 3); F.powersLeft = Math.floor(F.powersLeft); fixNum(F, 'usedTurn', 0, 0, 3); fixNum(F, 'stuck', 0, 0);

@@ -110,6 +110,7 @@ function passiveTick(gdt) {
   if (S.timers.dunCd > 0) S.timers.dunCd = Math.max(0, S.timers.dunCd - gdt);
   bldTick(gdt);
   if (h.inj.length) { for (const j of h.inj) j.t -= gdt; const n = h.inj.length; h.inj = h.inj.filter(j => j.t > 0); if (h.inj.length !== n) { recalcHp(); diary('🩹 Травма зажила. Снова как новенький (почти).', 'level'); } }
+  olyTick(gdt);
   S.timers.rivals -= gdt;
   if (S.timers.rivals <= 0) { S.timers.rivals = PACE.rivals; const r = pick(S.rivals); if (r.lvl < S.god.lvl + 2 && R() < .5) r.lvl++; r.hlvl = clamp(h.lvl + rnd(-1, 1), 1, MAX_LVL); if (R() < .5) r.army += rnd(0, 2); }
 }
@@ -137,6 +138,10 @@ function step(realDt) {
   chat.tick(idt);
   saveAcc += realDt; if (saveAcc > 5) { saveAcc = 0; save(); }
 }
+function olyAway(o0, seasons) {
+  const o1 = olySnap(), lost = o0.regs.filter(x => !o1.regs.includes(x)), got = o1.regs.filter(x => !o0.regs.includes(x));
+  return { r0: o0.rank, r1: o1.rank, n0: o0.regs.length, n1: o1.regs.length, lost: seasons.length ? [] : lost, got: seasons.length ? [] : got, seasons, n: o1.n, inf: o1.inf };
+}
 function fmtDur(sec) { const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60); return h ? `${h} ч ${m} мин` : `${m} мин`; }
 /* Офлайн-симуляция: герой живёт сам (75% темпа), развилки решает сам, итог — сжатая сводка в дневнике */
 function simulateAway(sec, why) {
@@ -149,25 +154,27 @@ function simulateAway(sec, why) {
   if (S.ev) S.ev = null;
   const c = { wins: 0, deaths: 0, quests: 0, forks: 0, lvls: 0, items: [] };
   const g0 = h.gold, f0 = Math.floor(S.flock.fol), l0 = h.lvl, fa0 = S.god.faith;
-  SILENT = { buf: [], c };
+  const base = Date.now() - sec * 1000, o0 = S.oly ? olySnap() : null;
+  SILENT = { buf: [], c }; OLY_NOW = base;
   let buf;
   try {
     if (S.fork) timeoutFork(true);
     const stepDt = ((PACE.step[0] + PACE.step[1]) / 2) / PACE.offEff;
     let t = 0, forkT = Math.max(PACE.forkOff[0] / 2, S.timers.fork);
     while (t < cap) {
-      t += stepDt;
+      t += stepDt; OLY_NOW = base + t * 1000;
       syncGuards();
       passiveTick(stepDt);
       forkT -= stepDt;
       if (forkT <= 0 && (h.state === 'road' || h.state === 'town')) { if (startFork() !== false && S.fork) timeoutFork(true); forkT = rspan(PACE.forkOff); }
       heroStep();
     }
+    if (sec > cap) olyFastForward(sec - cap); // герой спит, а мир живёт дальше: боги-соперники, храмы, конец сезона
     S.timers.fork = Math.min(PACE.fork[1], Math.max(60, forkT));
     S.timers.hero = Math.min(S.timers.hero, 5);
-  } finally { buf = SILENT.buf; SILENT = null; }
+  } finally { buf = SILENT.buf; SILENT = null; OLY_NOW = null; }
   // яркие моменты: уровни, черты, редкие вещи, смерти + пара смешных развилок
-  const pri = buf.filter(e => ['level', 'rare', 'death'].includes(e.c));
+  const pri = buf.filter(e => ['level', 'rare', 'death'].includes(e.c) || (e.c === 'oly' && /^(🏛|💔|👑|⚡|🔥 Сезон|🌊|🌾|🍷|🥟)/.test(e.x)));
   const forks = buf.filter(e => e.c === 'fork' && !/^(🙏|✨)/.test(e.x)).sort(() => R() - .5).slice(0, 2);
   const hl = pri.slice(-8).concat(forks);
   for (const e of hl.reverse()) { e.x = '⏳ ' + e.x; S.diary.unshift(e); }
@@ -176,7 +183,7 @@ function simulateAway(sec, why) {
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
   /* v11: сводка для отдельной карточки «Пока вас не было» */
-  lastAway = { sec: cap, slept: sec > cap, why: why || '', wins: c.wins, deaths: c.deaths, quests: c.quests, forks: c.forks, gold: gd, fol: fd, fa0: Math.floor(fa0), fa1: Math.floor(S.god.faith), l0, l1: h.lvl, items: c.items.slice(0, 6), hl: hl.slice(0, 6).map(e => ({ x: e.x.replace(/^⏳ /, ''), c: e.c })) };
+  lastAway = { sec: cap, slept: sec > cap, why: why || '', wins: c.wins, deaths: c.deaths, quests: c.quests, forks: c.forks, gold: gd, fol: fd, fa0: Math.floor(fa0), fa1: Math.floor(S.god.faith), l0, l1: h.lvl, items: c.items.slice(0, 6), hl: hl.slice(0, 6).map(e => ({ x: e.x.replace(/^⏳ /, ''), c: e.c })), oly: o0 ? olyAway(o0, c.seasons || []) : null };
   return c;
 }
 let lastAway = null;
@@ -187,6 +194,7 @@ function offlineCatchUp() {
     const m = S._migratedV3; delete S._migratedV3;
     diary(`✨ Мир обновился! Теперь я — ${RACES[m.race].n.toLowerCase()}-${CLASSES[m.cls].n.toLowerCase()}. Память слегка подтёрлась: был ${m.oldL}-го уровня, теперь ${m.newL}-го, зато с характеристиками и чертами. Боги говорят, так честнее.`, 'level');
   }
+  if (S._migratedV10) { delete S._migratedV10; diary('🏛 Обновление мира: началась «Война за Олимп»! Мир поделён на 14 регионов, и боги-соперники обращают в них души. Регион принадлежит богу с самой большой паствой и даёт веру и бонус. Через 4 недели топ-7 богов займут троны Олимпа. Карта и таблица — во вкладке «🏛 Олимп».', 'oly'); }
   if (S._migratedV8) { delete S._migratedV8; const id = bldId(S.hero); diary(`🧭 Обновление мира: герои теперь сами выбирают путь. Посмотрев на свои мускулы и рюкзак, ${S.hero.name} решил, что он — ${bldName(id)}. Посоветовать другой путь можно в «📋 Герой».`, 'rare'); }
   if (S._migratedV7) { delete S._migratedV7; diary(`🧥 Обновление мира: у героя теперь 10 слотов — шлем, перчатки, сапоги, пояс, щит и второе кольцо. Новые слоты пока пусты; у вещей появились требования, 9 комплектов и 15 легендарок. Старое снаряжение на месте.`, 'rare'); }
   if (S._migratedV6) { delete S._migratedV6; diary(`⚒ Обновление мира: у снаряжения появилась сила — ⚔ ГС (сейчас ${gearScore(S.hero)}). Подземелья теперь трёх сложностей с рекомендуемым ГС: недобор — монстры злее, перебор — легче. Огонь, вампиризм, шипы и серебро работают в бою, у боссов есть слабости. Кузнец в городе точит вещи за золото.`, 'level'); }
