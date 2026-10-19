@@ -9,7 +9,7 @@ const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalon
 let swReg = null, waitingSW = null, installEvt = null, updating = false, updFallback = null;
 const PWA = { get waiting() { return !!waitingSW; }, get build() { return APP_BUILD; }, get reg() { return swReg; }, get installable() { return !!installEvt; }, updateShown: false };
 function showUpdateBar() { PWA.updateShown = true; const b = $('updBar'); if (b) b.classList.add('on'); }
-function calmMoment() { return !S || (!S.fork && !S.fight && !S.dun && !(S.arena && S.arena.apps.some(a => a.joined !== null)) && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
+function calmMoment() { return !S || (!(S.fork && !forkPaused()) && !S.fight && !S.dun && !(S.arena && S.arena.apps.some(a => a.joined !== null)) && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
 function applyUpdate() {
   if (S) save();
   if (waitingSW) { updating = true; waitingSW.postMessage({ type: 'SKIP_WAITING' }); setTimeout(() => location.reload(), 3000); }

@@ -96,11 +96,11 @@ function syncGuards() {
   if (h.state === 'fight' && !h.monster) h.state = 'road';
   if (h.monster && h.state !== 'fight') h.monster = null;
   if (h.state === 'rest' && h.restT <= 0) h.state = 'road';
-  if (S.fork && (h.state === 'dead' || S.fight || S.dun)) S.fork = null;
+  if (S.fork && h.state === 'dead') S.fork = null; // в бою/пещере момент не сбрасывается — ждёт (forkPaused)
 }
 function passiveTick(gdt) {
   const h = S.hero;
-  addFaith(faithRegen() * gdt);
+  addFaith(faithRegen() * gdt); momClock += gdt;
   S.flock.fol += (S.flock.temple * 0.00014 + (S.god.align > 40 ? 0.0001 : 0)) * gdt;
   for (const k in S.buffs) if (S.buffs[k] > 0) S.buffs[k] = Math.max(0, S.buffs[k] - gdt);
   if (h.orcCd > 0) h.orcCd = Math.max(0, h.orcCd - gdt);
@@ -119,13 +119,18 @@ function step(realDt) {
   const h = S.hero;
   syncGuards();
   passiveTick(gdt);
-  if (!S.fork && !S.fight && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
-  if (S.fork) { S.fork.t -= idt; if (S.fork.t <= 0) timeoutFork(); }
-  else if (!S.fight && !S.dun && !dunPending && !duelPending) { S.timers.fork -= gdt; if (S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town')) { startFork(); S.timers.fork = rspan(PACE.fork); } }
+  if (!S.fight && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
+  // момент/развилка: герой живёт дальше, пока бог думает; в бою/пещере карточка ждёт, таймер стоит
+  // таймер считает «от начала до начала» (5–10 мин при ×1), но после ответа даём минимум 2 мин тишины
+  if (!forkPaused()) {
+    if (S.fork) { S.fork.t -= idt; if (S.fork.t <= 0) timeoutFork(); if (!S.fork) S.timers.fork = Math.max(S.timers.fork, 120); }
+    S.timers.fork -= gdt;
+    if (!S.fork && S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town' || h.state === 'rest')) { if (startFork() !== false) S.timers.fork = rspan(PACE.fork); else S.timers.fork = 30; }
+  }
   if (S.fight) fightTick(realDt); // решения в бою — в реальном времени: на ×2–×10 таймер не сжимается
-  else if (!S.fork && !S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
+  else if (!S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
   if (S.dun) dunTick(idt);
-  else if (!S.fork && !S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { if (h.hp < h.maxHp * .7) S.timers.dun = 120; else { S.timers.dun = rspan(PACE.dun); startDungeon(false); } } }
+  else if (!S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { if (h.hp < h.maxHp * .7) S.timers.dun = 120; else { S.timers.dun = rspan(PACE.dun); startDungeon(false); } } }
   if (S.ev) evTick(idt);
   else { S.timers.event -= gdt; if (S.timers.event <= 0) { S.timers.event = rspan(PACE.event); startEvent(); } }
   arenaStep(idt);
@@ -149,21 +154,21 @@ function simulateAway(sec, why) {
   try {
     if (S.fork) timeoutFork(true);
     const stepDt = ((PACE.step[0] + PACE.step[1]) / 2) / PACE.offEff;
-    let t = 0, forkT = Math.max(60, S.timers.fork);
+    let t = 0, forkT = Math.max(PACE.forkOff[0] / 2, S.timers.fork);
     while (t < cap) {
       t += stepDt;
       syncGuards();
       passiveTick(stepDt);
       forkT -= stepDt;
-      if (forkT <= 0 && (h.state === 'road' || h.state === 'town')) { if (startFork() !== false && S.fork) timeoutFork(true); forkT = rspan(PACE.fork); }
+      if (forkT <= 0 && (h.state === 'road' || h.state === 'town')) { if (startFork() !== false && S.fork) timeoutFork(true); forkT = rspan(PACE.forkOff); }
       heroStep();
     }
-    S.timers.fork = Math.max(60, forkT);
+    S.timers.fork = Math.min(PACE.fork[1], Math.max(60, forkT));
     S.timers.hero = Math.min(S.timers.hero, 5);
   } finally { buf = SILENT.buf; SILENT = null; }
   // яркие моменты: уровни, черты, редкие вещи, смерти + пара смешных развилок
   const pri = buf.filter(e => ['level', 'rare', 'death'].includes(e.c));
-  const forks = buf.filter(e => e.c === 'fork' && !e.x.startsWith('🙏')).sort(() => R() - .5).slice(0, 2);
+  const forks = buf.filter(e => e.c === 'fork' && !/^(🙏|✨)/.test(e.x)).sort(() => R() - .5).slice(0, 2);
   const hl = pri.slice(-8).concat(forks);
   for (const e of hl.reverse()) { e.x = '⏳ ' + e.x; S.diary.unshift(e); }
   const gd = h.gold - g0, fd = Math.floor(S.flock.fol) - f0;

@@ -542,7 +542,7 @@ function endBattle(F, winTeam) {
 }
 
 /* ---------- Запуск боёв ---------- */
-const heroFree = () => S.hero.state !== 'dead' && (S.hero.state === 'road' || S.hero.state === 'town') && !S.fight && !S.dun && !S.fork && !duelPending && !dunPending;
+const heroFree = () => S.hero.state !== 'dead' && (S.hero.state === 'road' || S.hero.state === 'town') && !S.fight && !S.dun && !duelPending && !dunPending;
 function startMonsterFight() {
   const h = S.hero, m = h.monster;
   if (!m || h.state !== 'fight' || S.fight || S.dun) return false;

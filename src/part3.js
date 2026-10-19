@@ -6,7 +6,8 @@
    ===================================================================== */
 const PACE = {
   step: [40, 60],          // шаг героя (запись в дневнике) раз в 40–60 с
-  fork: [720, 1200],       // развилка раз в 12–20 мин
+  fork: [300, 600],        // божественный момент / развилка раз в 5–10 мин (при ×1 — реальных)
+  forkOff: [720, 1200],    // офлайн герой сам решает момент раз в 12–20 мин (как старые развилки) — молча, в сводку попадают максимум 2
   duel: [2700, 4500],      // дуэль раз в 45–75 мин
   event: [7200, 10800],    // мировое событие раз в 2–3 ч
   dun: [10800, 18000],     // подземелье само раз в 3–5 ч (или по зову бога)
@@ -83,7 +84,7 @@ function defaultState(god, hero, race, cls) {
     buffs: { luck: 0, shield: 0, trade: 0 },
     timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
     fork: null, fight: null, ev: null, dun: null, fightAuto: false,
-    arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
+    arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], momHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
     speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
@@ -101,7 +102,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 8;
+const SAVE_VERSION = 9;
 /* v8: путь героя */
 function sanitizeBld(h) {
   const B = h.bld;
@@ -177,6 +178,7 @@ function migrate(o) {
     o._migratedV7 = 1;
   }
   if (v < 8) o._migratedV8 = 1;
+  if (v < 9 && o.timers && typeof o.timers === 'object' && isNum(o.timers.fork)) o.timers.fork = Math.min(o.timers.fork, 300); // v9: моменты — первый скоро
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
@@ -256,8 +258,15 @@ function sanitize(o) {
   if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(o.ui.mtab)) o.ui.mtab = 'hero';
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
-  if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;
-  if (o.fork) { o.fork.T = 30; o.fork.t = clamp(o.fork.t, 1, 30); o.fork.cls = !!o.fork.cls; }
+  o.momHist = Array.isArray(o.momHist) ? o.momHist.filter(i => typeof i === 'string' && MOM_BY[i]).slice(-MOM_HIST) : [];
+  if (o.fork && o.fork.m !== undefined) {
+    const F = o.fork;
+    if (!(typeof F.m === 'string' && MOM_BY[F.m] && typeof F.txt === 'string' && isNum(F.t))) o.fork = null;
+    else { o.fork = { m: F.m, txt: F.txt.slice(0, 400), t: clamp(F.t, 1, MOM_T), T: MOM_T, v: { m: F.v && typeof F.v.m === 'string' ? F.v.m.slice(0, 60) : 'противник' } }; }
+  } else {
+    if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;
+    if (o.fork) o.fork = { i: o.fork.i, T: MOM_T, t: clamp(o.fork.t, 1, MOM_T), cls: !!o.fork.cls };
+  }
   o.fightAuto = !!o.fightAuto;
   sanitizeArena(o, h);
   if (o.fight && !validFight(o.fight)) o.fight = null;
@@ -271,7 +280,6 @@ function sanitize(o) {
   if (o.dun && o.dun.phase !== 'end') { h.state = h.state === 'dead' ? (h.hp = 1, 'dungeon') : 'dungeon'; h.monster = null; }
   if (h.state === 'duel' && !(o.fight && o.fight.phase !== 'end')) h.state = 'road';
   if (!o.dun && h.state === 'dungeon') h.state = 'road';
-  if ((o.fight || o.dun) && o.fork) o.fork = null;
   if (o.fork && h.state === 'dead') o.fork = null;
   const E = o.ev;
   if (E && !(WEVENTS.find(e => e.id === E.id) && ['live', 'done'].includes(E.phase) && E.my && Array.isArray(E.parts))) {

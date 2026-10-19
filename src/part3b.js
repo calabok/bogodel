@@ -66,7 +66,7 @@ function check(s, dc, bonus) {
   if (!ok && h.race === 'halfling' && R() < .2) { r = rnd(1, 20); ok = r + b >= dc; if (ok) note = ', повезло со второго раза'; }
   if (!ok && hasFeat('lucky') && R() < .25) { r = rnd(1, 20); ok = r + b >= dc; if (ok) note = ', везунчик'; }
   if (!ok && h.cls === 'bard' && R() < .3) { ok = r + b + rnd(1, 6) >= dc; if (ok) note = ', вдохновение барда'; }
-  return { ok, note, label: `проверка ${STAT_GEN[s]}: ${ok ? 'успех' : 'провал'}${note}` };
+  return { ok, note, r, b, dc, label: `проверка ${STAT_GEN[s]}: ${ok ? 'успех' : 'провал'}${note}` };
 }
 
 /* ---------- Предметы ---------- */
@@ -141,23 +141,26 @@ function applyFx(e) {
   if (e.gold) {
     let v = Math.round(e.gold * goldScale(L));
     v = v > 0 ? Math.round(v * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1)) : -Math.min(h.gold, -v);
-    h.gold += v; if (v) out.push((v > 0 ? '+' : '') + v + ' 💰');
+    h.gold += v; if (v) out.push((v > 0 ? '+' : '−') + Math.abs(v) + ' 💰');
   }
   if (e.xp) { const v = Math.max(1, Math.round(e.xp * xpUnit(L) * .25)); gainXp(v); out.push('+' + v + ' опыта'); }
-  if (e.trust) { addTrust(e.trust); out.push((e.trust > 0 ? '+' : '') + e.trust + ' доверия'); }
-  if (e.fol) { const v = e.fol > 0 ? e.fol : -Math.min(Math.floor(S.flock.fol), -e.fol); S.flock.fol += v; if (v) out.push((v > 0 ? '+' : '') + v + ' паствы'); }
-  if (e.faith) { addFaith(e.faith); out.push('+' + e.faith + ' веры'); }
+  if (e.trust) { addTrust(e.trust); out.push((e.trust > 0 ? '+' : '−') + Math.abs(e.trust) + ' доверия'); }
+  if (e.fol) { const v = e.fol > 0 ? e.fol : -Math.min(Math.floor(S.flock.fol), -e.fol); S.flock.fol += v; if (v) out.push((v > 0 ? '+' : '−') + Math.abs(v) + ' паствы'); }
+  if (e.faith) { const f0 = S.god.faith; addFaith(e.faith); const d = Math.round(S.god.faith - f0); if (d) out.push((d > 0 ? '+' : '−') + Math.abs(d) + ' веры'); }
   if (e.army) { S.flock.army += e.army; out.push('+' + e.army + ' в армию'); }
   if (e.item) { if (R() < .35) { const it = lootDrop(.3, 'Трофей'); out.push('🎒 ' + it.n); } else { const it = addItem(); out.push('🎒 ' + it.n); } }
-  if (e.potion) { h.potions += e.potion; out.push('+' + e.potion + ' ' + plural(e.potion, 'зелье', 'зелья', 'зелий')); }
+  if (e.potion) { const pv = e.potion > 0 ? e.potion : -Math.min(h.potions, -e.potion); h.potions += pv; if (pv) out.push((pv > 0 ? '+' : '−') + Math.abs(pv) + ' ' + plural(pv, 'зелье', 'зелья', 'зелий')); }
+  if (e.shield) { S.buffs.shield += e.shield * 60; out.push('🛡 щит ' + e.shield + ' мин'); }
+  if (e.tprog && S.flock.temple < 10) { S.flock.templeProg += e.tprog; out.push('+' + e.tprog + ' к стройке храма'); while (S.flock.temple < 10 && S.flock.templeProg >= templeCost()) { S.flock.templeProg -= templeCost(); S.flock.temple++; diary(`⛪ Паства отстроила ${TEMPLE_NAMES[S.flock.temple - 1]} во славу нашего бога!`, 'level'); } }
+  if (e.cure && h.inj.length) { const cu = healInjuries('one'); if (cu) out.push('травма исцелена'); }
   if (e.maxhp) { h.st.con = Math.min(20, h.st.con + 1); recalcHp(); out.push('Телосложение +1'); }
-  if (e.luck) { S.buffs.luck += e.luck * 10; out.push('🍀 удача'); }
+  if (e.luck) { S.buffs.luck += e.luck * (e.safe ? 120 : 10); out.push(e.safe ? '🍀 удача ' + (e.luck * 2) + ' мин' : '🍀 удача'); }
   if (e.clearinv) { h.inv = h.inv.filter(i => i.slot); }
-  if (e.quest) { out.push('+' + e.quest + '% задания'); questProgress(e.quest); }
+  if (e.quest > 0) { out.push('+' + e.quest + '% задания'); questProgress(e.quest); } else if (e.quest < 0) { const q = Math.min(h.quest.p, -e.quest); h.quest.p -= q; if (q) out.push('−' + q + '% задания'); }
   if (e.hp) {
-    const v = Math.max(1, Math.round(Math.abs(e.hp) * h.maxHp / 70));
+    let v = Math.max(1, Math.round(Math.abs(e.hp) * h.maxHp / 70));
     if (e.hp > 0) { const a = healHero(v); if (a) out.push('+' + a + ' HP'); }
-    else { const d = damageHero(v, 'Погиб, принимая решения.'); out.push('−' + d + ' HP'); }
+    else { if (e.safe) v = Math.min(v, Math.max(0, h.hp - 1)); const d = damageHero(v, 'Погиб, принимая решения.'); out.push('−' + d + ' HP'); }
   }
   return out.join(', ');
 }
@@ -298,7 +301,7 @@ function winFight() {
   if (SILENT) SILENT.c.wins++;
   diary(pick(['Противник «{m}» побеждён! Забрал трофеи и чувство собственной важности.', 'Победа над противником «{m}»! Победный танец исполнен (зрителей не было).',
     '«{m}» больше не встанет. Сказал напоследок что-то умное. Никто не оценил — некому было.']).split('{m}').join(m.n), 'loot', fx);
-  h.monster = null; h.state = 'road';
+  h.monster = null; h.state = 'road'; momFightAt = momClock; momFightN = m.n;
   gainXp(xp); questProgress(rnd(2, 5));
   const lootP = .35 + (h.race === 'elf' ? .2 : 0) + (hasFeat('treasure') ? .2 : 0) + (S.buffs.luck > 0 ? .2 : 0) + mod(statVal('wis')) * .02;
   if (R() < lootP) { if (R() < .3) lootDrop(clamp((m.tier - h.lvl) * .3, 0, 1) + (S.buffs.luck > 0 ? .4 : 0), 'Трофей'); else { const it = addItem(); diary(`В карманах противника нашёлся «${it.n}».`, 'loot'); } }
@@ -469,18 +472,24 @@ function voice(text) {
   if (S.hero.monster && S.hero.monster.hp <= 0) winFight();
 }
 
-/* ---------- Развилки ---------- */
+/* ---------- Развилки и божественные моменты ----------
+   Один таймер (PACE.fork): чаще всего «божественный момент» (part3h.js), иногда старая «молитва» (FORKS).
+   startFork(число) — молитва по номеру, startFork('id') — момент по id, без аргумента — случайно. */
 function startFork(idx) {
-  if (S.fork || S.fight || S.dun || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
+  if (S.fork || forkPaused() || S.hero.state === 'dead') return false;
+  if (typeof idx === 'string') return startMoment(idx);
+  if (idx === undefined && R() >= MOM_LEGACY_P) { const ok = startMoment(); if (ok) return true; }
   let i = idx;
   if (i === undefined) { const free = FORKS.map((_, k) => k).filter(k => !S.forkHist.includes(k)); i = pick(free.length ? free : FORKS.map((_, k) => k)); }
   S.forkHist.push(i); if (S.forkHist.length > 10) S.forkHist.shift();
-  S.fork = { i, t: 30, T: 30, cls: R() < .4 }; S.timers.fork = Math.max(S.timers.fork, 300);
+  S.fork = { i, t: MOM_T, T: MOM_T, cls: R() < .4 };
   S.stats.forks++;
   diary('🙏 Молюсь: ' + FORKS[i].t, 'fork');
-  toast('🙏 Герой молится и ждёт вашего решения!');
+  if (!SILENT) toast('🙏 Герой молится и ждёт вашего решения!');
+  return true;
 }
-function forkOptions(fk) { const f = FORKS[fk.i], o = f.o.slice(); if (fk.cls) { const c = CLASS_FORK[S.hero.cls]; o.push({ l: c.l, a: 0, clsOpt: true }); } return o; }
+/* Варианты молитвы: свои + (иногда) классовый + всегда «Ничего не делать» (герой поступит по-своему) */
+function forkOptions(fk) { const f = FORKS[fk.i], o = f.o.slice(); if (fk.cls) { const c = CLASS_FORK[S.hero.cls]; o.push({ l: c.l, a: 0, clsOpt: true }); } o.push({ l: NOTHING, a: 0, nothing: true }); return o; }
 function resolveOption(fi, k) {
   const f = FORKS[fi];
   if (k >= f.o.length) { // классовый вариант
@@ -499,28 +508,32 @@ function resolveOption(fi, k) {
     for (const r of opt.r) { if (r.p === undefined) { res = r; break; } if (R() < r.p + bonus) { res = r; break; } }
   }
   const fx = applyFx(res.e);
-  diary(res.t, 'fork', [label, fx].filter(Boolean).join(' · '));
+  diary(res.t, 'fork', [label, fx || 'без последствий'].filter(Boolean).join(' · '));
 }
 function answerFork(k) {
   if (!S.fork) return;
+  if (S.fork.m) return answerMoment(+k);
   const fk = S.fork, opts = forkOptions(fk); if (!opts[k]) return;
-  S.fork = null; S.stats.forksAns++;
   const opt = opts[k];
+  if (opt.nothing) { S.fork = null; S.stats.forksAns++; diary(`Бог сказал: «${NOTHING}». Ладно, поступлю по-своему.`, 'god'); diary(FORKS[fk.i].self.t, 'fork', applyFx(FORKS[fk.i].self.e) || 'без последствий'); return; }
+  S.fork = null; S.stats.forksAns++; S.timers.fork = Math.max(S.timers.fork, 120);
   shiftAlign(opt.a); addGxp(10);
-  if (R() < obeyChance()) { addTrust(2); diary(`Услышал волю бога: «${opt.l}». Так и сделаю!`, 'god'); resolveOption(fk.i, k); }
+  const real = opts.filter(o => !o.nothing);
+  if (R() < obeyChance()) { addTrust(2); diary(`Услышал волю бога: «${opt.l}». Так и сделаю!`, 'god', '+2 доверия'); resolveOption(fk.i, k); }
   else {
-    const others = opts.map((_, j) => j).filter(j => j !== k); const j = pick(others);
-    diary(`Бог сказал «${opt.l}», но я решил, что лучше знаю. Выбираю «${opts[j].l}».`, 'god');
+    const others = real.map((_, j) => j).filter(j => j !== k); const j = pick(others);
+    diary(`Бог сказал «${opt.l}», но я решил, что лучше знаю. Выбираю «${real[j].l}».`, 'god');
     resolveOption(fk.i, j);
   }
 }
 function timeoutFork(offline) {
   if (!S.fork) return;
+  if (S.fork.m) return timeoutMoment();
   const fk = S.fork, f = FORKS[fk.i]; S.fork = null;
-  if (!offline) addTrust(-2);
-  const pen = offline ? '' : '−2 доверия';
+  const pen = !offline && godPresent() ? '−1 доверия' : ''; // обижается, только если бог был рядом и промолчал
+  if (pen) addTrust(-1);
   if (R() < .7) diary(f.self.t, 'fork', [applyFx(f.self.e), pen].filter(Boolean).join(', '));
-  else { const opts = forkOptions(fk), j = rnd(0, opts.length - 1); diary(`Бог промолчал. Выбрал наугад: «${opts[j].l}».`, 'fork', pen); resolveOption(fk.i, j); }
+  else { const opts = forkOptions(fk).filter(o => !o.nothing), j = rnd(0, opts.length - 1); diary(`Бог промолчал. Выбрал наугад: «${opts[j].l}».`, 'fork', pen); resolveOption(fk.i, j); }
   if (SILENT) SILENT.c.forks++;
 }
 

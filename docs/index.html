@@ -113,6 +113,21 @@ main{display:grid;gap:18px;padding:18px;max-width:1280px;margin:0 auto;
 .fork h2{color:#5e2f86;border-color:#b993dc}
 .fork .q{font-size:15.5px;line-height:1.45;margin:6px 0 10px}
 .fork .opts{display:flex;flex-direction:column;gap:7px}
+.card.fork.mom{border:2px solid var(--gold);background:linear-gradient(180deg,#fffbef,#f7ecd0);animation:momIn 1.1s ease-out 2}
+@keyframes momIn{0%{box-shadow:0 0 0 0 #e8b13ccc,var(--shadow)}70%{box-shadow:0 0 0 10px #e8b13c00,var(--shadow)}100%{box-shadow:var(--shadow)}}
+.momh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.momh b{font-size:15px;color:#7a4e06}.fork:not(.mom) .momh b{color:#5e2f86}
+.momt{font-size:12px;color:#7d6a4a;white-space:nowrap}
+.fork.mom .q{margin:4px 0 8px}
+.mopts{flex-direction:row!important;flex-wrap:wrap}
+.mopts .btn{flex:1 1 200px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:40px}
+.mopts .btn .ml{flex:1 1 auto}
+.fork.mom .opts .btn{background:linear-gradient(180deg,#fff,#f6ead0);border-color:#c9a560;box-shadow:0 2px 0 #a8873e;color:#4a320a}
+.fork .opts .btn.none{background:#fff;border-style:dashed;box-shadow:none;color:#6b5a44}
+.fork .opts .btn:disabled{opacity:.55}
+.tag.cost{background:#ffe7c2;color:#9a4a00;border:1px solid #f0b56a}.tag.chk{background:#e8f0ff;color:#2a4f8f;border:1px solid #a9c1ea}
+.bar.time.thin{height:5px;margin-top:8px}
+@media(max-width:560px){.mopts .btn{flex-basis:100%}}
 .fork .opts .btn{text-align:left;background:linear-gradient(180deg,#fff,#efe4fb);border-color:#a37fcb;box-shadow:0 2px 0 #8a68b0;color:#3d1f5c}
 .tag{font-size:11px;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle}
 .tag.kind{background:#fff1b8;color:#7a5b00}.tag.wrath{background:#ffd5cc;color:#8c2e20}.tag.neutral{background:#e3e3e3;color:#555}
@@ -986,7 +1001,8 @@ const BLD_SAY = {
    ===================================================================== */
 const PACE = {
   step: [40, 60],          // шаг героя (запись в дневнике) раз в 40–60 с
-  fork: [720, 1200],       // развилка раз в 12–20 мин
+  fork: [300, 600],        // божественный момент / развилка раз в 5–10 мин (при ×1 — реальных)
+  forkOff: [720, 1200],    // офлайн герой сам решает момент раз в 12–20 мин (как старые развилки) — молча, в сводку попадают максимум 2
   duel: [2700, 4500],      // дуэль раз в 45–75 мин
   event: [7200, 10800],    // мировое событие раз в 2–3 ч
   dun: [10800, 18000],     // подземелье само раз в 3–5 ч (или по зову бога)
@@ -1063,7 +1079,7 @@ function defaultState(god, hero, race, cls) {
     buffs: { luck: 0, shield: 0, trade: 0 },
     timers: { hero: 3, fork: 90, duel: 480, event: 900, dun: 1500, dunCd: 0, rivals: PACE.rivals },
     fork: null, fight: null, ev: null, dun: null, fightAuto: false,
-    arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], lastEv: null,
+    arena: { rating: 1000, w: 0, l: 0, fat: 0, fatT: 0, apps: [], seq: 0 }, chat: { msgs: [], unread: 0, open: false }, featOffer: null, featQueue: 0, forkHist: [], momHist: [], lastEv: null,
     diary: [], rivals: RIVALS_BASE.map(r => Object.assign({ w: 0, l: 0, army: rnd(0, 4), hlvl: rnd(1, 2), bld: bldForBot(r.cls, r.race) }, r)),
     stats: { forks: 0, forksAns: 0, duels: 0, dwins: 0, events: 0, evwins: 0, duns: 0, dwinsD: 0, arenaW: 0, arenaL: 0, bosses: 0 },
     speed: 1, paused: false, tab: 'powers', ui: { mtab: 'hero' }, lastSeen: Date.now()
@@ -1081,7 +1097,7 @@ function deepMerge(def, obj) {
   }
   return obj;
 }
-const SAVE_VERSION = 8;
+const SAVE_VERSION = 9;
 /* v8: путь героя */
 function sanitizeBld(h) {
   const B = h.bld;
@@ -1157,6 +1173,7 @@ function migrate(o) {
     o._migratedV7 = 1;
   }
   if (v < 8) o._migratedV8 = 1;
+  if (v < 9 && o.timers && typeof o.timers === 'object' && isNum(o.timers.fork)) o.timers.fork = Math.min(o.timers.fork, 300); // v9: моменты — первый скоро
   delete o.duel;
   o.v = SAVE_VERSION;
   return o;
@@ -1236,8 +1253,15 @@ function sanitize(o) {
   if (!['hero', 'diary', 'powers', 'arena', 'more'].includes(o.ui.mtab)) o.ui.mtab = 'hero';
   if (!isNum(o.lastSeen)) o.lastSeen = Date.now();
   o.forkHist = Array.isArray(o.forkHist) ? o.forkHist.filter(i => isNum(i) && FORKS[i]) : [];
-  if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;
-  if (o.fork) { o.fork.T = 30; o.fork.t = clamp(o.fork.t, 1, 30); o.fork.cls = !!o.fork.cls; }
+  o.momHist = Array.isArray(o.momHist) ? o.momHist.filter(i => typeof i === 'string' && MOM_BY[i]).slice(-MOM_HIST) : [];
+  if (o.fork && o.fork.m !== undefined) {
+    const F = o.fork;
+    if (!(typeof F.m === 'string' && MOM_BY[F.m] && typeof F.txt === 'string' && isNum(F.t))) o.fork = null;
+    else { o.fork = { m: F.m, txt: F.txt.slice(0, 400), t: clamp(F.t, 1, MOM_T), T: MOM_T, v: { m: F.v && typeof F.v.m === 'string' ? F.v.m.slice(0, 60) : 'противник' } }; }
+  } else {
+    if (o.fork && !(isNum(o.fork.i) && FORKS[o.fork.i] && isNum(o.fork.t))) o.fork = null;
+    if (o.fork) o.fork = { i: o.fork.i, T: MOM_T, t: clamp(o.fork.t, 1, MOM_T), cls: !!o.fork.cls };
+  }
   o.fightAuto = !!o.fightAuto;
   sanitizeArena(o, h);
   if (o.fight && !validFight(o.fight)) o.fight = null;
@@ -1251,7 +1275,6 @@ function sanitize(o) {
   if (o.dun && o.dun.phase !== 'end') { h.state = h.state === 'dead' ? (h.hp = 1, 'dungeon') : 'dungeon'; h.monster = null; }
   if (h.state === 'duel' && !(o.fight && o.fight.phase !== 'end')) h.state = 'road';
   if (!o.dun && h.state === 'dungeon') h.state = 'road';
-  if ((o.fight || o.dun) && o.fork) o.fork = null;
   if (o.fork && h.state === 'dead') o.fork = null;
   const E = o.ev;
   if (E && !(WEVENTS.find(e => e.id === E.id) && ['live', 'done'].includes(E.phase) && E.my && Array.isArray(E.parts))) {
@@ -1481,7 +1504,7 @@ function check(s, dc, bonus) {
   if (!ok && h.race === 'halfling' && R() < .2) { r = rnd(1, 20); ok = r + b >= dc; if (ok) note = ', повезло со второго раза'; }
   if (!ok && hasFeat('lucky') && R() < .25) { r = rnd(1, 20); ok = r + b >= dc; if (ok) note = ', везунчик'; }
   if (!ok && h.cls === 'bard' && R() < .3) { ok = r + b + rnd(1, 6) >= dc; if (ok) note = ', вдохновение барда'; }
-  return { ok, note, label: `проверка ${STAT_GEN[s]}: ${ok ? 'успех' : 'провал'}${note}` };
+  return { ok, note, r, b, dc, label: `проверка ${STAT_GEN[s]}: ${ok ? 'успех' : 'провал'}${note}` };
 }
 
 /* ---------- Предметы ---------- */
@@ -1556,23 +1579,26 @@ function applyFx(e) {
   if (e.gold) {
     let v = Math.round(e.gold * goldScale(L));
     v = v > 0 ? Math.round(v * (S.buffs.luck > 0 ? 1.5 : 1) * (eqHas('gold') ? 1.25 : 1)) : -Math.min(h.gold, -v);
-    h.gold += v; if (v) out.push((v > 0 ? '+' : '') + v + ' 💰');
+    h.gold += v; if (v) out.push((v > 0 ? '+' : '−') + Math.abs(v) + ' 💰');
   }
   if (e.xp) { const v = Math.max(1, Math.round(e.xp * xpUnit(L) * .25)); gainXp(v); out.push('+' + v + ' опыта'); }
-  if (e.trust) { addTrust(e.trust); out.push((e.trust > 0 ? '+' : '') + e.trust + ' доверия'); }
-  if (e.fol) { const v = e.fol > 0 ? e.fol : -Math.min(Math.floor(S.flock.fol), -e.fol); S.flock.fol += v; if (v) out.push((v > 0 ? '+' : '') + v + ' паствы'); }
-  if (e.faith) { addFaith(e.faith); out.push('+' + e.faith + ' веры'); }
+  if (e.trust) { addTrust(e.trust); out.push((e.trust > 0 ? '+' : '−') + Math.abs(e.trust) + ' доверия'); }
+  if (e.fol) { const v = e.fol > 0 ? e.fol : -Math.min(Math.floor(S.flock.fol), -e.fol); S.flock.fol += v; if (v) out.push((v > 0 ? '+' : '−') + Math.abs(v) + ' паствы'); }
+  if (e.faith) { const f0 = S.god.faith; addFaith(e.faith); const d = Math.round(S.god.faith - f0); if (d) out.push((d > 0 ? '+' : '−') + Math.abs(d) + ' веры'); }
   if (e.army) { S.flock.army += e.army; out.push('+' + e.army + ' в армию'); }
   if (e.item) { if (R() < .35) { const it = lootDrop(.3, 'Трофей'); out.push('🎒 ' + it.n); } else { const it = addItem(); out.push('🎒 ' + it.n); } }
-  if (e.potion) { h.potions += e.potion; out.push('+' + e.potion + ' ' + plural(e.potion, 'зелье', 'зелья', 'зелий')); }
+  if (e.potion) { const pv = e.potion > 0 ? e.potion : -Math.min(h.potions, -e.potion); h.potions += pv; if (pv) out.push((pv > 0 ? '+' : '−') + Math.abs(pv) + ' ' + plural(pv, 'зелье', 'зелья', 'зелий')); }
+  if (e.shield) { S.buffs.shield += e.shield * 60; out.push('🛡 щит ' + e.shield + ' мин'); }
+  if (e.tprog && S.flock.temple < 10) { S.flock.templeProg += e.tprog; out.push('+' + e.tprog + ' к стройке храма'); while (S.flock.temple < 10 && S.flock.templeProg >= templeCost()) { S.flock.templeProg -= templeCost(); S.flock.temple++; diary(`⛪ Паства отстроила ${TEMPLE_NAMES[S.flock.temple - 1]} во славу нашего бога!`, 'level'); } }
+  if (e.cure && h.inj.length) { const cu = healInjuries('one'); if (cu) out.push('травма исцелена'); }
   if (e.maxhp) { h.st.con = Math.min(20, h.st.con + 1); recalcHp(); out.push('Телосложение +1'); }
-  if (e.luck) { S.buffs.luck += e.luck * 10; out.push('🍀 удача'); }
+  if (e.luck) { S.buffs.luck += e.luck * (e.safe ? 120 : 10); out.push(e.safe ? '🍀 удача ' + (e.luck * 2) + ' мин' : '🍀 удача'); }
   if (e.clearinv) { h.inv = h.inv.filter(i => i.slot); }
-  if (e.quest) { out.push('+' + e.quest + '% задания'); questProgress(e.quest); }
+  if (e.quest > 0) { out.push('+' + e.quest + '% задания'); questProgress(e.quest); } else if (e.quest < 0) { const q = Math.min(h.quest.p, -e.quest); h.quest.p -= q; if (q) out.push('−' + q + '% задания'); }
   if (e.hp) {
-    const v = Math.max(1, Math.round(Math.abs(e.hp) * h.maxHp / 70));
+    let v = Math.max(1, Math.round(Math.abs(e.hp) * h.maxHp / 70));
     if (e.hp > 0) { const a = healHero(v); if (a) out.push('+' + a + ' HP'); }
-    else { const d = damageHero(v, 'Погиб, принимая решения.'); out.push('−' + d + ' HP'); }
+    else { if (e.safe) v = Math.min(v, Math.max(0, h.hp - 1)); const d = damageHero(v, 'Погиб, принимая решения.'); out.push('−' + d + ' HP'); }
   }
   return out.join(', ');
 }
@@ -1713,7 +1739,7 @@ function winFight() {
   if (SILENT) SILENT.c.wins++;
   diary(pick(['Противник «{m}» побеждён! Забрал трофеи и чувство собственной важности.', 'Победа над противником «{m}»! Победный танец исполнен (зрителей не было).',
     '«{m}» больше не встанет. Сказал напоследок что-то умное. Никто не оценил — некому было.']).split('{m}').join(m.n), 'loot', fx);
-  h.monster = null; h.state = 'road';
+  h.monster = null; h.state = 'road'; momFightAt = momClock; momFightN = m.n;
   gainXp(xp); questProgress(rnd(2, 5));
   const lootP = .35 + (h.race === 'elf' ? .2 : 0) + (hasFeat('treasure') ? .2 : 0) + (S.buffs.luck > 0 ? .2 : 0) + mod(statVal('wis')) * .02;
   if (R() < lootP) { if (R() < .3) lootDrop(clamp((m.tier - h.lvl) * .3, 0, 1) + (S.buffs.luck > 0 ? .4 : 0), 'Трофей'); else { const it = addItem(); diary(`В карманах противника нашёлся «${it.n}».`, 'loot'); } }
@@ -1884,18 +1910,24 @@ function voice(text) {
   if (S.hero.monster && S.hero.monster.hp <= 0) winFight();
 }
 
-/* ---------- Развилки ---------- */
+/* ---------- Развилки и божественные моменты ----------
+   Один таймер (PACE.fork): чаще всего «божественный момент» (part3h.js), иногда старая «молитва» (FORKS).
+   startFork(число) — молитва по номеру, startFork('id') — момент по id, без аргумента — случайно. */
 function startFork(idx) {
-  if (S.fork || S.fight || S.dun || S.hero.state === 'dead' || S.hero.state === 'duel' || S.hero.state === 'dungeon') return false;
+  if (S.fork || forkPaused() || S.hero.state === 'dead') return false;
+  if (typeof idx === 'string') return startMoment(idx);
+  if (idx === undefined && R() >= MOM_LEGACY_P) { const ok = startMoment(); if (ok) return true; }
   let i = idx;
   if (i === undefined) { const free = FORKS.map((_, k) => k).filter(k => !S.forkHist.includes(k)); i = pick(free.length ? free : FORKS.map((_, k) => k)); }
   S.forkHist.push(i); if (S.forkHist.length > 10) S.forkHist.shift();
-  S.fork = { i, t: 30, T: 30, cls: R() < .4 }; S.timers.fork = Math.max(S.timers.fork, 300);
+  S.fork = { i, t: MOM_T, T: MOM_T, cls: R() < .4 };
   S.stats.forks++;
   diary('🙏 Молюсь: ' + FORKS[i].t, 'fork');
-  toast('🙏 Герой молится и ждёт вашего решения!');
+  if (!SILENT) toast('🙏 Герой молится и ждёт вашего решения!');
+  return true;
 }
-function forkOptions(fk) { const f = FORKS[fk.i], o = f.o.slice(); if (fk.cls) { const c = CLASS_FORK[S.hero.cls]; o.push({ l: c.l, a: 0, clsOpt: true }); } return o; }
+/* Варианты молитвы: свои + (иногда) классовый + всегда «Ничего не делать» (герой поступит по-своему) */
+function forkOptions(fk) { const f = FORKS[fk.i], o = f.o.slice(); if (fk.cls) { const c = CLASS_FORK[S.hero.cls]; o.push({ l: c.l, a: 0, clsOpt: true }); } o.push({ l: NOTHING, a: 0, nothing: true }); return o; }
 function resolveOption(fi, k) {
   const f = FORKS[fi];
   if (k >= f.o.length) { // классовый вариант
@@ -1914,28 +1946,32 @@ function resolveOption(fi, k) {
     for (const r of opt.r) { if (r.p === undefined) { res = r; break; } if (R() < r.p + bonus) { res = r; break; } }
   }
   const fx = applyFx(res.e);
-  diary(res.t, 'fork', [label, fx].filter(Boolean).join(' · '));
+  diary(res.t, 'fork', [label, fx || 'без последствий'].filter(Boolean).join(' · '));
 }
 function answerFork(k) {
   if (!S.fork) return;
+  if (S.fork.m) return answerMoment(+k);
   const fk = S.fork, opts = forkOptions(fk); if (!opts[k]) return;
-  S.fork = null; S.stats.forksAns++;
   const opt = opts[k];
+  if (opt.nothing) { S.fork = null; S.stats.forksAns++; diary(`Бог сказал: «${NOTHING}». Ладно, поступлю по-своему.`, 'god'); diary(FORKS[fk.i].self.t, 'fork', applyFx(FORKS[fk.i].self.e) || 'без последствий'); return; }
+  S.fork = null; S.stats.forksAns++; S.timers.fork = Math.max(S.timers.fork, 120);
   shiftAlign(opt.a); addGxp(10);
-  if (R() < obeyChance()) { addTrust(2); diary(`Услышал волю бога: «${opt.l}». Так и сделаю!`, 'god'); resolveOption(fk.i, k); }
+  const real = opts.filter(o => !o.nothing);
+  if (R() < obeyChance()) { addTrust(2); diary(`Услышал волю бога: «${opt.l}». Так и сделаю!`, 'god', '+2 доверия'); resolveOption(fk.i, k); }
   else {
-    const others = opts.map((_, j) => j).filter(j => j !== k); const j = pick(others);
-    diary(`Бог сказал «${opt.l}», но я решил, что лучше знаю. Выбираю «${opts[j].l}».`, 'god');
+    const others = real.map((_, j) => j).filter(j => j !== k); const j = pick(others);
+    diary(`Бог сказал «${opt.l}», но я решил, что лучше знаю. Выбираю «${real[j].l}».`, 'god');
     resolveOption(fk.i, j);
   }
 }
 function timeoutFork(offline) {
   if (!S.fork) return;
+  if (S.fork.m) return timeoutMoment();
   const fk = S.fork, f = FORKS[fk.i]; S.fork = null;
-  if (!offline) addTrust(-2);
-  const pen = offline ? '' : '−2 доверия';
+  const pen = !offline && godPresent() ? '−1 доверия' : ''; // обижается, только если бог был рядом и промолчал
+  if (pen) addTrust(-1);
   if (R() < .7) diary(f.self.t, 'fork', [applyFx(f.self.e), pen].filter(Boolean).join(', '));
-  else { const opts = forkOptions(fk), j = rnd(0, opts.length - 1); diary(`Бог промолчал. Выбрал наугад: «${opts[j].l}».`, 'fork', pen); resolveOption(fk.i, j); }
+  else { const opts = forkOptions(fk).filter(o => !o.nothing), j = rnd(0, opts.length - 1); diary(`Бог промолчал. Выбрал наугад: «${opts[j].l}».`, 'fork', pen); resolveOption(fk.i, j); }
   if (SILENT) SILENT.c.forks++;
 }
 
@@ -1963,6 +1999,395 @@ function recruit(n) {
   if (n < 1) return toast('Нужно ' + c + ' веры и 2 последователя на одного солдата.');
   S.god.faith -= c * n; S.flock.fol -= 2 * n; S.flock.army += n; shiftAlign(-1 * Math.ceil(n / 3)); addGxp(n * 3);
   diary(`⚔ ${n * 2} ${plural(n * 2, 'последователь сменил', 'последователя сменили', 'последователей сменили')} молитвенники на вилы. В божьей армии +${n}.`, 'god');
+}
+
+/* =====================================================================
+   5б) БОЖЕСТВЕННЫЕ МОМЕНТЫ — расширение развилок (v10)
+   Короткий выбор раз в 5–10 мин (×1): ситуация в 1–2 фразы, 2–3 кнопки, одна всегда «Ничего не делать».
+   Используют ту же машинку, что и развилки: S.fork (поле m — id момента), PACE.fork, startFork/answerFork/timeoutFork.
+   Формат варианта:
+     { l: 'Подпись', cost: вера, a: сдвиг характера, s: 'str' | ['str','dex'] (лучшая), dc, ok: [текст, эффекты], no: [текст, эффекты] }
+     { l, r: [текст, эффекты] }  — без проверки;   { l, run: v => mo(текст, эффекты, проверка) } — особый
+     need: v => bool — когда вариант доступен (иначе кнопка серая).  n: исход «Ничего не делать» (так же).
+   Эффекты — как у развилок (applyFx): gold/xp/hp в «единицах» уровня, fol, trust, faith, potion, item, luck, quest, army
+   + новые: shield (мин щита), tprog (вклад в храм), cure (вылечить травму). Урон моментов не убивает (оставляет ≥1 HP).
+   ===================================================================== */
+const MOM_T = 150;                 // секунд на ответ (при ×1; на ускорении — максимум ×2 быстрее, как у развилок)
+const MOM_HIST = 20;               // столько последних моментов не повторяется
+const MOM_LEGACY_P = .2;           // доля старых «молитв» (FORKS) среди выборов
+const MOM_XP = 1.8;                // множитель опыта моментов (подогнан симуляцией: темп как у старых развилок)
+const NOTHING = 'Ничего не делать';
+const STAT_ABBR = { str: 'СИЛ', dex: 'ЛОВ', con: 'ТЕЛ', int: 'ИНТ', wis: 'МДР', cha: 'ХАР' };
+let momClock = 0, momFightAt = -1e9, momFightN = '', momDunAt = -1e9, momDunOk = false;
+const mo = (t, e, k) => ({ t, e: e || {}, k });
+const bestOf = ss => (Array.isArray(ss) ? ss : [ss]).reduce((a, b) => statVal(b) > statVal(a) ? b : a);
+/* Проверка с числами: «🎲 ЛОВ 13+4 = 17 против 14: успех». СЛ растёт на 1 каждые 4 уровня (как мастерство). */
+function momCheck(s, dc) {
+  const D = dc + Math.floor((S.hero.lvl - 1) / 4), k = check(s, D);
+  k.lbl = `🎲 ${STAT_ABBR[s]} ${k.r}${fmtMod(k.b)} = ${k.r + k.b} против ${D}: ${k.ok ? 'успех' : 'провал'}${k.note}`;
+  return k;
+}
+const gs = n => Math.round(n * goldScale(S.hero.lvl));     // сколько золота это «n» на уровне героя
+function momCtx() {
+  const h = S.hero, g = S.god, L = h.lvl;
+  return {
+    h, L, where: h.state === 'town' ? 'town' : 'road', race: h.race, cls: h.cls, bld: bldId(h),
+    after: momClock - momFightAt < 180 ? momFightN : '', dun: momClock - momDunAt < 900, dunOk: momDunOk,
+    low: h.hp < h.maxHp * .45, hurt: h.hp < h.maxHp * .8, rich: h.gold > gs(160), poor: h.gold < gs(15),
+    temple: S.flock.temple, fol: S.flock.fol, faith: g.faith, align: g.align, trust: h.trust, potions: h.potions,
+    night: (() => { const x = new Date().getHours(); return x >= 22 || x < 6; })()
+  };
+}
+/* ---------- Пул моментов ---------- */
+const MOMENTS = [
+  // ===== ДОРОГА =====
+  { id: 'troll', at: 'road', t: 'Под мостом сидит тролль и требует пошлину — «три монеты с ноги». Ног у меня две, но он считает иначе.',
+    o: [{ l: 'Ударить молнией', cost: 12, a: -1, r: ['Молния щёлкнула тролля по носу. Он убежал, бросив кошель.', { gold: 8, xp: 3 }] },
+        { l: 'Пусть дерётся', s: ['str', 'dex'], dc: 13, ok: ['Отлупил тролля его же дубиной и прошёл бесплатно.', { xp: 7, gold: 6 }], no: ['Тролль оказался крепче. Пришлось платить — и за моральный ущерб тоже.', { hp: -9, gold: -8 }] }],
+    n: ['Заплатил пошлину. Тролль выдал квитанцию и показал короткую дорогу.', { gold: -5, quest: 6 }] },
+  { id: 'goat', at: 'road', t: 'У дороги плачет девочка: потерялась коза Зорька. Коза, судя по следам, ушла в сторону волков.',
+    o: [{ l: 'Помочь найти', s: 'wis', dc: 12, ok: ['Нашёл Зорьку по следам. Вся деревня теперь говорит о моём боге!', { fol: 2, trust: 1, xp: 3 }], no: ['Зорьку нашёл, но она боднула меня в самое героическое место.', { hp: -5, fol: 1, xp: 2 }] },
+        { l: 'Явить знамение', cost: 8, a: 1, r: ['С неба спустился светящийся указатель «КОЗА ТУТ». Чудо видели все.', { fol: 3, trust: 1 }] }],
+    n: ['Прошёл мимо. Через час коза догнала меня сама и съела мой обед.', { hp: -2 }] },
+  { id: 'cart', at: 'road', t: 'Повозка торговца увязла в грязи по самые оси. Торговец обещает «щедро отблагодарить».',
+    o: [{ l: 'Вытолкать', s: 'str', dc: 13, ok: ['Вытолкал повозку одним плечом. Торговец отсыпал монет.', { gold: 10, xp: 2 }], no: ['Толкнул, поскользнулся и стал частью пейзажа. Торговец дал медяк из жалости.', { hp: -5, gold: 2 }] },
+        { l: 'Подсушить солнцем', cost: 10, a: 1, r: ['Солнце мигом высушило дорогу. Торговец уверовал прямо в повозке.', { gold: 8, fol: 1 }] }],
+    n: ['Дал совет «толкать сильнее» и пошёл дальше. Совет не помог, но я старался.', {}] },
+  { id: 'rivalshrine', at: 'road', t: 'Часовня чужого бога, на алтаре — свежие подношения. Никого вокруг.',
+    o: [{ l: 'Забрать подношения', a: -3, r: ['Подношения теперь мои. Чужой бог, наверное, расстроится.', { gold: 12, trust: -1 }] },
+        { l: 'Освятить вашим именем', cost: 15, a: 1, r: ['Часовня засияла вашим светом. Местные прихожане перешли к нам.', { fol: 4, trust: 1 }] }],
+    n: ['Посидел в прохладе часовни и отдохнул. Мой бог, кажется, ревнует.', { hp: 6, trust: -1 }] },
+  { id: 'storm', at: 'road', t: 'Над холмами собирается гроза. Молнии бьют всё ближе, а укрыться негде.',
+    o: [{ l: 'Накрыть щитом', cost: 10, a: 1, r: ['Вокруг меня встал божий щит. Капли отскакивают со звоном.', { shield: 5, trust: 1 }] },
+        { l: 'Переждать под дубом', s: 'wis', dc: 12, ok: ['Выбрал правильный дуб — сухой и без молний. Даже вздремнул.', { hp: 6 }], no: ['Выбрал самый высокий дуб. Молния выбрала его же.', { hp: -8, xp: 2 }] }],
+    n: ['Промок до нитки, но шёл не останавливаясь. Зато быстро.', { hp: -3, quest: 4 }] },
+  { id: 'fairies', at: 'road', t: 'Грибной круг, в нём пляшут феи. Они машут: «Иди к нам, большой!»',
+    o: [{ l: 'Сплясать с ними', s: 'cha', dc: 13, ok: ['Станцевал так, что феи подарили мне пыльцу удачи.', { luck: 1, xp: 3 }], no: ['Плясал два часа и не мог остановиться. Ноги гудят.', { hp: -4, xp: 2 }] },
+        { l: 'Благословить хоровод', cost: 8, r: ['Феи засияли и пообещали молиться вам по пятницам.', { fol: 2, luck: 1 }] }],
+    n: ['Обошёл круг стороной. Феи показали мне язык. Обидно, но безопасно.', {}] },
+  { id: 'knight', at: 'road', t: 'В канаве стонет раненый рыцарь. Доспех погнут, гордость тоже.',
+    o: [{ l: 'Отдать своё зелье', need: () => S.hero.potions > 0, r: ['Отдал рыцарю зелье. Он поклялся рассказать о моём боге при дворе и дал денег.', { potion: -1, gold: 12, fol: 2, trust: 1 }] },
+        { l: 'Исцелить чудом', cost: 14, a: 2, r: ['Рыцарь встал, сияя. Отсыпал золота и записался в ваши паладины.', { gold: 10, fol: 3, army: 1 }] }],
+    n: ['Пожелал рыцарю удачи. Рыцарь пожелал мне чего-то непечатного.', {}] },
+  { id: 'map', at: 'road', t: 'Ветер принёс обрывок карты с крестиком «КЛАД». Крестик в двух шагах. Наверное.',
+    o: [{ l: 'Разобрать карту', s: 'int', dc: 13, ok: ['Прочитал карту правильно и выкопал сундучок!', { gold: 18, item: 1 }], no: ['Копал не там. Нашёл чей-то старый сапог и мозоль.', { hp: -3, xp: 2 }] },
+        { l: 'Подсказать знамением', cost: 12, r: ['Луч света ткнул прямо в клад. Копать было одно удовольствие.', { gold: 18 }] }],
+    n: ['Продал карту первому встречному «за полцены». Встречный был очень рад.', { gold: 4 }] },
+  { id: 'bandits', at: 'road', t: 'Из-за камней вышли трое разбойников: «Кошелёк или жизнь!» Самый мелкий явно главный.',
+    o: [{ l: 'Пугнуть громом', cost: 12, a: -1, r: ['Гром среди ясного неба — разбойники бежали, теряя кошельки.', { gold: 8, xp: 2 }] },
+        { l: 'Драться', s: ['str', 'dex'], dc: 13, ok: ['Раскидал всех троих. Теперь у меня их кошельки.', { gold: 14, xp: 6 }], no: ['Их было трое, а я один и неудачник. Отняли часть денег.', { hp: -11, gold: -6 }] }],
+    n: v => S.hero.gold < gs(10) ? mo('Показал пустые карманы. Разбойники пожалели меня и дали пару монет.', { gold: 2 }) : mo('Отдал кошелёк без боя. Разбойники вежливо поблагодарили.', { gold: -8 }) },
+  { id: 'well', at: 'road', t: 'Старый колодец желаний. Говорят, если бросить монетку, сбудется. Говорят, кто-то даже проверял.',
+    o: [{ l: 'Бросить монетку', run: () => R() < .55 ? mo('Желание загадал, и удача сразу улыбнулась мне.', { gold: -2, luck: 1 }) : mo('Монетка булькнула. Желание пока в обработке.', { gold: -2 }) },
+        { l: 'Ответить из колодца', cost: 6, r: ['Из колодца прогремел ваш голос: «Будь хорошим». Я буду! И вся деревня это слышала.', { trust: 2, fol: 1 }] }],
+    n: ['Попил водички из колодца. Вкусная, с привкусом чужих желаний.', { hp: 4 }] },
+  { id: 'hermit', at: 'road', t: 'Отшельник у пещеры предлагает научить «древней мудрости» всего за час внимания.',
+    o: [{ l: 'Учиться', s: ['int', 'wis'], dc: 12, ok: ['Отшельник научил меня трём хитростям и одной поговорке.', { xp: 7 }], no: ['Понял только про грибы. Но про грибы — очень подробно.', { xp: 3 }] },
+        { l: 'Обратить отшельника', cost: 10, r: ['Отшельник увидел ваш свет и пошёл проповедовать по деревням.', { fol: 3 }] }],
+    n: ['Поделился с отшельником обедом. Он поделился тишиной. Хорошо посидели.', { hp: 4 }] },
+  { id: 'signpost', at: 'road', t: 'Указатель: «Короткий путь — через Болото Чавкающих Ботинок. Длинный — в обход».',
+    o: [{ l: 'Через болото', s: 'con', dc: 13, ok: ['Прошёл болото без потерь (не считая носков). Срезал полдороги!', { quest: 14, xp: 2 }], no: ['Болото чавкнуло и забрало сапог вместе с бодростью.', { hp: -8, quest: 6 }] },
+        { l: 'В обход', r: ['Пошёл в обход. Долго, сухо и скучно, но к цели ближе.', { quest: 6 }] }],
+    n: () => R() < .5 ? mo('Подбросил монетку — выпало «болото». Влез по колено, но вылез ближе к цели.', { quest: 10, hp: -4 }) : mo('Подбросил монетку — выпало «в обход». Скучно, зато сухо.', { quest: 5 }) },
+  { id: 'wolves', at: 'road', t: 'В сумерках вокруг загорелись жёлтые глаза. Волки. Много волков.',
+    o: [{ l: 'Призвать медведя', cost: 14, r: ['Из чащи вышел ваш медведь и объяснил волкам, кто тут главный.', { xp: 3, trust: 1 }] },
+        { l: 'Отбиваться', s: 'con', dc: 13, ok: ['Отбился! Волки ушли уважать кого-нибудь другого.', { xp: 6 }], no: ['Отбился, но волки успели попробовать меня на вкус.', { hp: -10, xp: 3 }] }],
+    n: ['Залез на дерево и просидел там до утра. Волки заскучали первыми.', { quest: -3 }] },
+  { id: 'peddler', at: 'road', t: 'Бродячий торговец предлагает «зелье здоровья почти без побочных эффектов» за полцены.',
+    o: [{ l: 'Купить', need: () => S.hero.gold >= gs(8), run: () => R() < .75 ? mo('Зелье оказалось настоящим! Почти без побочных эффектов.', { gold: -6, potion: 1 }) : mo('В бутылке был компот. Вкусный, но компот.', { gold: -6, hp: 3 }) },
+        { l: 'Освятить его товар', cost: 10, r: ['Освятил весь лоток. Торговец в благодарность дал зелье бесплатно.', { potion: 1, fol: 1 }] }],
+    n: ['Вежливо отказался. Торговец назвал меня скрягой и ушёл чихать в другую сторону.', {}] },
+  { id: 'shepherd', at: 'road', t: 'Пастух жалуется: кто-то по ночам ворует овец. Следы ведут к старой мельнице.',
+    o: [{ l: 'Устроить засаду', s: ['dex', 'wis'], dc: 13, ok: ['Поймал вора — это был лис в овечьей шкуре. Пастух заплатил.', { gold: 10, xp: 4, fol: 1 }], no: ['Уснул в засаде. Проснулся без сапог. Овец тоже стало меньше.', { gold: -3, xp: 2 }] },
+        { l: 'Поставить знак-оберег', cost: 9, r: ['Ваш знак засиял над стадом. Вор не вернулся, пастух уверовал.', { fol: 2, trust: 1 }] }],
+    n: ['Сказал пастуху «держись» и пошёл дальше. Пастух держится.', {}] },
+  { id: 'statue', at: 'road', t: 'У дороги старая статуя героя, очень похожего на меня. Табличка стёрта.',
+    o: [{ l: 'Дописать своё имя', s: 'cha', dc: 12, ok: ['Расписался красиво. Прохожие теперь кланяются и мне, и статуе.', { fol: 2, xp: 2 }], no: ['Написал криво и с ошибкой. Прохожие смеются.', { trust: -1 }] },
+        { l: 'Оживить статую на миг', cost: 12, r: ['Статуя подмигнула мне и сказала «Я — это ты в будущем». Мотивирует!', { xp: 6, trust: 1 }] }],
+    n: ['Посмотрел на статую. Статуя посмотрела на меня. Разошлись молча.', {}] },
+  // ===== ПОСЛЕ БОЯ =====
+  { id: 'loot', at: 'road', w: 3, when: c => !!c.after, t: v => `Над телом противника «${v.m}» что-то блестит, но там уже копошатся крысы.`,
+    o: [{ l: 'Обыскать', s: 'dex', dc: 12, ok: ['Ловко выудил из-под крыс кошелёк и кое-что ещё.', { gold: 10, item: 1 }], no: ['Крысы отстояли добычу. Унёс только укусы.', { hp: -5, gold: 3 }] },
+        { l: 'Окропить святостью', cost: 8, r: ['Крысы разбежались от святой воды. Забрал всё спокойно.', { gold: 10, trust: 1 }] }],
+    n: ['Не стал связываться с крысами. Крысы устроили пир в мою честь.', {}] },
+  { id: 'mercy', at: 'road', w: 3, when: c => !!c.after, t: v => `Побитый «${v.m}» отполз в кусты и жалобно скулит. Добить — дело секунды.`,
+    o: [{ l: 'Пощадить', a: 3, r: ['Отпустил его. Говорят, теперь он рассказывает своим о милосердном боге.', { fol: 1, trust: 2 }] },
+        { l: 'Добить и обыскать', a: -2, r: ['Сурово, но прибыльно. В кустах был его тайник.', { gold: 9, xp: 3 }] }],
+    n: ['Пока я думал, он уполз. Ну и ладно, мир большой.', {}] },
+  { id: 'crowd', at: 'road', w: 2, when: c => !!c.after, t: 'Бой видели крестьяне с поля. Стоят, раскрыв рты, ждут речи.',
+    o: [{ l: 'Прочитать проповедь', s: 'cha', dc: 12, ok: ['Сказал речь о моём боге — трое тут же уверовали.', { fol: 3 }], no: ['Сбился на второй фразе. Один всё-таки уверовал — из жалости.', { fol: 1 }] },
+        { l: 'Сияние над героем', cost: 10, a: 1, r: ['Над моей головой вспыхнул нимб. Крестьяне пали ниц.', { fol: 4, trust: 1 }] }],
+    n: ['Поклонился. Крестьяне похлопали и кинули пару монет.', { gold: 3 }] },
+  { id: 'wound', at: 'any', w: 2, when: c => c.hurt && !!c.after, t: 'Рана после боя выглядит нехорошо: краснеет и дёргает.',
+    o: [{ l: 'Промыть и перевязать', s: 'wis', dc: 12, ok: ['Обработал рану как настоящий лекарь.', { hp: 10 }], no: ['Перепутал спирт с уксусом. Щиплет, но работает плохо.', { hp: -3 }] },
+        { l: 'Исцелить', cost: 12, a: 1, r: ['Тёплый свет затянул рану без следа.', { hp: 20, trust: 1 }] }],
+    n: () => { const k = momCheck('con', 11); return k.ok ? mo('Заживёт как на собаке. И правда зажило.', { hp: 5 }, k) : mo('Не зажило. Ноет при каждом шаге.', { hp: -4 }, k); } },
+  // ===== ГОРОД =====
+  { id: 'brawl', at: 'town', t: 'В трактире началась драка. Летит табурет. Кажется, в мою сторону.',
+    o: [{ l: 'Ввязаться', s: 'str', dc: 13, ok: ['Победил в трактирной драке! Трактирщик налил за счёт заведения.', { xp: 6, gold: 5 }], no: ['Табурет оказался крепче моей головы.', { hp: -9, xp: 2 }] },
+        { l: 'Утихомирить громом', cost: 10, a: 1, r: ['Гром сотряс трактир. Драчуны протрезвели и уверовали.', { fol: 3, trust: 1 }] }],
+    n: ['Спрятался под стол. Нашёл там чьи-то монеты.', { gold: 4 }] },
+  { id: 'scam', at: 'town', t: 'Торговец шепчет: «Меч самого короля, почти даром!» Меч подозрительно деревянный.',
+    o: [{ l: 'Поторговаться', s: 'cha', dc: 14, ok: ['Сбил цену так, что торговец сам доплатил за «настоящую» находку.', { gold: -4, item: 1 }], no: ['Уболтали меня. Купил деревянный меч королевской работы.', { gold: -10 }] },
+        { l: 'Наслать на жулика икоту', cost: 6, a: -1, r: ['Жулик икал так, что вернул деньги всем обманутым. И мне за компанию.', { gold: 6, xp: 1 }] }],
+    n: ['Посмотрел, посмеялся, пошёл дальше. Меч остался ждать дурака.', {}] },
+  { id: 'roof', at: 'town', when: c => c.temple >= 1, t: 'Жрец вашего храма жалуется: крыша течёт, кадило плавает. Просит помочь.',
+    o: [{ l: 'Пожертвовать', need: () => S.hero.gold >= gs(15), r: ['Отдал золото на крышу. Жрецы молятся за меня втрое громче.', { gold: -15, tprog: 12, trust: 2 }] },
+        { l: 'Благословить стройку', cost: 15, r: ['Ваше благословение — и паства сама залатала крышу за день.', { tprog: 18, fol: 1 }] }],
+    n: ['Пообещал помочь «потом». Жрец вздохнул и подставил ведро.', {}] },
+  { id: 'armwrest', at: 'town', t: 'На площади турнир по армрестлингу. Победителю — кошель серебра.',
+    o: [{ l: 'Участвовать', s: 'str', dc: 14, ok: ['Положил всех! Даже кузнеца с руками как бочки.', { gold: 14, xp: 3 }], no: ['Кузнец положил меня вместе со столом.', { hp: -3, gold: -4 }] },
+        { l: 'Незримо подтолкнуть', cost: 8, a: -1, r: ['Вы чуть подтолкнули мою руку. Победа! Никто ничего не заметил.', { gold: 14 }] }],
+    n: () => R() < .5 ? mo('Сделал ставку со стороны и угадал!', { gold: 5 }) : mo('Сделал ставку со стороны и прогадал.', { gold: -4 }) },
+  { id: 'singers', at: 'town', t: 'Конкурс уличных певцов. Приз — мешочек золота и слава на весь квартал.',
+    o: [{ l: 'Выступить', s: 'cha', dc: 13, ok: ['Спел так, что плакали даже стражники. Приз мой!', { gold: 10, fol: 2 }], no: ['Спел. В меня кинули помидор. Хороший, кстати, помидор.', { hp: -2, xp: 2 }] },
+        { l: 'Хор ангелов', cost: 10, r: ['На припеве мне подпел небесный хор. Победа и толпа новых верующих.', { gold: 10, fol: 3 }] }],
+    n: ['Просто послушал. Отдохнул душой и телом.', { hp: 5 }] },
+  { id: 'library', at: 'town', t: 'В городской библиотеке пылится трактат «Как стать героем за 30 дней».',
+    o: [{ l: 'Изучить', s: 'int', dc: 13, ok: ['Прочитал и понял! Особенно главу «Не умирай».', { xp: 8 }], no: ['Уснул на третьей странице. Снилось, что я уже герой.', { xp: 3, hp: 3 }] },
+        { l: 'Ниспослать озарение', cost: 12, r: ['Буквы засветились и сами легли в голову. Чувствую себя умнее.', { xp: 9 }] }],
+    n: ['Вздремнул в читальном зале. Библиотекарь укрыл меня газетой.', { hp: 6 }] },
+  { id: 'alch', at: 'town', when: c => c.potions < 3, t: 'Алхимик распродаёт зелья: «Последнее! Только сегодня! И завтра тоже!»',
+    o: [{ l: 'Купить зелье', need: () => S.hero.gold >= gs(8), r: ['Купил зелье. Пахнет носком — значит, настоящее.', { gold: -7, potion: 1 }] },
+        { l: 'Освятить лавку', cost: 10, r: ['Алхимик в восторге: склад освящён! Подарил мне зелье.', { potion: 1, fol: 1 }] }],
+    n: ['Решил, что зелья — для слабаков. Посмотрим, что я скажу в следующем бою.', {}] },
+  { id: 'pickpocket', at: 'town', t: 'Чувствую в кармане чужую руку. Рука маленькая и очень шустрая.',
+    o: [{ l: 'Схватить за руку', s: 'dex', dc: 13, ok: ['Поймал воришку! Его кошелёк — компенсация.', { gold: 6, xp: 2 }], no: ['Воришка оказался быстрее. Минус часть кошелька.', { gold: -7 }] },
+        { l: 'Превратить кошелёк в ежа', cost: 6, r: ['Воришка сунул руку в ежа. Вопль слышал весь рынок.', { xp: 2, trust: 1 }] }],
+    n: () => S.hero.gold < gs(10) ? mo('Воришка ничего не нашёл и сунул мне монетку из жалости.', { gold: 1 }) : mo('Воришка ушёл с частью моих денег. Зато я не суетился.', { gold: -8 }) },
+  { id: 'guild', at: 'town', t: 'На доске гильдии висит срочный заказ: «Нужен герой. Можно б/у».',
+    o: [{ l: 'Взять заказ', r: ['Взялся за дело — цель стала ближе.', { quest: 12, xp: 2 }] },
+        { l: 'Благословить объявление', cost: 8, r: ['Заказ оказался проще, чем выглядел, и заплатили вперёд.', { quest: 16, gold: 5 }] }],
+    n: ['Взял самое лёгкое объявление: «помешать суп». Помешал.', { quest: 4 }] },
+  { id: 'fortune', at: 'town', t: 'Гадалка предлагает погадать по руке. Мою руку она держит крепко и не отдаёт.',
+    o: [{ l: 'Погадать', need: () => S.hero.gold >= gs(3), run: () => R() < .5 ? mo('«Тебя ждёт удача!» — и правда, чувствую её.', { gold: -3, luck: 1 }) : mo('«Тебя ждёт дорога». Спасибо, я в курсе.', { gold: -3, xp: 1 }) },
+        { l: 'Говорить её устами', cost: 7, r: ['Гадалка вдруг заговорила вашим голосом. Я всё понял и проникся.', { trust: 3 }] }],
+    n: ['Вырвал руку и убежал. Гадалка прокляла меня на насморк. Апчхи.', {}] },
+  // ===== МАЛО ЗДОРОВЬЯ =====
+  { id: 'nymph', at: 'road', w: 5, when: c => c.low, t: 'Израненный, набрёл на родник. Над водой сидит нимфа и придирчиво меня разглядывает.',
+    o: [{ l: 'Попросить нимфу', s: 'cha', dc: 12, ok: ['Нимфа сжалилась и умыла мои раны живой водой.', { hp: 22 }], no: ['Нимфа фыркнула, но глоток воды всё-таки разрешила.', { hp: 7 }] },
+        { l: 'Исцелить', cost: 14, a: 1, r: ['Ваш свет вылечил меня быстрее любой нимфы.', { hp: 30, trust: 2 }] }],
+    n: () => { const k = momCheck('con', 12); return k.ok ? mo('Напился из родника без спроса. Полегчало!', { hp: 12 }, k) : mo('Напился без спроса. Нимфа обиделась, вода оказалась ледяной.', { hp: 3 }, k); } },
+  { id: 'vultures', at: 'road', w: 3, when: c => c.low, t: 'Над головой кружат стервятники. Они явно считают мои HP.',
+    o: [{ l: 'Божий щит', cost: 10, r: ['Щит засиял — стервятники поняли, что ужина не будет.', { shield: 5 }] },
+        { l: 'Отпугнуть', s: 'str', dc: 12, ok: ['Швырнул камень и попал. Стервятники уважительно удалились.', { xp: 2 }], no: ['Промахнулся, а один стервятник клюнул меня в отместку.', { hp: -4 }] }],
+    n: ['Притворился мёртвым. Стервятник сел рядом, и я его поймал. Ужин!', { hp: 5 }] },
+  { id: 'medic', at: 'any', w: 4, when: c => c.low, t: 'Мимо едет полевой лекарь. Говорит, что вылечит всё, кроме характера.',
+    o: [{ l: 'Заплатить за лечение', need: () => S.hero.gold >= gs(10), r: ['Лекарь заштопал меня аккуратно и почти не больно.', { gold: -9, hp: 25, cure: 1 }] },
+        { l: 'Благословить лекаря', cost: 9, r: ['Лекарь, осенённый вашим светом, полечил меня бесплатно.', { hp: 18, fol: 1 }] }],
+    n: ['Сказал, что «само пройдёт». Лекарь пожал плечами и дал подорожник.', { hp: 3 }] },
+  // ===== БОГАТ / БЕДЕН =====
+  { id: 'invest', at: 'any', w: 2, when: c => c.rich, t: 'Солидный господин предлагает «вложиться в подземный бизнес» и удвоить золото за неделю.',
+    o: [{ l: 'Вложиться', s: 'int', dc: 14, ok: ['Разобрался в схеме и вложился с умом. Прибыль!', { gold: 25 }], no: ['Господин исчез вместе с «бизнесом» и моими деньгами.', { gold: -25 }] },
+        { l: 'Сон-предостережение', cost: 5, r: ['Во сне вы показали мне, чем это кончится. Отказался — и рад.', { trust: 2, xp: 2 }] }],
+    n: () => R() < .4 ? mo('Вложил немного «на пробу». Пробная прибыль!', { gold: 8 }) : mo('Вложил немного «на пробу». Проба не удалась.', { gold: -8 }) },
+  { id: 'charity', at: 'any', w: 2, when: c => c.rich, t: 'У меня полный кошель, а у сиротского приюта — дырявая крыша.',
+    o: [{ l: 'Пожертвовать щедро', r: ['Отдал приюту горсть золота. Весь город говорит о щедром боге.', { gold: -20, fol: 4, faith: 8 }] },
+        { l: 'Видение о сиротах', cost: 6, a: 2, r: ['После вашего видения отдал больше, чем собирался. И не жалею.', { gold: -28, fol: 6, trust: 1 }] }],
+    n: ['Купил себе шляпу с пером. Шляпа шикарная, совесть — так себе.', { gold: -5 }] },
+  { id: 'broke', at: 'any', w: 2, when: c => c.poor, t: 'В кошельке гуляет ветер. В порту ищут грузчиков, а у храма можно просить милостыню.',
+    o: [{ l: 'Наняться грузчиком', s: 'con', dc: 12, ok: ['Отработал смену. Спина болит, кошелёк звенит.', { gold: 14 }], no: ['Уронил ящик себе на ногу. Заплатили половину.', { gold: 7, hp: -5 }] },
+        { l: 'Монетка с неба', cost: 10, r: ['Прямо мне в ладонь упала золотая монета. Спасибо, о великий!', { gold: 16, trust: 2 }] }],
+    n: () => { const k = momCheck('cha', 12); return k.ok ? mo('Просил милостыню так трогательно, что подавали даже стражники.', { gold: 7 }, k) : mo('Просил милостыню. Подали старый сухарь.', { gold: 1, hp: 2 }, k); } },
+  // ===== ПАСТВА И ХРАМ =====
+  { id: 'dispute', at: 'any', when: c => c.fol >= 6, t: 'Двое ваших последователей спорят, с какой стороны правильно разбивать священное яйцо.',
+    o: [{ l: 'Рассудить мудро', s: 'wis', dc: 13, ok: ['Рассудил: «посередине». Оба довольны и привели друзей.', { fol: 2, trust: 1 }], no: ['Рассудил неудачно. Один ушёл, хлопнув дверью.', { fol: -1 }] },
+        { l: 'Явить знак', cost: 10, r: ['С неба упало яйцо, разбитое с обеих сторон. Спор исчерпан, вера крепнет.', { fol: 3 }] }],
+    n: ['Не вмешивался. Остроконечники ушли, тупоконечники привели родню.', { fol: 1 }] },
+  { id: 'pilgrims', at: 'road', when: c => c.fol >= 12, t: 'Группа ваших паломников просит проводить их до святого камня. Дорога опасная.',
+    o: [{ l: 'Повести их', s: 'wis', dc: 12, ok: ['Довёл всех целыми. Паломники разнесли весть о чудесном проводнике.', { fol: 3, quest: 5, xp: 3 }], no: ['Заблудились, но дошли. Я весь исцарапан, паломники — довольны.', { fol: 2, hp: -5 }] },
+        { l: 'Благословить путь', cost: 12, r: ['Дорога сама стелилась под ноги. Паломники пели вам гимны.', { fol: 4, trust: 1 }] }],
+    n: ['Паломники пошли сами и, говорят, дошли. Вера крепче, когда сама.', { fol: 1 }] },
+  { id: 'candles', at: 'town', when: c => c.temple >= 1, t: 'Из вашего храма выбежал воришка с мешком свечей!',
+    o: [{ l: 'Догнать', s: 'dex', dc: 13, ok: ['Догнал, отобрал свечи и прочитал нотацию.', { gold: 5, fol: 1, xp: 2 }], no: ['Не догнал. Зато пробежался.', { hp: -3 }] },
+        { l: 'Покарать молнией', cost: 10, a: -2, r: ['Молния опалила воришке пятки. Свидетели в ужасе и восторге.', { fol: 3, xp: 2 }] }],
+    n: ['Свечи унесли. В храме стало темнее, а вера — чуть слабее.', { faith: -5 }] },
+  { id: 'heretic', at: 'any', when: c => c.fol >= 5, t: 'На площади еретик кричит, что вас не существует. Толпа слушает.',
+    o: [{ l: 'Переспорить', s: ['cha', 'int'], dc: 14, ok: ['Разбил его доводы. Толпа перешла на нашу сторону.', { fol: 3 }], no: ['Еретик спорил лучше. Пара слушателей ушла к нему.', { fol: -2 }] },
+        { l: 'Поразить немотой', cost: 12, a: -1, r: ['Еретик открыл рот — и не смог произнести ни звука. Аргумент принят.', { fol: 2, trust: 1 }] }],
+    n: ['Не стал связываться. Один из ваших ушёл послушать еретика.', { fol: -1 }] },
+  // ===== РАСА =====
+  { id: 'r_dwarf', at: 'town', w: 3, when: c => c.race === 'dwarf', t: 'Дварфы из гильдии зовут на «испытание бородой»: три кружки тёмного подряд.',
+    o: [{ l: 'Принять вызов', s: 'con', dc: 12, ok: ['Выпил все три и спел гимн гильдии. Свой!', { xp: 4, gold: 8 }], no: ['На третьей кружке борода сдалась раньше меня.', { hp: -6, xp: 2 }] },
+        { l: 'Божественная закуска', cost: 6, r: ['Появилась тарелка солёных грибов от вас. Испытание пройдено с честью!', { xp: 4, gold: 8, trust: 1 }] }],
+    n: ['Сказал, что за рулём. Дварфы не поняли, но уважительно покивали.', {}] },
+  { id: 'r_elf', at: 'road', w: 3, when: c => c.race === 'elf', t: 'Древний дуб заговорил по-эльфийски: «Спой мне, дитя листвы».',
+    o: [{ l: 'Спеть дубу', s: 'wis', dc: 12, ok: ['Дуб растрогался и уронил мне золотой жёлудь.', { gold: 8, luck: 1 }], no: ['Сфальшивил. Дуб уронил мне на голову обычный жёлудь.', { hp: -3 }] },
+        { l: 'Пробудить рощу', cost: 10, r: ['Вся роща зашелестела вашим именем. Лесные жители уверовали.', { fol: 3 }] }],
+    n: ['Сделал вид, что не понимаю по-эльфийски. Дуб обиделся навсегда (лет на триста).', {}] },
+  { id: 'r_orc', at: 'road', w: 3, when: c => c.race === 'orc', t: 'Орочий отряд зовёт на ритуал дружбы — удар лбом о лоб. Кто устоит, тот свой.',
+    o: [{ l: 'Боднуть вожака', s: 'con', dc: 13, ok: ['Вожак упал, отряд ревёт от восторга. Двое пошли в божью армию.', { xp: 4, army: 1 }], no: ['Упал я. Орки утешили: «Бывает, хилый».', { hp: -7 }] },
+        { l: 'Каменный лоб', cost: 8, r: ['С вашей помощью мой лоб стал как скала. Вожак лёг сразу.', { xp: 4, army: 1 }] }],
+    n: ['Отказался. Орки решили, что я эльф в маскировке, и долго смеялись.', {}] },
+  { id: 'r_halfling', at: 'road', w: 3, when: c => c.race === 'halfling', t: 'Время второго завтрака, а в сумке только сухарь. В трактире напротив пахнет пирогами.',
+    o: [{ l: 'Пир в трактире', need: () => S.hero.gold >= gs(6), r: ['Съел три пирога и пудинг. Жизнь снова прекрасна.', { gold: -5, hp: 14 }] },
+        { l: 'Небесный пирог', cost: 8, r: ['С неба спустился тёплый пирог с вишней. Лучший бог на свете!', { hp: 18, trust: 2 }] }],
+    n: ['Сгрыз сухарь. Это был самый грустный второй завтрак в истории.', { hp: 3 }] },
+  { id: 'r_gnome', at: 'any', w: 3, when: c => c.race === 'gnome', t: 'Собрал из хлама «самоходную тележку». Осталось только запустить.',
+    o: [{ l: 'Запустить', s: 'int', dc: 13, ok: ['Поехала! Продал чертёж местному кузнецу.', { gold: 12, xp: 3 }], no: ['Тележка взорвалась. Брови отрастут.', { hp: -7, xp: 3 }] },
+        { l: 'Вдохнуть искру', cost: 10, r: ['Ваша искра — и тележка покатилась сама. Изобретение века!', { gold: 12, xp: 3, fol: 1 }] }],
+    n: ['Разобрал обратно. Остались лишние детали — продал.', { gold: 3 }] },
+  { id: 'r_tiefling', at: 'road', w: 3, when: c => c.race === 'tiefling', t: 'Деревенские увидели мои рога и схватились за вилы: «Демон!»',
+    o: [{ l: 'Убедить', s: 'cha', dc: 13, ok: ['Объяснил, что рога — это мода. Мне поверили и даже накормили.', { fol: 2, hp: 5 }], no: ['Не убедил. Вилы острые, бегаю я быстро, но не очень.', { hp: -6 }] },
+        { l: 'Нимб на рога', cost: 10, a: 1, r: ['На рогах засиял нимб. Деревня решила, что я святой.', { fol: 3 }] }],
+    n: ['Деревенские испугались сами и убежали, бросив пирог. Пирог вкусный.', { hp: 5 }] },
+  { id: 'r_human', at: 'town', w: 3, when: c => c.race === 'human', t: 'Вербовщик ополчения: «Один день службы — и монета, и слава!»',
+    o: [{ l: 'Отслужить денёк', s: 'con', dc: 12, ok: ['Отстоял караул без происшествий. Монета и благодарность капитана.', { gold: 10, xp: 3 }], no: ['На учениях меня затоптал строй. Заплатили, но с соболезнованиями.', { gold: 6, hp: -5 }] },
+        { l: 'Явиться капитану', cost: 8, r: ['Капитан увидел вас во сне и наутро произвёл меня в почётные сержанты.', { gold: 8, army: 1 }] }],
+    n: ['Сказал, что у меня аллергия на строевой шаг. Вербовщик понимающе кивнул.', {}] },
+  // ===== КЛАСС =====
+  { id: 'c_mage', at: 'any', w: 2, when: c => c.cls === 'mage', t: 'Нашёл свиток с мигающими рунами. Руны явно хотят, чтобы их прочли.',
+    o: [{ l: 'Прочесть вслух', s: 'int', dc: 13, ok: ['Руны сложились в заклинание! Чувствую, как растёт сила.', { xp: 8 }], no: ['Руны сложились в слово «бабах». И бабахнуло.', { hp: -7, xp: 3 }] },
+        { l: 'Расшифровать за героя', cost: 10, r: ['Вы подсветили нужные руны. Заклинание выучено без единого взрыва.', { xp: 8 }] }],
+    n: ['Продал свиток коллекционеру. Руны мигнули обиженно.', { gold: 6 }] },
+  { id: 'c_rogue', at: 'any', w: 2, when: c => c.cls === 'rogue', t: 'Сундук с хитрым замком стоит без присмотра на телеге стражи.',
+    o: [{ l: 'Вскрыть', a: -2, s: 'dex', dc: 13, ok: ['Щёлк — и сундук мой. Стража не заметила.', { gold: 14, item: 1 }], no: ['Замок щёлкнул громче, чем хотелось. Откупился от стражи.', { gold: -8 }] },
+        { l: 'Отвлечь стражу', cost: 8, a: -1, r: ['Вы устроили стражникам видение. Пока они молились, я поработал.', { gold: 12 }] }],
+    n: ['Прошёл мимо с честным лицом. Непривычно, но приятно.', { trust: 1 }] },
+  { id: 'c_cleric', at: 'any', w: 2, when: c => c.cls === 'cleric', t: 'Деревенский староста слёг с лихорадкой. Родня просит молитвы.',
+    o: [{ l: 'Молиться у постели', s: 'wis', dc: 12, ok: ['Молитва помогла! Вся деревня теперь ходит в ваш храм.', { fol: 4, trust: 1 }], no: ['Молился всю ночь. Старосте лучше, но не сильно.', { fol: 1 }] },
+        { l: 'Исцелить чудом', cost: 14, a: 2, r: ['Староста встал и пустился в пляс. Чудо видели все!', { fol: 6, trust: 1 }] }],
+    n: ['Оставил травы и наставления. Через неделю староста выздоровел сам.', { fol: 1 }] },
+  { id: 'c_bard', at: 'town', w: 2, when: c => c.cls === 'bard', t: 'Местный барон заказывает серенаду для своей невесты. Невеста — огр.',
+    o: [{ l: 'Спеть', s: 'cha', dc: 13, ok: ['Невеста-огр прослезилась. Барон заплатил вдвойне.', { gold: 16, xp: 2 }], no: ['Невеста-огр не оценила. Лютня цела, я — почти.', { hp: -6, gold: 4 }] },
+        { l: 'Вдохновение свыше', cost: 9, r: ['Ваше вдохновение — и серенада вошла в историю.', { gold: 14, fol: 2 }] }],
+    n: ['Сослался на больное горло. Барон спел сам. Невесте понравилось.', {}] },
+  { id: 'c_warrior', at: 'town', w: 2, when: c => c.cls === 'warrior', t: 'Ветеран у казармы предлагает спарринг: «Покажи, чему тебя учили».',
+    o: [{ l: 'Сразиться', s: 'str', dc: 13, ok: ['Победил ветерана! Он показал мне пару приёмов.', { xp: 7 }], no: ['Ветеран уложил меня за три удара. Зато теперь знаю, как.', { hp: -6, xp: 4 }] },
+        { l: 'Укрепить руку', cost: 8, r: ['Меч стал лёгким как перо. Ветеран поклонился.', { xp: 7, trust: 1 }] }],
+    n: ['Отказался. Ветеран рассказал байку про молодость. Длинную.', { xp: 1 }] },
+  { id: 'c_ranger', at: 'road', w: 2, when: c => c.cls === 'ranger', t: 'Свежие следы редкого серебряного оленя уходят в чащу.',
+    o: [{ l: 'Выследить', s: 'wis', dc: 13, ok: ['Выследил и сфотографировал… то есть зарисовал. Рисунок купил музей.', { gold: 12, xp: 4 }], no: ['Следы привели к моим же ботинкам. Опять.', { xp: 2 }] },
+        { l: 'Позвать оленя', cost: 9, r: ['Олень вышел сам и поклонился. Такое случается раз в жизни.', { xp: 5, luck: 1 }] }],
+    n: ['Отпустил оленя с миром. Пусть живёт, серебряный.', { trust: 1 }] },
+  { id: 'c_barbarian', at: 'road', w: 2, when: c => c.cls === 'barbarian', t: 'Дорогу перегородил валун размером с дом. Объезд — полдня.',
+    o: [{ l: 'Сдвинуть валун', s: 'str', dc: 14, ok: ['С рёвом сдвинул валун. Путники аплодируют.', { quest: 12, xp: 3 }], no: ['Валун победил. Спина хрустнула громко.', { hp: -7, xp: 2 }] },
+        { l: 'Расколоть молнией', cost: 10, r: ['Молния расколола валун пополам. Я сказал, что это я.', { quest: 12, fol: 1 }] }],
+    n: ['Пошёл в обход и по пути съел три яблока. Не так уж плохо.', { quest: 3, hp: 3 }] },
+  // ===== ПУТЬ ГЕРОЯ =====
+  { id: 'b_tank', at: 'road', w: 2, when: c => c.bld === 'tank', t: 'Караван просит прикрыть их на опасном перевале — «вы же такой крепкий».',
+    o: [{ l: 'Прикрыть щитом', s: 'con', dc: 13, ok: ['Принял на себя все стрелы и ни одной не пропустил. Караванщики щедры.', { gold: 12, xp: 4 }], no: ['Стрел было больше, чем щита.', { hp: -9, gold: 6 }] },
+        { l: 'Каменная кожа', cost: 10, r: ['С вашим благословением стрелы отскакивали от меня как горох.', { gold: 12, shield: 3 }] }],
+    n: ['Отказался. Караван пошёл другим путём, а я — своим.', {}] },
+  { id: 'b_trick', at: 'town', w: 2, when: c => c.bld === 'trick', t: 'Два купца спорят о цене ковра. Можно влезть посредником.',
+    o: [{ l: 'Стать посредником', s: 'cha', dc: 13, ok: ['Обоим продал идею, что они выиграли. Процент — мне.', { gold: 14, xp: 2 }], no: ['Купцы помирились — против меня. Пришлось угощать.', { gold: -6 }] },
+        { l: 'Подсказать цену', cost: 7, r: ['Шёпот свыше подсказал «правильную» цену. Сделка века!', { gold: 12 }] }],
+    n: ['Купил у одного и продал другому тот же ковёр. Чистая наука.', { gold: 4 }] },
+  { id: 'b_healer', at: 'road', w: 2, when: c => c.bld === 'healer', t: 'На обочине путники после стычки с гоблинами. Раненые стонут.',
+    o: [{ l: 'Лечить раненых', s: 'wis', dc: 12, ok: ['Перевязал всех. Путники клянутся молиться вам.', { fol: 3, xp: 3 }], no: ['Лечил, как мог. Могу, оказывается, не очень.', { fol: 1, hp: -2 }] },
+        { l: 'Массовое исцеление', cost: 12, a: 2, r: ['Свет коснулся всех сразу. Путники пали на колени.', { fol: 5, trust: 1 }] }],
+    n: ['Оставил им бинты и пошёл дальше. Хватит на всех, если не жадничать.', {}] },
+  { id: 'b_fighter', at: 'road', w: 2, when: c => ['berserk', 'crit', 'dodge'].includes(c.bld), t: 'Местный задира вызывает на бой «до первой крови». Ставка — его кошель.',
+    o: [{ l: 'Принять вызов', s: ['str', 'dex'], dc: 13, ok: ['Первая кровь — его. Кошель — мой.', { gold: 12, xp: 4 }], no: ['Первая кровь — моя. Обидно и больно.', { hp: -7, gold: -5 }] },
+        { l: 'Благословить клинок', cost: 9, r: ['Клинок засиял — задира сдался, не начав боя.', { gold: 10, xp: 2 }] }],
+    n: ['Сказал, что сегодня не дерусь. Задира назвал меня мудрецом. Или трусом. Не расслышал.', {}] },
+  { id: 'b_mage', at: 'any', w: 2, when: c => c.bld === 'mage', t: 'В воздухе висит сгусток дикой магии. Можно поглотить — если повезёт.',
+    o: [{ l: 'Поглотить', s: ['int', 'wis', 'cha'], dc: 14, ok: ['Магия впиталась. В голове светло и звонко.', { xp: 9 }], no: ['Магия впиталась не туда. Волосы стоят дыбом, нос искрит.', { hp: -8, xp: 3 }] },
+        { l: 'Укротить для героя', cost: 11, r: ['Вы укротили сгусток, и он мягко влился в меня.', { xp: 9 }] }],
+    n: ['Обошёл сгусток. Он лопнул и превратил ближайший куст в лягушку.', {}] },
+  // ===== ПОСЛЕ ПЕЩЕРЫ =====
+  { id: 'dunsplit', at: 'any', w: 3, when: c => c.dun, t: 'После пещеры товарищи по отряду делят остатки добычи у костра.',
+    o: [{ l: 'Отдать долю храму', a: 2, r: ['Свою долю отдал храму. Товарищи зауважали, жрецы — тоже.', { faith: 8, fol: 2 }] },
+        { l: 'Благословить отряд', cost: 10, r: ['Вы благословили весь отряд. Мне торжественно отдали лучшую долю.', { gold: 10, trust: 2 }] }],
+    n: ['Забрал свою долю и ушёл спать. Всё честно.', { gold: 6 }] },
+  { id: 'dunecho', at: 'any', w: 2, when: c => c.dun, t: 'Из глубины пещеры доносится шёпот: «Вернись… тут ещё осталось…»',
+    o: [{ l: 'Вернуться на минутку', s: 'wis', dc: 13, ok: ['Вернулся — и правда, в углу завалялся мешочек.', { gold: 12, item: 1 }], no: ['Это шептал голодный слизень. Еле отбился.', { hp: -9, xp: 3 }] },
+        { l: 'Заглянуть божьим оком', cost: 8, r: ['Вы осветили пещеру — забрал мешочек без риска.', { gold: 10 }] }],
+    n: ['Не повёлся. Шёпот обиженно затих.', {}] },
+  // ===== ХАРАКТЕР БОГА, НОЧЬ, ДОВЕРИЕ =====
+  { id: 'sinner', at: 'any', when: c => c.align >= 30, t: 'Раскаявшийся разбойник хочет исповедаться вашему герою. Говорят, ваш бог добр.',
+    o: [{ l: 'Выслушать', s: 'wis', dc: 11, ok: ['Выслушал и простил. Бывший разбойник стал ревностным верующим.', { fol: 2, trust: 1 }], no: ['Уснул на исповеди. Разбойник обиделся, но ушёл честным.', { fol: 1 }] },
+        { l: 'Отпустить грехи', cost: 8, a: 2, r: ['Свет снизошёл на грешника. Он раздал награбленное — часть мне.', { fol: 2, gold: 8 }] }],
+    n: ['Сказал: «Иди и не греши». Он ушёл и, кажется, не грешит.', {}] },
+  { id: 'tribute', at: 'any', when: c => c.align <= -30, t: 'Трусливые селяне несут дань «грозному богу», лишь бы их не трогали.',
+    o: [{ l: 'Принять дань', a: -2, r: ['Принял дань. Селяне трясутся, бог доволен.', { gold: 12, faith: 5 }] },
+        { l: 'Явить грозный лик', cost: 10, a: -3, r: ['Небо потемнело, селяне пали ниц и поклялись служить.', { fol: 3, army: 1 }] }],
+    n: ['Отказался от дани. Селяне растерялись и на всякий случай всё равно оставили пирог.', { hp: 4 }] },
+  { id: 'stars', at: 'road', w: 2, when: c => c.night, t: 'Ночь. Звёзды над лагерем складываются в чей-то профиль. Кажется, ваш.',
+    o: [{ l: 'Зажечь новую звезду', cost: 8, r: ['Над лагерем вспыхнула новая звезда. Её видели во всех деревнях.', { fol: 2, trust: 2 }] },
+        { l: 'Загадать желание', r: ['Загадал желание. Утром нашёл монетку в сапоге.', { gold: 4 }] }],
+    n: ['Уснул под звёздами. Выспался отлично.', { hp: 7 }] },
+  { id: 'doubt', at: 'any', w: 2, when: c => c.trust < 35, t: 'Герой сидит у костра и бормочет: «А есть ли ты вообще, бог?»',
+    o: [{ l: 'Ответить знамением', cost: 8, r: ['Костёр вспыхнул вашим знаком. Герой подскочил и долго молился.', { trust: 5 }] },
+        { l: 'Шепнуть во сне', r: ['Во сне вы сказали: «Есть». Утром герой задумчив.', { trust: 2 }] }],
+    n: ['Бог промолчал. Герой решил, что богу просто некогда.', { trust: -1 }] },
+  { id: 'devotee', at: 'any', when: c => c.trust >= 75, t: 'Фанатично преданный герой хочет высечь ваше имя на скале у дороги. Долго и громко.',
+    o: [{ l: 'Позволить', r: ['Высек ваше имя огромными буквами. Путники читают и проникаются.', { fol: 3, hp: -3 }] },
+        { l: 'Высечь молнией', cost: 9, r: ['Молния вывела ваше имя на скале за секунду. Путники в восторге.', { fol: 4 }] }],
+    n: ['Высек скромно, мелким шрифтом. Читают только самые внимательные.', { fol: 1 }] },
+  { id: 'shrinefind', at: 'road', when: c => c.faith < 40, t: 'Нашёл заброшенный алтарь. Если его очистить, он снова будет давать силу богам.',
+    o: [{ l: 'Очистить алтарь', s: 'con', dc: 12, ok: ['Отскрёб алтарь до блеска. Вера потекла к вам ручейком.', { faith: 10, xp: 2 }], no: ['Возился долго, порезался, но алтарь всё же ожил.', { faith: 5, hp: -4 }] },
+        { l: 'Освятить вашим именем', a: 1, r: ['Алтарь засиял вашим светом. Местные потянулись молиться.', { faith: 6, fol: 1 }] }],
+    n: ['Помолился у алтаря как есть. Немного веры всё же дошло.', { faith: 3 }] }
+];
+const MOM_BY = {}; for (const m of MOMENTS) MOM_BY[m.id] = m;
+
+/* ---------- Механика ---------- */
+const momOutOf = (x, v) => typeof x === 'function' ? x(v || {}) : Array.isArray(x) ? mo(x[0], x[1]) : x;
+const momStats = o => o.s ? (Array.isArray(o.s) ? o.s : [o.s]) : null;
+function momLabel(o) { return o.l; }
+function momAvail(o, v) { return (!o.need || o.need(v || {})) && (!o.cost || S.god.faith >= o.cost); }
+/* Пауза: бой по зонам (включая подготовку), пещера, дуэль/арена — момент ждёт в очереди и не показывается.
+   Автобой на дороге не мешает: карточка видна, но новый момент начинается только вне боя. */
+function forkPaused() { const st = S.hero.state; return !!(S.fight || S.dun || dunPending || duelPending || st === 'duel' || st === 'dungeon'); }
+function pickMoment() {
+  const c = momCtx(), hist = S.momHist || [];
+  const ok = MOMENTS.filter(m => (m.at === 'any' || m.at === c.where) && (!m.when || m.when(c)));
+  if (!ok.length) return null;
+  let pool = ok.filter(m => !hist.includes(m.id));
+  if (!pool.length) { const old = ok.slice().sort((a, b) => hist.indexOf(a.id) - hist.indexOf(b.id)); pool = old.slice(0, Math.max(1, Math.ceil(old.length / 3))); } // всё было недавно — берём самые давние
+  let sum = 0; for (const m of pool) sum += m.w || 1;
+  let r = R() * sum; for (const m of pool) { r -= m.w || 1; if (r <= 0) return { m, c }; }
+  return { m: pool[pool.length - 1], c };
+}
+function startMoment(id) {
+  let m = id && MOM_BY[id], c = momCtx();
+  if (!m) { const p = pickMoment(); if (!p) return false; m = p.m; c = p.c; }
+  const v = { m: c.after || 'противник' };
+  const txt = tx(typeof m.t === 'function' ? m.t(v) : m.t, v);
+  S.momHist = (S.momHist || []).filter(x => x !== m.id); S.momHist.push(m.id); if (S.momHist.length > MOM_HIST) S.momHist.shift();
+  S.fork = { m: m.id, t: MOM_T, T: MOM_T, txt, v };
+  S.stats.forks++;
+  diary('✨ ' + txt, 'fork');
+  if (!SILENT) toast('✨ Божественный момент! Решите, пока герой не решил сам.');
+  return true;
+}
+/* Применить исход момента и записать в дневник одну строку с числами */
+function momApply(m, k, how) {
+  const fk = S.fork || {}, v = fk.v || {}, isN = k >= m.o.length, o = isN ? null : m.o[k];
+  let res, extra = [];
+  if (isN) res = momOutOf(m.n, v);
+  else {
+    if (o.cost) { S.god.faith = Math.max(0, S.god.faith - o.cost); extra.push(`−${o.cost} веры`); addGxp(o.cost / 2); }
+    if (o.a) shiftAlign(o.a);
+    if (o.run) res = o.run(v);
+    else if (o.s) { const k2 = momCheck(bestOf(o.s), o.dc || 12); res = k2.ok ? mo(o.ok[0], o.ok[1], k2) : mo(o.no[0], o.no[1], k2); }
+    else res = mo(o.r[0], o.r[1]);
+  }
+  const e = Object.assign({ safe: 1 }, res.e); if (e.xp > 0) e.xp *= MOM_XP;
+  const fx = applyFx(e);
+  const label = isN ? NOTHING : momLabel(o);
+  const pre = how === 'self' ? `Бог молчал — решил сам: «${label}». ` : how === 'god' ? `«${label}». ` : '';
+  diary(pre + tx(res.t, v), 'fork', [res.k && res.k.lbl, extra.join(', '), fx || '±0 — без последствий'].filter(Boolean).join(', '));
+}
+function answerMoment(k) {
+  const fk = S.fork, m = MOM_BY[fk.m]; if (!m) { S.fork = null; return; }
+  if (k < m.o.length && !momAvail(m.o[k], fk.v)) return toast(m.o[k].cost && S.god.faith < m.o[k].cost ? 'Не хватает веры.' : 'Сейчас это невозможно.');
+  if (k > m.o.length) return;
+  S.stats.forksAns++; addGxp(6);
+  momApply(m, k, 'god'); S.fork = null; S.timers.fork = Math.max(S.timers.fork, 120);
+}
+/* Не ответили: герой решает сам (только бесплатные варианты; «ничего не делать» — чаще) */
+function timeoutMoment() {
+  const fk = S.fork, m = MOM_BY[fk.m]; if (!m) { S.fork = null; return; }
+  const free = m.o.map((o, j) => j).filter(j => !m.o[j].cost && momAvail(m.o[j], fk.v));
+  const k = free.length && R() < .55 ? pick(free) : m.o.length;
+  momApply(m, k, 'self'); S.fork = null;
+  if (SILENT) SILENT.c.forks++;
+}
+function momentButtons(fk) {
+  const m = MOM_BY[fk.m]; if (!m) return [];
+  return m.o.map(o => ({ l: momLabel(o), cost: o.cost || 0, st: momStats(o), a: o.a || 0, dis: !momAvail(o, fk.v) })).concat([{ l: NOTHING, nothing: 1 }]);
 }
 /* =====================================================================
    СНАРЯЖЕНИЕ v7: слоты, требования, комплекты, авто-экипировка, ГС, кузнец
@@ -2567,11 +2992,11 @@ function syncGuards() {
   if (h.state === 'fight' && !h.monster) h.state = 'road';
   if (h.monster && h.state !== 'fight') h.monster = null;
   if (h.state === 'rest' && h.restT <= 0) h.state = 'road';
-  if (S.fork && (h.state === 'dead' || S.fight || S.dun)) S.fork = null;
+  if (S.fork && h.state === 'dead') S.fork = null; // в бою/пещере момент не сбрасывается — ждёт (forkPaused)
 }
 function passiveTick(gdt) {
   const h = S.hero;
-  addFaith(faithRegen() * gdt);
+  addFaith(faithRegen() * gdt); momClock += gdt;
   S.flock.fol += (S.flock.temple * 0.00014 + (S.god.align > 40 ? 0.0001 : 0)) * gdt;
   for (const k in S.buffs) if (S.buffs[k] > 0) S.buffs[k] = Math.max(0, S.buffs[k] - gdt);
   if (h.orcCd > 0) h.orcCd = Math.max(0, h.orcCd - gdt);
@@ -2590,13 +3015,18 @@ function step(realDt) {
   const h = S.hero;
   syncGuards();
   passiveTick(gdt);
-  if (!S.fork && !S.fight && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
-  if (S.fork) { S.fork.t -= idt; if (S.fork.t <= 0) timeoutFork(); }
-  else if (!S.fight && !S.dun && !dunPending && !duelPending) { S.timers.fork -= gdt; if (S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town')) { startFork(); S.timers.fork = rspan(PACE.fork); } }
+  if (!S.fight && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
+  // момент/развилка: герой живёт дальше, пока бог думает; в бою/пещере карточка ждёт, таймер стоит
+  // таймер считает «от начала до начала» (5–10 мин при ×1), но после ответа даём минимум 2 мин тишины
+  if (!forkPaused()) {
+    if (S.fork) { S.fork.t -= idt; if (S.fork.t <= 0) timeoutFork(); if (!S.fork) S.timers.fork = Math.max(S.timers.fork, 120); }
+    S.timers.fork -= gdt;
+    if (!S.fork && S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town' || h.state === 'rest')) { if (startFork() !== false) S.timers.fork = rspan(PACE.fork); else S.timers.fork = 30; }
+  }
   if (S.fight) fightTick(realDt); // решения в бою — в реальном времени: на ×2–×10 таймер не сжимается
-  else if (!S.fork && !S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
+  else if (!S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
   if (S.dun) dunTick(idt);
-  else if (!S.fork && !S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { if (h.hp < h.maxHp * .7) S.timers.dun = 120; else { S.timers.dun = rspan(PACE.dun); startDungeon(false); } } }
+  else if (!S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { if (h.hp < h.maxHp * .7) S.timers.dun = 120; else { S.timers.dun = rspan(PACE.dun); startDungeon(false); } } }
   if (S.ev) evTick(idt);
   else { S.timers.event -= gdt; if (S.timers.event <= 0) { S.timers.event = rspan(PACE.event); startEvent(); } }
   arenaStep(idt);
@@ -2620,21 +3050,21 @@ function simulateAway(sec, why) {
   try {
     if (S.fork) timeoutFork(true);
     const stepDt = ((PACE.step[0] + PACE.step[1]) / 2) / PACE.offEff;
-    let t = 0, forkT = Math.max(60, S.timers.fork);
+    let t = 0, forkT = Math.max(PACE.forkOff[0] / 2, S.timers.fork);
     while (t < cap) {
       t += stepDt;
       syncGuards();
       passiveTick(stepDt);
       forkT -= stepDt;
-      if (forkT <= 0 && (h.state === 'road' || h.state === 'town')) { if (startFork() !== false && S.fork) timeoutFork(true); forkT = rspan(PACE.fork); }
+      if (forkT <= 0 && (h.state === 'road' || h.state === 'town')) { if (startFork() !== false && S.fork) timeoutFork(true); forkT = rspan(PACE.forkOff); }
       heroStep();
     }
-    S.timers.fork = Math.max(60, forkT);
+    S.timers.fork = Math.min(PACE.fork[1], Math.max(60, forkT));
     S.timers.hero = Math.min(S.timers.hero, 5);
   } finally { buf = SILENT.buf; SILENT = null; }
   // яркие моменты: уровни, черты, редкие вещи, смерти + пара смешных развилок
   const pri = buf.filter(e => ['level', 'rare', 'death'].includes(e.c));
-  const forks = buf.filter(e => e.c === 'fork' && !e.x.startsWith('🙏')).sort(() => R() - .5).slice(0, 2);
+  const forks = buf.filter(e => e.c === 'fork' && !/^(🙏|✨)/.test(e.x)).sort(() => R() - .5).slice(0, 2);
   const hl = pri.slice(-8).concat(forks);
   for (const e of hl.reverse()) { e.x = '⏳ ' + e.x; S.diary.unshift(e); }
   const gd = h.gold - g0, fd = Math.floor(S.flock.fol) - f0;
@@ -3200,7 +3630,7 @@ function endBattle(F, winTeam) {
 }
 
 /* ---------- Запуск боёв ---------- */
-const heroFree = () => S.hero.state !== 'dead' && (S.hero.state === 'road' || S.hero.state === 'town') && !S.fight && !S.dun && !S.fork && !duelPending && !dunPending;
+const heroFree = () => S.hero.state !== 'dead' && (S.hero.state === 'road' || S.hero.state === 'town') && !S.fight && !S.dun && !duelPending && !dunPending;
 function startMonsterFight() {
   const h = S.hero, m = h.monster;
   if (!m || h.state !== 'fight' || S.fight || S.dun) return false;
@@ -3350,7 +3780,7 @@ function gsMul(q) { return clamp(Math.pow(q, -(q > 1 ? GS_K.ku : GS_K.k)), GS_K.
 }
 const dunMonMul = U => (U.gm || 1) * ((DUN_TIERS[U.diff] || DUN_TIERS.normal).m);
 async function startDungeon(byCall, tier) {
-  if (S.dun || S.fight || S.fork || duelPending || dunPending) return false;
+  if (S.dun || S.fight || duelPending || dunPending) return false;
   const h = S.hero; if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon') return false;
   if (!byCall && S.timers.dunCd > 0) return false;
   const st = S; h.state = 'dungeon'; h.monster = null; h.restT = 0; dunPending = true;
@@ -3492,7 +3922,7 @@ function endDungeon(ok, why) {
   if (U.out) { U.out = 0; h.hp = Math.max(h.hp, Math.round(h.maxHp * .1)); ulog(`😵 ${h.name} очнулся уже снаружи, на травке. Голова гудит.`, 'foe'); }
   h.gold += gold; gainXp(xp); addGxp(20 + U.fights * 8 + (ok ? 25 : 0));
   if (ok) { addTrust(3); S.stats.dwinsD++; }
-  bldResult(ok || why === 'left', 'dun');
+  bldResult(ok || why === 'left', 'dun'); momDunAt = momClock; momDunOk = !!ok;
   const items = why === 'carried' ? U.loot.slice(0, 1) : U.loot, names = [];
   for (const it of items) { const worn = equip(it, true); bldItem(it); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
   rivals.reportDungeon({ ok, godIds: U.party.filter(p => !p.isMe).map(p => p.godId) });
@@ -3813,16 +4243,25 @@ function renderDiary() {
 function fxChips(f) { return String(f).split(/,\s+(?![^()]*\))/).filter(Boolean).map(x => `<span class="fxc">${esc(x)}</span>`).join(''); }
 function alignTag(a) { return a >= 2 ? '<span class="tag kind">добро</span>' : a <= -2 ? '<span class="tag wrath">гнев</span>' : ''; }
 function renderFork() {
-  const box = $('forkBox');
-  if (!S.fork) { setHTML(box, ''); return; }
-  const f = FORKS[S.fork.i], opts = forkOptions(S.fork);
-  setHTML(box, `<div class="card fork"><h2>🙏 Герой молится вам!</h2>
+  const box = $('forkBox'), fk = S.fork;
+  if (!fk || forkPaused()) { setHTML(box, ''); return; }   // в бою/пещере момент ждёт в очереди
+  if (fk.m) {
+    const bs = momentButtons(fk);
+    setHTML(box, `<div class="card fork mom" id="momCard"><div class="momh"><b>✨ Божественный момент</b><span class="momt" id="forkSec"></span></div>
+    <div class="q">${esc(fk.txt)}</div>
+    <div class="opts mopts">${bs.map((o, k) => `<button class="btn${o.nothing ? ' none' : ''}" data-act="fork" data-arg="${k}"${o.dis ? ' disabled' : ''}><span class="ml">${esc(o.l)}</span>${o.cost ? `<span class="tag cost" title="Стоит веры">🔥${o.cost}</span>` : ''}${o.st ? `<span class="tag chk" title="Проверка характеристики героя">🎲 ${o.st.map(s => STAT_ABBR[s]).join('/')}</span>` : ''}${alignTag(o.a)}</button>`).join('')}</div>
+    <div class="bar time thin"><i id="forkBar"></i></div></div>`);
+  } else {
+    const f = FORKS[fk.i], opts = forkOptions(fk);
+    setHTML(box, `<div class="card fork"><div class="momh"><b>🙏 Герой молится вам!</b><span class="momt" id="forkSec"></span></div>
     <div class="q">${esc(tx(f.t))}</div>
-    <div class="stat"><label><span>Ответьте, пока он не решил сам</span><span id="forkSec"></span></label><div class="bar time"><i id="forkBar"></i></div></div>
-    <div class="opts">${opts.map((o, k) => `<button class="btn" data-act="fork" data-arg="${k}">${esc(o.l)}${alignTag(o.a)}${o.clsOpt ? `<span class="tag cls">${CLASSES[S.hero.cls].n.toLowerCase()}</span>` : ''}</button>`).join('')}</div>
+    <div class="opts">${opts.map((o, k) => `<button class="btn${o.nothing ? ' none' : ''}" data-act="fork" data-arg="${k}">${esc(o.l)}${alignTag(o.a)}${o.clsOpt ? `<span class="tag cls">${CLASSES[S.hero.cls].n.toLowerCase()}</span>` : ''}</button>`).join('')}</div>
+    <div class="bar time thin"><i id="forkBar"></i></div>
     <div class="muted" style="margin-top:6px">Герой послушается с шансом ~${Math.round(obeyChance() * 100)}% (зависит от доверия). Исход зависит от его характеристик.</div></div>`);
-  $('forkSec').textContent = Math.ceil(S.fork.t) + ' с';
-  $('forkBar').style.width = pct(S.fork.t, S.fork.T);
+  }
+  const sec = Math.ceil(fk.t);
+  $('forkSec').textContent = `⏳ ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')} — потом герой решит сам`;
+  $('forkBar').style.width = pct(fk.t, fk.T);
 }
 function renderEvent() {
   const box = $('eventBox'), ev = S.ev;
@@ -3898,7 +4337,7 @@ function renderRight() {
     html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
       ${godsDunHTML()}
       ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
+        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
   }
   setHTML($('rightBody'), html);
 }
@@ -3906,9 +4345,9 @@ function renderNav() {
   const mt = S.ui.mtab, B = document.body; if (B.dataset.mtab !== mt) B.dataset.mtab = mt;
   B.classList.toggle('chatOpen', !!S.chat.open);
   document.querySelectorAll('#mnav button').forEach(b => b.classList.toggle('on', b.dataset.arg === mt));
-  const busy = S.fight ? '⚔ Идёт бой' : S.dun ? '🏰 Отряд в пещере' : S.fork ? '🙏 Герой молится вам' : S.featOffer ? '🎖 Выберите черту' : S.ev ? '🌍 Мировое событие' : '';
+  const busy = S.fight ? '⚔ Идёт бой' : S.dun ? '🏰 Отряд в пещере' : S.fork && !forkPaused() ? (S.fork.m ? '✨ Божественный момент' : '🙏 Герой молится вам') : S.featOffer ? '🎖 Выберите черту' : S.ev ? '🌍 Мировое событие' : '';
   setHTML($('mBanner'), busy && ['powers', 'arena', 'more'].includes(mt) ? `<div class="mban"><span>${busy}</span><button class="btn small" data-act="mtab" data-arg="hero">Открыть</button></div>` : '');
-  const heroDot = !!(S.fork || S.featOffer || (S.fight && S.fight.phase === 'turn' && !S.fight.auto) || (S.dun && S.dun.phase === 'explore'));
+  const heroDot = !!((S.fork && !forkPaused()) || S.featOffer || (S.fight && S.fight.phase === 'turn' && !S.fight.auto) || (S.dun && S.dun.phase === 'explore'));
   const md = $('moreDot'); if (md) md.classList.toggle('on', !!S.chat.unread);
   const cd = $('chatDot2'); if (cd) cd.classList.toggle('on', !!S.chat.unread);
   const hb = document.querySelector('#mnav button[data-arg=hero]'); if (hb) hb.classList.toggle('dot', heroDot && mt !== 'hero');
@@ -3957,7 +4396,8 @@ function help() {
   <p><b>📋 Характеристики.</b> СИЛ, ЛОВ, ТЕЛ, ИНТ, МДР, ХАР — как в настольных ролевых играх. Они влияют на бой, торговлю (Харизма), проповеди и исходы развилок: в дневнике видно «проверка Харизмы: успех». Раса и класс дают бонусы и особые умения.</p>
   <p><b>🎖 Черты.</b> На каждом чётном уровне герой выбирает черту или +2 к характеристике. Подскажите ему, иначе выберет сам.</p>
   <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение.</p>
-  <p><b>🙏 Развилки.</b> Герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
+  <p><b>✨ Божественные моменты.</b> Раз в 5–10 минут (на ×1) случается что-то, где решаете вы: 2–3 кнопки, одна всегда «Ничего не делать». Кнопки с 🔥 тратят веру и срабатывают наверняка, с 🎲 — проверка характеристики героя (бросок d20 и числа видны в дневнике). Не ответили за 2,5 мин — герой решит сам. В бою и в пещере момент ждёт, пока вы освободитесь.</p>
+  <p><b>🙏 Развилки.</b> Иногда вместо момента герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
   <p><b>😇 Характер бога.</b> Добрые поступки и силы света сдвигают его к «доброму» (силы света на 20% дешевле, паства растёт сама), кары — к «гневному» (кары дешевле, молния сильнее, солдаты дешевле).</p>
@@ -3976,7 +4416,7 @@ function settings() {
   <div class="btns"><button class="btn" data-act="rename">Сохранить</button><button class="btn" data-act="closeModal">Закрыть</button></div>
   ${pwaSettingsHTML()}
   <h3 style="margin-top:14px">Для тестирования</h3>
-  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">🙏 Развилка сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
+  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">✨ Момент сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
   <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Пещера сейчас</button>
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
   <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
@@ -4016,9 +4456,9 @@ const ACT = {
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
   bldOpen: () => bldModal(), bldPick: a => { if (!BUILDS[a]) return; const ok = suggestBuild(a); sheetModal(); if (!ok && S.hero.bld.id !== a) toast('Герой не послушался — см. дневник.'); },
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
-  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
-  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
-  dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
+  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
+  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
+  dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
   smith: sl => { if (!EQ_KEYS.includes(sl)) return; if (smithUpgrade(sl) === true) { render(); itemModal('eq:' + sl); } },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,
@@ -4050,14 +4490,14 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) save(
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261019-062621';
+const APP_BUILD = '20261019-154142';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
 let swReg = null, waitingSW = null, installEvt = null, updating = false, updFallback = null;
 const PWA = { get waiting() { return !!waitingSW; }, get build() { return APP_BUILD; }, get reg() { return swReg; }, get installable() { return !!installEvt; }, updateShown: false };
 function showUpdateBar() { PWA.updateShown = true; const b = $('updBar'); if (b) b.classList.add('on'); }
-function calmMoment() { return !S || (!S.fork && !S.fight && !S.dun && !(S.arena && S.arena.apps.some(a => a.joined !== null)) && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
+function calmMoment() { return !S || (!(S.fork && !forkPaused()) && !S.fight && !S.dun && !(S.arena && S.arena.apps.some(a => a.joined !== null)) && !(S.ev && S.ev.phase === 'live') && !S.featOffer); }
 function applyUpdate() {
   if (S) save();
   if (waitingSW) { updating = true; waitingSW.postMessage({ type: 'SKIP_WAITING' }); setTimeout(() => location.reload(), 3000); }
@@ -4280,7 +4720,7 @@ function arenaTabHTML() {
 }
 function godsDunHTML() {
   const st = S.stats, g = S.god, cd = S.timers.dunCd;
-  const dis = S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || g.faith < 40 || dunPending;
+  const dis = S.dun || S.fight || !['road', 'town'].includes(S.hero.state) || g.faith < 40 || dunPending;
   return `<div class="box"><h3>🏰 Пещеры</h3><div class="muted">Отряд из героя и 2–3 бойцов других богов идёт по карте комнат: ловушки, сундуки, ключ и босс. Классы важны: плут, жрец, маг, следопыт и бард помогают по-своему. Пройдено: ${st.dwinsD} из ${st.duns}, боссов: ${st.bosses}.</div>
     <div class="muted">${cd > 0 ? `Сам герой полезет в пещеру не раньше чем через ${fmtDur(cd)}.` : 'Герой готов к пещере — может забрести сам.'}</div>
     <div class="muted">⚔ Ваш ГС: <b>${gearScore(S.hero)}</b> (рек.: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} ${recGS(S.hero.lvl, k)}`).join(' · ')}).</div>
@@ -4333,6 +4773,7 @@ window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldSt
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },
+  MOMENTS, MOM_BY, MOM_T, startMoment, answerMoment, timeoutMoment, forkPaused, momentButtons, momCtx, forkOptions, get momClock() { return momClock; },
   PWA, parseSave, checkUpdate, APP_BUILD };
 </script>
 </body>

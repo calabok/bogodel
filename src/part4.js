@@ -180,16 +180,25 @@ function renderDiary() {
 function fxChips(f) { return String(f).split(/,\s+(?![^()]*\))/).filter(Boolean).map(x => `<span class="fxc">${esc(x)}</span>`).join(''); }
 function alignTag(a) { return a >= 2 ? '<span class="tag kind">добро</span>' : a <= -2 ? '<span class="tag wrath">гнев</span>' : ''; }
 function renderFork() {
-  const box = $('forkBox');
-  if (!S.fork) { setHTML(box, ''); return; }
-  const f = FORKS[S.fork.i], opts = forkOptions(S.fork);
-  setHTML(box, `<div class="card fork"><h2>🙏 Герой молится вам!</h2>
+  const box = $('forkBox'), fk = S.fork;
+  if (!fk || forkPaused()) { setHTML(box, ''); return; }   // в бою/пещере момент ждёт в очереди
+  if (fk.m) {
+    const bs = momentButtons(fk);
+    setHTML(box, `<div class="card fork mom" id="momCard"><div class="momh"><b>✨ Божественный момент</b><span class="momt" id="forkSec"></span></div>
+    <div class="q">${esc(fk.txt)}</div>
+    <div class="opts mopts">${bs.map((o, k) => `<button class="btn${o.nothing ? ' none' : ''}" data-act="fork" data-arg="${k}"${o.dis ? ' disabled' : ''}><span class="ml">${esc(o.l)}</span>${o.cost ? `<span class="tag cost" title="Стоит веры">🔥${o.cost}</span>` : ''}${o.st ? `<span class="tag chk" title="Проверка характеристики героя">🎲 ${o.st.map(s => STAT_ABBR[s]).join('/')}</span>` : ''}${alignTag(o.a)}</button>`).join('')}</div>
+    <div class="bar time thin"><i id="forkBar"></i></div></div>`);
+  } else {
+    const f = FORKS[fk.i], opts = forkOptions(fk);
+    setHTML(box, `<div class="card fork"><div class="momh"><b>🙏 Герой молится вам!</b><span class="momt" id="forkSec"></span></div>
     <div class="q">${esc(tx(f.t))}</div>
-    <div class="stat"><label><span>Ответьте, пока он не решил сам</span><span id="forkSec"></span></label><div class="bar time"><i id="forkBar"></i></div></div>
-    <div class="opts">${opts.map((o, k) => `<button class="btn" data-act="fork" data-arg="${k}">${esc(o.l)}${alignTag(o.a)}${o.clsOpt ? `<span class="tag cls">${CLASSES[S.hero.cls].n.toLowerCase()}</span>` : ''}</button>`).join('')}</div>
+    <div class="opts">${opts.map((o, k) => `<button class="btn${o.nothing ? ' none' : ''}" data-act="fork" data-arg="${k}">${esc(o.l)}${alignTag(o.a)}${o.clsOpt ? `<span class="tag cls">${CLASSES[S.hero.cls].n.toLowerCase()}</span>` : ''}</button>`).join('')}</div>
+    <div class="bar time thin"><i id="forkBar"></i></div>
     <div class="muted" style="margin-top:6px">Герой послушается с шансом ~${Math.round(obeyChance() * 100)}% (зависит от доверия). Исход зависит от его характеристик.</div></div>`);
-  $('forkSec').textContent = Math.ceil(S.fork.t) + ' с';
-  $('forkBar').style.width = pct(S.fork.t, S.fork.T);
+  }
+  const sec = Math.ceil(fk.t);
+  $('forkSec').textContent = `⏳ ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')} — потом герой решит сам`;
+  $('forkBar').style.width = pct(fk.t, fk.T);
 }
 function renderEvent() {
   const box = $('eventBox'), ev = S.ev;
@@ -265,7 +274,7 @@ function renderRight() {
     html = `<div class="box"><h3>Ваши подвиги</h3><div class="muted">Развилок: ${st.forks} (отвечено ${st.forksAns}) · Дуэлей богов: ${st.duels} (побед ${st.dwins}) · Арена: ${st.arenaW}:${st.arenaL} · Событий: ${st.events} (успешных ${st.evwins})</div></div>
       ${godsDunHTML()}
       ${rivals.listGods().slice().sort((a, b) => b.lvl - a.lvl).map(r => `<div class="rival"><div><b>${esc(r.name)}</b> · ур. ${r.lvl}<div class="muted">${PERS[r.pers]} · герой ${BUILDS[r.bld] ? BUILDS[r.bld].ic + ' ' : ''}${esc(r.hero)} (${RACES[r.race].n.toLowerCase()}-${CLASSES[r.cls].n.toLowerCase()}, ур. ${r.hlvl}) · армия ${r.army} · против вас ${r.w}:${r.l}</div></div>
-        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.fork || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
+        <div><button class="btn small red" data-act="challenge" data-arg="${r.id}" ${S.fight || S.dun || S.hero.state !== 'road' || g.faith < 10 || duelPending ? 'disabled' : ''}>⚔ Вызвать (10)</button></div></div>`).join('')}`;
   }
   setHTML($('rightBody'), html);
 }
@@ -273,9 +282,9 @@ function renderNav() {
   const mt = S.ui.mtab, B = document.body; if (B.dataset.mtab !== mt) B.dataset.mtab = mt;
   B.classList.toggle('chatOpen', !!S.chat.open);
   document.querySelectorAll('#mnav button').forEach(b => b.classList.toggle('on', b.dataset.arg === mt));
-  const busy = S.fight ? '⚔ Идёт бой' : S.dun ? '🏰 Отряд в пещере' : S.fork ? '🙏 Герой молится вам' : S.featOffer ? '🎖 Выберите черту' : S.ev ? '🌍 Мировое событие' : '';
+  const busy = S.fight ? '⚔ Идёт бой' : S.dun ? '🏰 Отряд в пещере' : S.fork && !forkPaused() ? (S.fork.m ? '✨ Божественный момент' : '🙏 Герой молится вам') : S.featOffer ? '🎖 Выберите черту' : S.ev ? '🌍 Мировое событие' : '';
   setHTML($('mBanner'), busy && ['powers', 'arena', 'more'].includes(mt) ? `<div class="mban"><span>${busy}</span><button class="btn small" data-act="mtab" data-arg="hero">Открыть</button></div>` : '');
-  const heroDot = !!(S.fork || S.featOffer || (S.fight && S.fight.phase === 'turn' && !S.fight.auto) || (S.dun && S.dun.phase === 'explore'));
+  const heroDot = !!((S.fork && !forkPaused()) || S.featOffer || (S.fight && S.fight.phase === 'turn' && !S.fight.auto) || (S.dun && S.dun.phase === 'explore'));
   const md = $('moreDot'); if (md) md.classList.toggle('on', !!S.chat.unread);
   const cd = $('chatDot2'); if (cd) cd.classList.toggle('on', !!S.chat.unread);
   const hb = document.querySelector('#mnav button[data-arg=hero]'); if (hb) hb.classList.toggle('dot', heroDot && mt !== 'hero');
@@ -324,7 +333,8 @@ function help() {
   <p><b>📋 Характеристики.</b> СИЛ, ЛОВ, ТЕЛ, ИНТ, МДР, ХАР — как в настольных ролевых играх. Они влияют на бой, торговлю (Харизма), проповеди и исходы развилок: в дневнике видно «проверка Харизмы: успех». Раса и класс дают бонусы и особые умения.</p>
   <p><b>🎖 Черты.</b> На каждом чётном уровне герой выбирает черту или +2 к характеристике. Подскажите ему, иначе выберет сам.</p>
   <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение.</p>
-  <p><b>🙏 Развилки.</b> Герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
+  <p><b>✨ Божественные моменты.</b> Раз в 5–10 минут (на ×1) случается что-то, где решаете вы: 2–3 кнопки, одна всегда «Ничего не делать». Кнопки с 🔥 тратят веру и срабатывают наверняка, с 🎲 — проверка характеристики героя (бросок d20 и числа видны в дневнике). Не ответили за 2,5 мин — герой решит сам. В бою и в пещере момент ждёт, пока вы освободитесь.</p>
+  <p><b>🙏 Развилки.</b> Иногда вместо момента герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
   <p><b>😇 Характер бога.</b> Добрые поступки и силы света сдвигают его к «доброму» (силы света на 20% дешевле, паства растёт сама), кары — к «гневному» (кары дешевле, молния сильнее, солдаты дешевле).</p>
@@ -343,7 +353,7 @@ function settings() {
   <div class="btns"><button class="btn" data-act="rename">Сохранить</button><button class="btn" data-act="closeModal">Закрыть</button></div>
   ${pwaSettingsHTML()}
   <h3 style="margin-top:14px">Для тестирования</h3>
-  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">🙏 Развилка сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
+  <div class="btns"><button class="btn small blue" data-act="dbg" data-arg="fork">✨ Момент сейчас</button><button class="btn small blue" data-act="dbg" data-arg="duel">⚜ Дуэль богов</button><button class="btn small blue" data-act="dbg" data-arg="arena">🤺 Бой 1нс1</button><button class="btn small blue" data-act="dbg" data-arg="group">👥 Бой 3нс3</button><button class="btn small blue" data-act="dbg" data-arg="monster">🎯 Ручной бой с монстром</button>
   <button class="btn small blue" data-act="dbg" data-arg="event">🌍 Событие сейчас</button><button class="btn small blue" data-act="dbg" data-arg="dun">🏰 Пещера сейчас</button>
   <button class="btn small blue" data-act="dbg" data-arg="feat">🎖 Черта сейчас</button><button class="btn small blue" data-act="dbg" data-arg="faith">+100 веры</button>
   <button class="btn small blue" data-act="dbg" data-arg="h1">⏩ +1 час</button><button class="btn small blue" data-act="dbg" data-arg="h8">⏩ +8 часов</button></div>
@@ -383,9 +393,9 @@ const ACT = {
   feat: a => chooseFeat(a, false), asi: a => chooseAsi(a, false),
   bldOpen: () => bldModal(), bldPick: a => { if (!BUILDS[a]) return; const ok = suggestBuild(a); sheetModal(); if (!ok && S.hero.bld.id !== a) toast('Герой не послушался — см. дневник.'); },
   asiOpen: () => { if (S.featOffer) S.featOffer.asi = true; }, asiBack: () => { if (S.featOffer) S.featOffer.asi = false; },
-  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.fork || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
-  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
-  dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
+  challenge: a => { if (S.god.faith < 10) return toast('Нужно 10 веры.'); if (S.fight || S.dun || S.hero.state !== 'road' || duelPending) return toast('Герой сейчас занят.'); S.god.faith -= 10; startGodDuel(a).then(ok => { if (!ok && S) addFaith(10); }); },
+  callDun: () => { if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); tierModal(); },
+  dunTier: t => { closeModal(); if (!DUN_TIERS[t]) return; if (S.god.faith < 40) return toast('Нужно 40 веры.'); if (S.dun || S.fight || !['road', 'town'].includes(S.hero.state) || dunPending) return toast('Герой сейчас занят.'); S.god.faith -= 40; addGxp(10); startDungeon(true, t).then(ok => { if (!ok && S) addFaith(40); }); },
   smith: sl => { if (!EQ_KEYS.includes(sl)) return; if (smithUpgrade(sl) === true) { render(); itemModal('eq:' + sl); } },
   rndHero: () => { $('inRace').value = pick(Object.keys(RACES)); $('inCls').value = pick(Object.keys(CLASSES)); obDesc(); },
   newGame,

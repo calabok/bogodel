@@ -124,7 +124,7 @@ function arenaTabHTML() {
 }
 function godsDunHTML() {
   const st = S.stats, g = S.god, cd = S.timers.dunCd;
-  const dis = S.dun || S.fight || S.fork || !['road', 'town'].includes(S.hero.state) || g.faith < 40 || dunPending;
+  const dis = S.dun || S.fight || !['road', 'town'].includes(S.hero.state) || g.faith < 40 || dunPending;
   return `<div class="box"><h3>🏰 Пещеры</h3><div class="muted">Отряд из героя и 2–3 бойцов других богов идёт по карте комнат: ловушки, сундуки, ключ и босс. Классы важны: плут, жрец, маг, следопыт и бард помогают по-своему. Пройдено: ${st.dwinsD} из ${st.duns}, боссов: ${st.bosses}.</div>
     <div class="muted">${cd > 0 ? `Сам герой полезет в пещеру не раньше чем через ${fmtDur(cd)}.` : 'Герой готов к пещере — может забрести сам.'}</div>
     <div class="muted">⚔ Ваш ГС: <b>${gearScore(S.hero)}</b> (рек.: ${DUN_TIER_KEYS.map(k => `${DUN_TIERS[k].ic} ${recGS(S.hero.lvl, k)}`).join(' · ')}).</div>
@@ -177,4 +177,5 @@ window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldSt
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },
+  MOMENTS, MOM_BY, MOM_T, startMoment, answerMoment, timeoutMoment, forkPaused, momentButtons, momCtx, forkOptions, get momClock() { return momClock; },
   PWA, parseSave, checkUpdate, APP_BUILD };

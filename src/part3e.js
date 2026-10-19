@@ -50,7 +50,7 @@ function gsMul(q) { return clamp(Math.pow(q, -(q > 1 ? GS_K.ku : GS_K.k)), GS_K.
 }
 const dunMonMul = U => (U.gm || 1) * ((DUN_TIERS[U.diff] || DUN_TIERS.normal).m);
 async function startDungeon(byCall, tier) {
-  if (S.dun || S.fight || S.fork || duelPending || dunPending) return false;
+  if (S.dun || S.fight || duelPending || dunPending) return false;
   const h = S.hero; if (h.state === 'dead' || h.state === 'duel' || h.state === 'dungeon') return false;
   if (!byCall && S.timers.dunCd > 0) return false;
   const st = S; h.state = 'dungeon'; h.monster = null; h.restT = 0; dunPending = true;
@@ -192,7 +192,7 @@ function endDungeon(ok, why) {
   if (U.out) { U.out = 0; h.hp = Math.max(h.hp, Math.round(h.maxHp * .1)); ulog(`😵 ${h.name} очнулся уже снаружи, на травке. Голова гудит.`, 'foe'); }
   h.gold += gold; gainXp(xp); addGxp(20 + U.fights * 8 + (ok ? 25 : 0));
   if (ok) { addTrust(3); S.stats.dwinsD++; }
-  bldResult(ok || why === 'left', 'dun');
+  bldResult(ok || why === 'left', 'dun'); momDunAt = momClock; momDunOk = !!ok;
   const items = why === 'carried' ? U.loot.slice(0, 1) : U.loot, names = [];
   for (const it of items) { const worn = equip(it, true); bldItem(it); names.push(`«${it.n}» (${RARITY[it.rar].n}${worn ? ', надел' : ''})`); }
   rivals.reportDungeon({ ok, godIds: U.party.filter(p => !p.isMe).map(p => p.godId) });
