@@ -141,6 +141,13 @@ function flog(F, t, c) { F.log.unshift({ t, c: c || 'sys' }); if (F.log.length >
 const fAlive = (F, team) => F.fighters.filter(f => f.alive && (team === undefined || f.team === team));
 const fEnemies = (F, f) => F.fighters.filter(x => x.alive && x.team !== f.team);
 const fMe = F => F.fighters.find(f => f.isMe);
+/* Присутствие бога: недавний ввод и открытая вкладка. Нет бога — герой бьётся сам, осторожно и без сил. */
+let lastInputT = Date.now(), hiddenSince = 0, fightVis = false, fightWait = 0;
+const godPresent = () => !SILENT && typeof document !== 'undefined' && !document.hidden && Date.now() - lastInputT < 120000;
+const setLastInput = t => { lastInputT = t === undefined ? Date.now() : t; };
+const FIGHT_ACT_KINDS = ['monster', 'dungeon'];
+const capUnit = f => !!f && (f.kind === 'hero' || f.kind === 'bot');
+const PREP_T = 30, TURN_MIN = 15;
 const hpTag = f => `[${Math.max(0, f.hp)}/${f.max}]`;
 function wpick(w) { let s = 0; for (const k in w) s += w[k]; let r = R() * s; for (const k in w) { r -= w[k]; if (r <= 0) return k; } return Object.keys(w)[0]; }
 /* «Мозг» бота (и привычки героя, когда бог молчит) */
@@ -149,8 +156,12 @@ function botBrain(F, f) {
   let target;
   if (f.isMe && F.my.target && en.find(e => e.id === F.my.target)) target = F.my.target;
   else {
-    const w = {}; for (const e of en) w[e.id] = 1 + (e.hp / e.max < .35 ? 2 : 0) + ((e.cls === 'warrior' || e.cls === 'barbarian') ? .8 : 0) + (e.kind === 'boss' ? 1 : 0) + (e.isMe && f.kind !== 'bot' && F.kind !== 'dungeon' ? .5 : 0);
-    target = R() < .55 && F.lastTarget && F.lastTarget[f.id] && en.find(e => e.id === F.lastTarget[f.id]) ? F.lastTarget[f.id] : wpick(w);
+    const mon = f.kind !== 'bot' && f.kind !== 'hero', tg = F._tg || (F._tg = {});
+    const w = {}; for (const e of en) { w[e.id] = 1 + (e.hp / e.max < .35 ? 2 : 0) + ((e.cls === 'warrior' || e.cls === 'barbarian') ? .8 : 0) + (e.kind === 'boss' ? 1 : 0) + (e.isMe && f.kind !== 'bot' && F.kind !== 'dungeon' ? .5 : 0);
+      if (mon) { if (e.bf && e.bf.id === 'tank') w[e.id] += 1.2; w[e.id] /= 1 + .9 * (tg[e.id] || 0); } } /* монстры не сваливаются толпой на одного: танк держит внимание */
+    const lt = F.lastTarget && F.lastTarget[f.id];
+    target = R() < .55 && lt && en.find(e => e.id === lt) && !(mon && (tg[lt] || 0) >= 1) ? lt : wpick(w);
+    if (mon) tg[target] = (tg[target] || 0) + 1;
   }
   const tb = (F.lastBlk || {})[target] || [];
   const atk = [];
@@ -164,15 +175,32 @@ function botBrain(F, f) {
   const blk = f.blkN === 2 && R() < .5 ? blkSet(ZONES[(ZONES.indexOf(bz) + 4) % 5], 2) : blkSet(bz, f.blkN);
   return { target, atk, blk };
 }
+/* Герой без подсказки бога: осторожен — закрывается от объявленного удара, от того, куда били, пьёт зелье на краю */
+function heroBrain(F, me) {
+  const c = botBrain(F, me); c.act = null;
+  const tf = F.tele && F.fighters.find(x => x.id === F.tele.fid);
+  if (tf && tf.team !== me.team && R() < .85) c.blk = blkSet(F.tele.zone, me.blkN);
+  if (FIGHT_ACT_KINDS.includes(F.kind) && me.hp < me.max * .3 && S.hero.potions > 0) c.act = 'potion';
+  return c;
+}
+function fleeChance(F, me) {
+  if (!me || !FIGHT_ACT_KINDS.includes(F.kind)) return 0;
+  const en = fEnemies(F, me), boss = en.some(e => e.boss);
+  return clamp(.5 + .05 * (me.dex || 0) - (boss ? .25 : 0) - .06 * Math.max(0, en.length - 1) + (fAlive(F, 0).length > 1 ? .1 : 0), .15, .85);
+}
 function fightView(F) { return { id: F.id, turn: F.turn, tele: F.tele, fighters: F.fighters.map(f => ({ id: f.id, team: f.team, cls: f.cls, hp: f.hp, max: f.max, alive: f.alive, isMe: !!f.isMe })) }; }
 /* Начало боя. allies/enemies — массивы бойцов (наш герой — в allies). */
 function beginBattle(kind, allies, enemies, o) {
   o = o || {};
   allies.forEach(u => u.team = 0); enemies.forEach(u => u.team = 1);
-  const F = { id: 'b' + Date.now().toString(36) + rnd(100, 999), kind, title: o.title || 'Бой', fighters: allies.concat(enemies), turn: 0, phase: 'intro', t: 3, T: 3,
+  const F = { id: 'b' + Date.now().toString(36) + rnd(100, 999), kind, title: o.title || 'Бой', fighters: allies.concat(enemies), turn: 0, phase: 'intro', t: 3, T: 3, prep: 0,
     my: { atk: [], blk: [], target: null }, choices: {}, ready: false, log: [], auto: !!S.fightAuto || !!o.auto, powersLeft: 3, usedTurn: 0,
     result: null, rew: '', win: null, rivalGod: o.rivalGod || null, ctx: o.ctx || {}, tele: null, lastAtk: {}, lastBlk: {}, lastTarget: {}, stuck: 0 };
-  S.fight = F;
+  S.fight = F; F._tg = {};
+  /* подготовка: бог рядом — есть время осмотреться и выбрать зоны; без бога герой начинает почти сразу */
+  if (!SILENT && !F.auto && godPresent()) { F.T = F.t = PREP_T; F.prep = 1; }
+  fightVis = false; fightWait = 0;
+  if (!SILENT && S.ui) S.ui.mtab = 'hero';
   const n0 = allies.map(u => u.name).join(', '), n1 = enemies.map(u => u.name).join(', ');
   flog(F, `Бой начался! ${n0} против ${n1}. ${o.intro || ''}`.trim());
   if (!SILENT) chat.fightNews(`⚔ ${F.title}: ${allies.length > 1 ? 'команда ' + S.hero.name : S.hero.name} против ${enemies.length > 1 ? enemies.length + ' противников' : enemies[0].name}.`);
@@ -180,13 +208,15 @@ function beginBattle(kind, allies, enemies, o) {
 }
 function nextTurn(F) {
   const me0 = fMe(F);
-  F.turn++; F.phase = 'turn'; F.T = F.auto || !(me0 && me0.alive) ? AUTO_T : TURN_T; F.t = F.T; F.choices = {}; F.ready = false; F.usedTurn = 0;
+  const pres = godPresent();
+  F.turn++; F.phase = 'turn'; F.absent = !F.auto && !pres; F.T = F.auto || !(me0 && me0.alive) ? AUTO_T : pres ? TURN_T : AUTO_T * 2; F.t = F.T; F.choices = {}; F.ready = false; F.usedTurn = 0; F._tg = {};
   for (const f of F.fighters) { f.buf.shield = 0; f.buf.dodge = 0; }
   const me = fMe(F), en = me ? fEnemies(F, me) : [];
-  F.my.atk = []; F.my.blk = F.my.blk && F.my.blk.length === (me ? me.blkN : 2) ? F.my.blk : [];
+  const keepAtk = F.turn === 1 && F.my.atk && F.my.atk.length === (me ? me.atkN : 1) ? F.my.atk : [];
+  F.my.atk = keepAtk; F.my.act = F.turn === 1 ? F.my.act || null : null; F.my.blk = F.my.blk && F.my.blk.length === (me ? me.blkN : 2) ? F.my.blk : [];
   if (!F.my.target || !en.find(e => e.id === F.my.target)) F.my.target = en[0] ? en[0].id : null;
   bossPreTurn(F);
-  if (F.auto && me && me.alive) { const c = botBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target }; F.ready = true; }
+  if ((F.auto || F.absent) && me && me.alive) { const c = heroBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target, act: c.act }; F.ready = !!F.auto; }
   const st = S, id = F.id, turn = F.turn;
   Promise.resolve(fightProv.decideTurn(fightView(F))).then(list => { if (S !== st || !S.fight || S.fight.id !== id || S.fight.turn !== turn) return; for (const c of list || []) S.fight.choices[c.fid] = c; }).catch(() => { });
   if (F.rivalGod && F.rivalGod.left > 0) Promise.resolve(fightProv.rivalPower(fightView(F))).then(p => { if (p && S === st && S.fight && S.fight.id === id && S.fight.turn === turn && S.fight.phase === 'turn') rivalGodAct(S.fight, p.act); }).catch(() => { });
@@ -214,13 +244,13 @@ function bossPreTurn(F) {
 function fightTargetOk(F, f, t) { const x = F.fighters.find(e => e.id === t); return x && x.alive && x.team !== f.team; }
 function choiceFor(F, f) {
   if (f.isMe) {
-    const c = { target: F.my.target, atk: F.my.atk.slice(), blk: F.my.blk.slice() };
+    const c = { target: F.my.target, atk: F.my.atk.slice(), blk: F.my.blk.slice(), act: F.my.act || null };
     if (c.atk.length < f.atkN || c.blk.length !== f.blkN || !fightTargetOk(F, f, c.target)) {
-      const b = botBrain(F, f); let note = false;
+      const b = heroBrain(F, f); let note = false;
       if (!fightTargetOk(F, f, c.target)) { c.target = b.target; note = true; }
       while (c.atk.length < f.atkN) { c.atk.push(b.atk[c.atk.length] || pick(ZONES)); note = true; }
       if (c.blk.length !== f.blkN) { c.blk = b.blk; note = true; }
-      if (note && !F.auto) flog(F, `${f.name} не дождался подсказки бога и действует по привычке.`, 'sys');
+      if (note && !F.auto && !F.absent) flog(F, `${f.name} не дождался подсказки бога и действует осторожно, по привычке.`, 'sys');
     }
     return c;
   }
@@ -263,6 +293,7 @@ function hitOne(F, a, d, z, picks, o) {
   dmg *= 1 - Math.min(.5, (d.za ? d.za[z] || 0 : d.armor * ZONE_ARM[z]) * (1 - (ag.pierce || 0)) * .035);
   if (!o.aoe && !o.magic) { const fx = k => ap.includes(k) && br !== k; if (fx('ice') && R() < .12) { d.debuf = Math.max(d.debuf, 2); tag += ' ❄ заморозка'; } if (fx('poison') && R() < .25) { d.buf.psn = 3; tag += ' ☠ яд'; } if (fx('stun') && R() < .08) { d.buf.stun = 1; tag += ' 💫 оглушение'; } }
   if (d.buf.shield) dmg *= .3;
+  if (!o.aoe && capUnit(d)) dmg = Math.min(dmg, d.max * (ARENA_KINDS.includes(F.kind) ? DUN_K.aCap[0] : DUN_K.hitCap)); /* один удар не сносит героя целиком */
   dmg = Math.max(1, Math.round(dmg));
   const adv = pick(F_ADV), verb = pick(F_VERB);
   const line = (crit ? `${a.name} ${pick(F_CRIT)} ${verb} ${zacc}${blocked ? ', пробив блок' : ''}! Критический удар` : `${a.name} ${adv} ${verb} ${zacc}${aimed ? ' (меткий выстрел сквозь блок)' : ''}…`) + (tag ? ` ${tag.trim()}` : '');
@@ -273,8 +304,20 @@ function resolveTurn(F) {
   const alive = F.fighters.filter(f => f.alive), picks = {}, pend = {};
   for (const f of alive) picks[f.id] = choiceFor(F, f);
   F.lastAtk = {}; F.lastBlk = {};
-  const add = (d, v) => { pend[d.id] = (pend[d.id] || 0) + v; }, heal = {};
+  const add = (d, v) => { pend[d.id] = (pend[d.id] || 0) + v; }, heal = {}, pendT = {};
   const lines = [];
+  /* действия героя вместо удара: зелье или попытка сбежать */
+  const me0 = fMe(F), mp = me0 && me0.alive ? picks[me0.id] : null; F.my.act = null;
+  if (mp && mp.act && FIGHT_ACT_KINDS.includes(F.kind)) {
+    if (mp.act === 'flee') {
+      const p = fleeChance(F, me0);
+      if (R() < p) { flog(F, `— Ход ${F.turn} —`, 'turn'); flog(F, `🏃 ${me0.name} ${F.kind === 'dungeon' ? 'командует отход — отряд вырвался из боя и уходит из пещеры!' : 'вырвался и дал дёру!'} (шанс ${Math.round(p * 100)}%)`, 'me'); return endFled(F); }
+      lines.push({ r: { dmg: 0, line: `🏃 ${me0.name} пытается сбежать, но его не пускают (шанс был ${Math.round(p * 100)}%)! Хорошо хоть блок держит.`, c: 'foe' }, d: me0 }); mp.atk = [];
+    } else if (mp.act === 'potion') {
+      if (S.hero.potions > 0) { S.hero.potions--; const a = Math.min(me0.max - me0.hp, Math.round(me0.max * .35 * (hasFeat('gourmet') ? 1.5 : 1))); me0.hp += a; lines.push({ r: { dmg: 0, line: `🧪 ${me0.name} вместо удара пьёт зелье: +${a} ${hpTag(me0)}`, c: 'heal' }, d: me0 }); }
+      mp.atk = [];
+    }
+  }
   for (const a of alive) {
     const P = picks[a.id], d = F.fighters.find(x => x.id === P.target);
     if (!d || !d.alive) continue;
@@ -295,16 +338,24 @@ function resolveTurn(F) {
   // приёмы боссов по площади
   for (const b of alive.filter(f => f.boss)) {
     const foes = alive.filter(x => x.team !== b.team);
-    if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: F.tele.mul || 1.5 }); if (r.dmg) add(d, r.dmg); r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
+    if (F.tele && F.tele.fid === b.id) for (const d of foes) { const r = hitOne(F, b, d, F.tele.zone, picks, { aoe: 1, mul: F.tele.mul || 1.5 }); if (r.dmg) pendT[d.id] = (pendT[d.id] || 0) + r.dmg; r.line = r.dmg ? `💥 ${b.name} обрушивает удар ${ZONE_ACC[F.tele.zone]}!` : `🛡 ${d.name} закрыл ${ZONE_GEN[F.tele.zone]} — удар босса прошёл мимо!`; lines.push({ r, d }); }
   }
   for (const f of alive) { const P = picks[f.id]; F.lastBlk[f.id] = P.blk; }
   for (const f of alive) if (f.buf.psn > 0) { f.buf.psn--; const v = Math.max(1, Math.round(f.max * .03)); add(f, v); lines.push({ r: { dmg: v, line: `☠ Яд жжёт: ${f.name}`, c: 'foe' }, d: f }); }
   // применяем урон одновременно
-  for (const f of alive) if (pend[f.id]) f.hp -= pend[f.id];
+  const capped = [];
+  for (const f of alive) {
+    let v = pend[f.id] || 0;
+    const tc = ARENA_KINDS.includes(F.kind) ? DUN_K.aCap[1] : DUN_K.turnCap;
+    if (v && capUnit(f) && v > f.max * tc) { v = Math.round(f.max * tc); capped.push(f); } /* за ход не больше трети здоровья — есть время среагировать */
+    f.hp -= v + (pendT[f.id] || 0);
+  }
   for (const f of alive) if (f.bf && f.bf.heal && f.hp > 0 && f.hp < f.max) heal[f.id] = (heal[f.id] || 0) + Math.max(1, Math.round(f.max * f.bf.heal));
   for (const f of alive) if (heal[f.id] && f.hp > 0) f.hp = Math.min(f.max, f.hp + heal[f.id]);
   flog(F, `— Ход ${F.turn} —`, 'turn');
-  for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg} ${hpTag(d)}` : r.line, r.c);
+  for (const { r, d } of lines) flog(F, r.dmg ? `${r.line} ${d.name} −${r.dmg}` : r.line, r.c);
+  for (const f of capped) flog(F, `🛡 ${f.name} уворачивается, как может: часть ударов прошла вскользь.`, 'me');
+  for (const f of alive) if (pend[f.id] || pendT[f.id]) flog(F, `${f.name}: ${hpTag(f)}`, f.team === 0 ? 'me' : 'foe');
   for (const f of alive) {
     if (f.hp <= 0) { f.hp = 0; f.alive = false; flog(F, '☠ ' + pick(F_DEATH).replace('{d}', f.name), 'dead'); continue; }
     if (f.cls === 'warrior' && !f.used.wind && f.hp < f.max * .3) { f.used.wind = 1; const a = Math.round(f.max * .25); f.hp = Math.min(f.max, f.hp + a); flog(F, `💨 ${f.name}: второе дыхание! +${a} ${hpTag(f)}`, 'heal'); }
@@ -314,6 +365,7 @@ function resolveTurn(F) {
     }
     if (f.debuf > 0) f.debuf--;
   }
+  const meL = fMe(F); if (meL && meL.alive && meL.hp < meL.max * .3 && !meL.used.lowW) { meL.used.lowW = 1; flog(F, `⚠ ${meL.name} еле жив (${hpTag(meL)})! ${FIGHT_ACT_KINDS.includes(F.kind) ? 'Блок, зелье, сила бога или побег — решайте.' : 'Блок или сила бога — решайте.'}`, 'warn'); }
   const me = fMe(F); if (me && F.kind !== 'monster') S.hero.hp = clamp(me.hp, 1, S.hero.maxHp); else if (me && me.hp > 0) S.hero.hp = Math.min(S.hero.maxHp, me.hp);
   checkBattleEnd(F);
 }
@@ -334,7 +386,7 @@ function applyFightPower(F, user, id, mu, who) {
   const name = DUEL_NAMES[id] || id;
   let txt = '';
   switch (id) {
-    case 'heal': { const a = Math.round(user.max * .25 * mu); user.hp = Math.min(user.max, user.hp + a); txt = `${user.name} +${a} ${hpTag(user)}`; break; }
+    case 'heal': { const up = !user.alive; if (up) { user.alive = true; user.hp = 0; } const a = Math.round(user.max * (up ? .3 : DUN_K.godHeal) * mu); user.hp = Math.min(user.max, user.hp + a); txt = `${up ? 'поднимает павшего! ' : ''}${user.name} +${a} ${hpTag(user)}`; if (user.isMe && S.dun) S.dun.out = 0; break; }
     case 'rain': for (const f of F.fighters.filter(x => x.alive && x.team === user.team)) f.hp = Math.min(f.max, f.hp + Math.round(f.max * .12 * mu)); txt = 'союзники подлечились'; break;
     case 'bless': user.buf.crit = 1; txt = `следующий удар ${user.name} — критический`; break;
     case 'shield': user.buf.shield = 1; txt = `урон по ${user.name} в этом ходу −70%`; break;
@@ -354,7 +406,7 @@ function fightPower(id) {
   if (F.powersLeft < 1) return toast('Лимит сил на этот бой исчерпан (3).');
   if (F.usedTurn >= 1) return toast('Одна сила за ход.');
   if (!S.god.skills[id]) return toast('Сила не изучена.');
-  const me = fMe(F); if (!me || !me.alive) return toast('Ваш герой уже не в строю.');
+  const me = fMe(F); if (!me || (!me.alive && !(F.kind === 'dungeon' && id === 'heal'))) return toast('Ваш герой уже не в строю.');
   const c = powerCost(id); if (S.god.faith < c) return toast('Не хватает веры.');
   S.god.faith -= c; F.powersLeft--; F.usedTurn++; shiftAlign(POWERS[id].al); addGxp(c / 3);
   applyFightPower(F, me, id, pmult(id), 'me');
@@ -366,25 +418,53 @@ function rivalGodAct(F, act) {
   applyFightPower(F, foe, act, 1 + .5 * Math.min(2, Math.floor(G.lvl / 3)), 'rival');
 }
 function fightZone(arg) {
-  const F = S.fight; if (!F || F.phase !== 'turn' || F.auto) return;
+  const F = S.fight; if (!F || (F.phase !== 'turn' && F.phase !== 'intro') || F.auto) return;
   const me = fMe(F); if (!me || !me.alive) return;
   const [k, z] = String(arg).split(':'); if (!ZONES.includes(z)) return;
   if (k === 'a') { if (me.atkN === 1) F.my.atk = [z]; else { const i = F.my.atk.indexOf(z); if (i >= 0) F.my.atk.splice(i, 1); else { F.my.atk.push(z); if (F.my.atk.length > me.atkN) F.my.atk.shift(); } } }
   else F.my.blk = blkSet(z, me.blkN);
 }
-function fightTarget(id) { const F = S.fight; if (!F || F.phase !== 'turn') return; const me = fMe(F); if (me && fightTargetOk(F, me, id)) F.my.target = id; }
+function fightTarget(id) { const F = S.fight; if (!F || (F.phase !== 'turn' && F.phase !== 'intro')) return; const me = fMe(F); if (me && fightTargetOk(F, me, id)) F.my.target = id; }
 function fightGo() {
-  const F = S.fight; if (!F || F.phase !== 'turn') return;
+  const F = S.fight; if (!F) return;
+  if (F.phase === 'intro') { nextTurn(F); return; }
+  if (F.phase !== 'turn') return;
   const me = fMe(F);
-  if (me && me.alive && (F.my.atk.length < me.atkN || F.my.blk.length !== me.blkN)) return toast(`Выберите ${me.atkN > 1 ? 'две зоны удара' : 'зону удара'} и блок.`);
+  if (me && me.alive && ((F.my.atk.length < me.atkN && !F.my.act) || F.my.blk.length !== me.blkN)) return toast(`Выберите ${me.atkN > 1 ? 'две зоны удара' : 'зону удара'} и блок.`);
   F.ready = true; resolveTurn(F);
 }
 function fightAuto(on) {
   const F = S.fight; S.fightAuto = on === undefined ? !S.fightAuto : !!on;
-  if (F) { F.auto = S.fightAuto; if (F.phase === 'turn') { if (F.auto) { F.t = Math.min(F.t, AUTO_T); const me = fMe(F); if (me && me.alive) { const c = botBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target }; } } else { F.T = TURN_T; F.t = TURN_T; } } }
+  if (F) { F.auto = S.fightAuto; if (F.phase === 'turn') { if (F.auto) { F.t = Math.min(F.t, AUTO_T); const me = fMe(F); if (me && me.alive) { const c = heroBrain(F, me); F.my = { atk: c.atk, blk: c.blk, target: c.target, act: c.act }; } } else { F.T = TURN_T; F.t = TURN_T; } } }
+}
+function fightAct(k) {
+  const F = S.fight; if (!F || (F.phase !== 'turn' && F.phase !== 'intro') || F.auto) return;
+  const me = fMe(F); if (!me || !me.alive) return;
+  if (!FIGHT_ACT_KINDS.includes(F.kind)) return toast('На арене так нельзя — только блок и силы бога.');
+  if (k === 'potion' && S.hero.potions < 1) return toast('Зелий нет.');
+  if (!['potion', 'flee'].includes(k)) return;
+  F.my.act = F.my.act === k ? null : k;
+}
+function endFled(F) {
+  const h = S.hero, me = fMe(F);
+  F.phase = 'end'; F.t = 10; F.T = 10; F.win = null; F.tele = null; F.fled = 1;
+  if (F.kind === 'monster') { h.hp = Math.max(1, me.hp); h.monster = null; h.state = 'road'; F.result = '🏃 Сбежал! Жив — уже победа.'; diary(`🏃 ${F.title}: вовремя унёс ноги. Бог одобрил (или промолчал).`, 'fight'); }
+  else if (F.kind === 'dungeon') {
+    const U = S.dun; h.hp = clamp(me.hp, 1, h.maxHp);
+    if (U) { for (const f of F.fighters) if (f.team === 0 && f.ref) { const p = U.party.find(x => x.godId === f.ref); if (p) p.hp = f.alive ? Math.max(1, Math.round(f.hp / f.max * 100)) : 0; }
+      U.lastFight = { title: F.title, won: false, turns: F.turn, log: F.log.slice(0, 14).map(l => ({ t: String(l.t).slice(0, 200), c: l.c })) };
+      ulog('🏃 Отряд вырвался из боя и ушёл из пещеры со всей добычей.', 'warn'); endDungeon(false, 'left'); }
+    F.result = '🏃 Отряд отступил из боя.';
+  }
+  flog(F, F.result, 'sys');
 }
 function fightTick(idt) {
   const F = S.fight;
+  /* таймер стоит, пока карточка боя не видна (переходы, другая вкладка), но не дольше 90 с — потом герой решает сам */
+  if (!SILENT && F.phase !== 'end' && !F.auto) {
+    const hid = typeof document !== 'undefined' && document.hidden;
+    if ((hid || (!fightVis && godPresent())) && fightWait < 90) { fightWait += idt; return; }
+  }
   F.t -= idt;
   if (F.phase === 'intro') { if (F.t <= 0) nextTurn(F); return; }
   if (F.phase === 'end') { if (F.t <= 0) closeFight(); return; }

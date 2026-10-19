@@ -14,11 +14,12 @@ function fighterRow(F, f, me, canTarget) {
     : `<div class="fr ${f.isMe ? 'me' : ''} ${f.alive ? '' : 'dead'} ${sel ? 'sel' : ''}">${inner}</div>`;
 }
 function zoneBody(F, me, k) {
-  const sel = k === 'a' ? F.my.atk : F.my.blk, dis = F.auto || F.phase !== 'turn' || !me.alive;
+  const sel = k === 'a' ? F.my.atk : F.my.blk, dis = F.auto || F.phase === 'end' || !me.alive;
   const n = k === 'a' ? me.atkN : me.blkN;
   const lbl = k === 'a' ? `⚔ Удар${n > 1 ? ` (${n} зоны)` : ''}` : `🛡 Блок (${n} ${plural(n, 'зона', 'зоны', 'зон')})`;
   return `<div class="body ${k === 'a' ? 'atk' : 'blk'}"><h4>${lbl}</h4>${ZONES.map(z => `<button class="zb ${z} ${sel.includes(z) ? 'on' : ''} ${k === 'b' && F.tele && F.tele.zone === z ? 'tele' : ''}" data-act="fz" data-arg="${k}:${z}" ${dis ? 'disabled' : ''} aria-label="${k === 'a' ? 'Удар' : 'Блок'}: ${ZONE_RU[z]}">${ZONE_RU[z]}</button>`).join('')}</div>`;
 }
+let fightSeenId = null;
 function renderFight() {
   const box = $('fightBox'), F = S.fight;
   if (!F) { setHTML(box, ''); return; }
@@ -27,23 +28,38 @@ function renderFight() {
   const teams = `<div class="teams"><div class="team"><h4>${t0.length > 1 ? 'Наши' : 'Вы'}</h4>${t0.map(f => fighterRow(F, f, me, false)).join('')}</div>
     <div class="team"><h4>${t1.length > 1 ? `Противники${turn && mine ? ' · нажмите — цель' : ''}` : 'Противник'}</h4>${t1.map(f => fighterRow(F, f, me, turn && mine && fAlive(F, 1).length > 1)).join('')}</div></div>`;
   let mid = '';
-  if (F.phase === 'intro') mid = `<div class="q">Бойцы выходят на арену и разминают шеи…</div>`;
+  const acts = FIGHT_ACT_KINDS.includes(F.kind) && mine && !F.auto ? `<div class="facts"><button class="btn small ${F.my.act === 'potion' ? 'on green' : ''}" data-act="fpot" ${S.hero.potions < 1 ? 'disabled' : ''} title="Вместо удара: +35% HP, блок остаётся">🧪 Зелье вместо удара (${S.hero.potions})</button><button class="btn small ${F.my.act === 'flee' ? 'on red' : ''}" data-act="fflee" title="${F.kind === 'dungeon' ? 'Отряд уходит из пещеры с добычей' : 'Сбежать с поля боя'}">🏃 Сбежать (${Math.round(fleeChance(F, me) * 100)}%)</button></div>${F.my.act ? `<div class="muted">${F.my.act === 'potion' ? '🧪 В этот ход герой пьёт зелье вместо удара.' : '🏃 В этот ход герой попробует сбежать вместо удара.'}</div>` : ''}` : '';
+  const low = mine && me.hp < me.max * .3 ? `<div class="lowhp">⚠ ${esc(me.name)} еле жив: ${me.hp}/${me.max} HP! ${FIGHT_ACT_KINDS.includes(F.kind) ? 'Поставьте блок, выпейте зелье, призовите силу бога или попробуйте сбежать.' : 'Поставьте блок или призовите силу бога.'}</div>` : '';
+  const pIds = Object.keys(POWERS).filter(id => S.god.skills[id]);
+  const powRow = `<div class="muted" style="margin-top:6px">Силы бога в бою: ${F.powersLeft}/3 (1 за ход) · ${faithChip()}${F.rivalGod ? ` · у бога ${esc(F.rivalGod.name)} осталось ${F.rivalGod.left}` : ''}</div>
+      <div class="acts">${pIds.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="fpow" data-arg="${id}" ${S.god.faith < powerCost(id) || F.powersLeft < 1 || F.usedTurn >= 1 || F.phase !== 'turn' ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет изученных сил.</span>'}</div>`;
+  if (F.phase === 'intro') {
+    const U = S.dun, en = F.fighters.filter(f => f.team === 1);
+    const tr = en.map(e => { const t = []; if (e.boss) t.push(`👑 ${esc(U && U.boss ? U.boss.d : 'босс')}`); if (e.elite) t.push('💀 элита: на половине HP звереет'); const w = e.weak || e.boss && e.boss.weak, r = e.res || e.boss && e.boss.res; if (w) t.push(`боится ${PROP_IC[w]} ${PROP_RU[w]}`); if (r) t.push(`не берёт ${PROP_IC[r]} ${PROP_RU[r]}`); if (e.cls) t.push(`${CLS_IC[e.cls] || ''} ${CLASSES[e.cls].n.toLowerCase()}${e.bld && BUILDS[e.bld] ? ' · ' + BUILDS[e.bld].ic + ' ' + BUILDS[e.bld].n : ''}`); return t.length ? `<li><b>${esc(e.name)}</b> (${e.hp}/${e.max}): ${t.join(' · ')}</li>` : ''; }).join('');
+    const pa = F.fighters.filter(f => f.team === 0).map(f => `${f.isMe ? '⭐' : ''}${esc(f.name)} ${f.alive ? `${f.hp}/${f.max}` : '😵 без сознания'}`).join(' · ');
+    mid = `<div class="fprep"><b>⚔ Бой начинается!</b> ${F.prep ? 'Осмотритесь и выберите зоны — первый ход начнётся, когда нажмёте «В бой» или кончится время.' : 'Бога рядом нет — герой начнёт сам и будет осторожен.'}
+      <div class="muted">Отряд: ${pa} · 🧪 зелий: ${S.hero.potions}</div>${tr ? `<ul class="ftraits">${tr}</ul>` : ''}</div>${low}
+      ${mine ? `<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>` : ''}${acts}
+      <div class="fctl"><button class="btn go" data-act="fgo">⚔ В бой!</button><button class="btn small ${F.auto ? 'on green' : ''}" data-act="fauto">🤖 Автобой: ${F.auto ? 'вкл' : 'выкл'}</button></div>`;
+  }
   else if (turn) {
     const tele = F.tele ? `<div class="telewarn">⚠ ${esc(F.fighters.find(f => f.id === F.tele.fid).name)} ударит ${ZONE_ACC[F.tele.zone]} всех! Поставьте блок на «${ZONE_RU[F.tele.zone]}».</div>` : '';
-    const ok = mine && F.my.atk.length >= me.atkN && F.my.blk.length === me.blkN;
-    const ids = Object.keys(POWERS).filter(id => S.god.skills[id]);
-    mid = mine ? `${tele}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
+    const ok = mine && (F.my.atk.length >= me.atkN || F.my.act) && F.my.blk.length === me.blkN;
+    const ids = pIds;
+    mid = mine ? `${tele}${low}${F.absent ? '<div class="muted">🙏 Бога нет рядом — герой бьётся сам: осторожно, без сил. Нажмите что-нибудь, чтобы взять бой под контроль.</div>' : ''}<div class="zpick">${zoneBody(F, me, 'a')}${zoneBody(F, me, 'b')}</div>
       <div class="fctl"><button class="btn go ${ok ? '' : 'blue'}" data-act="fgo" ${F.auto ? 'disabled' : ''}>${F.auto ? '🤖 Герой бьётся сам…' : ok ? '⚔ Ход!' : '⚔ Ход (герой доберёт сам)'}</button>
-      <button class="btn small ${F.auto ? 'on green' : ''}" data-act="fauto">🤖 Автобой: ${F.auto ? 'вкл' : 'выкл'}</button></div>
+      <button class="btn small ${F.auto ? 'on green' : ''}" data-act="fauto">🤖 Автобой: ${F.auto ? 'вкл' : 'выкл'}</button></div>${acts}
       <div class="muted" style="margin-top:6px">Силы бога в бою: ${F.powersLeft}/3 (1 за ход) · ${faithChip()}${F.rivalGod ? ` · у бога ${esc(F.rivalGod.name)} осталось ${F.rivalGod.left}` : ''}</div>
       <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="fpow" data-arg="${id}" ${S.god.faith < powerCost(id) || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет изученных сил.</span>'}</div>`
-      : `<div class="q">Ваш герой выбыл из боя. Союзники бьются дальше…</div>`;
+      : `<div class="q">😵 ${F.kind === 'dungeon' ? 'Герой без сознания — союзники бьются дальше и прикрывают его.' : 'Ваш герой выбыл из боя. Союзники бьются дальше…'}</div>${F.kind === 'dungeon' && S.god.skills.heal ? `<div class="acts"><button class="btn small green" data-act="fpow" data-arg="heal" ${S.god.faith < powerCost('heal') || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>✚ Поднять героя (${powerCost('heal')})</button></div>` : ''}`;
   } else mid = `<div class="fend"><b>${esc(F.result || '')}</b>${F.rew ? `<div class="muted">${esc(F.rew)}</div>` : ''}</div><div class="btns"><button class="btn" data-act="fclose">Закрыть</button></div>`;
   setHTML(box, `<div class="card zf"><h2>⚔ ${esc(F.title)} <span class="muted">${F.phase === 'turn' ? `ход ${F.turn}` : F.phase === 'intro' ? 'подготовка' : 'итог'}</span></h2>
     ${teams}
-    <div class="stat"><label><span>${turn ? (F.auto ? 'Следующий ход через' : 'До конца хода (потом герой решит сам)') : F.phase === 'intro' ? 'Бой начнётся через' : 'Закроется через'}</span><span id="fSec"></span></label><div class="bar time"><i id="fBar"></i></div></div>
+    <div class="stat"><label><span>${turn ? (F.auto ? 'Следующий ход через' : 'До конца хода (потом герой решит сам)') : F.phase === 'intro' ? (F.prep ? 'Подготовка — бой начнётся через' : 'Бой начнётся через') : 'Закроется через'}</span><span id="fSec"></span></label><div class="bar time"><i id="fBar"></i></div></div>
     ${mid}
     <div class="flog">${F.log.slice(0, 40).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
+  { const r = box.getBoundingClientRect(); fightVis = !!box.offsetParent && r.height > 0 && r.top < innerHeight && r.bottom > 0;
+    if (fightSeenId !== F.id) { fightSeenId = F.id; if (!fightVis || r.top > innerHeight * .35 || r.top < 0) { const hd = document.querySelector('header'), hh = hd && getComputedStyle(hd).position !== 'static' ? hd.getBoundingClientRect().height : 0; window.scrollTo(0, Math.max(0, r.top + scrollY - hh - 6)); const r2 = box.getBoundingClientRect(); fightVis = !!box.offsetParent && r2.height > 0 && r2.top < innerHeight && r2.bottom > 0; } } }
   $('fSec').textContent = Math.max(0, Math.ceil(F.t)) + ' с';
   $('fBar').style.width = pct(F.t, F.T);
 }
@@ -73,8 +89,8 @@ function renderDunMap() {
   const hc = dunHealCost(), hl = DUN_K.heals - (U.heals || 0);
   const mid = U.phase === 'end' ? `<div class="q"><b>${esc(U.result || '')}</b></div><div class="btns"><button class="btn" data-act="dclose">Закрыть</button></div>`
     : U.phase === 'fight' ? '<div class="q">⚔ Отряд сражается!</div>'
-    : `${dunLowHp(U) ? `<div class="dwarn">⚠ Отряд еле жив — лучше отступить или подлечиться (у героя ${S.hero.hp}/${S.hero.maxHp} HP).</div>` : `<div class="hint">Ходите по соседним комнатам (жёлтая рамка). Лечения почти нет — берегите отряд.</div>`}
-      <div class="btns">${S.hero.potions > 0 && S.hero.hp < S.hero.maxHp ? `<button class="btn small" data-act="dpotion" title="+35% HP">🧪 Зелье (${S.hero.potions})</button>` : ''}${S.god.skills.heal ? `<button class="btn small green" data-act="dheal" ${hl < 1 || S.god.faith < hc ? 'disabled' : ''} title="Герой +30% HP, отряд +20%">✚ Лечить отряд · ${hc} (${hl})</button>` : ''}<button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Авто: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave" title="Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи">🚪 Отступить с добычей</button></div>`;
+    : `${U.out ? `<div class="dwarn">😵 ${esc(S.hero.name)} без сознания — друзья несут его. Поднять: зелье, лечение бога, жрец или источник. Иначе отряд идёт без него (его доля добычи — половина) или отступает.</div>` : dunLowHp(U) ? `<div class="dwarn">⚠ Отряд еле жив — лучше отступить или подлечиться (у героя ${S.hero.hp}/${S.hero.maxHp} HP).</div>` : `<div class="hint">Ходите по соседним комнатам (жёлтая рамка). Лечения почти нет — берегите отряд.</div>`}
+      <div class="btns">${S.hero.potions > 0 && S.hero.hp < S.hero.maxHp ? `<button class="btn small" data-act="dpotion" title="+35% HP">🧪 ${U.out ? 'Влить зелье' : 'Зелье'} (${S.hero.potions})</button>` : ''}${S.god.skills.heal ? `<button class="btn small green" data-act="dheal" ${hl < 1 || S.god.faith < hc ? 'disabled' : ''} title="Герой +30% HP, отряд +20%">✚ Лечить отряд · ${hc} (${hl})</button>` : ''}<button class="btn small ${U.auto ? 'on green' : ''}" data-act="dauto">🧭 Авто: ${U.auto ? 'вкл' : 'выкл'}</button><button class="btn small red" data-act="dleave" title="Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи">🚪 ${U.out ? 'Унести героя и отступить' : 'Отступить с добычей'}</button></div>`;
   setHTML(box, `<div class="card dmap"><h2>🏰 ${esc(U.name)}</h2>
     <div class="row"><span>🗝 <b>${U.keys}</b> · ${U.gold} 💰 · ${U.loot.length} 🎁</span>${roles.length ? `<span class="hint">${roles.join(' · ')}</span>` : ''}</div>
     ${dunGsRow(U)}${party}<div class="dgrid">${cells}</div><div class="dleg">⚔ логово · 💀 элита · 🪤 ловушка · 💎 сундук · 🗝 ключ · ⛲ источник · 👑 босс</div>
@@ -132,7 +148,7 @@ function renderChat() {
   const ad2 = $('arenaDot2'); if (ad2) ad2.classList.toggle('on', !!dot && S.ui.mtab !== 'arena');
 }
 Object.assign(ACT, {
-  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a),
+  fz: a => fightZone(a), ftarget: a => fightTarget(a), fgo: () => fightGo(), fauto: () => fightAuto(), fpow: a => fightPower(a), fpot: () => fightAct('potion'), fflee: () => fightAct('flee'),
   fclose: () => { if (S.fight && S.fight.phase === 'end') closeFight(); },
   fmanual: () => { if (!startMonsterFight()) toast('Сейчас нечего брать под контроль.'); },
   dgo: a => dunMove(a), dheal: () => dunHeal(), dpotion: () => dunPotion(false), dauto: () => dunToggleAuto(), dleave: () => { if (confirm(`Отступить? Унесёте ${Math.round(DUN_K.left * 100)}% золота и опыта и все найденные вещи. Босс останется непобеждённым.`)) dunLeave(); },
@@ -154,8 +170,10 @@ function loop() {
 S = load();
 if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) joinEvent(S.ev); save(); render(); } else onboarding();
 setInterval(loop, 250);
+for (const ev of ['pointerdown', 'keydown', 'touchstart']) addEventListener(ev, () => setLastInput(), { capture: true, passive: true });
 /* Отладочный доступ из консоли / тестов */
 window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldStatW, bldFit, pickBuild, bldForBot, mkBld, initBuild, buildStat, heroFeatPref, startRespec, reconsider, bldResult, bldItem, bldTick, suggestBuild, bldFx, inferBuild, bldModal, itemScore, offerFeat, EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+  heroBrain, fleeChance, fightAct, endFled, godPresent, setLastInput, dunWake, partyWeak, dunPotion, dunHeal, dunAutoStep, renderFight, nextTurn, resolveTurn, hitOne, botBrain,
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,
   get dunPending() { return dunPending; }, get duelPending() { return duelPending; },

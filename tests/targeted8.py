@@ -46,7 +46,7 @@ async def main():
           return {loss, item, stuck, cdBlock, d:G.S.diary.slice(0,3).map(x=>x.x)}})()""")
         ok('mind changes: loss streak, great item of another build, long stagnation; cooldown blocks', r['loss']>=5 and r['item']>=10 and r['stuck']>=3 and r['cdBlock'], r)
         # совет бога
-        r=await pg.evaluate("""(()=>{const G=GAME,h=G.S.hero,S=G.S; h.bld=G.mkBld('tank','start',1); h.trust=100; S.god.faith=G.maxFaith(); const f0=S.god.faith; const a=G.suggestBuild('healer'); const spent=f0-S.god.faith;
+        r=await pg.evaluate("""(()=>{const G=GAME,h=G.S.hero,S=G.S; h.bld=G.mkBld('tank','start',1); h.bld.cd=0; h.trust=100; S.god.faith=G.maxFaith(); const f0=S.god.faith; const a=G.suggestBuild('healer'); const spent=f0-S.god.faith;
           let no=0; for(let i=0;i<60;i++){ h.bld=G.mkBld('tank','start',1); h.bld.cd=1e5; h.trust=0; S.god.faith=G.maxFaith(); if(!G.suggestBuild('mage')) no++; }
           return {a, id:a&&h.bld.id, spent, no, say:S.diary.slice(0,8).some(d=>/🙄/.test(d.x))}})()""")
         ok('god suggests build: costs faith, trust-based obey (refusals happen, with diary)', r['a'] and r['spent']==30 and r['no']>=25 and r['say'], r)
@@ -123,7 +123,7 @@ async def main():
         await pg.evaluate("GAME.S.hero.hp=Math.max(1,Math.round(GAME.S.hero.maxHp*.08)); GAME.render()")
         await pg.click(f'[data-act=dgo][data-arg="{q["x"]},{q["y"]}"]'); await pg.wait_for_timeout(100)
         r=await pg.evaluate("""(()=>{const F=GAME.S.fight; if(!F) return {fight:false}; const me=F.fighters.find(f=>f.isMe); me.hp=0; me.alive=false; for(const f of F.fighters) if(f.team===1) { f.hp=1; f.max=Math.max(f.max,1); } autoResolveBattle(F); const h=GAME.S.hero, U=GAME.S.dun; GAME.render(); return {fight:true, hp:h.hp, max:h.maxHp, phase:U&&U.phase, lf:U&&U.lastFight&&U.lastFight.log.length, det:!!document.querySelector('.dmap details.dlast'), log:U&&U.log.slice(0,3).map(l=>l.t).join(' | ')}})()""")
-        ok('second click enters; fallen hero in a won fight gets up with ≥35% HP; last fight log readable on map', r['fight'] and r['hp']>=int(r['max']*.35) and r['lf']>=3 and r['det'], r)
+        ok('second click enters; fallen hero in a won fight stays unconscious (no magic revive); last fight log readable on map', r['fight'] and r['hp']<=int(r['max']*.2) and GAME_ok(1) and 'без сознания' in r['log'] and r['lf']>=3 and r['det'], r)
         await pg.screenshot(path='/workspace/godgame/shots8_dungeon_desktop.png')
         await ctx.close()
         ctx,pg=await newgame(br,'mage')

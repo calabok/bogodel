@@ -122,7 +122,7 @@ function step(realDt) {
   if (!S.fork && !S.fight && !S.dun) { S.timers.hero -= gdt; if (S.timers.hero <= 0) { heroStep(); S.timers.hero = rspan(PACE.step); } }
   if (S.fork) { S.fork.t -= idt; if (S.fork.t <= 0) timeoutFork(); }
   else if (!S.fight && !S.dun && !dunPending && !duelPending) { S.timers.fork -= gdt; if (S.timers.fork <= 0 && (h.state === 'road' || h.state === 'town')) { startFork(); S.timers.fork = rspan(PACE.fork); } }
-  if (S.fight) fightTick(idt);
+  if (S.fight) fightTick(realDt); // решения в бою — в реальном времени: на ×2–×10 таймер не сжимается
   else if (!S.fork && !S.dun && !dunPending) { S.timers.duel -= gdt; if (S.timers.duel <= 0 && h.state === 'road' && !S.arena.apps.some(a => a.joined !== null)) { S.timers.duel = rspan(PACE.duel); startGodDuel(); } }
   if (S.dun) dunTick(idt);
   else if (!S.fork && !S.fight && !duelPending) { S.timers.dun -= gdt; if (S.timers.dun <= 0 && h.state === 'road' && S.timers.dunCd <= 0) { if (h.hp < h.maxHp * .7) S.timers.dun = 120; else { S.timers.dun = rspan(PACE.dun); startDungeon(false); } } }

@@ -41,7 +41,8 @@ window.BAL = (() => {
 })();
 // ---------- Пещеры: автопроход vs «умный бог» ----------
 window.BAL.smartChoice = function (F, good) {
-  const me = fMe(F); if (!me || !me.alive) return;
+  const me = fMe(F); if (me && !me.alive && good && F.kind === 'dungeon' && S.god.skills.heal && S.god.faith >= powerCost('heal') && F.powersLeft > 0 && F.usedTurn < 1) fightPower('heal');
+  if (!me || !me.alive) return;
   const en = fEnemies(F, me), b = botBrain(F, me);
   const boss = en.find(e => e.boss), adds = en.filter(e => !e.boss);
   let tgt = en.slice().sort((x, y) => x.hp - y.hp)[0];
@@ -97,8 +98,9 @@ window.BAL.dun = async function (L, cls, N, policy, tier, q) {
     while (S.dun && k++ < 400) {
       if (S.fight) { const F = S.fight; if (F.ctx.boss && !F._c) { F._c = 1; out.bossFight++; }
         if (policy !== 'auto') { F.auto = false; let q = 0; while (S.fight === F && F.phase !== 'end' && q++ < 200) { if (F.phase === 'intro') nextTurn(F); else { BAL.smartChoice(F, policy === 'good'); if (F.phase === 'turn') resolveTurn(F); } } if (S.fight === F) closeFight(); }
-        else autoResolveBattle(F); out.nf++; const mm = F.fighters.find(f => f.isMe), dead = !!(mm && !mm.alive); if (dead) out.fell++; if (out._k !== i) { out._k = i; out.n1++; if (dead) out.fell1++; } continue; }
+        else autoResolveBattle(F); out.nf++; const mm = F.fighters.find(f => f.isMe), dead = !F.ctx.out && !!(mm && !mm.alive); if (F.ctx.out) { out.nf--; out.outF = (out.outF || 0) + 1; continue; } if (dead) out.fell++; if (out._k !== i) { out._k = i; out.n1++; if (dead) out.fell1++; } continue; }
       if (S.dun.phase === 'end') { res = S.dun.result; break; }
+      if (policy !== 'auto' && S.dun.out) { if (S.hero.potions > 0) { dunPotion(false); continue; } if ((S.dun.heals || 0) < DUN_K.heals && S.god.skills.heal && S.god.faith >= dunHealCost()) { dunHeal(); continue; } if (partyWeak(S.dun)) { dunLeave(); continue; } }
       if (policy === 'good' && Math.random() < .2) { dunAutoStep(); continue; }
       if (policy !== 'auto') { const h = S.hero; const bossNext = (() => { const n = BAL.smartRoute(S.dun); return n && S.dun.tiles[n.y * DW + n.x].t === 'boss'; })();
         if ((h.hp / h.maxHp < .5 || (bossNext && h.hp / h.maxHp < .8)) && (S.dun.heals || 0) < DUN_K.heals && S.god.faith >= dunHealCost()) dunHeal();

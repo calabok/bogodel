@@ -22,7 +22,7 @@ const BOT_K = 1.1;
 /* Монстры: в бою по зонам — доли от «типичного героя» того же уровня; на дороге — множители старой формулы */
 const MON_K = { hp: 1, d: 1, arm: .6 }, ROAD_K = { hp: 1.1, d: 1.55, vet: .07 };
 /* Пещеры v5: меньше бесплатного лечения, злее комнаты и боссы, отступление с частью добычи */
-const DUN_K = { fallHp: .35, lowHp: .35, lowLvl: [.72, .07], shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.18, mdmg: 1.06, bhp: [1.6, .45], bdmg: 1.5, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
+const DUN_K = { hitCap: .3, turnCap: .32, aCap: [.35, .36], godHeal: .3, outShare: .5, wakeCl: .5, fallHp: .35, lowHp: .35, lowLvl: [.72, .07], shrine: .3, camp: .1, cleric: .1, trap: [.2, .3], disarm: .7, mhp: 1.4, mdmg: 1.9, bhp: [2.3, .6], bdmg: 3.2, tele: 2.5, carried: .3, left: .6, heals: 1, ablk: .7 };
 /* v6: сила снаряжения (ГС) и уровни сложности пещер. g — доля «типичного» ГС уровня, m — сила монстров, rew — награда, rar — бонус редкости */
 const DUN_TIERS = {
   easy: { n: 'Лёгкая', ic: '🟢', g: .75, m: .86, rew: .7, rar: -.3, nm: 'Крысиный погреб' },
