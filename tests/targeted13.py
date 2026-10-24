@@ -38,8 +38,8 @@ async def main():
             ctx, pg = await newpage(br, W)
             await pg.evaluate(CLEAN)
             r = await pg.evaluate(f"""(()=>{{
-              const doll=document.querySelector('#colHero .vis');
-              const wrap=document.querySelector('#colHero .vwrap.vtap');
+              const doll=document.querySelector('#colHero .scn .vis, #colHero .vis');
+              const wrap=document.querySelector('#colHero .scn[data-act=sheet], #colHero .vwrap.vtap');
               const wr=wrap&&wrap.getBoundingClientRect();
               const nav=[...document.querySelectorAll('#mnav [data-arg]')].map(b=>b.dataset.arg);
               return {{doll:!!doll, pose:doll&&[...doll.classList].find(c=>c.startsWith('p-')),
@@ -49,8 +49,8 @@ async def main():
             ok(f'{W}px: doll present on hero card, no h-scroll, bottom nav intact',
                r['doll'] and not r['ov'] and set(r['nav']) >= {'powers', 'flock', 'arena', 'gods', 'hero'}, r)
             if W <= 760:
-                ok(f'{W}px: doll tap target ≥40px', r['tap'] >= 40 and r['taph'] >= 40, r)
-                sm = await pg.evaluate(SIZES, '#mnav button, #colHero .vwrap.vtap, header button')
+                ok(f'{W}px: doll tap target ≥40px', (r.get('tap') or 0) >= 40 and (r.get('taph') or 0) >= 40, r)
+                sm = await pg.evaluate(SIZES, '#mnav button, #colHero .scn[data-act=sheet], #colHero .vwrap.vtap, header button')
                 ok(f'{W}px: key buttons ≥40px', not sm, sm)
             await ctx.close()
 
@@ -60,14 +60,14 @@ async def main():
         r = await pg.evaluate("""()=>{
           const G=GAME,h=G.S.hero, keys=G.EQ_KEYS;
           const before={};
-          for(const k of keys) before[k]=!!document.querySelector('#colHero '+({
+          for(const k of keys) before[k]=!!document.querySelector('#colHero .scn '+({
             weapon:'.vl.weapon',offhand:'.vl.offhand',helm:'.vl.helm',armor:'.vl.armor',belt:'.vl.belt',
             gloves:'.vl.gloves',boots:'.vl.boots',amulet:'.vl.amulet',ring:'.vl.ring',ring2:'.vl.ring2'
           }[k]));
           // снять всё
           for(const k of keys) h.eq[k]=null;
           G.render();
-          const naked=!!document.querySelector('#colHero .vl.bodyt') && !document.querySelector('#colHero .vl.armor');
+          const naked=!!document.querySelector('#colHero .scn .vl.bodyt, #colHero .vl.bodyt') && !document.querySelector('#colHero .scn .vl.armor, #colHero .vl.armor');
           const after={};
           for(const k of keys){
             const slot=k==='ring2'?'ring':k;
@@ -77,15 +77,15 @@ async def main():
             G.render();
             const sel={weapon:'.vl.weapon',offhand:'.vl.offhand',helm:'.vl.helm',armor:'.vl.armor',belt:'.vl.belt',
               gloves:'.vl.gloves',boots:'.vl.boots',amulet:'.vl.amulet',ring:'.vl.ring',ring2:'.vl.ring2'}[k];
-            after[k]=!!document.querySelector('#colHero '+sel);
+            after[k]=!!document.querySelector('#colHero .scn '+sel+', #colHero '+sel);
           }
           // unequip armor → body
           h.eq.armor=null; G.render();
-          const bodyBack=!!document.querySelector('#colHero .vl.bodyt') && !document.querySelector('#colHero .vl.armor');
+          const bodyBack=!!document.querySelector('#colHero .scn .vl.bodyt, #colHero .vl.bodyt') && !document.querySelector('#colHero .scn .vl.armor, #colHero .vl.armor');
           // legendary glow
           const L=G.LEGENDARY.find(l=>l.slot==='weapon')||G.LEGENDARY[0];
           const leg=G.makeLegend(L, 12); h.eq[leg.slot]=leg; G.render();
-          const glow=document.querySelector('#colHero .vis.leg') && document.querySelector('#colHero .vaura');
+          const glow=document.querySelector('#colHero .scn .vis.leg, #colHero .vis.leg') && document.querySelector('#colHero .scn .vaura, #colHero .vaura');
           return {keys, naked, after, bodyBack, glow:!!glow, all:keys.every(k=>after[k])};
         }""")
         ok('EQ_KEYS has 10 slots', len(r['keys']) == 10, r['keys'])
@@ -98,7 +98,7 @@ async def main():
         r = await pg.evaluate("""()=>{
           const G=GAME,h=G.S.hero; G.S.fight=null;
           h.state='road'; h.travel={to:'town',left:4,total:6}; h.monster=null; G.render();
-          const card=document.querySelector('#colHero .vis.p-walk');
+          const card=document.querySelector('#colHero .scn .vis.p-walk, #colHero .vis.p-walk');
           const route=document.querySelector('.route .rdot.hasvis .vis, .route .vis');
           const pose=route && [...route.classList].find(c=>c.startsWith('p-'));
           return {card:!!card, route:!!route, pose};
@@ -114,7 +114,7 @@ async def main():
           const poses={};
           for(const p of ['attack','block','hurt','idle']){
             G.visApplyFightPose(null, p);
-            poses[p]=!!document.querySelector('#colHero .vis.p-'+p);
+            poses[p]=!!document.querySelector('#colHero .scn .vis.p-'+p+', #colHero .vis.p-'+p);
           }
           // prefight: start a zone fight card if possible
           let pair=false, foe=false;
@@ -139,7 +139,7 @@ async def main():
 
         # tap opens sheet
         await pg.evaluate(CLEAN)
-        await pg.click('#colHero .vwrap.vtap')
+        await pg.click('#colHero .scn[data-act=sheet], #colHero .vwrap.vtap')
         await pg.wait_for_timeout(200)
         r = await pg.evaluate("(()=>({on:document.getElementById('modal').classList.contains('on'), sheet:document.getElementById('modal').innerText.includes('Снаряжение')||document.getElementById('modal').querySelector('.dav, .doll, .eq')!==null, vis:!!document.querySelector('#modal .vis')}))()")
         ok('tap doll → gear/inventory sheet (with doll)', r['on'] and (r['sheet'] or r['vis']), r)
@@ -152,7 +152,7 @@ async def main():
         r = await pg.evaluate("""()=>{
           const G=GAME,h=G.S.hero;
           h.state='road'; h.travel={to:'town',left:3,total:5}; G.render();
-          const el=document.querySelector('#colHero .vis.p-walk .vroot');
+          const el=document.querySelector('#colHero .scn .vis.p-walk .vroot, #colHero .vis.p-walk .vroot');
           const cs=el&&getComputedStyle(el);
           return {rm:document.body.classList.contains('rm'), name:cs&&cs.animationName, dur:cs&&cs.animationDuration};
         }""")

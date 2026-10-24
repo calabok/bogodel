@@ -728,6 +728,81 @@ body.theme-evil .vpair .vis.foe{filter:hue-rotate(-10deg) saturate(1.15)}
   .vpair .vis{width:100px;height:138px}
 }
 
+/* ---------- v14: живая сцена местности ---------- */
+.hc-scene{margin:6px 0 4px;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:inset 0 0 0 1px #0001}
+.scn{position:relative;height:clamp(150px,42vw,220px);max-height:48vh;cursor:pointer;isolation:isolate;background:#2a3040;color:#87b0d8}
+.scn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.scn-bg{position:absolute;inset:0;overflow:hidden}
+.scn-layer{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.scn-sky{z-index:0}.scn-far{z-index:1}.scn-mid{z-index:2}.scn-ground{z-index:3}
+.scn-parallax{transform:translateX(0)}
+.scn-tile{/* ground strip is 640-wide in a 320 view — offset for scroll */}
+.scn-stage{position:absolute;left:0;right:0;bottom:4px;z-index:5;display:flex;justify-content:center;align-items:flex-end;pointer-events:none;height:78%}
+.scn-stage .vwrap,.scn-stage .vis{pointer-events:none}
+.scn-stage .vis{width:min(88px,28%);height:auto;max-height:95%;filter:drop-shadow(0 3px 2px #0005)}
+.scn-label{position:absolute;left:8px;top:8px;z-index:6;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--card,#fff) 82%,transparent);color:var(--ink);border:1px solid var(--line);backdrop-filter:blur(4px);max-width:calc(100% - 16px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.scn-ic{margin-right:2px}
+/* time of day sky colors */
+.scn-day{color:#7eb6e8}.scn-day .scn-skyfill{color:#7eb6e8}
+.scn-dusk{color:#c87850}.scn-dusk .scn-skyfill{color:#c87850}
+.scn-night{color:#1a2438}.scn-night .scn-skyfill{color:#1a2438}.scn-night .scn-moongap{color:#1a2438}
+/* biome accents */
+.scn-forest{--scn-g:#2e5a34}.scn-swamp{--scn-g:#243828;color:#4a6858}.scn-swamp.scn-day{color:#5a7868}
+.scn-mount{--scn-g:#5a6070}.scn-coast{--scn-g:#c8b078;color:#6aa0c0}
+.scn-city,.scn-village,.scn-castle{--scn-g:#5a5048}.scn-field,.scn-valley{--scn-g:#5a8a38}
+.scn-waste{--scn-g:#7a6858;color:#a09070}.scn-ravine{--scn-g:#3a3848;color:#4a5068}
+.scn-dungeon{color:#1a1428;--scn-g:#1a1424}.scn-arena{--scn-g:#8a6a48;color:#c09060}
+.scn-camp{--scn-g:#3a4a30}
+/* walk parallax — CSS only */
+.scn-walk .scn-far .scn-parallax{animation:scnParFar 12s linear infinite}
+.scn-walk .scn-mid .scn-parallax{animation:scnParMid 7s linear infinite}
+.scn-walk .scn-ground .scn-parallax{animation:scnParGnd 3.5s linear infinite}
+@keyframes scnParFar{from{transform:translateX(0)}to{transform:translateX(-10%)}}
+@keyframes scnParMid{from{transform:translateX(0)}to{transform:translateX(-18%)}}
+@keyframes scnParGnd{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.scn-walk .scn-clouds{animation:scnCloud 20s linear infinite}
+@keyframes scnCloud{from{transform:translateX(0)}to{transform:translateX(-30%)}}
+.scn-bub{animation:scnBub 2.4s ease-in-out infinite}
+@keyframes scnBub{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:.9;transform:translateY(-4px)}}
+.scn-wave{animation:scnWave 3s ease-in-out infinite}
+.scn-wave2{animation:scnWave 4s ease-in-out infinite reverse}
+@keyframes scnWave{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+.scn-fire{animation:scnFire .6s ease-in-out infinite alternate}
+@keyframes scnFire{from{opacity:.7;transform:scale(1)}to{opacity:1;transform:scale(1.15)}}
+.scn-torch{animation:scnTorch 1.8s ease-in-out infinite}
+@keyframes scnTorch{0%,100%{opacity:.15}50%{opacity:.35}}
+/* fight mini scene */
+.scn-fight.scn-mini{height:140px;max-height:28vh;cursor:default;border-radius:12px;margin-bottom:4px;border:1px solid var(--line)}
+.scn-stage-fight{height:100%;align-items:flex-end;padding-bottom:2px}
+.scn-stage-fight .vpair{width:100%;justify-content:space-evenly}
+.scn-stage-fight .vis{width:72px;max-height:90%}
+.vfight .scn-label{display:none}
+/* collapse */
+body.heroCol .hc-scene .scn{height:88px;max-height:18vh}
+body.heroCol .hc-scene .scn-label{font-size:11px;padding:2px 8px}
+body.heroCol .hc-scene .scn-stage .vis{width:48px}
+/* reduced motion */
+body.rm .scn-walk .scn-parallax,body.rm .scn-walk .scn-clouds,
+body.rm .scn-bub,body.rm .scn-wave,body.rm .scn-wave2,body.rm .scn-fire,body.rm .scn-torch{animation:none!important}
+@media (prefers-reduced-motion:reduce){
+  .scn-walk .scn-parallax,.scn-walk .scn-clouds,.scn-bub,.scn-wave,.scn-wave2,.scn-fire,.scn-torch{animation:none!important}
+}
+@media (max-width:400px){
+  .scn{height:clamp(140px,46vw,180px)}
+  .scn-stage .vis{width:72px}
+  .scn-fight.scn-mini{height:120px}
+}
+@media (min-width:1000px){
+  .scn{height:240px;max-height:280px}
+  .scn-stage .vis{width:100px}
+  .scn-fight.scn-mini{height:160px}
+}
+/* theme accents on scene frame */
+body.theme-good .hc-scene{border-color:color-mix(in srgb,var(--gold2) 45%,var(--line))}
+body.theme-evil .hc-scene{border-color:color-mix(in srgb,#8a2030 40%,var(--line))}
+body.theme-evil .scn-night{color:#1a1020}
+
+
 </style>
 </head>
 <body>
