@@ -662,6 +662,72 @@ body[data-frame=f1] #colHero{box-shadow:0 0 0 3px #f5c542,var(--shadow)}body[dat
 body.rm .omap .rg.hot .rs,body.rm .omap .rw{animation:none}
 @media (prefers-reduced-motion:reduce){.omap .rg.hot .rs,.omap .rw{animation:none}}
 @media (max-width:760px){.oboard .orow{grid-template-columns:18px 12px minmax(0,1fr) auto 44px;gap:5px}.olegend{font-size:11px}}
+
+/* ---------- v13: бумажная кукла героя ---------- */
+.visav{width:auto;height:auto;border-radius:12px;padding:0;overflow:visible;background:transparent;border:none;display:flex;align-items:flex-end;justify-content:center}
+.hc-av.visav{width:72px;height:96px;flex:none}
+.dav.visav{width:100%;height:120px;margin:0 auto}
+.vwrap{display:inline-flex;align-items:flex-end;justify-content:center;line-height:0;position:relative}
+.vwrap.vtap{cursor:pointer;border-radius:10px;min-width:44px;min-height:44px}
+.vwrap.vtap:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.vwrap.vtap:hover .vis{filter:brightness(1.05)}
+.vis{width:72px;height:100px;display:block;overflow:visible}
+.vis.sm{width:36px;height:50px}
+.vis.lg{width:100px;height:140px}
+.vis.foe{opacity:.95}
+.route .rdot.hasvis{top:-28px;font-size:0}
+.route .rdot.hasvis .vis{width:40px;height:56px;filter:drop-shadow(0 2px 2px #0006)}
+.vfight{display:flex;justify-content:center;margin:6px 0 4px}
+.vpair{display:flex;align-items:flex-end;gap:10px;justify-content:center}
+.vpair .vvs{font-size:22px;align-self:center;opacity:.7}
+.vpair .vis{width:88px;height:122px}
+.vaura{pointer-events:none}
+/* позы — короткие CSS-анимации; reduced-motion глушит глобально */
+.vis .armR,.vis .armL,.vis .vl.weapon,.vis .vl.offhand,.vis .vroot{transform-box:fill-box;transform-origin:center}
+.vis.p-walk .vroot{animation:vwalk 0.7s ease-in-out infinite}
+.vis.p-walk .armR{animation:vswingR 0.7s ease-in-out infinite}
+.vis.p-walk .armL{animation:vswingL 0.7s ease-in-out infinite}
+.vis.p-walk .vl.legs path:nth-child(1){animation:vlegL 0.7s ease-in-out infinite}
+.vis.p-walk .vl.legs path:nth-child(2){animation:vlegR 0.7s ease-in-out infinite}
+@keyframes vwalk{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes vswingR{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-12deg)}}
+@keyframes vswingL{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(12deg)}}
+@keyframes vlegL{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(8deg)}}
+@keyframes vlegR{0%,100%{transform:rotate(6deg)}50%{transform:rotate(-8deg)}}
+.vis.p-attack .vl.weapon,.vis.p-attack .armR{animation:vatk .4s ease-out 1}
+.vis.p-attack .vroot{animation:vlean .4s ease-out 1}
+@keyframes vatk{0%{transform:rotate(0)}40%{transform:rotate(-40deg) translate(4px,-2px)}100%{transform:rotate(0)}}
+@keyframes vlean{0%,100%{transform:translateX(0)}40%{transform:translateX(4px)}}
+.vis.p-block .vl.offhand,.vis.p-block .armL{animation:vblk .35s ease-out 1;transform:rotate(-18deg) translate(2px,-4px)}
+.vis.p-block .vroot{transform:translateX(-2px)}
+@keyframes vblk{0%{transform:rotate(0)}100%{transform:rotate(-18deg) translate(2px,-4px)}}
+.vis.p-hurt .vroot{animation:vhurt .45s ease-out 1}
+.vis.p-hurt{filter:brightness(1.15) saturate(1.2)}
+@keyframes vhurt{0%,100%{transform:translateX(0)}30%{transform:translateX(-5px) rotate(-4deg)}60%{transform:translateX(3px)}}
+.vis.p-dead .vroot{transform:rotate(70deg) translate(10px,20px);opacity:.55;transform-origin:60px 120px}
+.vis.p-idle .armR{transform:rotate(4deg)}.vis.p-idle .armL{transform:rotate(-4deg)}
+.vis.cursed .vroot{filter:brightness(.78) saturate(.65)}
+.vis.leg .vaura{opacity:.2;animation:vpulse 2.2s ease-in-out infinite}
+.vis.epi .vaura{opacity:.14}
+@keyframes vpulse{0%,100%{opacity:.12}50%{opacity:.22}}
+body.rm .vis.p-walk .vroot,body.rm .vis.p-walk .armR,body.rm .vis.p-walk .armL,body.rm .vis.p-walk .vl.legs path,
+body.rm .vis.p-attack .vl.weapon,body.rm .vis.p-attack .armR,body.rm .vis.p-attack .vroot,
+body.rm .vis.p-block .vl.offhand,body.rm .vis.p-hurt .vroot,body.rm .vis.leg .vaura{animation:none!important}
+body.rm .vis.p-walk .armR{transform:rotate(10deg)}body.rm .vis.p-walk .armL{transform:rotate(-10deg)}
+body.rm .vis.p-attack .armR,body.rm .vis.p-attack .vl.weapon{transform:rotate(-28deg)}
+body.rm .vis.p-block .armL,body.rm .vis.p-block .vl.offhand{transform:rotate(-18deg) translate(2px,-4px)}
+body.rm .vis.p-hurt .vroot{transform:translateX(-3px)}
+body.theme-good .visav,body.theme-good .vfight{--vis-glow:color-mix(in srgb,var(--gold2) 35%,transparent)}
+body.theme-evil .vpair .vis.foe{filter:hue-rotate(-10deg) saturate(1.15)}
+@media (max-width:400px){
+  .hc-av.visav{width:58px;height:80px}.vis{width:58px;height:80px}
+  .vpair .vis{width:70px;height:98px}.dav.visav{height:100px}.vis.lg{width:84px;height:118px}
+}
+@media (min-width:1000px){
+  .hc-av.visav{width:84px;height:112px}.hc-av.visav .vis{width:84px;height:112px}
+  .vpair .vis{width:100px;height:138px}
+}
+
 </style>
 </head>
 <body>

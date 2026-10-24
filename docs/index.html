@@ -662,6 +662,72 @@ body[data-frame=f1] #colHero{box-shadow:0 0 0 3px #f5c542,var(--shadow)}body[dat
 body.rm .omap .rg.hot .rs,body.rm .omap .rw{animation:none}
 @media (prefers-reduced-motion:reduce){.omap .rg.hot .rs,.omap .rw{animation:none}}
 @media (max-width:760px){.oboard .orow{grid-template-columns:18px 12px minmax(0,1fr) auto 44px;gap:5px}.olegend{font-size:11px}}
+
+/* ---------- v13: бумажная кукла героя ---------- */
+.visav{width:auto;height:auto;border-radius:12px;padding:0;overflow:visible;background:transparent;border:none;display:flex;align-items:flex-end;justify-content:center}
+.hc-av.visav{width:72px;height:96px;flex:none}
+.dav.visav{width:100%;height:120px;margin:0 auto}
+.vwrap{display:inline-flex;align-items:flex-end;justify-content:center;line-height:0;position:relative}
+.vwrap.vtap{cursor:pointer;border-radius:10px;min-width:44px;min-height:44px}
+.vwrap.vtap:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.vwrap.vtap:hover .vis{filter:brightness(1.05)}
+.vis{width:72px;height:100px;display:block;overflow:visible}
+.vis.sm{width:36px;height:50px}
+.vis.lg{width:100px;height:140px}
+.vis.foe{opacity:.95}
+.route .rdot.hasvis{top:-28px;font-size:0}
+.route .rdot.hasvis .vis{width:40px;height:56px;filter:drop-shadow(0 2px 2px #0006)}
+.vfight{display:flex;justify-content:center;margin:6px 0 4px}
+.vpair{display:flex;align-items:flex-end;gap:10px;justify-content:center}
+.vpair .vvs{font-size:22px;align-self:center;opacity:.7}
+.vpair .vis{width:88px;height:122px}
+.vaura{pointer-events:none}
+/* позы — короткие CSS-анимации; reduced-motion глушит глобально */
+.vis .armR,.vis .armL,.vis .vl.weapon,.vis .vl.offhand,.vis .vroot{transform-box:fill-box;transform-origin:center}
+.vis.p-walk .vroot{animation:vwalk 0.7s ease-in-out infinite}
+.vis.p-walk .armR{animation:vswingR 0.7s ease-in-out infinite}
+.vis.p-walk .armL{animation:vswingL 0.7s ease-in-out infinite}
+.vis.p-walk .vl.legs path:nth-child(1){animation:vlegL 0.7s ease-in-out infinite}
+.vis.p-walk .vl.legs path:nth-child(2){animation:vlegR 0.7s ease-in-out infinite}
+@keyframes vwalk{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes vswingR{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-12deg)}}
+@keyframes vswingL{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(12deg)}}
+@keyframes vlegL{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(8deg)}}
+@keyframes vlegR{0%,100%{transform:rotate(6deg)}50%{transform:rotate(-8deg)}}
+.vis.p-attack .vl.weapon,.vis.p-attack .armR{animation:vatk .4s ease-out 1}
+.vis.p-attack .vroot{animation:vlean .4s ease-out 1}
+@keyframes vatk{0%{transform:rotate(0)}40%{transform:rotate(-40deg) translate(4px,-2px)}100%{transform:rotate(0)}}
+@keyframes vlean{0%,100%{transform:translateX(0)}40%{transform:translateX(4px)}}
+.vis.p-block .vl.offhand,.vis.p-block .armL{animation:vblk .35s ease-out 1;transform:rotate(-18deg) translate(2px,-4px)}
+.vis.p-block .vroot{transform:translateX(-2px)}
+@keyframes vblk{0%{transform:rotate(0)}100%{transform:rotate(-18deg) translate(2px,-4px)}}
+.vis.p-hurt .vroot{animation:vhurt .45s ease-out 1}
+.vis.p-hurt{filter:brightness(1.15) saturate(1.2)}
+@keyframes vhurt{0%,100%{transform:translateX(0)}30%{transform:translateX(-5px) rotate(-4deg)}60%{transform:translateX(3px)}}
+.vis.p-dead .vroot{transform:rotate(70deg) translate(10px,20px);opacity:.55;transform-origin:60px 120px}
+.vis.p-idle .armR{transform:rotate(4deg)}.vis.p-idle .armL{transform:rotate(-4deg)}
+.vis.cursed .vroot{filter:brightness(.78) saturate(.65)}
+.vis.leg .vaura{opacity:.2;animation:vpulse 2.2s ease-in-out infinite}
+.vis.epi .vaura{opacity:.14}
+@keyframes vpulse{0%,100%{opacity:.12}50%{opacity:.22}}
+body.rm .vis.p-walk .vroot,body.rm .vis.p-walk .armR,body.rm .vis.p-walk .armL,body.rm .vis.p-walk .vl.legs path,
+body.rm .vis.p-attack .vl.weapon,body.rm .vis.p-attack .armR,body.rm .vis.p-attack .vroot,
+body.rm .vis.p-block .vl.offhand,body.rm .vis.p-hurt .vroot,body.rm .vis.leg .vaura{animation:none!important}
+body.rm .vis.p-walk .armR{transform:rotate(10deg)}body.rm .vis.p-walk .armL{transform:rotate(-10deg)}
+body.rm .vis.p-attack .armR,body.rm .vis.p-attack .vl.weapon{transform:rotate(-28deg)}
+body.rm .vis.p-block .armL,body.rm .vis.p-block .vl.offhand{transform:rotate(-18deg) translate(2px,-4px)}
+body.rm .vis.p-hurt .vroot{transform:translateX(-3px)}
+body.theme-good .visav,body.theme-good .vfight{--vis-glow:color-mix(in srgb,var(--gold2) 35%,transparent)}
+body.theme-evil .vpair .vis.foe{filter:hue-rotate(-10deg) saturate(1.15)}
+@media (max-width:400px){
+  .hc-av.visav{width:58px;height:80px}.vis{width:58px;height:80px}
+  .vpair .vis{width:70px;height:98px}.dav.visav{height:100px}.vis.lg{width:84px;height:118px}
+}
+@media (min-width:1000px){
+  .hc-av.visav{width:84px;height:112px}.hc-av.visav .vis{width:84px;height:112px}
+  .vpair .vis{width:100px;height:138px}
+}
+
 </style>
 </head>
 <body>
@@ -4941,7 +5007,7 @@ function dollHTML(h) {
   const sh = sheet(), za = zoneArmor(h, S.flock.temple), sp = setProgress(h);
   return `<h3>Снаряжение</h3><div class="doll">
     <div class="dcol">${['helm', 'amulet', 'armor', 'belt', 'boots'].map(k => dollCell(h, k)).join('')}</div>
-    <div class="dmid"><div class="dav">${CLS_IC[h.cls] || '🧔'}</div><div class="dgsv" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></div>
+    <div class="dmid"><div class="dav visav">${visHTML(h, { size: 'lg', tap: false })}</div><div class="dgsv" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b></div>
       <div class="dst">урон ≈${Math.round(sh.avg)}<br>КД ${sh.ac} · ❤ ${h.maxHp}</div>
       <div class="dza" title="Броня по зонам в бою: шлем — голова, броня — грудь и живот, пояс — пояс, сапоги — ноги">${ZONES.map(z => `<span>${ZONE_RU[z]} <b>${Math.round(za[z])}</b></span>`).join('')}</div></div>
     <div class="dcol">${['weapon', 'offhand', 'gloves', 'ring', 'ring2'].map(k => dollCell(h, k)).join('')}</div>
@@ -5024,11 +5090,12 @@ function routePos(h) {
 }
 function routeHTML(h) {
   const p = routePos(h), L = x => (8 + 84 * x).toFixed(1) + '%';
-  const ic = h.state === 'dead' ? '💀' : S.fight || h.state === 'fight' ? '⚔' : h.state === 'duel' ? '🤺' : h.state === 'rest' ? '💤' : (CLS_IC[h.cls] || '🧔');
+  const special = h.state === 'dead' ? '💀' : S.fight || h.state === 'fight' ? '⚔' : h.state === 'duel' ? '🤺' : h.state === 'rest' ? '💤' : '';
+  const dot = special || visHTML(h, { size: 'sm', tap: false, pose: h.state === 'road' ? 'walk' : 'idle' });
   return `<div class="route" role="img" aria-label="Маршрут: ${ROUTE.map(r => r[1]).join(' → ')}; герой сейчас у точки «${ROUTE[p.node][1]}»">
     <div class="rl"><i style="width:${(p.f * 100).toFixed(1)}%"></i></div>
     ${ROUTE.map((r, i) => `<span class="rn ${i === p.node ? 'on' : ''}" style="left:${L(i / 3)}"><b>${r[0]}</b>${r[1]}</span>`).join('')}
-    <span class="rdot ${h.state === 'road' ? 'walk' : ''}" id="routeDot" data-node="${p.node}" style="left:${L(p.f)}">${ic}</span></div>`;
+    <span class="rdot ${h.state === 'road' && !special ? 'walk' : ''} ${special ? '' : 'hasvis'}" id="routeDot" data-node="${p.node}" style="left:${L(p.f)}">${dot}</span></div>`;
 }
 function renderHero() {
   const h = S.hero, m = h.monster, b = S.buffs;
@@ -5036,7 +5103,7 @@ function renderHero() {
   if (b.luck > 0) buffs.push(`🍀 ${Math.ceil(b.luck)}с`); if (b.shield > 0) buffs.push(`🛡 ${Math.ceil(b.shield)}с`); if (b.trade > 0) buffs.push('☠ торговцы');
   const act = h.state === 'rest' ? `💤 ${h.restKind === 'camp' ? 'спит в лагере' : h.restKind === 'temple' ? 'ночует в храме' : 'отдыхает в трактире'}` : (STATE_RU[h.state] || h.state) + (m ? ': ' + esc(m.n) : '');
   const col = !!S.ui.heroCol;
-  let html = `<div class="hc-top"><div class="hc-av">${CLS_IC[h.cls] || '🧔'}</div><div class="hc-id"><h2>${esc(h.name)}</h2><div class="hc-sub">${RACES[h.race].n} · ${CLASSES[h.cls].n} · ур. ${h.lvl}</div></div>
+  let html = `<div class="hc-top"><div class="hc-av visav">${visHTML(h, { size: 'md' })}</div><div class="hc-id"><h2>${esc(h.name)}</h2><div class="hc-sub">${RACES[h.race].n} · ${CLASSES[h.cls].n} · ур. ${h.lvl}</div></div>
     <div class="hc-btns"><button class="btn small ghost" data-act="sheet" title="Характеристики, снаряжение, рюкзак">📋<span class="hideXS"> Герой</span></button><button class="btn small ghost hcol" data-act="heroCol" aria-expanded="${!col}" title="${col ? 'Развернуть карточку' : 'Свернуть карточку'}">${col ? '▾' : '▴'}</button></div></div>
   <div class="hc-now"><span>📍 ${S.oly && S.oly.reg[h.reg] && S.oly.reg[h.reg].own ? godDot(S.oly.reg[h.reg].own) : ''}${esc(h.loc)}</span><span class="st">${act}</span>${S.oly ? olyChip() : ''}${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
   ${routeHTML(h)}
@@ -5357,14 +5424,14 @@ function help() {
   <p><b>Герой живёт сам</b>: бродит, дерётся, торгует, отдыхает и пишет дневник. Ваша валюта — <b>вера</b>: копится от паствы и храма, а ещё герой жертвует золото, если доверяет вам. Это неспешная игра: до 10-го уровня — пара недель.</p>
   <p><b>📋 Характеристики.</b> СИЛ, ЛОВ, ТЕЛ, ИНТ, МДР, ХАР — как в настольных ролевых играх. Они влияют на бой, торговлю (Харизма), проповеди и исходы развилок: в дневнике видно «проверка Харизмы: успех». Раса и класс дают бонусы и особые умения.</p>
   <p><b>🎖 Черты.</b> На каждом чётном уровне герой выбирает черту или +2 к характеристике. Подскажите ему, иначе выберет сам.</p>
-  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение.</p>
+  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение. Герой и снаряжение видны на фигурке: на карточке, на маршруте и в бою — надетое сразу отображается на слоях куклы.</p>
   <p><b>✨ Божественные моменты.</b> Раз в 5–10 минут (на ×1) случается что-то, где решаете вы: 2–3 кнопки, одна всегда «Ничего не делать». Кнопки с 🔥 тратят веру и срабатывают наверняка, с 🎲 — проверка характеристики героя (бросок d20 и числа видны в дневнике). Не ответили за 2,5 мин — герой решит сам. В бою и в пещере момент ждёт, пока вы освободитесь.</p>
   <p><b>🙏 Развилки.</b> Иногда вместо момента герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
   <p><b>⛪ Паства.</b> Вера растёт с корнем из паствы. Паству приносят проповеди героя (Харизма!), ливни, развилки, дуэли и чудеса. Храм строится по частям: каждый уровень даёт веру, её запас, бесплатный ночлег и +1 КД на каждые 2 уровня. Солдаты армии стоят веры и 2 последователей, но помогают в дуэлях и событиях.</p>
   <p><b>😇 Характер бога.</b> Добрые поступки и силы света сдвигают его к «доброму» (силы света на 20% дешевле, паства растёт сама), кары — к «гневному» (кары дешевле, молния сильнее, солдаты дешевле).</p>
   <p><b>🏛 Война за Олимп.</b> Мир поделён на 14 регионов (лес, города, горы, болота, берег…), в каждом свои души. Регион принадлежит богу, у которого там больше всего верующих (не меньше 12% жителей), и даёт ему <b>+9 веры в час</b> и <b>свой бонус</b> (лес — добыча чаще, Годград — покупки дешевле, Понты — продажа дороже и т. д.). Ваши души растут, когда <b>герой ходит и проповедует в регионе</b> и побеждает там врагов; ещё помогают <b>храмы региона</b> (обращают сами и защищают), <b>штурм армией</b> (солдаты из «Паствы») и <b>дуэль богов за регион</b>. Отправить героя: кнопка на регионе или глас «иди в лес». Восемь богов-соперников тоже обращают души и иногда штурмуют ваши земли — в дневнике будет «⚠ Бог … обращает души в …». Без присмотра души остывают медленно (около 6% в сутки), так что день отсутствия не страшен. <b>Сезон — 4 недели</b>: каждый час вы получаете очки влияния (ОВ) за свои регионы и всех своих душ. В конце <b>топ-7 занимают троны Олимпа</b>: титул, рамка и «⚡ Олимпийский дар» на весь следующий сезон; затем карта сбрасывается, а герой, вещи, главный храм и армия остаются. Карта, таблица и хроника — во вкладке «🏛 Олимп».</p>
-  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Олимп | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Карта мира, таблица сезона, чат, пещеры и соперники — в «Олимпе», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
+  <p><b>🧭 Где что.</b> Главный экран — «сцена бога»: сверху вера, уровень бога и скорость, в центре карточка героя с фигуркой и маршрутом Город → Лес → Подземелье → Город и дневник. Внизу — вкладки <b>Силы | Паства | Арена | Олимп | Герой</b>. Ваши вмешательства подсвечены в дневнике синим 🙏; важные события крупнее; запись с ▾ можно развернуть (броски кубиков, ход боя). Карта мира, таблица сезона, чат, пещеры и соперники — в «Олимпе», храм, чудеса и армия — в «Пастве», характеристики, снаряжение и рюкзак — в «Герое» (и по кнопке «📋»). Настройки (звук, сохранение, имена) — ⚙ сверху.</p>
   <p><b>⚔ Бой по зонам</b> (как в старом добром «Бойцовском клубе»). Каждый ход выберите <b>одну зону удара</b> (голова, грудь, живот, пояс, ноги) и <b>блок</b> (обычно 2 соседние зоны; воин и жрец закрывают 3, плут бьёт дважды, но закрывает 1). Противник выбирает одновременно. Кнопка «👁 Подсказать» (6 веры, раз за ход) подсмотрит, бьёт ли самый опасный враг в верх или в низ. Попал в блок — промах; ЛОВ даёт уворот, ИНТ/МДР — криты, сила и оружие — урон, доспех защищает (лучше всего грудь). 30 секунд на ход, потом герой решит сам по привычке. «🤖 Автобой» — пусть дерётся сам. До 3 сил бога за бой, 1 за ход.</p>
   <p><b>🤺 Арена</b> — вкладка с заявками: дуэли 1нс1, группы 3нс3 и 5нс5, хаотичные бои. Принимайте чужие или подавайте свои. За бои — опыт, золото и рейтинг; после поражения — травмы (штраф к характеристике, лечатся временем, отдыхом и храмом). <b>⚜ Дуэль богов</b> — тот же бой, но соперничающий бог тоже колдует.</p>
   <p><b>🏰 Пещеры</b> — карта 5×5: ведите отряд по комнатам, ищите 🗝 ключ и бейте 👑 босса. Это испытание: бесплатного лечения почти нет (один ⛲ источник и жрец), чем глубже — тем злее, 💀 элита на половине здоровья звереет. Боссы <b>объявляют</b> страшный удар по зоне — поставьте туда блок, иначе удар в 2,5 раза сильнее. Можно лечить отряд силой «Исцеление» между комнатами (раз за пещеру) и <b>отступить с добычей</b> (60% золота и опыта, все вещи). Если отряд разбит — героя вынесут, оставив 30%. Награда за босса — гарантированная редкая вещь и много опыта. Пещера не чаще раза в 4 часа. <b>💬 Чат</b> — пока с ботами, но они стараются. <b>🌍 Мировые события</b> — общий босс для всех богов.</p>
@@ -5554,6 +5621,15 @@ function fightFx(F) {
   const card = document.querySelector('#fightBox .card');
   if (card) flashRect(card.getBoundingClientRect(), meHit ? 'hit' : 'good');
   sfx(crit ? 'crit' : meHit ? 'hit' : blk ? 'blk' : 'hit');
+  /* поза куклы: удар / блок / боль */
+  if (typeof visApplyFightPose === 'function') {
+    const dealt = F.fx.a.some(a => me && a.id !== me.id && a.v > 0);
+    document.querySelectorAll('#fightBox .vwrap.me .vis, #colHero .vis').forEach(el => {
+      el.classList.remove('p-idle', 'p-walk', 'p-attack', 'p-block', 'p-hurt', 'p-dead');
+      el.classList.add(meHit ? 'p-hurt' : dealt ? 'p-attack' : blk ? 'p-block' : 'p-idle');
+    });
+    if (meHit || dealt) setTimeout(() => { if (S && S.fight) visApplyFightPose(S.fight); }, 500);
+  }
 }
 /* ---------- Сводка «Пока вас не было» — отдельная карточка при входе ---------- */
 function awayModal() {
@@ -5742,7 +5818,7 @@ const OLY_EXPORTS = ({ olyApply, olyConvert, regOwner, OLY_K, REGIONS, REG_BY, G
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261019-205103';
+const APP_BUILD = '20261024-211135';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -5846,6 +5922,236 @@ Object.assign(ACT, {
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([exportText()], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); toast('💾 Файл ' + name + ' скачан.'); }
 });
 /* Импорт доступен и без существующего мира (с экрана создания) */
+/* =====================================================================
+   5в) Визуал героя: бумажная кукла (слои SVG ↔ слоты снаряжения)
+   ===================================================================== */
+/* Цвета кожи и волос по расе; силуэт слегка меняется классом */
+const VIS_SKIN = { human: '#e8b896', elf: '#d4e8b8', dwarf: '#c9966e', halfling: '#f0c9a0', orc: '#7a9a5a', gnome: '#e0b070', tiefling: '#c07070' };
+const VIS_HAIR = { human: '#5a3a28', elf: '#d4c878', dwarf: '#8a4a20', halfling: '#c87838', orc: '#2a3820', gnome: '#c04040', tiefling: '#1a1018' };
+const VIS_EYE = { human: '#3a5a88', elf: '#5a9888', dwarf: '#4a3a28', halfling: '#5868a0', orc: '#c8d840', gnome: '#3868a8', tiefling: '#d04040' };
+/* Редкость: подсветка контура; проклятие — тёмный фильтр */
+const VIS_GLOW = ['none', '0 0 4px #2e8b3a88', '0 0 6px #2a64c488', '0 0 8px #8a3cc4aa', '0 0 10px #d9731acc,0 0 18px #d9731a66'];
+
+function visSkin(h) { return VIS_SKIN[h.race] || VIS_SKIN.human; }
+function visHair(h) { return VIS_HAIR[h.race] || VIS_HAIR.human; }
+function visEye(h) { return VIS_EYE[h.race] || VIS_EYE.human; }
+/* Класс → лёгкий силуэт (плечи / рост) */
+function visScale(h) {
+  if (h.race === 'halfling' || h.race === 'gnome') return { y: 1.08, s: .88 };
+  if (h.race === 'dwarf' || h.race === 'orc') return { y: 1.04, s: .94 };
+  if (h.cls === 'barbarian' || h.cls === 'warrior') return { y: 1, s: 1.04 };
+  if (h.cls === 'mage' || h.cls === 'bard') return { y: 1, s: .96 };
+  return { y: 1, s: 1 };
+}
+function visPose(h) {
+  if (!h) return 'idle';
+  if (h.state === 'dead') return 'dead';
+  if (S.fight && fMe(S.fight)) {
+    const F = S.fight, me = fMe(F);
+    if (!me || !me.alive) return 'dead';
+    if (F.fx && F.fx.a) {
+      const hit = F.fx.a.find(a => a.id === me.id && a.v > 0);
+      const atk = F.fx.a.find(a => a.aid === me.id || (a.from === me.id));
+      if (hit && (hit.k === 'hit' || hit.k === 'crit')) return 'hurt';
+    }
+    if (F.my && F.my.act === 'flee') return 'hurt';
+    if (F.phase === 'turn' && F.my && F.my.blk && F.my.blk.length) return 'block';
+    if (F.phase === 'turn' || F.phase === 'intro') return 'idle';
+    return 'idle';
+  }
+  if (h.state === 'road') return 'walk';
+  if (h.state === 'rest') return 'idle';
+  if (h.state === 'fight' || h.state === 'duel' || h.state === 'dungeon') return 'idle';
+  return 'idle';
+}
+/* Слот → видимый слой: пустой слот не рисуем (кроме тела) */
+function visItem(h, k) { return h && h.eq && h.eq[k] ? h.eq[k] : null; }
+function visTint(it) {
+  if (!it) return '';
+  const c = it.curse ? 'filter:brightness(.72) saturate(.7);' : '';
+  const g = VIS_GLOW[it.rar] || 'none';
+  return `style="${c}${g !== 'none' ? 'filter:' + (it.curse ? 'brightness(.72) saturate(.7) ' : '') + 'drop-shadow(' + g.replace(/,/g, ') drop-shadow(') + ');' : c}"`;
+}
+function visMetal(kind) { return kind === 'h' ? '#8a96a8' : kind === 'l' ? '#8a6a48' : '#6a5a88'; }
+function visCloth(kind) { return kind === 'h' ? '#5a6878' : kind === 'l' ? '#6a5038' : '#4a3a68'; }
+
+/* ---------- Оружие по категории ---------- */
+function visWeaponPath(cat, x, y) {
+  /* правая рука roughly (x,y); пути относительно viewBox 100×140 */
+  if (cat === 'bow') return `<g class="vw bow" transform="translate(${x},${y})"><path d="M0,-18 Q-14,0 0,18" fill="none" stroke="#6a4020" stroke-width="2.2"/><path d="M0,-18 L0,18" fill="none" stroke="#c8b898" stroke-width="1"/><line x1="0" y1="0" x2="16" y2="-2" stroke="#8a7050" stroke-width="1.4"/></g>`;
+  if (cat === 'staff') return `<g class="vw staff" transform="translate(${x},${y})"><line x1="2" y1="-28" x2="2" y2="22" stroke="#6a4828" stroke-width="2.6" stroke-linecap="round"/><circle cx="2" cy="-30" r="5" fill="#7ec8e8" opacity=".9"/><circle cx="2" cy="-30" r="2.5" fill="#fff8"/></g>`;
+  if (cat === 'axe') return `<g class="vw axe" transform="translate(${x},${y})"><line x1="1" y1="-8" x2="1" y2="18" stroke="#5a3a20" stroke-width="2.2"/><path d="M1,-6 L14,-10 L14,2 Z" fill="#9aa4b0" stroke="#3a4050" stroke-width=".6"/></g>`;
+  if (cat === 'mace') return `<g class="vw mace" transform="translate(${x},${y})"><line x1="1" y1="-4" x2="1" y2="18" stroke="#5a3a20" stroke-width="2.2"/><circle cx="1" cy="-8" r="6" fill="#8a9098" stroke="#3a4050" stroke-width=".6"/><circle cx="-2" cy="-10" r="1.4" fill="#c0c4c8"/><circle cx="4" cy="-6" r="1.4" fill="#c0c4c8"/></g>`;
+  if (cat === 'dagger') return `<g class="vw dagger" transform="translate(${x},${y})"><line x1="1" y1="-14" x2="1" y2="10" stroke="#b0b8c0" stroke-width="1.8" stroke-linecap="round"/><line x1="-3" y1="2" x2="5" y2="2" stroke="#6a4828" stroke-width="1.6"/><path d="M1,-14 L3,-8 L-1,-8 Z" fill="#d0d6dc"/></g>`;
+  if (cat === 'two') return `<g class="vw two" transform="translate(${x},${y})"><line x1="2" y1="-26" x2="2" y2="20" stroke="#5a3a20" stroke-width="2.8" stroke-linecap="round"/><path d="M2,-24 L10,-18 L10,-6 L2,-2 Z" fill="#9aa4b0" stroke="#3a4050" stroke-width=".6"/><path d="M2,-24 L-6,-18 L-6,-6 L2,-2 Z" fill="#8a949e" stroke="#3a4050" stroke-width=".6"/></g>`;
+  if (cat === 'music') return `<g class="vw music" transform="translate(${x},${y})"><ellipse cx="2" cy="6" rx="7" ry="10" fill="#8a5a30" stroke="#4a3020" stroke-width=".8"/><rect x="-1" y="-16" width="6" height="14" rx="1" fill="#6a4020"/><circle cx="2" cy="4" r="2.5" fill="#f0d8a0"/><path d="M8,-10 Q14,-4 8,2" fill="none" stroke="#c8a060" stroke-width="1.2"/></g>`;
+  /* sword default */
+  return `<g class="vw sword" transform="translate(${x},${y})"><line x1="1" y1="-20" x2="1" y2="12" stroke="#c0c8d0" stroke-width="2.2" stroke-linecap="round"/><line x1="-5" y1="0" x2="7" y2="0" stroke="#6a4828" stroke-width="2"/><rect x="-1" y="12" width="4" height="6" rx="1" fill="#5a3a20"/><path d="M1,-20 L3,-12 L-1,-12 Z" fill="#e8eef4"/></g>`;
+}
+function visShield(x, y, kind) {
+  const fill = kind === 'h' ? '#6a7888' : kind === 'c' ? '#5a4a78' : '#8a6a48';
+  return `<g class="vsh" transform="translate(${x},${y})"><path d="M0,-12 L12,-6 L10,10 L0,16 L-10,10 L-12,-6 Z" fill="${fill}" stroke="#2a3038" stroke-width="1.2"/><path d="M0,-6 L6,-2 L5,6 L0,9 L-5,6 L-6,-2 Z" fill="#00000022"/></g>`;
+}
+
+/* ---------- Основной SVG ---------- */
+function visSVG(h, opt) {
+  opt = opt || {};
+  h = h || (S && S.hero);
+  if (!h) return '';
+  const skin = visSkin(h), hair = visHair(h), eye = visEye(h), sc = visScale(h);
+  const pose = opt.pose || visPose(h);
+  const sz = opt.size || 'md'; /* sm | md | lg */
+  const w = visItem(h, 'weapon'), oh = visItem(h, 'offhand'), hm = visItem(h, 'helm');
+  const ar = visItem(h, 'armor'), bt = visItem(h, 'boots'), bl = visItem(h, 'belt');
+  const gl = visItem(h, 'gloves'), am = visItem(h, 'amulet'), r1 = visItem(h, 'ring'), r2 = visItem(h, 'ring2');
+  const h2 = w && w.h2;
+  const bodyW = h.cls === 'barbarian' || h.cls === 'warrior' ? 18 : h.cls === 'mage' ? 14 : 16;
+  /* ноги / сапоги */
+  const bootC = bt ? visMetal(bt.kind) : '#3a2a20';
+  const legC = ar && ar.kind === 'h' ? '#4a5560' : ar && ar.kind === 'l' ? '#5a4030' : '#3a2a48';
+  /* броня */
+  let armorG = '';
+  if (ar) {
+    const fill = visCloth(ar.kind), stroke = visMetal(ar.kind);
+    if (ar.kind === 'c') armorG = `<path class="vl armor" d="M42,48 Q50,44 58,48 L62,78 Q50,84 38,78 Z" fill="${fill}" stroke="${stroke}" stroke-width="1" ${visTint(ar)}/>
+      <path d="M40,48 L36,72 L42,76" fill="${fill}" opacity=".9"/><path d="M60,48 L64,72 L58,76" fill="${fill}" opacity=".9"/>`;
+    else if (ar.kind === 'l') armorG = `<path class="vl armor" d="M40,48 L60,48 L63,76 L50,82 L37,76 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.2" ${visTint(ar)}/>
+      <path d="M44,52 L48,74 M56,52 L52,74" stroke="#0003" stroke-width="1"/>`;
+    else armorG = `<path class="vl armor" d="M38,47 L62,47 L66,55 L64,78 L50,84 L36,78 L34,55 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.4" ${visTint(ar)}/>
+      <rect x="44" y="52" width="12" height="10" rx="1" fill="#0002"/><path d="M40,56 L36,74 M60,56 L64,74" stroke="#fff3" stroke-width="1"/>`;
+  } else {
+    /* голое тело / рубаха */
+    armorG = `<path class="vl bodyt" d="M42,48 L58,48 L60,76 L50,80 L40,76 Z" fill="${skin}" stroke="#0002" stroke-width=".5"/>
+      <path d="M42,48 L38,70 L42,74" fill="${skin}"/><path d="M58,48 L62,70 L58,74" fill="${skin}"/>`;
+  }
+  /* пояс */
+  const beltG = bl ? `<rect class="vl belt" x="38" y="72" width="24" height="5" rx="1.5" fill="${visMetal(bl.kind)}" stroke="#2a2018" stroke-width=".6" ${visTint(bl)}/><circle cx="50" cy="74.5" r="1.8" fill="#d4b060"/>` : '';
+  /* сапоги / ноги */
+  const legs = `<g class="vl legs">
+    <path d="M42,78 L40,108 L46,108 L48,80 Z" fill="${legC}"/><path d="M58,78 L60,108 L54,108 L52,80 Z" fill="${legC}"/>
+    ${bt ? `<path class="vl boots" d="M38,106 L40,118 L48,118 L47,106 Z" fill="${bootC}" ${visTint(bt)}/><path class="vl boots" d="M62,106 L60,118 L52,118 L53,106 Z" fill="${bootC}" ${visTint(bt)}/><ellipse cx="43" cy="118" rx="6" ry="2.2" fill="${bootC}"/><ellipse cx="57" cy="118" rx="6" ry="2.2" fill="${bootC}"/>`
+      : `<path d="M39,108 L40,116 L47,116 L46,108" fill="${skin}"/><path d="M61,108 L60,116 L53,116 L54,108" fill="${skin}"/>`}
+  </g>`;
+  /* голова */
+  const headR = h.race === 'orc' ? 13 : 12;
+  const ear = h.race === 'elf' ? `<path d="M38,28 L34,22 L38,32 Z" fill="${skin}"/><path d="M62,28 L66,22 L62,32 Z" fill="${skin}"/>`
+    : h.race === 'tiefling' ? `<path d="M40,22 L36,12 L42,24" fill="none" stroke="${hair}" stroke-width="2"/><path d="M60,22 L64,12 L58,24" fill="none" stroke="${hair}" stroke-width="2"/>` : '';
+  const beard = (h.race === 'dwarf' || h.cls === 'barbarian') && !hm ? `<path d="M44,40 Q50,50 56,40 Q50,46 44,40" fill="${hair}"/>` : '';
+  const hairG = hm ? '' : (h.race === 'orc' ? `<path d="M40,22 Q50,16 60,22" fill="none" stroke="${hair}" stroke-width="3"/>`
+    : `<path d="M38,30 Q40,16 50,14 Q60,16 62,30" fill="${hair}"/><path d="M40,28 Q42,22 50,20 Q58,22 60,28" fill="${hair}" opacity=".85"/>`);
+  /* шлем */
+  let helmG = '';
+  if (hm) {
+    const fill = visMetal(hm.kind), soft = hm.kind === 'c';
+    if (soft) helmG = `<path class="vl helm" d="M37,30 Q50,12 63,30 L60,36 Q50,32 40,36 Z" fill="${visCloth('c')}" stroke="#2a2038" stroke-width="1" ${visTint(hm)}/><path d="M36,30 Q50,38 64,30" fill="${visCloth('c')}" opacity=".9"/>`;
+    else helmG = `<path class="vl helm" d="M36,32 Q38,14 50,12 Q62,14 64,32 L60,36 Q50,30 40,36 Z" fill="${fill}" stroke="#2a3038" stroke-width="1.2" ${visTint(hm)}/>
+      <rect x="46" y="20" width="8" height="4" rx="1" fill="#0003"/>${hm.kind === 'h' ? `<path d="M42,14 L40,6 M58,14 L60,6" stroke="${fill}" stroke-width="2"/>` : ''}`;
+  }
+  const face = `<g class="vl head">
+    <circle cx="50" cy="30" r="${headR}" fill="${skin}" stroke="#0002" stroke-width=".6"/>
+    ${ear}${hairG}${helmG}${beard}
+    <circle cx="45" cy="29" r="1.6" fill="${eye}"/><circle cx="55" cy="29" r="1.6" fill="${eye}"/>
+    <circle cx="45.4" cy="28.6" r=".5" fill="#fff"/><circle cx="55.4" cy="28.6" r=".5" fill="#fff"/>
+    <path d="M46,36 Q50,39 54,36" fill="none" stroke="#0004" stroke-width="1" stroke-linecap="round"/>
+  </g>`;
+  /* руки + перчатки */
+  const handC = gl ? visMetal(gl.kind) : skin;
+  const arms = `<g class="vl arms">
+    <path class="armL" d="M40,50 L28,66 L30,70 L42,56 Z" fill="${ar ? visCloth(ar.kind) : skin}"/>
+    <path class="armR" d="M60,50 L72,66 L70,70 L58,56 Z" fill="${ar ? visCloth(ar.kind) : skin}"/>
+    <circle class="vl gloves handL" cx="28" cy="70" r="4.2" fill="${handC}" ${gl ? visTint(gl) : ''}/>
+    <circle class="vl gloves handR" cx="72" cy="70" r="4.2" fill="${handC}" ${gl ? visTint(gl) : ''}/>
+  </g>`;
+  /* оружие / щит — слои поверх рук */
+  const weapG = w ? `<g class="vl weapon" ${visTint(w)}>${visWeaponPath(w.cat || 'sword', 74, 62)}</g>` : '';
+  const offG = oh ? (oh.slot === 'weapon' || oh.cat ? `<g class="vl offhand" ${visTint(oh)}>${visWeaponPath(oh.cat || 'dagger', 24, 64)}</g>`
+    : `<g class="vl offhand" ${visTint(oh)}>${visShield(24, 64, oh.kind)}</g>`)
+    : (h2 ? '' : '');
+  /* амулет и кольца — мелкие акценты */
+  const amG = am ? `<g class="vl amulet" ${visTint(am)}><line x1="50" y1="42" x2="50" y2="52" stroke="#d4b060" stroke-width="1.2"/><circle cx="50" cy="54" r="3.2" fill="${RARITY[am.rar] ? RARITY[am.rar].c : '#d4b060'}" stroke="#2a2010" stroke-width=".6"/></g>` : '';
+  const ringG = `${r1 ? `<circle class="vl ring" cx="74" cy="70" r="2.2" fill="none" stroke="${RARITY[r1.rar].c}" stroke-width="1.4" ${visTint(r1)}/>` : ''}
+    ${r2 ? `<circle class="vl ring2" cx="26" cy="70" r="2.2" fill="none" stroke="${RARITY[r2.rar].c}" stroke-width="1.4" ${visTint(r2)}/>` : ''}`;
+  /* легендарное / эпическое свечение за спиной */
+  const topRar = Math.max(w ? w.rar : 0, ar ? ar.rar : 0, hm ? hm.rar : 0, oh ? oh.rar : 0);
+  const aura = topRar >= 3 ? `<ellipse class="vaura r${topRar}" cx="50" cy="70" rx="36" ry="48" fill="${RARITY[topRar].c}" opacity=".12"/>` : '';
+  const cursed = equipped(h).some(it => it.curse);
+  const tf = `translate(50 ${sc.y * 70}) scale(${sc.s}) translate(-50 ${-70})`;
+  return `<svg class="vis ${sz} p-${pose}${cursed ? ' cursed' : ''}${topRar >= 4 ? ' leg' : topRar >= 3 ? ' epi' : ''}" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <g class="vroot" transform="${tf}">${aura}${legs}${armorG}${beltG}${amG}${arms}${offG}${weapG}${ringG}${face}</g>
+  </svg>`;
+}
+
+/* Простой силуэт врага для prefight / vs */
+function visFoeSVG(f, opt) {
+  opt = opt || {};
+  const boss = f && (f.kind === 'boss' || f.boss);
+  const elite = f && (f.kind === 'elite' || f.elite);
+  const fill = boss ? '#6a2030' : elite ? '#4a3050' : '#3a4050';
+  const horn = boss ? `<path d="M38,24 L34,10 L42,26 M62,24 L66,10 L58,26" fill="none" stroke="#c04040" stroke-width="2.5"/>` : '';
+  return `<svg class="vis foe ${opt.size || 'md'}" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <ellipse cx="50" cy="128" rx="22" ry="4" fill="#0003"/>
+    <path d="M40,50 L60,50 L64,90 L50,100 L36,90 Z" fill="${fill}"/>
+    <circle cx="50" cy="32" r="14" fill="${fill}"/>${horn}
+    <circle cx="44" cy="30" r="2" fill="#e04040"/><circle cx="56" cy="30" r="2" fill="#e04040"/>
+    <path d="M42,40 Q50,46 58,40" fill="none" stroke="#0006" stroke-width="1.5"/>
+    <path d="M38,55 L24,80 L30,82 L42,60 M62,55 L76,80 L70,82 L58,60" fill="${fill}"/>
+  </svg>`;
+}
+
+/* Обёртка: кнопка-кукла → лист снаряжения */
+function visHTML(h, opt) {
+  opt = opt || {};
+  h = h || S.hero;
+  const pose = opt.pose || visPose(h);
+  const label = `${h.name}: ${RACES[h.race].n}-${CLASSES[h.cls].n}, ГС ${gearScore(h)}`;
+  const cls = `vwrap ${opt.cls || ''} ${opt.tap === false ? '' : 'vtap'}`;
+  const act = opt.tap === false ? '' : ` role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение"`;
+  return `<div class="${cls}" data-pose="${pose}"${act}>${visSVG(h, opt)}</div>`;
+}
+function visPairHTML(h, foe, opt) {
+  opt = opt || {};
+  return `<div class="vpair" aria-hidden="true">${visHTML(h, Object.assign({}, opt, { tap: false, cls: 'me' }))}<span class="vvs">⚔</span>${visFoeSVG(foe, opt)}</div>`;
+}
+
+/* Обновить позу куклы в бою без полной перерисовки (дёшево) */
+function visApplyFightPose(F, forcePose) {
+  if (forcePose) {
+    document.querySelectorAll('.vwrap.me .vis, #fightBox .vwrap .vis, #colHero .vis').forEach(el => {
+      el.classList.remove('p-idle', 'p-walk', 'p-attack', 'p-block', 'p-hurt', 'p-dead');
+      el.classList.add('p-' + forcePose);
+    });
+    return forcePose;
+  }
+  if (!F) return;
+  let me = null;
+  try { me = typeof fMe === 'function' ? fMe(F) : null; } catch (e) { me = null; }
+  if (!me && F.units) me = F.units.find(u => u && u.isMe) || F.units[0];
+  if (!me) return;
+  let pose = 'idle';
+  if (!me.alive) pose = 'dead';
+  else if (F.fx && F.fx.a) {
+    const hit = F.fx.a.some(a => a.id === me.id && a.v > 0 && a.k !== 'heal');
+    const dealt = F.fx.a.some(a => a.id !== me.id && a.v > 0 && (a.k === 'crit' || a.k === 'hit'));
+    if (hit) pose = 'hurt';
+    else if (dealt) pose = 'attack';
+    else if (F.my && F.my.blk && F.my.blk.length) pose = 'block';
+  } else if (F.my && F.my.blk && F.my.blk.length && F.phase === 'turn') pose = 'block';
+  document.querySelectorAll('.vwrap.me .vis, #fightBox .vwrap .vis, #colHero .vis').forEach(el => {
+    el.classList.remove('p-idle', 'p-walk', 'p-attack', 'p-block', 'p-hurt', 'p-dead');
+    el.classList.add('p-' + pose);
+  });
+  if (pose === 'attack' || pose === 'hurt') {
+    setTimeout(() => {
+      document.querySelectorAll('.vis.p-attack, .vis.p-hurt').forEach(el => {
+        if (!S.fight) return;
+        el.classList.remove('p-attack', 'p-hurt');
+        el.classList.add(S.hero.state === 'road' ? 'p-walk' : 'p-idle');
+      });
+    }, 480);
+  }
+  return pose;
+}
+
 
 /* =====================================================================
    14) ИНТЕРФЕЙС v4: бой по зонам, арена, пещера-карта, чат
@@ -5907,8 +6213,9 @@ function renderFight() {
       <div class="acts">${ids.map(id => `<button class="btn small ${POWERS[id].br === 'wrath' ? 'red' : POWERS[id].br === 'nature' ? 'green' : ''}" data-act="fpow" data-arg="${id}" ${S.god.faith < powerCost(id) || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>${DUEL_NAMES[id]} (${powerCost(id)})</button>`).join('') || '<span class="muted">Нет изученных сил.</span>'}</div>`
       : `<div class="q">😵 ${F.kind === 'dungeon' ? 'Герой без сознания — союзники бьются дальше и прикрывают его.' : 'Ваш герой выбыл из боя. Союзники бьются дальше…'}</div>${F.kind === 'dungeon' && S.god.skills.heal ? `<div class="acts"><button class="btn small green" data-act="fpow" data-arg="heal" ${S.god.faith < powerCost('heal') || F.powersLeft < 1 || F.usedTurn >= 1 ? 'disabled' : ''}>✚ Поднять героя (${powerCost('heal')})</button></div>` : ''}`;
   } else mid = `<div class="fend"><b>${esc(F.result || '')}</b>${F.rew ? `<div class="muted">${esc(F.rew)}</div>` : ''}</div><div class="btns"><button class="btn" data-act="fclose">Закрыть</button></div>`;
+  const vis = `<div class="vfight">${visPairHTML(S.hero, foeT, { size: 'md' })}</div>`;
   setHTML(box, `<div class="card zf"><h2>⚔ ${esc(F.title)} <span class="muted">${F.phase === 'turn' ? `ход ${F.turn}` : F.phase === 'intro' ? 'подготовка' : 'итог'}</span></h2>
-    ${vs}${teams}
+    ${vs}${vis}${teams}
     <div class="stat"><label><span>${turn ? (F.auto ? 'Следующий ход через' : 'До конца хода (потом герой решит сам)') : F.phase === 'intro' ? (F.prep ? 'Подготовка — бой начнётся через' : 'Бой начнётся через') : 'Закроется через'}</span><span id="fSec"></span></label><div class="bar time"><i id="fBar"></i></div></div>
     ${mid}
     <div class="flog">${F.log.slice(0, 40).map(l => `<div class="${l.c}">${esc(l.t)}</div>`).join('')}</div></div>`);
@@ -5917,6 +6224,7 @@ function renderFight() {
   $('fSec').textContent = Math.max(0, Math.ceil(F.t)) + ' с';
   $('fBar').style.width = pct(F.t, F.T);
   fightFx(F);
+  visApplyFightPose(F);
 }
 /* ---------- Пещера ---------- */
 function dunGsRow(U) {
@@ -6027,7 +6335,7 @@ if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) jo
 setInterval(loop, 250);
 for (const ev of ['pointerdown', 'keydown', 'touchstart']) addEventListener(ev, () => setLastInput(), { capture: true, passive: true });
 /* Отладочный доступ из консоли / тестов */
-window.GAME = { heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldStatW, bldFit, pickBuild, bldForBot, mkBld, initBuild, buildStat, heroFeatPref, startRespec, reconsider, bldResult, bldItem, bldTick, suggestBuild, bldFx, inferBuild, bldModal, itemScore, offerFeat, EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+window.GAME = { visHTML, visSVG, visFoeSVG, visPairHTML, visPose, visApplyFightPose, visSkin, VIS_SKIN, heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldStatW, bldFit, pickBuild, bldForBot, mkBld, initBuild, buildStat, heroFeatPref, startRespec, reconsider, bldResult, bldItem, bldTick, suggestBuild, bldFx, inferBuild, bldModal, itemScore, offerFeat, EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
   heroBrain, fleeChance, fightAct, endFled, godPresent, setLastInput, dunWake, partyWeak, dunPotion, dunHeal, dunAutoStep, renderFight, nextTurn, resolveTurn, hitOne, botBrain,
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,

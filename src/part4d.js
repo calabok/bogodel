@@ -85,6 +85,15 @@ function fightFx(F) {
   const card = document.querySelector('#fightBox .card');
   if (card) flashRect(card.getBoundingClientRect(), meHit ? 'hit' : 'good');
   sfx(crit ? 'crit' : meHit ? 'hit' : blk ? 'blk' : 'hit');
+  /* поза куклы: удар / блок / боль */
+  if (typeof visApplyFightPose === 'function') {
+    const dealt = F.fx.a.some(a => me && a.id !== me.id && a.v > 0);
+    document.querySelectorAll('#fightBox .vwrap.me .vis, #colHero .vis').forEach(el => {
+      el.classList.remove('p-idle', 'p-walk', 'p-attack', 'p-block', 'p-hurt', 'p-dead');
+      el.classList.add(meHit ? 'p-hurt' : dealt ? 'p-attack' : blk ? 'p-block' : 'p-idle');
+    });
+    if (meHit || dealt) setTimeout(() => { if (S && S.fight) visApplyFightPose(S.fight); }, 500);
+  }
 }
 /* ---------- Сводка «Пока вас не было» — отдельная карточка при входе ---------- */
 function awayModal() {
