@@ -802,6 +802,38 @@ body.theme-good .hc-scene{border-color:color-mix(in srgb,var(--gold2) 45%,var(--
 body.theme-evil .hc-scene{border-color:color-mix(in srgb,#8a2030 40%,var(--line))}
 body.theme-evil .scn-night{color:#1a1020}
 
+/* ---------- v15: нарисованные пластины + кукла ---------- */
+.scn-plate{position:absolute;inset:0;z-index:4;overflow:hidden;pointer-events:none}
+.scn-plate.fail{display:none}
+.scn-plate-shift{position:absolute;inset:0;width:112%;left:-6%}
+.scn-plate-img{width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block;user-select:none;-webkit-user-drag:none}
+.scn-svg-fallback{position:absolute;inset:0;z-index:1}
+.scn.has-art .scn-svg-fallback{opacity:0;visibility:hidden}
+.scn-tod-veil,.scn-theme-veil{position:absolute;inset:0;pointer-events:none;z-index:2}
+.scn-day .scn-tod-veil{background:linear-gradient(180deg,#fff2 0%,transparent 35%,#0001 100%)}
+.scn-dusk .scn-tod-veil{background:linear-gradient(180deg,#e8785044 0%,#c0603022 40%,#3a204088 100%)}
+.scn-night .scn-tod-veil{background:linear-gradient(180deg,#1a2848aa 0%,#1a203888 45%,#0a1020cc 100%)}
+body.theme-good .scn-theme-veil{background:radial-gradient(ellipse at 50% 80%,#f5c54218,transparent 60%)}
+body.theme-evil .scn-theme-veil{background:radial-gradient(ellipse at 50% 20%,#8a203028,transparent 55%),linear-gradient(180deg,#40081814,transparent 50%)}
+body.theme-neutral .scn-theme-veil{background:transparent}
+.scn-walk .scn-plate-shift{animation:scnPlateWalk 14s linear infinite}
+@keyframes scnPlateWalk{from{transform:translateX(0)}to{transform:translateX(-8%)}}
+/* пыль под ногами */
+.scn-dust{position:absolute;left:50%;bottom:10%;width:80px;height:24px;margin-left:-40px;z-index:4.5;pointer-events:none}
+.scn-dust i{position:absolute;bottom:0;width:5px;height:5px;border-radius:50%;background:#c8b090aa;opacity:0;animation:scnDust 1.1s ease-out infinite}
+.scn-dust i:nth-child(1){left:20%;animation-delay:0s}.scn-dust i:nth-child(2){left:35%;animation-delay:.18s}
+.scn-dust i:nth-child(3){left:50%;animation-delay:.35s}.scn-dust i:nth-child(4){left:62%;animation-delay:.5s}
+.scn-dust i:nth-child(5){left:28%;animation-delay:.7s}.scn-dust i:nth-child(6){left:55%;animation-delay:.9s}
+@keyframes scnDust{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:.7}100%{opacity:0;transform:translate(-10px,-14px) scale(1.2)}}
+body.rm .scn-walk .scn-plate-shift,body.rm .scn-dust i{animation:none!important}
+@media (prefers-reduced-motion:reduce){.scn-walk .scn-plate-shift,.scn-dust i{animation:none!important}}
+/* кукла: объёмнее */
+.vis .vroot{filter:drop-shadow(0 2px 1px #0004)}
+.scn-stage .vis{filter:drop-shadow(0 4px 3px #0006) drop-shadow(0 1px 0 #fff2)}
+.scn.has-art .scn-stage .vis{width:min(96px,30%)}
+.scn-fight.has-art .scn-stage-fight .vis{width:78px}
+
+
 
 </style>
 </head>
@@ -5500,7 +5532,7 @@ function help() {
   <p><b>Герой живёт сам</b>: бродит, дерётся, торгует, отдыхает и пишет дневник. Ваша валюта — <b>вера</b>: копится от паствы и храма, а ещё герой жертвует золото, если доверяет вам. Это неспешная игра: до 10-го уровня — пара недель.</p>
   <p><b>📋 Характеристики.</b> СИЛ, ЛОВ, ТЕЛ, ИНТ, МДР, ХАР — как в настольных ролевых играх. Они влияют на бой, торговлю (Харизма), проповеди и исходы развилок: в дневнике видно «проверка Харизмы: успех». Раса и класс дают бонусы и особые умения.</p>
   <p><b>🎖 Черты.</b> На каждом чётном уровне герой выбирает черту или +2 к характеристике. Подскажите ему, иначе выберет сам.</p>
-  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение. Герой и снаряжение видны на фигурке в живой сцене местности (город, лес, болото, горы, берег, пещера…): в пути земля уходит назад, в бою — тот же фон. Нажмите на сцену или куклу — откроется снаряжение.</p>
+  <p><b>💎 Предметы</b> бывают обычные, необычные, редкие, эпические и легендарные. Иногда попадаются проклятые — их можно очистить за веру. Слотов 10: оружие, щит (или второй кинжал у плута; двуручное занимает обе руки), шлем, броня, пояс, перчатки, сапоги, амулет и два кольца. Шлем бережёт голову, пояс — пояс, сапоги — ноги, щит даёт шанс блока. У вещей есть требования («ур. 6, СИЛ 14»): пока не выполнены — вещь лежит в рюкзаке. 🧩 Комплекты (в основном из пещер) дают бонусы за 2, 4 и все части. Нажмите на вещь в «📋 Герой» — увидите подробности и сравнение. Герой и снаряжение видны на фигурке в живой нарисованной сцене местности (город, лес, болото, горы, берег, пещера…): в пути фон уезжает назад, в бою — тот же пейзаж. Нажмите на сцену — откроется снаряжение.</p>
   <p><b>✨ Божественные моменты.</b> Раз в 5–10 минут (на ×1) случается что-то, где решаете вы: 2–3 кнопки, одна всегда «Ничего не делать». Кнопки с 🔥 тратят веру и срабатывают наверняка, с 🎲 — проверка характеристики героя (бросок d20 и числа видны в дневнике). Не ответили за 2,5 мин — герой решит сам. В бою и в пещере момент ждёт, пока вы освободитесь.</p>
   <p><b>🙏 Развилки.</b> Иногда вместо момента герой молится и просит совета. Не ответили — решит сам (обычно глупо). Послушается ли он — зависит от <b>доверия</b>.</p>
   <p><b>📣 Глас.</b> Ключевые слова: «лечись», «бей», «копай», «проповедуй», «в город», «беги», «вперёд», «отдыхай».</p>
@@ -5894,7 +5926,7 @@ const OLY_EXPORTS = ({ olyApply, olyConvert, regOwner, OLY_K, REGIONS, REG_BY, G
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261024-212741';
+const APP_BUILD = '20261024-214526';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -6050,6 +6082,12 @@ function visTint(it) {
 }
 function visMetal(kind) { return kind === 'h' ? '#8a96a8' : kind === 'l' ? '#8a6a48' : '#6a5a88'; }
 function visCloth(kind) { return kind === 'h' ? '#5a6878' : kind === 'l' ? '#6a5038' : '#4a3a68'; }
+function visShade(id, c1, c2) {
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient>`;
+}
+function visRad(id, c1, c2) {
+  return `<radialGradient id="${id}" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></radialGradient>`;
+}
 
 /* ---------- Оружие по категории ---------- */
 function visWeaponPath(cat, x, y) {
@@ -6097,14 +6135,15 @@ function visSVG(h, opt) {
       <rect x="44" y="52" width="12" height="10" rx="1" fill="#0002"/><path d="M40,56 L36,74 M60,56 L64,74" stroke="#fff3" stroke-width="1"/>`;
   } else {
     /* голое тело / рубаха */
-    armorG = `<path class="vl bodyt" d="M42,48 L58,48 L60,76 L50,80 L40,76 Z" fill="${skin}" stroke="#0002" stroke-width=".5"/>
-      <path d="M42,48 L38,70 L42,74" fill="${skin}"/><path d="M58,48 L62,70 L58,74" fill="${skin}"/>`;
+    armorG = `<path class="vl bodyt" d="M42,48 L58,48 L60,76 L50,80 L40,76 Z" fill="url(#sk)" stroke="#0003" stroke-width=".6"/>
+      <path d="M42,48 L38,70 L42,74" fill="url(#sk)"/><path d="M58,48 L62,70 L58,74" fill="url(#sk)"/>
+      <path d="M44,52 L48,72 M56,52 L52,72" stroke="#0001" stroke-width="1"/>`;
   }
   /* пояс */
   const beltG = bl ? `<rect class="vl belt" x="38" y="72" width="24" height="5" rx="1.5" fill="${visMetal(bl.kind)}" stroke="#2a2018" stroke-width=".6" ${visTint(bl)}/><circle cx="50" cy="74.5" r="1.8" fill="#d4b060"/>` : '';
   /* сапоги / ноги */
   const legs = `<g class="vl legs">
-    <path d="M42,78 L40,108 L46,108 L48,80 Z" fill="${legC}"/><path d="M58,78 L60,108 L54,108 L52,80 Z" fill="${legC}"/>
+    <path d="M42,78 L40,108 L46,108 L48,80 Z" fill="${legC}" stroke="#0003" stroke-width=".5"/><path d="M58,78 L60,108 L54,108 L52,80 Z" fill="${legC}" stroke="#0003" stroke-width=".5"/>
     ${bt ? `<path class="vl boots" d="M38,106 L40,118 L48,118 L47,106 Z" fill="${bootC}" ${visTint(bt)}/><path class="vl boots" d="M62,106 L60,118 L52,118 L53,106 Z" fill="${bootC}" ${visTint(bt)}/><ellipse cx="43" cy="118" rx="6" ry="2.2" fill="${bootC}"/><ellipse cx="57" cy="118" rx="6" ry="2.2" fill="${bootC}"/>`
       : `<path d="M39,108 L40,116 L47,116 L46,108" fill="${skin}"/><path d="M61,108 L60,116 L53,116 L54,108" fill="${skin}"/>`}
   </g>`;
@@ -6124,19 +6163,23 @@ function visSVG(h, opt) {
       <rect x="46" y="20" width="8" height="4" rx="1" fill="#0003"/>${hm.kind === 'h' ? `<path d="M42,14 L40,6 M58,14 L60,6" stroke="${fill}" stroke-width="2"/>` : ''}`;
   }
   const face = `<g class="vl head">
-    <circle cx="50" cy="30" r="${headR}" fill="${skin}" stroke="#0002" stroke-width=".6"/>
+    <circle cx="50" cy="30" r="${headR}" fill="url(#sk)" stroke="#0003" stroke-width=".7"/>
+    <ellipse cx="46" cy="28" rx="4" ry="3" fill="#fff3"/>
     ${ear}${hairG}${helmG}${beard}
-    <circle cx="45" cy="29" r="1.6" fill="${eye}"/><circle cx="55" cy="29" r="1.6" fill="${eye}"/>
-    <circle cx="45.4" cy="28.6" r=".5" fill="#fff"/><circle cx="55.4" cy="28.6" r=".5" fill="#fff"/>
-    <path d="M46,36 Q50,39 54,36" fill="none" stroke="#0004" stroke-width="1" stroke-linecap="round"/>
+    <ellipse cx="45" cy="29.2" rx="2.1" ry="2.3" fill="#fff"/><ellipse cx="55" cy="29.2" rx="2.1" ry="2.3" fill="#fff"/>
+    <circle cx="45.3" cy="29.4" r="1.35" fill="${eye}"/><circle cx="55.3" cy="29.4" r="1.35" fill="${eye}"/>
+    <circle cx="45.7" cy="28.9" r=".45" fill="#fff"/><circle cx="55.7" cy="28.9" r=".45" fill="#fff"/>
+    <path d="M46.5,36.2 Q50,39.5 53.5,36.2" fill="none" stroke="#0005" stroke-width="1.1" stroke-linecap="round"/>
+    <ellipse cx="50" cy="33" rx="3.5" ry="1.6" fill="#0001"/>
   </g>`;
   /* руки + перчатки */
   const handC = gl ? visMetal(gl.kind) : skin;
+  const armFill = ar ? visCloth(ar.kind) : 'url(#sk)';
   const arms = `<g class="vl arms">
-    <path class="armL" d="M40,50 L28,66 L30,70 L42,56 Z" fill="${ar ? visCloth(ar.kind) : skin}"/>
-    <path class="armR" d="M60,50 L72,66 L70,70 L58,56 Z" fill="${ar ? visCloth(ar.kind) : skin}"/>
-    <circle class="vl gloves handL" cx="28" cy="70" r="4.2" fill="${handC}" ${gl ? visTint(gl) : ''}/>
-    <circle class="vl gloves handR" cx="72" cy="70" r="4.2" fill="${handC}" ${gl ? visTint(gl) : ''}/>
+    <path class="armL" d="M40,50 L28,66 L30,70 L42,56 Z" fill="${armFill}" stroke="#0003" stroke-width=".5"/>
+    <path class="armR" d="M60,50 L72,66 L70,70 L58,56 Z" fill="${armFill}" stroke="#0003" stroke-width=".5"/>
+    <circle class="vl gloves handL" cx="28" cy="70" r="4.4" fill="${gl ? handC : 'url(#sk)'}" stroke="#0003" stroke-width=".4" ${gl ? visTint(gl) : ''}/>
+    <circle class="vl gloves handR" cx="72" cy="70" r="4.4" fill="${gl ? handC : 'url(#sk)'}" stroke="#0003" stroke-width=".4" ${gl ? visTint(gl) : ''}/>
   </g>`;
   /* оружие / щит — слои поверх рук */
   const weapG = w ? `<g class="vl weapon" ${visTint(w)}>${visWeaponPath(w.cat || 'sword', 74, 62)}</g>` : '';
@@ -6152,7 +6195,10 @@ function visSVG(h, opt) {
   const aura = topRar >= 3 ? `<ellipse class="vaura r${topRar}" cx="50" cy="70" rx="36" ry="48" fill="${RARITY[topRar].c}" opacity=".12"/>` : '';
   const cursed = equipped(h).some(it => it.curse);
   const tf = `translate(50 ${sc.y * 70}) scale(${sc.s}) translate(-50 ${-70})`;
+  const skin2 = (() => { const n = parseInt((skin||'#e8b896').slice(1), 16); const r=Math.max(0,(n>>16)-28), g=Math.max(0,((n>>8)&255)-32), b=Math.max(0,(n&255)-28); return `#${(r<<16|g<<8|b).toString(16).padStart(6,'0')}`; })();
   return `<svg class="vis ${sz} p-${pose}${cursed ? ' cursed' : ''}${topRar >= 4 ? ' leg' : topRar >= 3 ? ' epi' : ''}" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>${visRad('sk', skin, skin2)}${visShade('mt', '#c8d0d8', '#6a7480')}${visShade('wd', '#a07840', '#5a3a18')}</defs>
+    <ellipse cx="50" cy="128" rx="18" ry="3.5" fill="#0003"/>
     <g class="vroot" transform="${tf}">${aura}${legs}${armorG}${beltG}${amG}${arms}${offG}${weapG}${ringG}${face}</g>
   </svg>`;
 }
@@ -6237,6 +6283,31 @@ const SCN_BIOME = {
   mount: 'mount', valley: 'valley', field: 'field', castle: 'castle',
   coast: 'coast', waste: 'waste', ravine: 'ravine'
 };
+
+/* Нарисованные пластины биомов (webp); при ошибке загрузки остаётся SVG */
+const SCN_ART = { city:1, village:1, forest:1, swamp:1, mount:1, valley:1, field:1, castle:1, coast:1, waste:1, ravine:1, dungeon:1, arena:1 };
+function scnArtKey(biome) {
+  if (biome === 'camp') return 'field';
+  return SCN_ART[biome] ? biome : 'forest';
+}
+function scnPlateHTML(biome) {
+  const key = scnArtKey(biome);
+  return `<div class="scn-plate" data-art="${key}">
+    <div class="scn-plate-shift scn-parallax" data-spd="0.35">
+      <picture>
+        <source type="image/webp" srcset="art/${key}.webp"/>
+        <img class="scn-plate-img" src="art/${key}.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" draggable="false"
+          onload="this.closest('.scn').classList.add('has-art')"
+          onerror="this.closest('.scn-plate').classList.add('fail');this.closest('.scn').classList.remove('has-art')"/>
+      </picture>
+    </div>
+    <div class="scn-tod-veil" aria-hidden="true"></div>
+    <div class="scn-theme-veil" aria-hidden="true"></div>
+  </div>`;
+}
+function scnDustHTML() {
+  return `<div class="scn-dust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>`;
+}
 const SCN_RU = {
   city: 'Город', village: 'Деревня', forest: 'Лес', swamp: 'Болото',
   mount: 'Горы', valley: 'Долина', field: 'Поля', castle: 'Замок',
@@ -6431,7 +6502,11 @@ function scnHTML(h, opt) {
   const doll = visHTML(h, { size: opt.size || 'md', pose, tap: false, cls: 'scn-doll' });
   const cls = `scn scn-${biome} scn-${tod}${walk ? ' scn-walk' : ''}${mode === 'fight' ? ' scn-fight' : ''}${opt.cls ? ' ' + opt.cls : ''}`;
   return `<div class="${cls}" data-biome="${biome}" data-tod="${tod}" data-mode="${mode}" role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение">
-    <div class="scn-bg">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+    <div class="scn-bg">
+      <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+      ${scnPlateHTML(biome)}
+      ${walk ? scnDustHTML() : ''}
+    </div>
     <div class="scn-stage">${doll}</div>
     <div class="scn-label"><span class="scn-ic">${(REG_BY[h.reg] && REG_BY[h.reg].ic) || '📍'}</span> ${esc(label)}</div>
   </div>`;
@@ -6441,7 +6516,10 @@ function scnFightWrap(inner, h) {
   const biome = scnBiome(h || S.hero);
   const tod = scnTod();
   return `<div class="scn scn-${biome} scn-${tod} scn-fight scn-mini" data-biome="${biome}" aria-hidden="true">
-    <div class="scn-bg">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+    <div class="scn-bg">
+      <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+      ${scnPlateHTML(biome)}
+    </div>
     <div class="scn-stage scn-stage-fight">${inner}</div>
   </div>`;
 }

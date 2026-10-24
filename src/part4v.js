@@ -50,6 +50,12 @@ function visTint(it) {
 }
 function visMetal(kind) { return kind === 'h' ? '#8a96a8' : kind === 'l' ? '#8a6a48' : '#6a5a88'; }
 function visCloth(kind) { return kind === 'h' ? '#5a6878' : kind === 'l' ? '#6a5038' : '#4a3a68'; }
+function visShade(id, c1, c2) {
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient>`;
+}
+function visRad(id, c1, c2) {
+  return `<radialGradient id="${id}" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></radialGradient>`;
+}
 
 /* ---------- Оружие по категории ---------- */
 function visWeaponPath(cat, x, y) {
@@ -97,14 +103,15 @@ function visSVG(h, opt) {
       <rect x="44" y="52" width="12" height="10" rx="1" fill="#0002"/><path d="M40,56 L36,74 M60,56 L64,74" stroke="#fff3" stroke-width="1"/>`;
   } else {
     /* голое тело / рубаха */
-    armorG = `<path class="vl bodyt" d="M42,48 L58,48 L60,76 L50,80 L40,76 Z" fill="${skin}" stroke="#0002" stroke-width=".5"/>
-      <path d="M42,48 L38,70 L42,74" fill="${skin}"/><path d="M58,48 L62,70 L58,74" fill="${skin}"/>`;
+    armorG = `<path class="vl bodyt" d="M42,48 L58,48 L60,76 L50,80 L40,76 Z" fill="url(#sk)" stroke="#0003" stroke-width=".6"/>
+      <path d="M42,48 L38,70 L42,74" fill="url(#sk)"/><path d="M58,48 L62,70 L58,74" fill="url(#sk)"/>
+      <path d="M44,52 L48,72 M56,52 L52,72" stroke="#0001" stroke-width="1"/>`;
   }
   /* пояс */
   const beltG = bl ? `<rect class="vl belt" x="38" y="72" width="24" height="5" rx="1.5" fill="${visMetal(bl.kind)}" stroke="#2a2018" stroke-width=".6" ${visTint(bl)}/><circle cx="50" cy="74.5" r="1.8" fill="#d4b060"/>` : '';
   /* сапоги / ноги */
   const legs = `<g class="vl legs">
-    <path d="M42,78 L40,108 L46,108 L48,80 Z" fill="${legC}"/><path d="M58,78 L60,108 L54,108 L52,80 Z" fill="${legC}"/>
+    <path d="M42,78 L40,108 L46,108 L48,80 Z" fill="${legC}" stroke="#0003" stroke-width=".5"/><path d="M58,78 L60,108 L54,108 L52,80 Z" fill="${legC}" stroke="#0003" stroke-width=".5"/>
     ${bt ? `<path class="vl boots" d="M38,106 L40,118 L48,118 L47,106 Z" fill="${bootC}" ${visTint(bt)}/><path class="vl boots" d="M62,106 L60,118 L52,118 L53,106 Z" fill="${bootC}" ${visTint(bt)}/><ellipse cx="43" cy="118" rx="6" ry="2.2" fill="${bootC}"/><ellipse cx="57" cy="118" rx="6" ry="2.2" fill="${bootC}"/>`
       : `<path d="M39,108 L40,116 L47,116 L46,108" fill="${skin}"/><path d="M61,108 L60,116 L53,116 L54,108" fill="${skin}"/>`}
   </g>`;
@@ -124,19 +131,23 @@ function visSVG(h, opt) {
       <rect x="46" y="20" width="8" height="4" rx="1" fill="#0003"/>${hm.kind === 'h' ? `<path d="M42,14 L40,6 M58,14 L60,6" stroke="${fill}" stroke-width="2"/>` : ''}`;
   }
   const face = `<g class="vl head">
-    <circle cx="50" cy="30" r="${headR}" fill="${skin}" stroke="#0002" stroke-width=".6"/>
+    <circle cx="50" cy="30" r="${headR}" fill="url(#sk)" stroke="#0003" stroke-width=".7"/>
+    <ellipse cx="46" cy="28" rx="4" ry="3" fill="#fff3"/>
     ${ear}${hairG}${helmG}${beard}
-    <circle cx="45" cy="29" r="1.6" fill="${eye}"/><circle cx="55" cy="29" r="1.6" fill="${eye}"/>
-    <circle cx="45.4" cy="28.6" r=".5" fill="#fff"/><circle cx="55.4" cy="28.6" r=".5" fill="#fff"/>
-    <path d="M46,36 Q50,39 54,36" fill="none" stroke="#0004" stroke-width="1" stroke-linecap="round"/>
+    <ellipse cx="45" cy="29.2" rx="2.1" ry="2.3" fill="#fff"/><ellipse cx="55" cy="29.2" rx="2.1" ry="2.3" fill="#fff"/>
+    <circle cx="45.3" cy="29.4" r="1.35" fill="${eye}"/><circle cx="55.3" cy="29.4" r="1.35" fill="${eye}"/>
+    <circle cx="45.7" cy="28.9" r=".45" fill="#fff"/><circle cx="55.7" cy="28.9" r=".45" fill="#fff"/>
+    <path d="M46.5,36.2 Q50,39.5 53.5,36.2" fill="none" stroke="#0005" stroke-width="1.1" stroke-linecap="round"/>
+    <ellipse cx="50" cy="33" rx="3.5" ry="1.6" fill="#0001"/>
   </g>`;
   /* руки + перчатки */
   const handC = gl ? visMetal(gl.kind) : skin;
+  const armFill = ar ? visCloth(ar.kind) : 'url(#sk)';
   const arms = `<g class="vl arms">
-    <path class="armL" d="M40,50 L28,66 L30,70 L42,56 Z" fill="${ar ? visCloth(ar.kind) : skin}"/>
-    <path class="armR" d="M60,50 L72,66 L70,70 L58,56 Z" fill="${ar ? visCloth(ar.kind) : skin}"/>
-    <circle class="vl gloves handL" cx="28" cy="70" r="4.2" fill="${handC}" ${gl ? visTint(gl) : ''}/>
-    <circle class="vl gloves handR" cx="72" cy="70" r="4.2" fill="${handC}" ${gl ? visTint(gl) : ''}/>
+    <path class="armL" d="M40,50 L28,66 L30,70 L42,56 Z" fill="${armFill}" stroke="#0003" stroke-width=".5"/>
+    <path class="armR" d="M60,50 L72,66 L70,70 L58,56 Z" fill="${armFill}" stroke="#0003" stroke-width=".5"/>
+    <circle class="vl gloves handL" cx="28" cy="70" r="4.4" fill="${gl ? handC : 'url(#sk)'}" stroke="#0003" stroke-width=".4" ${gl ? visTint(gl) : ''}/>
+    <circle class="vl gloves handR" cx="72" cy="70" r="4.4" fill="${gl ? handC : 'url(#sk)'}" stroke="#0003" stroke-width=".4" ${gl ? visTint(gl) : ''}/>
   </g>`;
   /* оружие / щит — слои поверх рук */
   const weapG = w ? `<g class="vl weapon" ${visTint(w)}>${visWeaponPath(w.cat || 'sword', 74, 62)}</g>` : '';
@@ -152,7 +163,10 @@ function visSVG(h, opt) {
   const aura = topRar >= 3 ? `<ellipse class="vaura r${topRar}" cx="50" cy="70" rx="36" ry="48" fill="${RARITY[topRar].c}" opacity=".12"/>` : '';
   const cursed = equipped(h).some(it => it.curse);
   const tf = `translate(50 ${sc.y * 70}) scale(${sc.s}) translate(-50 ${-70})`;
+  const skin2 = (() => { const n = parseInt((skin||'#e8b896').slice(1), 16); const r=Math.max(0,(n>>16)-28), g=Math.max(0,((n>>8)&255)-32), b=Math.max(0,(n&255)-28); return `#${(r<<16|g<<8|b).toString(16).padStart(6,'0')}`; })();
   return `<svg class="vis ${sz} p-${pose}${cursed ? ' cursed' : ''}${topRar >= 4 ? ' leg' : topRar >= 3 ? ' epi' : ''}" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>${visRad('sk', skin, skin2)}${visShade('mt', '#c8d0d8', '#6a7480')}${visShade('wd', '#a07840', '#5a3a18')}</defs>
+    <ellipse cx="50" cy="128" rx="18" ry="3.5" fill="#0003"/>
     <g class="vroot" transform="${tf}">${aura}${legs}${armorG}${beltG}${amG}${arms}${offG}${weapG}${ringG}${face}</g>
   </svg>`;
 }

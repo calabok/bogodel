@@ -1,7 +1,7 @@
 /* БогоДел — service worker. Версия подставляется deploy.sh; любое изменение файла = обновление у игроков. */
-const VERSION = '20261024-212741';
+const VERSION = '20261024-214526';
 const CACHE = 'bogodel-' + VERSION;
-const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
+const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'art/city.webp', 'art/village.webp', 'art/forest.webp', 'art/swamp.webp', 'art/mount.webp', 'art/valley.webp', 'art/field.webp', 'art/castle.webp', 'art/coast.webp', 'art/waste.webp', 'art/ravine.webp', 'art/dungeon.webp', 'art/arena.webp'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE.map(u => new Request(u, { cache: 'reload' })))));
   // не вызываем skipWaiting сразу: игра сама предложит «Обновить» (или обновится, когда её свернут)

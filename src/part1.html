@@ -802,6 +802,38 @@ body.theme-good .hc-scene{border-color:color-mix(in srgb,var(--gold2) 45%,var(--
 body.theme-evil .hc-scene{border-color:color-mix(in srgb,#8a2030 40%,var(--line))}
 body.theme-evil .scn-night{color:#1a1020}
 
+/* ---------- v15: нарисованные пластины + кукла ---------- */
+.scn-plate{position:absolute;inset:0;z-index:4;overflow:hidden;pointer-events:none}
+.scn-plate.fail{display:none}
+.scn-plate-shift{position:absolute;inset:0;width:112%;left:-6%}
+.scn-plate-img{width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block;user-select:none;-webkit-user-drag:none}
+.scn-svg-fallback{position:absolute;inset:0;z-index:1}
+.scn.has-art .scn-svg-fallback{opacity:0;visibility:hidden}
+.scn-tod-veil,.scn-theme-veil{position:absolute;inset:0;pointer-events:none;z-index:2}
+.scn-day .scn-tod-veil{background:linear-gradient(180deg,#fff2 0%,transparent 35%,#0001 100%)}
+.scn-dusk .scn-tod-veil{background:linear-gradient(180deg,#e8785044 0%,#c0603022 40%,#3a204088 100%)}
+.scn-night .scn-tod-veil{background:linear-gradient(180deg,#1a2848aa 0%,#1a203888 45%,#0a1020cc 100%)}
+body.theme-good .scn-theme-veil{background:radial-gradient(ellipse at 50% 80%,#f5c54218,transparent 60%)}
+body.theme-evil .scn-theme-veil{background:radial-gradient(ellipse at 50% 20%,#8a203028,transparent 55%),linear-gradient(180deg,#40081814,transparent 50%)}
+body.theme-neutral .scn-theme-veil{background:transparent}
+.scn-walk .scn-plate-shift{animation:scnPlateWalk 14s linear infinite}
+@keyframes scnPlateWalk{from{transform:translateX(0)}to{transform:translateX(-8%)}}
+/* пыль под ногами */
+.scn-dust{position:absolute;left:50%;bottom:10%;width:80px;height:24px;margin-left:-40px;z-index:4.5;pointer-events:none}
+.scn-dust i{position:absolute;bottom:0;width:5px;height:5px;border-radius:50%;background:#c8b090aa;opacity:0;animation:scnDust 1.1s ease-out infinite}
+.scn-dust i:nth-child(1){left:20%;animation-delay:0s}.scn-dust i:nth-child(2){left:35%;animation-delay:.18s}
+.scn-dust i:nth-child(3){left:50%;animation-delay:.35s}.scn-dust i:nth-child(4){left:62%;animation-delay:.5s}
+.scn-dust i:nth-child(5){left:28%;animation-delay:.7s}.scn-dust i:nth-child(6){left:55%;animation-delay:.9s}
+@keyframes scnDust{0%{opacity:0;transform:translate(0,0) scale(.6)}30%{opacity:.7}100%{opacity:0;transform:translate(-10px,-14px) scale(1.2)}}
+body.rm .scn-walk .scn-plate-shift,body.rm .scn-dust i{animation:none!important}
+@media (prefers-reduced-motion:reduce){.scn-walk .scn-plate-shift,.scn-dust i{animation:none!important}}
+/* кукла: объёмнее */
+.vis .vroot{filter:drop-shadow(0 2px 1px #0004)}
+.scn-stage .vis{filter:drop-shadow(0 4px 3px #0006) drop-shadow(0 1px 0 #fff2)}
+.scn.has-art .scn-stage .vis{width:min(96px,30%)}
+.scn-fight.has-art .scn-stage-fight .vis{width:78px}
+
+
 
 </style>
 </head>

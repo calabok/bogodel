@@ -7,6 +7,31 @@ const SCN_BIOME = {
   mount: 'mount', valley: 'valley', field: 'field', castle: 'castle',
   coast: 'coast', waste: 'waste', ravine: 'ravine'
 };
+
+/* Нарисованные пластины биомов (webp); при ошибке загрузки остаётся SVG */
+const SCN_ART = { city:1, village:1, forest:1, swamp:1, mount:1, valley:1, field:1, castle:1, coast:1, waste:1, ravine:1, dungeon:1, arena:1 };
+function scnArtKey(biome) {
+  if (biome === 'camp') return 'field';
+  return SCN_ART[biome] ? biome : 'forest';
+}
+function scnPlateHTML(biome) {
+  const key = scnArtKey(biome);
+  return `<div class="scn-plate" data-art="${key}">
+    <div class="scn-plate-shift scn-parallax" data-spd="0.35">
+      <picture>
+        <source type="image/webp" srcset="art/${key}.webp"/>
+        <img class="scn-plate-img" src="art/${key}.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" draggable="false"
+          onload="this.closest('.scn').classList.add('has-art')"
+          onerror="this.closest('.scn-plate').classList.add('fail');this.closest('.scn').classList.remove('has-art')"/>
+      </picture>
+    </div>
+    <div class="scn-tod-veil" aria-hidden="true"></div>
+    <div class="scn-theme-veil" aria-hidden="true"></div>
+  </div>`;
+}
+function scnDustHTML() {
+  return `<div class="scn-dust" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>`;
+}
 const SCN_RU = {
   city: 'Город', village: 'Деревня', forest: 'Лес', swamp: 'Болото',
   mount: 'Горы', valley: 'Долина', field: 'Поля', castle: 'Замок',
@@ -201,7 +226,11 @@ function scnHTML(h, opt) {
   const doll = visHTML(h, { size: opt.size || 'md', pose, tap: false, cls: 'scn-doll' });
   const cls = `scn scn-${biome} scn-${tod}${walk ? ' scn-walk' : ''}${mode === 'fight' ? ' scn-fight' : ''}${opt.cls ? ' ' + opt.cls : ''}`;
   return `<div class="${cls}" data-biome="${biome}" data-tod="${tod}" data-mode="${mode}" role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение">
-    <div class="scn-bg">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+    <div class="scn-bg">
+      <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+      ${scnPlateHTML(biome)}
+      ${walk ? scnDustHTML() : ''}
+    </div>
     <div class="scn-stage">${doll}</div>
     <div class="scn-label"><span class="scn-ic">${(REG_BY[h.reg] && REG_BY[h.reg].ic) || '📍'}</span> ${esc(label)}</div>
   </div>`;
@@ -211,7 +240,10 @@ function scnFightWrap(inner, h) {
   const biome = scnBiome(h || S.hero);
   const tod = scnTod();
   return `<div class="scn scn-${biome} scn-${tod} scn-fight scn-mini" data-biome="${biome}" aria-hidden="true">
-    <div class="scn-bg">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+    <div class="scn-bg">
+      <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
+      ${scnPlateHTML(biome)}
+    </div>
     <div class="scn-stage scn-stage-fight">${inner}</div>
   </div>`;
 }
