@@ -1,7 +1,7 @@
 /* БогоДел — service worker. Версия подставляется deploy.sh; любое изменение файла = обновление у игроков. */
 const VERSION = '__BUILD__';
 const CACHE = 'bogodel-' + VERSION;
-const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'art/city.webp', 'art/village.webp', 'art/forest.webp', 'art/swamp.webp', 'art/mount.webp', 'art/valley.webp', 'art/field.webp', 'art/castle.webp', 'art/coast.webp', 'art/waste.webp', 'art/ravine.webp', 'art/dungeon.webp', 'art/arena.webp'];
+const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png', 'art/city.webp', 'art/village.webp', 'art/forest.webp', 'art/swamp.webp', 'art/mount.webp', 'art/valley.webp', 'art/field.webp', 'art/castle.webp', 'art/coast.webp', 'art/waste.webp', 'art/ravine.webp', 'art/dungeon.webp', 'art/arena.webp', 'art/hero_idle.webp', 'art/hero_walk1.webp', 'art/hero_walk2.webp', 'art/hero_attack.webp', 'art/hero_block.webp', 'art/hero_hurt.webp', 'art/hero_dead.webp', 'art/foe_beast.webp', 'art/foe_bandit.webp', 'art/foe_undead.webp'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE.map(u => new Request(u, { cache: 'reload' })))));
   // не вызываем skipWaiting сразу: игра сама предложит «Обновить» (или обновится, когда её свернут)

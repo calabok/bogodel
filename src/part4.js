@@ -156,6 +156,7 @@ function renderHero() {
   <div class="hc-mini">${bldChip(h)}<button class="linkbtn gsc" data-act="sheet" title="${esc(gsTip(h))}">⚔ ГС <b>${gearScore(h)}</b>${equipped(h).some(it => it.curse) ? ' <span class="cur" title="Надет проклятый предмет">☠</span>' : ''}</button><span title="Золото"><b>${h.gold}</b> 💰</span><span title="Зелья"><b>${h.potions}</b> 🧪</span><span title="Привалы"><b>${h.shortRests}</b> ⛺</span>
     ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div></div>`;
   setHTML($('colHero'), html);
+  if (typeof visPaintCheck === 'function') visPaintCheck($('colHero'));
   document.body.classList.toggle('heroCol', col);
 }
 /* ---------- v8: путь героя в интерфейсе ---------- */

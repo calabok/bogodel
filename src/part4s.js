@@ -214,6 +214,8 @@ function scnGroundSVG(biome) {
   return `<svg class="scn-layer scn-ground" viewBox="0 0 320 160" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><g class="scn-parallax scn-tile" data-spd="1">${path}</g></svg>`;
 }
 
+let scnLastBiome = null, scnLastMode = null;
+
 function scnHTML(h, opt) {
   opt = opt || {};
   h = h || S.hero;
@@ -222,9 +224,12 @@ function scnHTML(h, opt) {
   const mode = opt.mode || scnMode(h);
   const label = opt.label || scnLabel(h);
   const walk = mode === 'walk';
-  const pose = walk ? 'walk' : mode === 'dead' ? 'dead' : mode === 'rest' ? 'idle' : (mode === 'fight' ? 'idle' : 'idle');
+  const pose = walk ? 'walk' : mode === 'dead' ? 'dead' : mode === 'rest' ? 'idle' : 'idle';
   const doll = visHTML(h, { size: opt.size || 'md', pose, tap: false, cls: 'scn-doll' });
-  const cls = `scn scn-${biome} scn-${tod}${walk ? ' scn-walk' : ''}${mode === 'fight' ? ' scn-fight' : ''}${opt.cls ? ' ' + opt.cls : ''}`;
+  const xfade = (scnLastBiome && scnLastBiome !== biome) || (scnLastMode && scnLastMode !== mode && (mode === 'fight' || scnLastMode === 'fight'));
+  const beat = scnJourneyBeat(h, biome, mode);
+  const cls = `scn scn-${biome} scn-${tod}${walk ? ' scn-walk' : ''}${mode === 'fight' ? ' scn-fight' : ''}${xfade ? ' scn-xfade' : ''}${beat ? ' scn-beat-' + beat : ''}${opt.cls ? ' ' + opt.cls : ''}`;
+  scnLastBiome = biome; scnLastMode = mode;
   return `<div class="${cls}" data-biome="${biome}" data-tod="${tod}" data-mode="${mode}" role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение">
     <div class="scn-bg">
       <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
@@ -233,9 +238,20 @@ function scnHTML(h, opt) {
     </div>
     <div class="scn-stage">${doll}</div>
     <div class="scn-label"><span class="scn-ic">${(REG_BY[h.reg] && REG_BY[h.reg].ic) || '📍'}</span> ${esc(label)}</div>
+    ${xfade ? `<div class="scn-transit" aria-hidden="true"><span>${esc(SCN_RU[biome] || label)}</span></div>` : ''}
+    ${beat ? `<div class="scn-beat" aria-hidden="true">${beat === 'arrive' ? '🏘' : beat === 'enter' ? '🕳' : beat === 'camp' ? '🔥' : beat === 'leave' ? '🛣' : '✨'}</div>` : ''}
   </div>`;
 }
-/* Фон боя: тот же биом, без куклы (куклы уже в vpair) */
+function scnJourneyBeat(h, biome, mode) {
+  if (!h) return '';
+  if (mode === 'fight') return '';
+  if (h.state === 'town' && scnLastMode === 'walk') return 'arrive';
+  if (h.state === 'road' && scnLastMode === 'idle' && (scnLastBiome === 'city' || scnLastBiome === 'village')) return 'leave';
+  if (biome === 'dungeon' && scnLastBiome !== 'dungeon') return 'enter';
+  if (biome === 'camp' && scnLastBiome !== 'camp') return 'camp';
+  return '';
+}
+/* Фон боя: биом + герой vs враг + слой ударов */
 function scnFightWrap(inner, h) {
   const biome = scnBiome(h || S.hero);
   const tod = scnTod();
@@ -244,7 +260,21 @@ function scnFightWrap(inner, h) {
       <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
       ${scnPlateHTML(biome)}
     </div>
-    <div class="scn-stage scn-stage-fight">${inner}</div>
+    <div class="scn-stage scn-stage-fight">${inner}<div class="scn-fx" aria-hidden="true"></div></div>
   </div>`;
 }
-
+function scnFightSlash(F) {
+  const box = document.querySelector('#fightBox .scn-fx');
+  if (!box) return;
+  const zone = (F && F.my && F.my.atk && F.my.atk[0]) || 'chest';
+  const el = document.createElement('i');
+  el.className = 'scn-slash z-' + zone;
+  box.appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 480);
+  /* hit flash on foe */
+  const foe = document.querySelector('#fightBox .vfoe, #fightBox .vis.foe');
+  if (foe) {
+    foe.classList.add('hitflash');
+    setTimeout(() => foe.classList.remove('hitflash'), 360);
+  }
+}

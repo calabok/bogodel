@@ -88,10 +88,18 @@ function fightFx(F) {
   /* поза куклы: удар / блок / боль */
   if (typeof visApplyFightPose === 'function') {
     const dealt = F.fx.a.some(a => me && a.id !== me.id && a.v > 0);
-    document.querySelectorAll('#fightBox .vwrap.me .vis, #colHero .vis').forEach(el => {
-      el.classList.remove('p-idle', 'p-walk', 'p-attack', 'p-block', 'p-hurt', 'p-dead');
-      el.classList.add(meHit ? 'p-hurt' : dealt ? 'p-attack' : blk ? 'p-block' : 'p-idle');
+    const pose = meHit ? 'hurt' : dealt ? 'attack' : blk ? 'block' : 'idle';
+    document.querySelectorAll('#fightBox .vwrap, #colHero .vwrap.painted, #colHero .scn-doll').forEach(el => {
+      if (typeof visSetPoseOn === 'function') visSetPoseOn(el, pose);
+      else {
+        el.setAttribute('data-pose', pose);
+        el.querySelectorAll('.vis').forEach(v => {
+          v.classList.remove('p-idle', 'p-walk', 'p-attack', 'p-block', 'p-hurt', 'p-dead');
+          v.classList.add('p-' + pose);
+        });
+      }
     });
+    if (pose === 'attack' && typeof scnFightSlash === 'function') scnFightSlash(F);
     if (meHit || dealt) setTimeout(() => { if (S && S.fight) visApplyFightPose(S.fight); }, 500);
   }
 }

@@ -772,7 +772,9 @@ body.theme-evil .vpair .vis.foe{filter:hue-rotate(-10deg) saturate(1.15)}
 .scn-torch{animation:scnTorch 1.8s ease-in-out infinite}
 @keyframes scnTorch{0%,100%{opacity:.15}50%{opacity:.35}}
 /* fight mini scene */
-.scn-fight.scn-mini{height:140px;max-height:28vh;cursor:default;border-radius:12px;margin-bottom:4px;border:1px solid var(--line)}
+.scn-fight.scn-mini{width:100%;height:140px;max-height:28vh;cursor:default;border-radius:12px;margin-bottom:4px;border:1px solid var(--line);overflow:hidden}
+.vfight{width:100%}
+.vfight .scn{width:100%}
 .scn-stage-fight{height:100%;align-items:flex-end;padding-bottom:2px}
 .scn-stage-fight .vpair{width:100%;justify-content:space-evenly}
 .scn-stage-fight .vis{width:72px;max-height:90%}
@@ -833,6 +835,97 @@ body.rm .scn-walk .scn-plate-shift,body.rm .scn-dust i{animation:none!important}
 .scn.has-art .scn-stage .vis{width:min(96px,30%)}
 .scn-fight.has-art .scn-stage-fight .vis{width:78px}
 
+
+
+
+/* ---------- v16: стильный герой + бой-виньетка + путешествие ---------- */
+.vwrap.painted{position:relative;display:inline-flex;align-items:flex-end;justify-content:center;width:72px;height:100px}
+.vwrap.painted.sm,.vwrap.painted .vis.sm{width:36px;height:50px}
+.vwrap.painted .vis.lg,.dav .vwrap.painted{width:100px;height:140px}
+.vpaint{position:absolute;inset:0;z-index:1;pointer-events:none}
+.vpaint .vp-fr{position:absolute;inset:0;opacity:0;transition:opacity .12s linear}
+.vpaint .vp-fr img{width:100%;height:100%;object-fit:contain;object-position:bottom center;display:block;opacity:1;filter:drop-shadow(0 3px 2px #0005)}
+.vwrap.painted .vgear{position:absolute;inset:0;z-index:2;width:100%!important;height:100%!important;pointer-events:none;overflow:visible}
+.vwrap.painted .vfb{display:none}
+.vwrap.painted.paint-fail .vpaint{display:none}
+.vwrap.painted.paint-fail .vgear{display:none}
+.vwrap.painted.paint-fail .vfb{display:block;position:relative;inset:auto;opacity:1}
+.vfoe .foe-svg{display:none}
+.vfoe.paint-fail .fpaint{display:none}
+.vfoe.paint-fail .foe-svg{display:block;position:relative;opacity:1}
+/* позы → кадры */
+.vwrap[data-pose=idle] .vp-idle,
+.vwrap[data-pose=rest] .vp-idle{opacity:1}
+.vwrap[data-pose=walk] .vp-walk1{opacity:1;animation:vpWalkA .55s steps(1) infinite}
+.vwrap[data-pose=walk] .vp-walk2{opacity:0;animation:vpWalkB .55s steps(1) infinite}
+@keyframes vpWalkA{0%,49.9%{opacity:1}50%,100%{opacity:0}}
+@keyframes vpWalkB{0%,49.9%{opacity:0}50%,100%{opacity:1}}
+.vwrap[data-pose=attack] .vp-attack{opacity:1}
+.vwrap[data-pose=block] .vp-block{opacity:1}
+.vwrap[data-pose=hurt] .vp-hurt{opacity:1}
+.vwrap[data-pose=dead] .vp-dead{opacity:1}
+.vwrap[data-pose=attack]{animation:vpLunge .4s ease-out 1}
+.vwrap[data-pose=hurt]{animation:vpRecoil .4s ease-out 1;filter:brightness(1.12)}
+.vwrap[data-pose=block] .vgear .vl.offhand{transform:rotate(-16deg) translate(2px,-3px)}
+@keyframes vpLunge{0%,100%{transform:translateX(0)}40%{transform:translateX(6px)}}
+@keyframes vpRecoil{0%,100%{transform:translateX(0)}35%{transform:translateX(-6px) rotate(-3deg)}}
+/* раса / класс — лёгкий тинт краски */
+.vpaint.race-elf{filter:hue-rotate(12deg) saturate(1.04) brightness(1.02)}
+.vpaint.race-dwarf{filter:saturate(1.15) brightness(.96) sepia(.12)}
+.vpaint.race-orc{filter:hue-rotate(22deg) saturate(1.05) brightness(.98)}
+.vpaint.race-tiefling{filter:hue-rotate(-8deg) saturate(1.08) brightness(.99)}
+.vpaint.race-halfling{filter:saturate(1.08) brightness(1.05)}
+.vpaint.race-gnome{filter:hue-rotate(8deg) saturate(1.1)}
+.vpaint.cls-mage{filter:brightness(1.03) saturate(.95)}
+.vpaint.cls-barbarian{filter:contrast(1.05) saturate(1.08)}
+.vwrap.painted .vgear.cursed,.vwrap.painted.has-paint.cursed .vpaint{filter:brightness(.78) saturate(.65)}
+.vwrap.painted .vgear.leg .vaura{opacity:.22;animation:vpulse 2.2s ease-in-out infinite}
+/* враг */
+.vfoe{position:relative;width:72px;height:100px;display:inline-flex;align-items:flex-end;justify-content:center}
+.vfoe .fpaint{position:absolute;inset:0;z-index:1;transform:scaleX(-1)}
+.vfoe .fpaint img{width:100%;height:100%;object-fit:contain;object-position:bottom center;filter:drop-shadow(0 3px 2px #0005)}
+.vfoe .foe-svg{position:absolute;inset:0;z-index:0;width:100%!important;height:100%!important}
+.vfoe.hitflash{animation:foeFlash .35s ease-out 1}
+@keyframes foeFlash{0%{filter:brightness(2) saturate(1.4)}100%{filter:none}}
+.fpaint.boss{filter:drop-shadow(0 0 6px #c0404088)}
+.fpaint.elite{filter:drop-shadow(0 0 4px #8a3cc488)}
+.vpair .vfoe{width:88px;height:122px}
+.scn-stage .vwrap.painted{width:min(96px,30%);height:95%;max-height:95%}
+.scn-stage-fight .vwrap.painted,.scn-stage-fight .vfoe{width:78px;height:90%}
+/* сцена боя: слэш */
+.scn-fx{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden}
+.scn-slash{position:absolute;left:42%;top:35%;width:48%;height:4px;border-radius:3px;background:linear-gradient(90deg,#fff0,#ffe8a0,#fff8);box-shadow:0 0 8px #ffc040aa;transform-origin:left center;animation:scnSlash .42s ease-out 1;opacity:0}
+.scn-slash.z-head{top:22%}.scn-slash.z-chest{top:35%}.scn-slash.z-belly,.scn-slash.z-waist{top:48%}.scn-slash.z-legs{top:62%}
+@keyframes scnSlash{0%{opacity:0;transform:scaleX(.2) rotate(-8deg)}30%{opacity:1}100%{opacity:0;transform:scaleX(1.1) rotate(6deg)}}
+/* путешествие: кроссфейд + метка */
+.scn-xfade{animation:scnXfade .55s ease-out 1}
+@keyframes scnXfade{0%{filter:brightness(1.4) saturate(.7)}100%{filter:none}}
+.scn-transit{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);z-index:7;font-size:13px;font-weight:800;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--card,#fff) 88%,transparent);border:1px solid var(--line);color:var(--ink);pointer-events:none;animation:scnTransit .9s ease-out 1;white-space:nowrap}
+@keyframes scnTransit{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}25%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%) scale(1.05)}}
+.scn-beat{position:absolute;right:10px;bottom:12px;z-index:7;font-size:22px;pointer-events:none;animation:scnBeat 1s ease-out 1}
+@keyframes scnBeat{0%{opacity:0;transform:scale(.5) translateY(8px)}40%{opacity:1;transform:scale(1.15)}100%{opacity:0;transform:scale(1) translateY(-10px)}}
+/* reduced motion */
+body.rm .vwrap[data-pose=walk] .vp-walk1,body.rm .vwrap[data-pose=walk] .vp-walk2{animation:none!important}
+body.rm .vwrap[data-pose=walk] .vp-walk1{opacity:1}
+body.rm .vwrap[data-pose=walk] .vp-walk2{opacity:0}
+body.rm .vwrap[data-pose=attack],body.rm .vwrap[data-pose=hurt],body.rm .scn-xfade,body.rm .scn-transit,body.rm .scn-beat,body.rm .scn-slash,body.rm .vfoe.hitflash{animation:none!important}
+body.rm .scn-slash{opacity:.7}
+@media (prefers-reduced-motion:reduce){
+  .vwrap[data-pose=walk] .vp-walk1,.vwrap[data-pose=walk] .vp-walk2{animation:none!important}
+  .vwrap[data-pose=walk] .vp-walk1{opacity:1}.vwrap[data-pose=walk] .vp-walk2{opacity:0}
+  .vwrap[data-pose=attack],.vwrap[data-pose=hurt],.scn-xfade,.scn-transit,.scn-beat,.scn-slash,.vfoe.hitflash{animation:none!important}
+}
+@media (max-width:400px){
+  .vwrap.painted{width:58px;height:80px}
+  .vpair .vfoe,.vpair .vwrap.painted{width:70px;height:98px}
+  .scn-stage .vwrap.painted{width:72px}
+}
+@media (min-width:1000px){
+  .vwrap.painted{width:84px;height:112px}
+  .vpair .vfoe,.vpair .vwrap.painted{width:100px;height:138px}
+  .scn-stage .vwrap.painted{width:110px}
+  .scn-stage-fight .vwrap.painted,.scn-stage-fight .vfoe{width:92px}
+}
 
 
 </style>
