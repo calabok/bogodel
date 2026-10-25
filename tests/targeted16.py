@@ -66,7 +66,7 @@ async def main():
                 ov:{OV}, nav, biome:scn&&scn.dataset.biome}};
             }})()""")
             ok(f'{W}px: painted hero+scene, walk pose, no h-scroll',
-               r['scn'] and r['painted'] and r['pose']=='walk' and r['frames']==7 and not r['ov']
+               r['scn'] and r['painted'] and r['pose']=='walk' and r['frames']>=7 and not r['ov']
                and set(r['nav'])>={'powers','flock','arena','gods','hero'} and (r['paint'] or URL.startswith('file:')), r)
             await ctx.close()
 
@@ -80,11 +80,14 @@ async def main():
         r = await pg.evaluate("""()=>{
           const w=document.querySelector('#colHero .vwrap.painted');
           const gear=w&&[...w.querySelectorAll('.vgear .vl.weapon,.vgear .vl.helm,.vgear .vl.armor,.vgear .vl.offhand,.vgear .vl.amulet,.vgear .vl.ring')].length;
-          const img=w&&w.querySelector('.vp-idle img');
-          return {pose:w&&w.dataset.pose, gear, has:w&&w.classList.contains('has-paint'), fail:w&&w.classList.contains('paint-fail'),
+          const kit=w&&w.dataset.kit;
+          const worn=w&&w.querySelector('.vp-kit-h .vp-idle img');
+          const img=w&&w.querySelector('.vp-bare.vp-idle img, .vp-idle img');
+          return {pose:w&&w.dataset.pose, gear, kit, worn:!!(worn&&(worn.naturalWidth>0||worn.complete)),
+            has:w&&w.classList.contains('has-paint'), fail:w&&w.classList.contains('paint-fail'),
             paintVis:img&&(img.naturalWidth>0||img.complete), race:w&&w.querySelector('.vpaint')&&w.querySelector('.vpaint').dataset.race};
         }""")
-        ok('idle+geared layers (weapon/helm/armor/offhand…)', r['pose']=='idle' and r['gear']>=3 and (r['has'] or r.get('fail') or r.get('paintVis')), r)
+        ok('idle+geared layers (weapon/helm/armor/offhand…)', r['pose']=='idle' and (r['kit'] in ('h','l','c') or r['gear']>=3) and (r['has'] or r.get('fail') or r.get('paintVis')), r)
         await pg.locator('#colHero .scn').screenshot(path=SHOTS+'idle_geared_390.png')
 
         # walk

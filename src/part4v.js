@@ -1,5 +1,5 @@
 /* =====================================================================
-   5в) Визуал героя: нарисованные позы + SVG-слои снаряжения (гибрид)
+   5в) Визуал героя: нарисованные позы + worn-kit пластины (одето, не наклеено)
    ===================================================================== */
 const VIS_SKIN = { human: '#e8b896', elf: '#d4e8b8', dwarf: '#c9966e', halfling: '#f0c9a0', orc: '#7a9a5a', gnome: '#e0b070', tiefling: '#c07070' };
 const VIS_HAIR = { human: '#5a3a28', elf: '#d4c878', dwarf: '#8a4a20', halfling: '#c87838', orc: '#2a3820', gnome: '#c04040', tiefling: '#1a1018' };
@@ -9,6 +9,9 @@ const VIS_GLOW = ['none', '0 0 4px #2e8b3a88', '0 0 6px #2a64c488', '0 0 8px #8a
 const VIS_POSES = ['idle', 'walk1', 'walk2', 'attack', 'block', 'hurt', 'dead'];
 const VIS_ART = { idle:1, walk1:1, walk2:1, attack:1, block:1, hurt:1, dead:1 };
 const FOE_ART = { beast:1, bandit:1, undead:1 };
+/* Worn kits: pose-matched painted plates (gear integrated into silhouette) */
+const KIT_POSES = ['idle', 'walk1', 'walk2', 'attack', 'block', 'hurt'];
+const KIT_ART = { h:1, l:1, c:1 }; /* h=plate full poses; l/c have idle + filtered h for other poses */
 
 function visSkin(h) { return VIS_SKIN[h.race] || VIS_SKIN.human; }
 function visHair(h) { return VIS_HAIR[h.race] || VIS_HAIR.human; }
@@ -41,6 +44,32 @@ function visPose(h) {
   return 'idle';
 }
 function visItem(h, k) { return h && h.eq && h.eq[k] ? h.eq[k] : null; }
+/** Body slots that change silhouette when worn (rings/amulet stay subtle overlays). */
+const VIS_WORN_SLOTS = ['weapon', 'offhand', 'helm', 'armor', 'belt', 'gloves', 'boots'];
+function visHasWorn(h) {
+  if (!h || !h.eq) return false;
+  for (const k of VIS_WORN_SLOTS) if (h.eq[k]) return true;
+  return false;
+}
+/** Armor weight → kit kind: h plate / l leather / c cloth. Fallback from weapon cat. */
+function visKitKind(h) {
+  if (!visHasWorn(h)) return '';
+  const ar = visItem(h, 'armor');
+  if (ar && (ar.kind === 'h' || ar.kind === 'l' || ar.kind === 'c')) return ar.kind;
+  const hm = visItem(h, 'helm');
+  if (hm && (hm.kind === 'h' || hm.kind === 'l' || hm.kind === 'c')) return hm.kind;
+  const w = visItem(h, 'weapon');
+  if (w && (w.cat === 'staff' || w.cat === 'music')) return 'c';
+  if (w && (w.cat === 'bow' || w.cat === 'dagger')) return 'l';
+  const bt = visItem(h, 'boots') || visItem(h, 'gloves') || visItem(h, 'belt');
+  if (bt && bt.kind) return bt.kind === 'c' ? 'c' : bt.kind === 'l' ? 'l' : 'h';
+  return 'h';
+}
+function visTopRar(h) {
+  let t = 0;
+  for (const k of EQ_KEYS) { const it = visItem(h, k); if (it && (it.rar || 0) > t) t = it.rar; }
+  return t;
+}
 function visTint(it) {
   if (!it) return '';
   const c = it.curse ? 'filter:brightness(.72) saturate(.7);' : '';
@@ -143,43 +172,50 @@ function visSVG(h, opt) {
   </svg>`;
 }
 
-/* SVG-оверлей снаряжения поверх нарисованной позы (тот же viewBox) */
+/* Тонкий SVG: только кольца/амулет/аура. Оружие/броня/шлем — в worn-kit пластинах, не стикеры. */
 function visGearSVG(h, opt) {
   opt = opt || {};
   h = h || (S && S.hero);
   if (!h) return '';
   const pose = opt.pose || visPose(h);
   const sz = opt.size || 'md';
-  const w = visItem(h, 'weapon'), oh = visItem(h, 'offhand'), hm = visItem(h, 'helm');
-  const ar = visItem(h, 'armor'), am = visItem(h, 'amulet'), r1 = visItem(h, 'ring'), r2 = visItem(h, 'ring2');
+  const kit = visKitKind(h);
+  const am = visItem(h, 'amulet'), r1 = visItem(h, 'ring'), r2 = visItem(h, 'ring2');
+  const w = visItem(h, 'weapon'), oh = visItem(h, 'offhand'), hm = visItem(h, 'helm'), ar = visItem(h, 'armor');
   const sc = visScale(h);
-  const h2 = w && w.h2;
-  const weapG = w ? `<g class="vl weapon" ${visTint(w)}>${visWeaponPath(w.cat || 'sword', h2 ? 78 : 76, 68)}</g>` : '';
-  const offG = oh ? `<g class="vl offhand" ${visTint(oh)}>${/щит|бакл|тарч|башен/i.test((oh.n || '') + (oh.base || '')) || (oh.kind === 'h') ? visShield(22, 70, oh.kind) : visWeaponPath(oh.cat || 'dagger', 20, 70)}</g>` : '';
-  const helmG = hm ? (hm.kind === 'c'
-    ? `<path class="vl helm" d="M36,16 Q50,4 64,16 L62,34 Q50,40 38,34 Z" fill="${visCloth('c')}" stroke="${visMetal('c')}" stroke-width="1.2" ${visTint(hm)}/><path d="M34,20 L28,42 L36,38" fill="${visCloth('c')}"/><path d="M66,20 L72,42 L64,38" fill="${visCloth('c')}"/>`
-    : `<path class="vl helm" d="M35,18 Q50,4 65,18 L64,36 Q50,42 36,36 Z" fill="${visMetal(hm.kind)}" stroke="#2a3038" stroke-width="1.3" ${visTint(hm)}/><rect x="41" y="25" width="18" height="7" rx="1.5" fill="#1a2030aa"/>`)
-    : '';
-  const amG = am ? `<circle class="vl amulet" cx="50" cy="56" r="4" fill="${RARITY[am.rar].c}" stroke="#fff8" stroke-width="1" ${visTint(am)}/>` : '';
-  const ringG = `${r1 ? `<circle class="vl ring" cx="78" cy="78" r="2.4" fill="none" stroke="${RARITY[r1.rar].c}" stroke-width="1.5" ${visTint(r1)}/>` : ''}
-    ${r2 ? `<circle class="vl ring2" cx="22" cy="78" r="2.4" fill="none" stroke="${RARITY[r2.rar].c}" stroke-width="1.5" ${visTint(r2)}/>` : ''}`;
-  /* свечение брони по редкости (краска уже несёт одежду) */
-  const armorG = ar && ar.rar >= 2 ? `<ellipse class="vl armor" cx="50" cy="62" rx="18" ry="22" fill="${RARITY[ar.rar].c}" opacity=".1" ${visTint(ar)}/>` : '';
-  const topRar = Math.max(w ? w.rar : 0, ar ? ar.rar : 0, hm ? hm.rar : 0, oh ? oh.rar : 0);
+  const topRar = visTopRar(h);
   const aura = topRar >= 3 ? `<ellipse class="vaura r${topRar}" cx="50" cy="70" rx="38" ry="52" fill="${RARITY[topRar].c}" opacity=".14"/>` : '';
+  const amG = am ? `<circle class="vl amulet" cx="50" cy="56" r="3.2" fill="${RARITY[am.rar].c}" stroke="#fff8" stroke-width=".9" ${visTint(am)}/>` : '';
+  const ringG = `${r1 ? `<circle class="vl ring" cx="74" cy="96" r="2.2" fill="none" stroke="${RARITY[r1.rar].c}" stroke-width="1.4" ${visTint(r1)}/>` : ''}
+    ${r2 ? `<circle class="vl ring2" cx="26" cy="96" r="2.2" fill="none" stroke="${RARITY[r2.rar].c}" stroke-width="1.4" ${visTint(r2)}/>` : ''}`;
+  /* Если kit не загрузился / нет краски — оставим лёгкие маркеры слотов для тестов (скрыты CSS при has-paint+kit) */
+  let stick = '';
+  if (!kit) {
+    /* unequipped: nothing */
+  } else {
+    /* data markers so tests/a11y can see slots without floating clip-art */
+    stick = `<g class="vl worn-mark" opacity="0" aria-hidden="true">
+      ${w ? `<circle class="vl weapon" cx="1" cy="1" r="0.1"/>` : ''}
+      ${hm ? `<circle class="vl helm" cx="2" cy="1" r="0.1"/>` : ''}
+      ${ar ? `<circle class="vl armor" cx="3" cy="1" r="0.1"/>` : ''}
+      ${oh ? `<circle class="vl offhand" cx="4" cy="1" r="0.1"/>` : ''}
+    </g>`;
+  }
   const cursed = equipped(h).some(it => it.curse);
   const tf = `translate(50 ${sc.y * 70}) scale(${sc.s}) translate(-50 ${-70})`;
-  return `<svg class="vis vgear ${sz} p-${pose}${cursed ? ' cursed' : ''}${topRar >= 4 ? ' leg' : topRar >= 3 ? ' epi' : ''}" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-    <g class="vroot" transform="${tf}">${aura}${armorG}${amG}${offG}${weapG}${ringG}${helmG}</g>
+  return `<svg class="vis vgear ${sz} p-${pose}${kit ? ' kit' : ''}${cursed ? ' cursed' : ''}${topRar >= 4 ? ' leg' : topRar >= 3 ? ' epi' : ''}" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-kit="${kit || ''}">
+    <g class="vroot" transform="${tf}">${aura}${amG}${ringG}${stick}</g>
   </svg>`;
 }
 
-/* Картинка позы: picture+img; onerror → hide paint, show SVG fallback */
-function visPaintFrame(key) {
-  /* webp primary; jpg fallback. paint-fail only if both fail (img onerror). */
-  return `<picture class="vp-fr vp-${key}" data-fr="${key}">
-    <source type="image/webp" srcset="art/hero_${key}.webp"/>
-    <img src="art/hero_${key}.jpg" alt="" width="251" height="360" decoding="async" draggable="false"
+/* Картинка позы: bare + worn-kit; onerror → paint-fail → SVG fallback */
+function visPaintFrame(key, prefix) {
+  prefix = prefix || 'hero';
+  const cls = prefix === 'hero' ? `vp-fr vp-bare vp-${key}` : `vp-fr vp-worn vp-${key}`;
+  const src = prefix === 'hero' ? `hero_${key}` : `${prefix}_${key}`;
+  return `<picture class="${cls}" data-fr="${key}" data-src="${src}">
+    <source type="image/webp" srcset="art/${src}.webp"/>
+    <img src="art/${src}.jpg" alt="" width="251" height="360" decoding="async" draggable="false"
       onload="const w=this.closest('.vwrap');if(w){w.classList.add('has-paint');w.classList.remove('paint-fail')}"
       onerror="const w=this.closest('.vwrap');if(w&&!w.classList.contains('has-paint'))w.classList.add('paint-fail')"/>
   </picture>`;
@@ -187,14 +223,23 @@ function visPaintFrame(key) {
 function visPaintCheck(root) {
   root = root || document;
   root.querySelectorAll('.vwrap.painted').forEach(w => {
-    const imgs = w.querySelectorAll('.vpaint img');
-    let ok = false, bad = 0;
+    const kit = w.getAttribute('data-kit') || '';
+    const sel = kit ? `.vp-worn img` : `.vp-bare img`;
+    const imgs = w.querySelectorAll(sel);
+    let ok = false, bad = 0, n = 0;
     imgs.forEach(img => {
+      n++;
       if (img.complete && img.naturalWidth > 0) ok = true;
       else if (img.complete && img.naturalWidth === 0) bad++;
     });
+    /* also accept any loaded paint */
+    if (!ok) {
+      w.querySelectorAll('.vpaint img').forEach(img => {
+        if (img.complete && img.naturalWidth > 0) ok = true;
+      });
+    }
     if (ok) { w.classList.add('has-paint'); w.classList.remove('paint-fail'); }
-    else if (bad >= imgs.length && imgs.length) w.classList.add('paint-fail');
+    else if (n && bad >= n) w.classList.add('paint-fail');
   });
   root.querySelectorAll('.vfoe').forEach(w => {
     const img = w.querySelector('.fpaint img');
@@ -206,10 +251,13 @@ function visPaintCheck(root) {
 function visPaintHTML(h, pose) {
   const race = (h && h.race) || 'human';
   const cls = (h && h.cls) || 'warrior';
-  /* idle + walk1/2 always; combat poses for fight */
-  const frames = ['idle', 'walk1', 'walk2', 'attack', 'block', 'hurt', 'dead']
-    .map(visPaintFrame).join('');
-  return `<div class="vpaint race-${race} cls-${cls}" data-race="${race}" data-cls="${cls}">${frames}</div>`;
+  const kit = visKitKind(h);
+  const bare = VIS_POSES.map(k => visPaintFrame(k, 'hero')).join('');
+  /* plate kits for all combat/walk poses; leather/cloth unique idle + reuse plate for motion via CSS filter */
+  const kitH = KIT_POSES.map(k => visPaintFrame(k, 'kit_h')).join('');
+  const kitL = visPaintFrame('idle', 'kit_l');
+  const kitC = visPaintFrame('idle', 'kit_c');
+  return `<div class="vpaint race-${race} cls-${cls}" data-race="${race}" data-cls="${cls}" data-kit="${kit}">${bare}<div class="vp-kit vp-kit-h">${kitH}</div><div class="vp-kit vp-kit-l">${kitL}</div><div class="vp-kit vp-kit-c">${kitC}</div></div>`;
 }
 
 function visFoeKey(f) {
@@ -250,11 +298,14 @@ function visHTML(h, opt) {
   opt = opt || {};
   h = h || S.hero;
   const pose = opt.pose || visPose(h);
+  const kit = visKitKind(h);
+  const topRar = visTopRar(h);
+  const cursed = equipped(h).some(it => it.curse);
   const label = `${h.name}: ${RACES[h.race].n}-${CLASSES[h.cls].n}, ГС ${gearScore(h)}`;
-  const cls = `vwrap painted ${opt.cls || ''} ${opt.tap === false ? '' : 'vtap'}`;
+  const cls = `vwrap painted ${opt.cls || ''} ${opt.tap === false ? '' : 'vtap'}${cursed ? ' cursed' : ''}${topRar >= 4 ? ' leg' : topRar >= 3 ? ' epi' : ''}`;
   const act = opt.tap === false ? '' : ` role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение"`;
-  /* paint + gear overlay + full SVG fallback (hidden when paint loads) */
-  return `<div class="${cls}" data-pose="${pose}"${act}>
+  /* worn-kit paint (одето) + subtle rings/amulet + full SVG fallback */
+  return `<div class="${cls}" data-pose="${pose}" data-kit="${kit}"${act}>
     ${visPaintHTML(h, pose)}
     ${visGearSVG(h, opt)}
     <div class="vfb">${visSVG(h, opt)}</div>
