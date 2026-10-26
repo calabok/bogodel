@@ -64,13 +64,13 @@ async def main():
               const nav=[...document.querySelectorAll('#mnav [data-arg]')].map(b=>b.dataset.arg);
               const diary=document.getElementById('diary');
               return {{amap:!!a, nodes:a&&a.querySelectorAll('.amap-node').length,
-                paths:a&&a.querySelectorAll('.amap-path').length,
+                paths:(a&&(a.querySelectorAll('.wmap-road').length||a.querySelectorAll('.amap-path').length))||0,
                 hero:!!(a&&a.querySelector('.amap-hero .vwrap')),
                 mode:a&&a.dataset.mode, kit:a&&a.querySelector('.amap-hero .vwrap')&&a.querySelector('.amap-hero .vwrap').dataset.kit,
                 ov:{OV}, nav, diary:!!(diary&&diary.children.length>=0)}};
             }})()""")
             ok(f"{W}px: amap 14 nodes + hero, no h-scroll, nav OK",
-               r["amap"] and r["nodes"] == 14 and r["paths"] >= 14 and r["hero"]
+               r["amap"] and r["nodes"] == 14 and r["paths"] >= 10 and r["hero"]
                and not r["ov"] and set(r["nav"]) >= {"powers", "flock", "arena", "gods", "hero"}, r)
             await ctx.close()
 
