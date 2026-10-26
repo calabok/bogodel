@@ -730,7 +730,7 @@ body.theme-evil .vpair .vis.foe{filter:hue-rotate(-10deg) saturate(1.15)}
 
 /* ---------- v14: живая сцена местности ---------- */
 .hc-scene{margin:6px 0 4px;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:inset 0 0 0 1px #0001}
-.scn{position:relative;height:clamp(150px,42vw,220px);max-height:48vh;cursor:pointer;isolation:isolate;background:#2a3040;color:#87b0d8}
+.scn{position:relative;height:clamp(180px,48vw,280px);max-height:55vh;cursor:pointer;isolation:isolate;background:#2a3040;color:#87b0d8}
 .scn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .scn-bg{position:absolute;inset:0;overflow:hidden}
 .scn-layer{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
@@ -837,6 +837,60 @@ body.rm .scn-walk .scn-plate-shift,body.rm .scn-dust i{animation:none!important}
 
 
 
+
+
+/* ---------- v18: карта приключений (Deskrawl walk) ---------- */
+.scn-amap .scn-bg-soft{opacity:.42;filter:saturate(.85) brightness(.9)}
+.scn-amap.has-art .scn-bg-soft{opacity:.38}
+.scn-stage-amap{inset:0;height:100%;bottom:0;align-items:stretch;justify-content:stretch;padding:0;z-index:5}
+.amap{position:relative;width:100%;height:100%;overflow:hidden;border-radius:0;touch-action:pan-x pan-y;--amap-face:1}
+.amap-cam{position:absolute;inset:-8% -12%;width:124%;height:116%;transform:translate(calc(var(--amap-cam-x,0%) * .55),calc(var(--amap-cam-y,0%) * .4));transition:transform .45s ease-out;will-change:transform}
+.amap-rm .amap-cam{transition:none}
+.amap-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.amap-ground{fill:#172028}
+.amap-path{stroke:#c8b070;stroke-width:3.2;stroke-linecap:round;opacity:.55;filter:drop-shadow(0 0 1px #0008)}
+.amap-path.on{stroke:#ffe08a;stroke-width:4;opacity:.95;stroke-dasharray:6 5;animation:amapDash 1s linear infinite}
+.amap-node .amap-blob{filter:url(#amapSoft)}
+.amap-node .amap-ring{transition:transform .2s}
+.amap-node.here .amap-ring{stroke:#ffe08a;stroke-width:2.4;filter:drop-shadow(0 0 4px #ffe08a88)}
+.amap-node.goal .amap-ring{stroke:#7ec8ff;stroke-width:2.2}
+.amap-node.town .amap-ring{stroke-dasharray:none}
+.amap-name{fill:#e8eef4;opacity:.8;font-family:system-ui,sans-serif;font-weight:700;paint-order:stroke;stroke:#000a;stroke-width:.8px}
+.amap-ic{font-size:13px}
+.amap-dun-room{fill:#5a4a30;stroke:#c8a040;stroke-width:1}
+.amap-dun-room.on{fill:#e8c060;stroke:#fff}
+.amap-actors{position:absolute;inset:0;pointer-events:none}
+.amap-hero,.amap-foe{position:absolute;transform:translate(-50%,-78%);width:52px;height:72px;z-index:3;transition:left .08s linear,top .08s linear}
+.amap-rm .amap-hero,.amap-rm .amap-foe{transition:none}
+.amap-hero-inner{width:100%;height:100%;transform:scaleX(var(--amap-face,1));transform-origin:center bottom;filter:drop-shadow(0 3px 3px #0007)}
+.amap[data-facing="-1"] .amap-hero-inner{transform:scaleX(-1)}
+.amap-hero .vwrap.painted,.amap-hero .vwrap{width:48px!important;height:66px!important}
+.amap-foe{z-index:2;width:56px;height:76px}
+.amap-foe .vfoe{width:56px!important;height:76px!important}
+.amap-walk .amap-hero{animation:amapBob .55s ease-in-out infinite}
+.amap-fight .amap-hero{animation:none;filter:drop-shadow(0 0 8px #ffc04088);width:64px;height:88px;z-index:5}
+.amap-fight .amap-hero .vwrap.painted,.amap-fight .amap-hero .vwrap{width:60px!important;height:82px!important}
+.amap-fight .amap-foe{filter:drop-shadow(0 0 6px #c0404088);width:68px;height:92px;z-index:4}
+.amap-fight .amap-foe .vfoe{width:68px!important;height:92px!important}
+.amap-enc{opacity:.9}
+@keyframes amapBob{0%,100%{transform:translate(-50%,-78%)}50%{transform:translate(-50%,-82%)}}
+@keyframes amapDash{to{stroke-dashoffset:-22}}
+body.rm .amap-walk .amap-hero,body.rm .amap-path.on{animation:none!important}
+@media (prefers-reduced-motion:reduce){
+  .amap-cam{transition:none}
+  .amap-walk .amap-hero,.amap-path.on{animation:none!important}
+  .amap-hero,.amap-foe{transition:none}
+}
+@media (max-width:400px){
+  .amap-hero{width:42px;height:58px}
+  .amap-hero .vwrap.painted{width:40px!important;height:56px!important}
+  .amap-foe,.amap-foe .vfoe{width:46px!important;height:64px!important}
+}
+@media (min-width:1000px){
+  .scn{height:clamp(220px,32vh,320px)}
+  .amap-hero{width:60px;height:84px}
+  .amap-hero .vwrap.painted{width:56px!important;height:78px!important}
+}
 
 /* ---------- v16–17: стильный герой + worn-kit (одето) + бой + путешествие ---------- */
 .vwrap.painted{position:relative;display:inline-flex;align-items:flex-end;justify-content:center;width:72px;height:100px}

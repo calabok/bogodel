@@ -230,13 +230,14 @@ function scnHTML(h, opt) {
   const beat = scnJourneyBeat(h, biome, mode);
   const cls = `scn scn-${biome} scn-${tod}${walk ? ' scn-walk' : ''}${mode === 'fight' ? ' scn-fight' : ''}${xfade ? ' scn-xfade' : ''}${beat ? ' scn-beat-' + beat : ''}${opt.cls ? ' ' + opt.cls : ''}`;
   scnLastBiome = biome; scnLastMode = mode;
-  return `<div class="${cls}" data-biome="${biome}" data-tod="${tod}" data-mode="${mode}" role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение">
-    <div class="scn-bg">
+  const map = typeof amapHTML === 'function' ? amapHTML(h, { fightPose: pose }) : '';
+  return `<div class="${cls} scn-amap" data-biome="${biome}" data-tod="${tod}" data-mode="${mode}" role="button" tabindex="0" data-act="sheet" aria-label="${esc(label)}. Открыть снаряжение">
+    <div class="scn-bg scn-bg-soft">
       <div class="scn-svg-fallback">${scnSkySVG(biome, tod)}${scnFarSVG(biome)}${scnMidSVG(biome)}${scnGroundSVG(biome)}</div>
       ${scnPlateHTML(biome)}
       ${walk ? scnDustHTML() : ''}
     </div>
-    <div class="scn-stage">${doll}</div>
+    <div class="scn-stage scn-stage-amap">${map || doll}</div>
     <div class="scn-label"><span class="scn-ic">${(REG_BY[h.reg] && REG_BY[h.reg].ic) || '📍'}</span> ${esc(label)}</div>
     ${xfade ? `<div class="scn-transit" aria-hidden="true"><span>${esc(SCN_RU[biome] || label)}</span></div>` : ''}
     ${beat ? `<div class="scn-beat" aria-hidden="true">${beat === 'arrive' ? '🏘' : beat === 'enter' ? '🕳' : beat === 'camp' ? '🔥' : beat === 'leave' ? '🛣' : '✨'}</div>` : ''}

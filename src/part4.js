@@ -157,6 +157,7 @@ function renderHero() {
     ${h.inj.length ? `<button class="linkbtn" data-act="sheet" style="color:#8c2e20">🤕 травмы: ${h.inj.length}</button>` : ''}</div></div>`;
   setHTML($('colHero'), html);
   if (typeof visPaintCheck === 'function') visPaintCheck($('colHero'));
+  if (typeof amapAfterRender === 'function') amapAfterRender();
   document.body.classList.toggle('heroCol', col);
 }
 /* ---------- v8: путь героя в интерфейсе ---------- */
