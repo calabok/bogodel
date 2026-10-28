@@ -102,6 +102,8 @@ function fightFx(F) {
     if (pose === 'attack' && typeof scnFightSlash === 'function') scnFightSlash(F);
     if (meHit || dealt) setTimeout(() => { if (S && S.fight) visApplyFightPose(S.fight); }, 500);
   }
+
+  try { if (typeof rhudFightFx === 'function') rhudFightFx(F); } catch (err) {}
 }
 /* ---------- Сводка «Пока вас не было» — отдельная карточка при входе ---------- */
 function awayModal() {

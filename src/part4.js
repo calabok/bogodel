@@ -142,7 +142,7 @@ function renderHero() {
   const col = !!S.ui.heroCol;
   let html = `<div class="hc-top"><div class="hc-id"><h2>${esc(h.name)}</h2><div class="hc-sub">${RACES[h.race].n} · ${CLASSES[h.cls].n} · ур. ${h.lvl}</div></div>
     <div class="hc-btns"><button class="btn small ghost" data-act="sheet" title="Характеристики, снаряжение, рюкзак">📋<span class="hideXS"> Герой</span></button><button class="btn small ghost hcol" data-act="heroCol" aria-expanded="${!col}" title="${col ? 'Развернуть карточку' : 'Свернуть карточку'}">${col ? '▾' : '▴'}</button></div></div>
-  <div class="hc-scene">${scnHTML(h)}</div>
+  <div class="hc-scene">${typeof rhudHTML === 'function' ? rhudHTML(h) : scnHTML(h)}</div>
   <div class="hc-now"><span>📍 ${S.oly && S.oly.reg[h.reg] && S.oly.reg[h.reg].own ? godDot(S.oly.reg[h.reg].own) : ''}${esc(h.loc)}</span><span class="st">${act}</span>${S.oly ? olyChip() : ''}${buffs.length ? `<span>${buffs.join(' ')}</span>` : ''}</div>
   ${routeHTML(h)}
   ${m && !S.fight ? `<div class="stat"><label><span>${esc(m.n)}${m.curse ? ' ☠' : ''}</span><span>${Math.max(0, m.hp)}/${m.max}</span></label>${bar('hp', m.hp, m.max)}</div><div class="btns" style="margin-top:4px"><button class="btn small red" data-act="fmanual">🎯 Взять бой под контроль</button></div>` : ''}
@@ -158,6 +158,7 @@ function renderHero() {
   setHTML($('colHero'), html);
   if (typeof visPaintCheck === 'function') visPaintCheck($('colHero'));
   if (typeof amapAfterRender === 'function') amapAfterRender();
+  if (typeof rhudAfterRender === 'function') rhudAfterRender();
   document.body.classList.toggle('heroCol', col);
 }
 /* ---------- v8: путь героя в интерфейсе ---------- */

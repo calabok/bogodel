@@ -914,6 +914,90 @@ body.rm .amap-walk .amap-hero,body.rm .wmap-road.on{animation:none!important}
 .wmap-fx-rest .wmap-fx-prop{left:-6px;top:28px}
 .wmap-fx-loot .wmap-fx-prop{animation:wmapFxPop .5s ease-out}
 .wmap-fx-death{filter:grayscale(.4)}
+/* ---- v21 Runner HUD (Dota / Desk-Rival strip) ---- */
+.hc-scene{margin:6px 0 4px;border-radius:14px;overflow:hidden;border:1px solid #1a2030;box-shadow:0 4px 18px #0008,inset 0 0 0 1px #ffffff0d}
+.rhud{--rhud-bg:#0c1018;--rhud-panel:#121826;--rhud-line:#2a3548;--rhud-ink:#d8e0ee;--rhud-dim:#8a96a8;--rhud-hp:#c23a3a;--rhud-xp:#c8a040;--rhud-accent:#3d6cff;
+  background:linear-gradient(180deg,#141a28 0%,var(--rhud-bg) 40%,#0a0e16 100%);color:var(--rhud-ink);display:flex;flex-direction:column;min-height:clamp(220px,52vh,420px);max-height:62vh;position:relative;font:600 12px/1.25 system-ui,sans-serif;user-select:none}
+.rhud-bars{display:flex;align-items:center;gap:8px;padding:8px 10px 6px;background:linear-gradient(180deg,#1a2234,#0e1420);border-bottom:1px solid var(--rhud-line);z-index:3}
+.rhud-lvl{flex:0 0 auto;background:#1e2a44;border:1px solid #3a4a6a;color:#f0d78c;border-radius:8px;padding:4px 8px;font-weight:800;letter-spacing:.02em;box-shadow:inset 0 1px 0 #fff2}
+.rhud-bar{position:relative;flex:1;height:18px;border-radius:9px;background:#0a0e16;border:1px solid #000;overflow:hidden;box-shadow:inset 0 1px 3px #000a}
+.rhud-bar>i{position:absolute;left:0;top:0;bottom:0;border-radius:9px;transition:width .25s ease}
+.rhud-hp>i{background:linear-gradient(180deg,#e05050,#8a2020)}
+.rhud-hp.low>i{background:linear-gradient(180deg,#ff7070,#a01010);animation:rhudPulse 1s ease-in-out infinite}
+.rhud-hp.dead>i{background:#333;width:100%!important}
+.rhud-xp>i{background:linear-gradient(180deg,#e8c860,#8a6820)}
+.rhud-bar>span{position:relative;z-index:1;display:block;text-align:center;font-size:11px;line-height:18px;color:#fff;text-shadow:0 1px 2px #000c;font-weight:700}
+.rhud-body{flex:1;display:flex;min-height:0;position:relative}
+.rhud-stage{flex:1;min-width:0;height:auto!important;max-height:none!important;border-radius:0;cursor:default;border:none;isolation:isolate}
+.rhud-stage .scn-bg{inset:0}
+.rhud-stage .scn-plate{opacity:1;filter:saturate(1.05) brightness(.88)}
+.rhud-stage.has-art .scn-svg-fallback{opacity:.15}
+.rhud-stage-inner{position:absolute;inset:0;z-index:5;display:flex;align-items:flex-end;justify-content:stretch;pointer-events:none;padding:0 8px 6px}
+.rhud-actors{position:relative;width:100%;height:78%;display:flex;align-items:flex-end;justify-content:flex-start;gap:8px}
+.rhud-hero{position:relative;z-index:3;transform:translateX(8%);filter:drop-shadow(0 4px 4px #0009)}
+.rhud-hero .vwrap,.rhud-hero .vis,.rhud-doll{width:min(96px,34vw)!important;max-height:95%;height:auto}
+.rhud-foe{position:absolute;right:6%;bottom:0;z-index:2;filter:drop-shadow(0 4px 6px #4008);animation:rhudFoeIn .35s ease-out}
+.rhud-foe .vfoe,.rhud-foe .vis{width:min(100px,36vw)!important;height:auto;max-height:95%}
+.rhud-fight .rhud-hero{transform:translateX(4%);filter:drop-shadow(0 0 10px #ffc04066)}
+.rhud-floats{position:absolute;inset:0;pointer-events:none;z-index:6}
+.rhud-ftx{position:absolute;font:800 15px/1 system-ui,sans-serif;text-shadow:0 1px 2px #000,0 0 6px #000a;animation:rhudFloat 1.15s ease-out forwards;animation-delay:var(--d,0ms);opacity:0;white-space:nowrap}
+.rhud-ftx[data-side=hero]{left:22%;bottom:55%}
+.rhud-ftx[data-side=foe]{right:18%;bottom:58%}
+.rhud-ftx.hit{color:#ff6a6a}.rhud-ftx.crit{color:#ffd24a;font-size:17px}.rhud-ftx.blk,.rhud-ftx.dodge{color:#9ec8ff}.rhud-ftx.heal{color:#6dff8a}
+.rhud-feed{flex:0 0 38%;max-width:200px;min-width:120px;background:linear-gradient(180deg,#101624ee,#0a0e18f2);border-left:1px solid var(--rhud-line);display:flex;flex-direction:column;z-index:4;backdrop-filter:blur(6px)}
+.rhud-feed-hd{padding:6px 8px 4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rhud-dim);border-bottom:1px solid #ffffff0d}
+.rhud-feed-list{list-style:none;margin:0;padding:4px 0;overflow:auto;flex:1;scrollbar-width:thin}
+.rhud-feed-item{display:flex;gap:6px;align-items:flex-start;padding:5px 8px;border-bottom:1px solid #ffffff08;color:var(--rhud-ink);font-weight:600;font-size:11px;line-height:1.3}
+.rhud-feed-item.rhud-feed-new{animation:rhudFeedIn .4s ease-out}
+.rhud-feed-ic{flex:0 0 auto;font-size:13px;line-height:1.2;filter:drop-shadow(0 1px 1px #000a)}
+.rhud-feed-tx{flex:1;min-width:0;color:#c8d0e0}
+.rhud-feed-empty{padding:10px 8px;color:var(--rhud-dim);font-size:11px;font-weight:500}
+.rhud-dock{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px 8px;background:linear-gradient(0deg,#0a0e16,#151c2c);border-top:1px solid var(--rhud-line);z-index:3}
+.rhud-eq,.rhud-pows{display:flex;gap:4px;flex-wrap:nowrap;overflow:auto;scrollbar-width:none}
+.rhud-eq::-webkit-scrollbar,.rhud-pows::-webkit-scrollbar{display:none}
+.rhud-slot,.rhud-pow{flex:0 0 auto;width:36px;height:36px;border-radius:8px;border:1px solid #3a4558;background:radial-gradient(circle at 40% 30%,#2a3448,#121820);color:#d8e0ee;display:grid;place-items:center;position:relative;cursor:pointer;padding:0;box-shadow:inset 0 1px 0 #fff1,0 2px 4px #0008}
+.rhud-slot.empty{opacity:.55;border-style:dashed}
+.rhud-slot .rhud-slot-ic,.rhud-pow span{font-size:16px;line-height:1;filter:drop-shadow(0 1px 1px #000a)}
+.rhud-slot em{position:absolute;right:2px;bottom:1px;font:800 9px/1 system-ui;color:#f0d78c}
+.rhud-slot .cur{position:absolute;left:1px;top:0;font-size:10px}
+.rhud-slot.r2{border-color:#4a8}.rhud-slot.r3{border-color:#48c}.rhud-slot.r4{border-color:#a4f;box-shadow:0 0 8px #a4f5}
+.rhud-slot.r5,.rhud-slot.r6{border-color:var(--rcol,#e8c060);box-shadow:0 0 10px color-mix(in srgb,var(--rcol,#e8c060) 55%,transparent)}
+.rhud-pow{border-color:#3a5080;background:radial-gradient(circle at 40% 30%,#243050,#101828)}
+.rhud-pow.off,.rhud-pow:disabled{opacity:.35;filter:grayscale(.4);cursor:default}
+.rhud-mini{position:absolute;right:6px;bottom:6px;width:72px;height:54px;border-radius:8px;overflow:hidden;border:1px solid #ffffff22;box-shadow:0 2px 8px #000a;z-index:7;opacity:.92;pointer-events:none;transform-origin:bottom right}
+.rhud-mini .amap,.rhud-mini .wmap{height:100%;border-radius:0}
+.rhud-mini .wmap-fog{background:radial-gradient(ellipse at 50% 55%,transparent 35%,#0a1210cc 100%)}
+.rhud-mini .amap-hero{width:18px;height:24px}
+.rhud-mini .amap-hero .vwrap{width:16px!important;height:22px!important}
+.rhud-mini .wmap-label,.rhud-mini .wmap-props,.rhud-mini .wmap-ghost{display:none}
+.rhud-rm .scn-parallax,.rhud-rm.rhud .scn-walk .scn-parallax,.rhud-rm .rhud-ftx,.rhud-rm .rhud-foe{animation:none!important}
+body.heroCol .rhud{min-height:140px;max-height:28vh}
+body.heroCol .rhud-feed{display:none}
+body.heroCol .rhud-dock{padding:4px}
+body.heroCol .rhud-slot,body.heroCol .rhud-pow{width:28px;height:28px}
+body.rm .rhud .scn-parallax,body.rm .rhud-ftx,body.rm .rhud-foe,body.rm .rhud-feed-new{animation:none!important}
+@keyframes rhudFloat{0%{opacity:0;transform:translateY(8px) scale(.9)}15%{opacity:1;transform:translateY(0) scale(1.05)}100%{opacity:0;transform:translateY(-36px) scale(1)}}
+@keyframes rhudFeedIn{from{background:#3d6cff44}to{background:transparent}}
+@keyframes rhudFoeIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes rhudPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+@media (max-width:430px){
+  .rhud{min-height:clamp(240px,50vh,360px)}
+  .rhud-feed{flex-basis:34%;max-width:140px;min-width:108px}
+  .rhud-feed-item{font-size:10px;padding:4px 6px}
+  .rhud-hero .vwrap,.rhud-hero .vis{width:min(84px,32vw)!important}
+  .rhud-mini{width:56px;height:42px;opacity:.8}
+}
+@media (min-width:761px){
+  .rhud{min-height:300px;max-height:480px}
+  .rhud-feed{flex-basis:42%;max-width:240px}
+  .rhud-hero .vwrap,.rhud-hero .vis{width:110px!important}
+  .rhud-foe .vfoe{width:118px!important}
+  .rhud-slot,.rhud-pow{width:40px;height:40px}
+}
+@media (prefers-reduced-motion:reduce){
+  .rhud .scn-parallax,.rhud-ftx,.rhud-foe,.rhud-feed-new,.rhud-hp.low>i{animation:none!important}
+}
+
 .amap-fx-act .amap-hero{filter:drop-shadow(0 0 6px #ffe08a66)}
 @keyframes wmapFxPop{from{opacity:0;transform:translate(-50%,-80%) scale(.6)}to{opacity:1;transform:translate(-50%,-120%) scale(1)}}
 @keyframes wmapFxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}

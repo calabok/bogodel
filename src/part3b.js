@@ -34,6 +34,7 @@ function diary(text, cls, fx) {
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
   try { if (typeof amapOnDiary === 'function') amapOnDiary(e); } catch (err) {}
+  try { if (typeof rhudOnDiary === 'function') rhudOnDiary(e); } catch (err) {}
 }
 /* v11: подробности к записи дневника (лог боя/пещеры), разворачиваются по нажатию */
 function diaryDetail(after, log) {
