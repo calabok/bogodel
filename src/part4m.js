@@ -492,7 +492,7 @@ function amapAfterRender() {
 const AMAP_FX_BY_CLS = {
   fight: { icon: '⚔️', pose: 'attack', prop: '', kind: 'fight' },
   loot: { icon: '💎', pose: 'idle', prop: '📦', kind: 'loot' },
-  god: { icon: '✨', pose: 'idle', prop: '', kind: 'pray' },
+  god: { icon: '✨', pose: 'idle', prop: '💫', kind: 'divine' },
   level: { icon: '⭐', pose: 'idle', prop: '', kind: 'cheer' },
   death: { icon: '💀', pose: 'dead', prop: '', kind: 'death' },
   oly: { icon: '🧭', pose: 'walk', prop: '', kind: 'travel' },
@@ -505,34 +505,62 @@ function amapClassifyDiary(e) {
   const cls = (e && e.c) || '';
   const text = ((e && e.x) || '') + ' ' + ((e && e.f) || '');
   const low = text.toLowerCase();
-  let fx = Object.assign({}, AMAP_FX_BY_CLS[cls] || { icon: '💬', pose: 'idle', prop: '', kind: 'talk' });
-  if (/лагер|выспался|привал|пенёк|сплю|храп|отдых|перевязал|короткий привал/i.test(text)) {
-    fx = { icon: '⛺', pose: 'idle', prop: '🔥', kind: 'rest' };
-  } else if (/проповед|рассказал прохож|уверовал|несу.*слово|паств/i.test(text)) {
-    fx = { icon: '📣', pose: 'idle', prop: '', kind: 'preach' };
-  } else if (/копа|рудник|шахт|под кустом|в канаве|из трещины вылез сундук|копаю|выкопа/i.test(text)) {
-    fx = { icon: '⛏️', pose: 'idle', prop: '📦', kind: 'dig' };
-  } else if (/храм|алтар|молил|пожертв|благослов|божий щит|молни|ливень/i.test(text)) {
-    fx = { icon: '🙏', pose: 'idle', prop: '', kind: 'pray' };
-  } else if (/пришёл в |в город|на рынок|торгов|прода/i.test(text)) {
-    fx = { icon: '🏘', pose: 'idle', prop: '🏪', kind: 'town' };
-  } else if (/пещер|подземел|данж|🕳/i.test(text)) {
-    fx = { icon: '🕳', pose: 'walk', prop: '', kind: 'dungeon' };
-  } else if (/побед|побеждён|танц/i.test(text)) {
-    fx = { icon: '🏆', pose: 'idle', prop: '', kind: 'cheer' };
-  } else if (/умер|палъ|💀|лежу/i.test(text) || cls === 'death') {
-    fx = { icon: '💀', pose: 'dead', prop: '', kind: 'death' };
-  } else if (/бой|волк|противник|выпрыгнул|сдачи|атак/i.test(text) || cls === 'fight') {
-    if (!AMAP_FX_BY_CLS[cls]) fx = { icon: '⚔️', pose: 'attack', prop: '', kind: 'fight' };
-  } else if (/уровень|черту|прокач/i.test(text) || cls === 'level') {
-    fx = { icon: '⭐', pose: 'idle', prop: '', kind: 'cheer' };
-  }
-  /* explicit diary class wins over weak keyword collisions (e.g. «Щит» item ≠ pray) */
-  if (cls === 'loot' && fx.kind !== 'dig') fx = { icon: '💎', pose: 'idle', prop: '📦', kind: 'loot' };
-  if (cls === 'fight' && fx.kind !== 'death') fx = Object.assign({}, AMAP_FX_BY_CLS.fight);
-  if (cls === 'death') fx = Object.assign({}, AMAP_FX_BY_CLS.death);
-  if (cls === 'level') fx = Object.assign({}, AMAP_FX_BY_CLS.level);
-  fx.dur = fx.kind === 'death' ? 2800 : (fx.kind === 'fight' ? 2000 : 1600);
+  let fx = { icon: '💬', pose: 'idle', prop: '', kind: 'talk' };
+
+  /* --- keyword priority (specific → broad) --- */
+  if (/пока вас не было/i.test(text)) fx = { icon: '🌙', pose: 'idle', prop: '📜', kind: 'offline' };
+  else if (/очнулся в канаве|пора совершать подвиги/i.test(text)) fx = { icon: '🌅', pose: 'walk', prop: '🗺', kind: 'travel' };
+  else if (/💀|лежу, смотрю|погиб|умер|мертв/i.test(text) || cls === 'death') fx = { icon: '💀', pose: 'dead', prop: '🪦', kind: 'death' };
+  else if (/воскрес|воскресил/i.test(text)) fx = { icon: '✨', pose: 'idle', prop: '👼', kind: 'resurrect' };
+  else if (/травм|🤕|после боя:/i.test(text)) fx = { icon: '🤕', pose: 'hurt', prop: '🩹', kind: 'injury' };
+  else if (/унёс ноги|стратегическое отступление|сбежал|убежал|бегств/i.test(text)) fx = { icon: '🏃', pose: 'walk', prop: '💨', kind: 'flee' };
+  else if (/украл|обокрал|стырил|карманник|воров/i.test(text)) fx = { icon: '🥷', pose: 'idle', prop: '👜', kind: 'steal' };
+  else if (/болез|хворь|кашл|температур|тошн|отравил|мухомор/i.test(text)) fx = { icon: '🤒', pose: 'hurt', prop: '🤢', kind: 'ill' };
+  else if (/праздник|ярмарк|фестивал|хоровод|гулян|компот/i.test(text)) fx = { icon: '🎉', pose: 'idle', prop: '🎊', kind: 'fest' };
+  else if (/встретил|познакомил|путник|странник|герой по имени/i.test(text)) fx = { icon: '🤝', pose: 'idle', prop: '🗣️', kind: 'meet' };
+  else if (/ливень|дожд|морось/i.test(text)) fx = { icon: '🌧️', pose: 'idle', prop: '💧', kind: 'rain' };
+  else if (/с небес|божий щит|божий медведь|сила бога/i.test(text)) fx = { icon: '✨', pose: 'idle', prop: '🌩️', kind: 'divine' };
+  else if (/молни|землетряс|разверз|гроз/i.test(text)) fx = { icon: '⚡', pose: 'hurt', prop: '🌩️', kind: 'storm' };
+  else if (/проклят/i.test(text)) fx = { icon: '😈', pose: 'hurt', prop: '☠️', kind: 'curse' };
+  else if (/благослов|подкова удачи|удача сегодня|снизошло благословение/i.test(text)) fx = { icon: '🍀', pose: 'idle', prop: '✨', kind: 'bless' };
+  else if (/лагер|выспался|привал|пенёк|сплю|храп|отдых|перевязал|короткий привал|трактир|ночу/i.test(text)) fx = { icon: '⛺', pose: 'idle', prop: '🔥', kind: 'rest' };
+  else if (/проповед|рассказал прохож|уверовал|несу.*слово|паств.*уверовал|рассказал белке/i.test(text)) fx = { icon: '📣', pose: 'idle', prop: '', kind: 'preach' };
+  else if (/(?:^|[^а-я])копа|выкопа|копаю|копал|копает|рудник|шахт|под кустом|копать/i.test(text) && !/землетряс|очнулся в канаве/i.test(text)) fx = { icon: '⛏️', pose: 'attack', prop: '📦', kind: 'dig' };
+  else if (/выпил зелье|тёплый свет|раны затянул|исцел|лечение/i.test(text) || /heal/i.test(cls)) fx = { icon: '✚', pose: 'idle', prop: '💧', kind: 'heal' };
+  else if (/кузнец|стучал молотком/i.test(text)) fx = { icon: '⚒', pose: 'attack', prop: '🔨', kind: 'smith' };
+  else if (/вхожу |пришёл в |выхожу из |у ворот|вернулся в город|отправляюсь в город/i.test(text)) fx = { icon: '🏘', pose: 'walk', prop: '🚪', kind: 'town' };
+  else if (/торгов|рынк|прода|купил|лавк|проклятые торговцы/i.test(text)) fx = { icon: '🏪', pose: 'idle', prop: '💰', kind: 'shop' };
+  else if (/храм|алтар|пожертв|кадил|паства отстроила/i.test(text)) fx = { icon: '🙏', pose: 'idle', prop: '⛪', kind: 'temple' };
+  else if (/пещер|подземел|спустился|факел|данж|🕳|прошёл «|вернулся из «/i.test(text)) fx = { icon: '🕳', pose: 'walk', prop: '', kind: 'dungeon' };
+  else if (/арми|солдат|вилы|штурмует/i.test(text)) fx = { icon: '⚔', pose: 'attack', prop: '🚩', kind: 'army' };
+  else if (/дуэл|арен|🏆|арена ревела|место.*из/i.test(text) || cls === 'duel') fx = { icon: '🤺', pose: 'attack', prop: '🏟', kind: 'duel' };
+  else if (/олимп|регион.*мой|потерян|трон|олимпийский дар|сезон .*окончен/i.test(text) || cls === 'oly') fx = { icon: '🏛', pose: 'idle', prop: '👑', kind: 'oly' };
+  else if (/задани|квест|📌|вернул книг/i.test(text)) fx = { icon: '📌', pose: 'idle', prop: '📜', kind: 'quest' };
+  else if (/уровень|вырос над|переучив|путь:|достиг|🎉|🌟 мой бог|прокачать/i.test(text) || cls === 'level') fx = { icon: '⭐', pose: 'idle', prop: '✨', kind: 'cheer' };
+  else if (/комплект|легендар|редк/i.test(text) || cls === 'rare') fx = { icon: '💎', pose: 'idle', prop: '🧩', kind: 'rare' };
+  else if (/надел «|достал из рюкзака|посоветовал надеть/i.test(text)) fx = { icon: '🧥', pose: 'idle', prop: '✨', kind: 'equip' };
+  else if (/молюсь|бог сказал|бог промолчал|услыш|глас|волю бога/i.test(text) || cls === 'fork') fx = { icon: '🙏', pose: 'idle', prop: '💫', kind: 'pray' };
+  else if (/мировое событие|🌈|обновление мира/i.test(text) || cls === 'event') fx = { icon: '🌍', pose: 'idle', prop: '📰', kind: 'event' };
+  else if (/побед|побеждён|танц|трофе/i.test(text)) fx = { icon: '🏆', pose: 'attack', prop: '', kind: 'cheer' };
+  else if (/бой|волк|противник|выпрыгнул|сдачи|атак|голодным/i.test(text) || cls === 'fight') fx = { icon: '⚔️', pose: 'attack', prop: '', kind: 'fight' };
+  else if (/нашёл|сундук|клад|в карманах|положил в рюкзак|добыл/i.test(text) || cls === 'loot') fx = { icon: '💎', pose: 'idle', prop: '📦', kind: 'loot' };
+  else if (/иду |отправляюсь|путь|шагаю|дальше/i.test(text) || cls === 'oly') fx = { icon: '🛣', pose: 'walk', prop: '', kind: 'travel' };
+  else if (AMAP_FX_BY_CLS[cls]) fx = Object.assign({}, AMAP_FX_BY_CLS[cls]);
+
+  /* explicit diary class fills gaps; never erase a more specific keyword kind */
+  const SPEC = new Set(['dig','preach','rest','steal','flee','ill','fest','meet','rain','storm','bless','curse','heal','shop','smith','temple','town','dungeon','death','resurrect','cheer','quest','army','oly','duel','divine','equip','injury','offline','rare','travel']);
+  if (cls === 'loot' && !SPEC.has(fx.kind)) fx = { icon: '💎', pose: 'idle', prop: '📦', kind: 'loot' };
+  if (cls === 'fight' && !SPEC.has(fx.kind) && fx.kind !== 'fight') fx = Object.assign({}, AMAP_FX_BY_CLS.fight || { icon: '⚔️', pose: 'attack', prop: '', kind: 'fight' });
+  if (cls === 'death') fx = { icon: '💀', pose: 'dead', prop: '🪦', kind: 'death' };
+  if (cls === 'level' && fx.kind !== 'injury') fx = { icon: '⭐', pose: 'idle', prop: '✨', kind: 'cheer' };
+  if (cls === 'duel' && fx.kind !== 'death') fx = { icon: '🤺', pose: 'attack', prop: '🏟', kind: 'duel' };
+  if (cls === 'oly' && !SPEC.has(fx.kind)) fx = { icon: '🏛', pose: 'idle', prop: '👑', kind: 'oly' };
+  if (cls === 'god' && !SPEC.has(fx.kind)) fx = { icon: '✨', pose: 'idle', prop: '💫', kind: 'divine' };
+  if (cls === 'fork' && !SPEC.has(fx.kind)) fx = { icon: '🙏', pose: 'idle', prop: '💫', kind: 'pray' };
+  if (cls === 'event' && !SPEC.has(fx.kind)) fx = { icon: '🌍', pose: 'idle', prop: '📰', kind: 'event' };
+  if (cls === 'rare' && !SPEC.has(fx.kind)) fx = { icon: '💎', pose: 'idle', prop: '🧩', kind: 'rare' };
+
+  fx.dur = ({ death: 3200, fight: 2000, duel: 2400, rest: 3200, dig: 2800, preach: 3000, offline: 1800, storm: 2600, rain: 2400 }[fx.kind]) || 2200;
   fx.text = text.slice(0, 48);
   return fx;
 }
