@@ -22,7 +22,7 @@ cp src/*.html src/*.js "$REPO/src/"
 cp build.sh deploy.sh "$REPO/"
 cp site/sw.js.tpl site/manifest.webmanifest "$REPO/tools/" 2>/dev/null || true
 cp tools_icons.py "$REPO/tools/make_icons.py"
-cp targeted19.py targeted18.py targeted17.py targeted16.py targeted15.py targeted14.py targeted13.py targeted12.py season12.py targeted11.py fuzz11.py shots11.py targeted10.py fuzz10.py pace10.py targeted9.py targeted8.py bal8.py repro_dun.py targeted7.py pace7.py smoke7.py targeted6.py dun6.py shots6.py PACING.md offline_deaths.py fuzz5.py targeted5.py targeted5_v5.py balance5.js bal5.py baltab.py dun5.py shots5.py fuzz4.py targeted4.py balance4.py online4.py shots4.py migrate_test.py pace.py online.py shots3.py shots_hp.py pwa_test.py "$REPO/tests/" 2>/dev/null || true
+cp targeted20.py targeted19.py targeted18.py targeted17.py targeted16.py targeted15.py targeted14.py targeted13.py targeted12.py season12.py targeted11.py fuzz11.py shots11.py targeted10.py fuzz10.py pace10.py targeted9.py targeted8.py bal8.py repro_dun.py targeted7.py pace7.py smoke7.py targeted6.py dun6.py shots6.py PACING.md offline_deaths.py fuzz5.py targeted5.py targeted5_v5.py balance5.js bal5.py baltab.py dun5.py shots5.py fuzz4.py targeted4.py balance4.py online4.py shots4.py migrate_test.py pace.py online.py shots3.py shots_hp.py pwa_test.py "$REPO/tests/" 2>/dev/null || true
 cp PACING.md "$REPO/" 2>/dev/null || true
 if [ "${NOPUSH:-0}" = "1" ]; then echo "Собрано: $BUILD (без пуша)"; exit 0; fi
 cd "$REPO"

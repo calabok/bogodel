@@ -92,7 +92,8 @@ async def main():
         # walk
         r = await pg.evaluate("""()=>{
           const scn=document.querySelector('#colHero .scn');
-          return {walk:scn.classList.contains('scn-walk'), doll:!!scn.querySelector('.vis.p-walk'), dust:!!scn.querySelector('.scn-dust')};
+          const doll=!!(scn.querySelector('.vis.p-walk')||scn.querySelector('.amap-hero .vwrap[data-pose=walk]')||scn.querySelector('.vwrap[data-pose=walk]'));
+          return {walk:scn.classList.contains('scn-walk'), doll, dust:!!scn.querySelector('.scn-dust')};
         }""")
         ok('travel: walk + dust particles', r['walk'] and r['doll'] and r['dust'], r)
 

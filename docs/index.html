@@ -904,6 +904,21 @@ body.rm .amap-walk .amap-hero,body.rm .wmap-road.on{animation:none!important}
   .wmap-patch{width:320px;height:260px}
 }
 
+
+.wmap-fx{position:absolute;transform:translate(-50%,-120%);z-index:8;pointer-events:none;animation:wmapFxPop .35s ease-out}
+.wmap-fx-ico{display:block;font-size:22px;filter:drop-shadow(0 2px 2px #000a);animation:wmapFxFloat 1.2s ease-in-out infinite}
+.wmap-fx-prop{position:absolute;left:22px;top:10px;font-size:18px;animation:wmapFxPop .4s ease-out .1s both}
+.wmap-fx-burst{position:absolute;left:50%;top:50%;width:56px;height:56px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#ffe08a55,#0000 70%);animation:wmapPulse 1s ease-out}
+.wmap-fx-dig .wmap-fx-ico{animation:wmapFxDig .45s ease-in-out infinite}
+.wmap-fx-preach .wmap-fx-ico{animation:wmapFxFloat .7s ease-in-out infinite}
+.wmap-fx-rest .wmap-fx-prop{left:-6px;top:28px}
+.wmap-fx-loot .wmap-fx-prop{animation:wmapFxPop .5s ease-out}
+.wmap-fx-death{filter:grayscale(.4)}
+.amap-fx-act .amap-hero{filter:drop-shadow(0 0 6px #ffe08a66)}
+@keyframes wmapFxPop{from{opacity:0;transform:translate(-50%,-80%) scale(.6)}to{opacity:1;transform:translate(-50%,-120%) scale(1)}}
+@keyframes wmapFxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes wmapFxDig{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+
 /* ---------- v16–17: стильный герой + worn-kit (одето) + бой + путешествие ---------- */
 .vwrap.painted{position:relative;display:inline-flex;align-items:flex-end;justify-content:center;width:72px;height:100px}
 .vwrap.painted.sm,.vwrap.painted .vis.sm{width:36px;height:50px}
@@ -2111,6 +2126,7 @@ function diary(text, cls, fx) {
   S.diary.unshift(e);
   if (S.diary.length > 150) S.diary.length = 150;
   diaryVer++;
+  try { if (typeof amapOnDiary === 'function') amapOnDiary(e); } catch (err) {}
 }
 /* v11: подробности к записи дневника (лог боя/пещеры), разворачиваются по нажатию */
 function diaryDetail(after, log) {
@@ -6140,7 +6156,7 @@ const OLY_EXPORTS = ({ olyApply, olyConvert, regOwner, OLY_K, REGIONS, REG_BY, G
 /* =====================================================================
    10) ПРИЛОЖЕНИЕ (PWA): установка, обновления, перенос сохранений
    ===================================================================== */
-const APP_BUILD = '20261026-214759';
+const APP_BUILD = '20261028-212422';
 const IS_HTTP = /^https?:$/.test(location.protocol);
 const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const IS_STANDALONE = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
@@ -6916,7 +6932,11 @@ const AMAP_VB = (() => {
 let amapVis = {
   x: 0, y: 0, facing: 1, from: null, to: null, t0: 0, dur: 5000,
   mode: 'idle', edgeKey: '', snap: true, raf: 0, lastReg: null, lastFight: false,
-  path: null, pathLen: 0, biome: 'field', fightAt: null
+  path: null, pathLen: 0, biome: 'field', fightAt: null,
+  /* journey continuity */
+  holdHop: false, journeyId: 0,
+  /* diary → map FX */
+  fxQ: [], fxLive: null, fxSeq: 0, lastDiaryI: 0, fxSuppress: false
 };
 
 function amapNodeXY(id) {
@@ -6986,17 +7006,34 @@ function amapPointOnRoad(road, t) {
   return { x, y, facing };
 }
 
+function amapNearestRoadT(road, x, y) {
+  if (!road || !road.pts || !road.pts.length) return 0;
+  let best = 0, bd = 1e15;
+  for (let i = 0; i < road.pts.length; i++) {
+    const p = road.pts[i];
+    const d = (p.x - x) * (p.x - x) + (p.y - y) * (p.y - y);
+    if (d < bd) { bd = d; best = i; }
+  }
+  return road.seg[best] / Math.max(1e-3, road.plen);
+}
 function amapSetEdge(from, to, restart) {
   const key = from + '>' + to;
   if (!restart && amapVis.edgeKey === key && amapVis.from === from && amapVis.path) return;
   amapVis.from = from;
   amapVis.to = to;
   amapVis.edgeKey = key;
-  amapVis.t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
   amapVis.dur = amapWalkDur();
   amapVis.snap = false;
+  amapVis.holdHop = false;
   amapVis.path = amapBuildRoad(from, to);
   amapVis.pathLen = amapVis.path.plen;
+  const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  /* Resume from current world pos if already along this road (no snap-back) */
+  let t0prog = 0;
+  if (!restart && amapVis.x && amapVis.y) {
+    t0prog = Math.max(0, Math.min(0.92, amapNearestRoadT(amapVis.path, amapVis.x, amapVis.y)));
+  }
+  amapVis.t0 = now - t0prog * amapVis.dur;
   const A = amapNodeXY(from), B = amapNodeXY(to);
   amapVis.facing = B.x >= A.x ? 1 : -1;
 }
@@ -7024,12 +7061,15 @@ function amapSyncLogic(h) {
   const dun = !!(S && S.dun) || h.state === 'dungeon';
   const dest = (S && S.oly && S.oly.dest) || null;
 
+  /* Region arrived: snap forward to new node (never rewind). Clear finished edge. */
   if (amapVis.lastReg && amapVis.lastReg !== h.reg) {
     const p = amapNodeXY(h.reg);
     amapVis.x = p.x; amapVis.y = p.y;
     amapVis.edgeKey = '';
     amapVis.path = null;
+    amapVis.holdHop = false;
     amapVis.snap = true;
+    amapVis.journeyId++;
   }
   amapVis.lastReg = h.reg;
 
@@ -7049,8 +7089,10 @@ function amapSyncLogic(h) {
 
   if (amapVis.lastFight && !fight) {
     amapVis.lastFight = false;
+    /* resume from freeze point — do not teleport to node */
     amapVis.edgeKey = '';
     amapVis.path = null;
+    amapVis.holdHop = false;
   }
 
   if (dun) {
@@ -7059,7 +7101,6 @@ function amapSyncLogic(h) {
     const room = (S.dun && (S.dun.room || S.dun.step || 0)) || 0;
     const n = Math.max(3, (S.dun && S.dun.rooms) || 4);
     const t = Math.min(1, (room % n) / Math.max(1, n - 1));
-    /* corridor walk: local offset east of region */
     amapVis.x = base.x - 40 + t * 160;
     amapVis.y = base.y + 70;
     amapVis.facing = 1;
@@ -7069,27 +7110,48 @@ function amapSyncLogic(h) {
   }
 
   if (h.state === 'road') {
-    amapVis.mode = 'walk';
+    /* Pick next hop from sim dest only — never invent reversing wander */
     let next = null;
     if (dest && dest !== h.reg) {
       const path = typeof regPath === 'function' ? regPath(h.reg, dest) : null;
       next = (path && path[0]) || dest;
-    } else {
-      const nbs = REG_BY[h.reg].nb || [];
-      if (nbs.length) {
-        const tick = Math.floor(((typeof momClock === 'number' ? momClock : Date.now() / 1000)) / 45);
-        next = nbs[tick % nbs.length];
-      }
     }
-    if (next && REG_BY[next]) {
+
+    /* Sticky mid-edge: finish current hop even if dest flickers briefly */
+    const mid = amapVis.path && amapVis.from === h.reg && amapVis.to && !amapVis.holdHop
+      && amapEdgeProgress() < 1;
+    if (mid) next = amapVis.to;
+
+    if (next && REG_BY[next] && next !== h.reg) {
       amapSetEdge(h.reg, next, false);
       const t = amapEdgeProgress();
-      const pt = amapPointOnRoad(amapVis.path, t);
+      const pt = amapPointOnRoad(amapVis.path, Math.min(1, t));
       amapVis.x = pt.x; amapVis.y = pt.y; amapVis.facing = pt.facing;
-      if (t >= 1 && !dest) amapSetEdge(next, h.reg, true);
+      if (t >= 1) {
+        /* Arrived at hop end — HOLD here until sim updates h.reg. No reverse ping-pong. */
+        amapVis.holdHop = true;
+        amapVis.mode = 'walk';
+        amapVis.snap = true;
+      } else {
+        amapVis.holdHop = false;
+        amapVis.mode = 'walk';
+      }
+    } else if (amapVis.holdHop && amapVis.path && amapVis.to) {
+      const pt = amapPointOnRoad(amapVis.path, 1);
+      amapVis.x = pt.x; amapVis.y = pt.y;
+      amapVis.mode = 'walk'; /* wait at hop — walk-in-place, no reverse */
     } else {
+      /* No dest: patrol in place at region (walk pose) — never invent reverse edges */
       const p = amapNodeXY(h.reg);
-      amapVis.x = p.x; amapVis.y = p.y;
+      if (!amapVis.x && !amapVis.y) { amapVis.x = p.x; amapVis.y = p.y; }
+      else {
+        amapVis.x = amapLerp(amapVis.x, p.x, amapRm() ? 1 : .2);
+        amapVis.y = amapLerp(amapVis.y, p.y, amapRm() ? 1 : .2);
+      }
+      amapVis.mode = 'walk';
+      amapVis.edgeKey = '';
+      amapVis.path = null;
+      amapVis.holdHop = false;
     }
     amapVis.biome = amapNearestBiome(amapVis.x, amapVis.y);
     return;
@@ -7106,6 +7168,7 @@ function amapSyncLogic(h) {
   amapVis.snap = true;
   amapVis.edgeKey = '';
   amapVis.path = null;
+  amapVis.holdHop = false;
   amapVis.biome = amapNearestBiome(amapVis.x, amapVis.y);
 }
 
@@ -7261,6 +7324,7 @@ function amapHTML(h, opt) {
             <div class="amap-hero-inner">${doll}</div>
           </div>
           ${foeHTML ? `<div class="amap-foe" style="left:${(hx + (amapVis.facing > 0 ? 36 : -36)).toFixed(1)}px;top:${(hy - 4).toFixed(1)}px">${foeHTML}</div>` : ''}
+          ${amapFxHTML()}
         </div>
         ${mode === 'fight' ? `<div class="wmap-enc" style="left:${hx.toFixed(1)}px;top:${hy.toFixed(1)}px"></div>` : ''}
       </div>
@@ -7322,7 +7386,140 @@ function amapAfterRender() {
     if (pose) amapApplyDomPose(pose);
   }
   if (S && S.hero && S.hero.state === 'road' && !S.fight && !amapRm()) amapStartLoop();
+  if (amapVis.fxLive) amapPaintFx(amapVis.fxLive);
+  else amapPumpFx();
 }
+
+
+/* ---------- Diary → map action visuals ---------- */
+const AMAP_FX_BY_CLS = {
+  fight: { icon: '⚔️', pose: 'attack', prop: '', kind: 'fight' },
+  loot: { icon: '💎', pose: 'idle', prop: '📦', kind: 'loot' },
+  god: { icon: '✨', pose: 'idle', prop: '', kind: 'pray' },
+  level: { icon: '⭐', pose: 'idle', prop: '', kind: 'cheer' },
+  death: { icon: '💀', pose: 'dead', prop: '', kind: 'death' },
+  oly: { icon: '🧭', pose: 'walk', prop: '', kind: 'travel' },
+  fork: { icon: '🙏', pose: 'idle', prop: '', kind: 'pray' },
+  event: { icon: '📜', pose: 'idle', prop: '', kind: 'event' },
+  rare: { icon: '✨', pose: 'idle', prop: '💎', kind: 'loot' }
+};
+
+function amapClassifyDiary(e) {
+  const cls = (e && e.c) || '';
+  const text = ((e && e.x) || '') + ' ' + ((e && e.f) || '');
+  const low = text.toLowerCase();
+  let fx = Object.assign({}, AMAP_FX_BY_CLS[cls] || { icon: '💬', pose: 'idle', prop: '', kind: 'talk' });
+  if (/лагер|выспался|привал|пенёк|сплю|храп|отдых|перевязал|короткий привал/i.test(text)) {
+    fx = { icon: '⛺', pose: 'idle', prop: '🔥', kind: 'rest' };
+  } else if (/проповед|рассказал прохож|уверовал|несу.*слово|паств/i.test(text)) {
+    fx = { icon: '📣', pose: 'idle', prop: '', kind: 'preach' };
+  } else if (/копа|рудник|шахт|под кустом|в канаве|из трещины вылез сундук|копаю|выкопа/i.test(text)) {
+    fx = { icon: '⛏️', pose: 'idle', prop: '📦', kind: 'dig' };
+  } else if (/храм|алтар|молил|пожертв|благослов|божий щит|молни|ливень/i.test(text)) {
+    fx = { icon: '🙏', pose: 'idle', prop: '', kind: 'pray' };
+  } else if (/пришёл в |в город|на рынок|торгов|прода/i.test(text)) {
+    fx = { icon: '🏘', pose: 'idle', prop: '🏪', kind: 'town' };
+  } else if (/пещер|подземел|данж|🕳/i.test(text)) {
+    fx = { icon: '🕳', pose: 'walk', prop: '', kind: 'dungeon' };
+  } else if (/побед|побеждён|танц/i.test(text)) {
+    fx = { icon: '🏆', pose: 'idle', prop: '', kind: 'cheer' };
+  } else if (/умер|палъ|💀|лежу/i.test(text) || cls === 'death') {
+    fx = { icon: '💀', pose: 'dead', prop: '', kind: 'death' };
+  } else if (/бой|волк|противник|выпрыгнул|сдачи|атак/i.test(text) || cls === 'fight') {
+    if (!AMAP_FX_BY_CLS[cls]) fx = { icon: '⚔️', pose: 'attack', prop: '', kind: 'fight' };
+  } else if (/уровень|черту|прокач/i.test(text) || cls === 'level') {
+    fx = { icon: '⭐', pose: 'idle', prop: '', kind: 'cheer' };
+  }
+  /* explicit diary class wins over weak keyword collisions (e.g. «Щит» item ≠ pray) */
+  if (cls === 'loot' && fx.kind !== 'dig') fx = { icon: '💎', pose: 'idle', prop: '📦', kind: 'loot' };
+  if (cls === 'fight' && fx.kind !== 'death') fx = Object.assign({}, AMAP_FX_BY_CLS.fight);
+  if (cls === 'death') fx = Object.assign({}, AMAP_FX_BY_CLS.death);
+  if (cls === 'level') fx = Object.assign({}, AMAP_FX_BY_CLS.level);
+  fx.dur = fx.kind === 'death' ? 2800 : (fx.kind === 'fight' ? 2000 : 1600);
+  fx.text = text.slice(0, 48);
+  return fx;
+}
+
+function amapOnDiary(e) {
+  if (!e || amapVis.fxSuppress) return;
+  if (typeof SILENT !== 'undefined' && SILENT) return; /* offline batch — skip VFX storm */
+  const fx = amapClassifyDiary(e);
+  fx.id = ++amapVis.fxSeq;
+  fx.diaryI = e.i || 0;
+  fx.t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  /* queue if flooded */
+  if (amapVis.fxQ.length >= 4) amapVis.fxQ.shift();
+  amapVis.fxQ.push(fx);
+  amapPumpFx();
+}
+
+function amapPumpFx() {
+  if (amapVis.fxLive) {
+    const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    if (now - amapVis.fxLive.t0 < amapVis.fxLive.dur) return;
+    amapVis.fxLive = null;
+  }
+  if (!amapVis.fxQ.length) return;
+  const fx = amapVis.fxQ.shift();
+  fx.t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  amapVis.fxLive = fx;
+  amapPaintFx(fx);
+  if (fx.pose && fx.pose !== 'idle') {
+    try { amapApplyDomPose(fx.pose); } catch (err) {}
+  }
+  const wait = fx.dur || 1600;
+  setTimeout(() => {
+    if (amapVis.fxLive && amapVis.fxLive.id === fx.id) {
+      amapVis.fxLive = null;
+      amapClearFxDom();
+      if (S && S.hero && S.hero.state === 'road' && !S.fight) {
+        try { amapApplyDomPose('walk'); } catch (err) {}
+      }
+    }
+    amapPumpFx();
+  }, wait);
+}
+
+function amapClearFxDom() {
+  const root = document.querySelector('#colHero .amap');
+  if (!root) return;
+  root.querySelectorAll('.wmap-fx').forEach(el => el.remove());
+  root.classList.remove('amap-fx-act');
+  if (root.dataset) delete root.dataset.fx;
+}
+
+function amapPaintFx(fx) {
+  const root = document.querySelector('#colHero .amap');
+  if (!root) return;
+  amapClearFxDom();
+  const actors = root.querySelector('.amap-actors');
+  if (!actors) return;
+  root.classList.add('amap-fx-act');
+  root.dataset.fx = fx.kind;
+  const vb = AMAP_VB;
+  const hx = amapVis.x - vb.x, hy = amapVis.y - vb.y;
+  const el = document.createElement('div');
+  el.className = 'wmap-fx wmap-fx-' + fx.kind;
+  el.style.left = hx.toFixed(1) + 'px';
+  el.style.top = hy.toFixed(1) + 'px';
+  el.innerHTML = `<span class="wmap-fx-ico">${fx.icon || ''}</span>`
+    + (fx.prop ? `<span class="wmap-fx-prop">${fx.prop}</span>` : '')
+    + `<span class="wmap-fx-burst"></span>`;
+  actors.appendChild(el);
+}
+
+function amapFxHTML() {
+  const fx = amapVis.fxLive;
+  if (!fx) return '';
+  const vb = AMAP_VB;
+  const hx = amapVis.x - vb.x, hy = amapVis.y - vb.y;
+  return `<div class="wmap-fx wmap-fx-${fx.kind}" style="left:${hx.toFixed(1)}px;top:${hy.toFixed(1)}px">
+    <span class="wmap-fx-ico">${fx.icon || ''}</span>
+    ${fx.prop ? `<span class="wmap-fx-prop">${fx.prop}</span>` : ''}
+    <span class="wmap-fx-burst"></span>
+  </div>`;
+}
+
 
 function amapWireFight() {
   if (typeof visApplyFightPose !== 'function') return;
@@ -7521,7 +7718,7 @@ if (S) { offlineCatchUp(); if (S.ev && S.ev.phase === 'live' && !S.ev.joined) jo
 setInterval(loop, 250);
 for (const ev of ['pointerdown', 'keydown', 'touchstart']) addEventListener(ev, () => setLastInput(), { capture: true, passive: true });
 /* Отладочный доступ из консоли / тестов */
-window.GAME = { visHTML, visSVG, visGearSVG, visKitKind, visHasWorn, visPaintCheck, visFoeSVG, visFoeKey, visPairHTML, visPose, visApplyFightPose, visSetPoseOn, visSkin, VIS_SKIN, VIS_ART, FOE_ART, scnHTML, scnBiome, scnTod, scnMode, scnLabel, scnFightWrap, scnFightSlash, amapHTML, amapAfterRender, amapVis, amapTick, amapSyncLogic, amapBuildRoad, amapPointOnRoad, amapNearestBiome, AMAP_VB, WMAP_TILE, SCN_RU, SCN_ART, heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldStatW, bldFit, pickBuild, bldForBot, mkBld, initBuild, buildStat, heroFeatPref, startRespec, reconsider, bldResult, bldItem, bldTick, suggestBuild, bldFx, inferBuild, bldModal, itemScore, offerFeat, EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
+window.GAME = { visHTML, visSVG, visGearSVG, visKitKind, visHasWorn, visPaintCheck, visFoeSVG, visFoeKey, visPairHTML, visPose, visApplyFightPose, visSetPoseOn, visSkin, VIS_SKIN, VIS_ART, FOE_ART, scnHTML, scnBiome, scnTod, scnMode, scnLabel, scnFightWrap, scnFightSlash, amapHTML, amapAfterRender, amapVis, amapTick, amapSyncLogic, amapBuildRoad, amapNodeXY, amapPointOnRoad, amapNearestBiome, amapOnDiary, amapClassifyDiary, amapClearFxDom, amapPaintFx, AMAP_VB, WMAP_TILE, SCN_RU, SCN_ART, heroPicksFeat, chooseAsi, BUILDS, BUILD_BAL, BLD_K, bldId, bldStatW, bldFit, pickBuild, bldForBot, mkBld, initBuild, buildStat, heroFeatPref, startRespec, reconsider, bldResult, bldItem, bldTick, suggestBuild, bldFx, inferBuild, bldModal, itemScore, offerFeat, EQ_KEYS, BASES, WCAT, SETS, LEGENDARY, PROP_DEF, CURSES, makeSetItem, makeLegend, reqOk, reqHtml, equip, equipInv, tryEquipInv, bestPlace, setCounts, setBonusProps, allProps, zoneArmor, gearFx, itemModal, sheetModal, virtualHero, nameOf, keepInInv, shopPick, gearScore, itemGS, typGS, recGS, DUN_TIERS, GS_K, smithUpgrade, smithCost, smithOk, autoTier, dunGearMul, dunMonMul, startDungeon, tierModal, gearProps, monsterUnit, closeModal, dunHeal, dunHealCost, DUN_K, CLASS_BAL, ROAD_K, MON_K, BOSSES, monsterRef, get S() { return S; }, render: () => render(), set S(v) { S = v; }, maxFaith: () => maxFaith(), FORKS, WEVENTS, SAVE_KEY, save, load, startFork, startDuel, startGodDuel, startEvent, startDungeon, answerFork, usePower, evGive, evVote, step, heroStep, simulateAway, offlineCatchUp, chooseFeat, chooseAsi, offerFeat, liftCurse, makeItem, equip, check, sheet, calcMaxHp, xpNext, xpUnit, defaultState, gainXp, RACES, CLASSES, FEATS, MAX_LVL, PACE, migrate, sanitize,
   heroBrain, fleeChance, fightAct, endFled, godPresent, setLastInput, dunWake, partyWeak, dunPotion, dunHeal, dunAutoStep, renderFight, nextTurn, resolveTurn, hitOne, botBrain,
   startFight, fightZone, fightTarget, fightGo, fightAuto, fightPower, closeFight, autoResolveBattle, startMonsterFight, beginBattle, heroUnit, botUnit, monsterUnit, injure, healInjuries, statVal,
   arenaPost, arenaJoin, arenaLeave, arenaStep, newBotApp, fightProv, chat, chatSend, dunMove, dunAutoStep, dunAutoFinish, dunLeave, dunToggleAuto, endDungeon, genDungeon, validFight, validDun, ZONES,

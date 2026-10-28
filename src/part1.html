@@ -904,6 +904,21 @@ body.rm .amap-walk .amap-hero,body.rm .wmap-road.on{animation:none!important}
   .wmap-patch{width:320px;height:260px}
 }
 
+
+.wmap-fx{position:absolute;transform:translate(-50%,-120%);z-index:8;pointer-events:none;animation:wmapFxPop .35s ease-out}
+.wmap-fx-ico{display:block;font-size:22px;filter:drop-shadow(0 2px 2px #000a);animation:wmapFxFloat 1.2s ease-in-out infinite}
+.wmap-fx-prop{position:absolute;left:22px;top:10px;font-size:18px;animation:wmapFxPop .4s ease-out .1s both}
+.wmap-fx-burst{position:absolute;left:50%;top:50%;width:56px;height:56px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#ffe08a55,#0000 70%);animation:wmapPulse 1s ease-out}
+.wmap-fx-dig .wmap-fx-ico{animation:wmapFxDig .45s ease-in-out infinite}
+.wmap-fx-preach .wmap-fx-ico{animation:wmapFxFloat .7s ease-in-out infinite}
+.wmap-fx-rest .wmap-fx-prop{left:-6px;top:28px}
+.wmap-fx-loot .wmap-fx-prop{animation:wmapFxPop .5s ease-out}
+.wmap-fx-death{filter:grayscale(.4)}
+.amap-fx-act .amap-hero{filter:drop-shadow(0 0 6px #ffe08a66)}
+@keyframes wmapFxPop{from{opacity:0;transform:translate(-50%,-80%) scale(.6)}to{opacity:1;transform:translate(-50%,-120%) scale(1)}}
+@keyframes wmapFxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes wmapFxDig{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+
 /* ---------- v16–17: стильный герой + worn-kit (одето) + бой + путешествие ---------- */
 .vwrap.painted{position:relative;display:inline-flex;align-items:flex-end;justify-content:center;width:72px;height:100px}
 .vwrap.painted.sm,.vwrap.painted .vis.sm{width:36px;height:50px}
